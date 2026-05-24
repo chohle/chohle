@@ -13,11 +13,15 @@ interface IncomeSource {
   payout_day: number
   canton: string
   payout_rule: 'earlier' | 'later' | 'none'
+  pay_date: string
+  reason: string | null
 }
 
-const { data: sources, refresh } = await useFetch<IncomeSource[]>('/api/income/sources', {
-  default: () => []
-})
+const month = ref(new Date().toISOString().slice(0, 7))
+const { data, refresh } = await useFetch<{ month: string, sources: IncomeSource[] }>(
+  '/api/income/overview',
+  { query: { month }, default: () => ({ month: '', sources: [] }) }
+)
 
 const ruleItems = [
   { label: 'Pay earlier', value: 'earlier' },
@@ -97,6 +101,16 @@ function chf(rappen: number) {
     maximumFractionDigits: 2
   })
 }
+
+function formatDate(iso: string) {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('de-CH', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
 </script>
 
 <template>
@@ -106,12 +120,19 @@ function chf(rappen: number) {
         <h1 class="text-2xl font-bold">Income</h1>
         <p class="text-muted mt-1">Salary and jobs with Swiss pay-date calculation.</p>
       </div>
-      <UButton icon="i-lucide-plus" @click="openCreate">Add job</UButton>
+      <div class="flex items-center gap-3">
+        <input
+          v-model="month"
+          type="month"
+          class="h-8 rounded border border-default bg-default px-2"
+        >
+        <UButton icon="i-lucide-plus" @click="openCreate">Add job</UButton>
+      </div>
     </div>
 
-    <p v-if="!sources.length" class="text-muted text-sm mt-6">No jobs yet.</p>
+    <p v-if="!data.sources.length" class="text-muted text-sm mt-6">No jobs yet.</p>
     <div v-else class="grid sm:grid-cols-2 gap-4 mt-6">
-      <UCard v-for="s in sources" :key="s.id">
+      <UCard v-for="s in data.sources" :key="s.id">
         <div class="flex items-start justify-between gap-2">
           <div>
             <div class="font-semibold">{{ s.company }}</div>
@@ -137,6 +158,14 @@ function chf(rappen: number) {
         <div class="text-xl font-semibold mt-2">{{ s.currency }} {{ chf(s.salary_rappen) }}</div>
         <div class="text-sm text-muted mt-1">
           Pays on the {{ s.payout_day }}. · {{ s.canton }} · {{ ruleLabel(s.payout_rule) }}
+        </div>
+        <div class="mt-3 pt-3 border-t border-default">
+          <div class="text-xs text-muted">Pays this month</div>
+          <div class="font-medium">{{ formatDate(s.pay_date) }}</div>
+          <UBadge v-if="s.reason" color="warning" variant="subtle" size="sm" class="mt-1">
+            Moved · {{ s.reason }}
+          </UBadge>
+          <div v-else class="text-xs text-muted mt-0.5">On the scheduled day</div>
         </div>
       </UCard>
     </div>
