@@ -28,9 +28,6 @@ SaaS subscription and without your financial data living on someone else's serve
 It is deliberately single-user and Swiss-first: CHF, MWST (8.1 %), 5-Rappen rounding,
 cantonal public holidays, and the QR-bill are first-class, not afterthoughts.
 
-> Read the [vision](docs/idea/VISION.md) for the why, and the
-> [feature spec](docs/idea/FEATURES.md) for the what.
-
 ## Features
 
 - **Expenses** with receipt uploads (PDF or image), categories, and filters
@@ -72,8 +69,6 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 | Doc | What's inside |
 | --- | --- |
 | [Development](docs/DEVELOPMENT.md) | Local setup, environment, database, project structure |
-| [Vision](docs/idea/VISION.md) | What batze is for and the guiding principles |
-| [Features](docs/idea/FEATURES.md) | Every planned feature, explained |
 | [Contributing](CONTRIBUTING.md) | How to contribute |
 | [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format |
 
