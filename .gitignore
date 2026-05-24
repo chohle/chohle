@@ -9,6 +9,9 @@ dist
 # Node dependencies
 node_modules
 
+# Private app data (SQLite db + uploaded files)
+data/
+
 # Logs
 logs
 *.log
