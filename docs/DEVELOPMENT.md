@@ -67,6 +67,25 @@ docs/             documentation
 data/             SQLite db and uploads (gitignored)
 ```
 
+## Troubleshooting
+
+If the dev server throws an odd module-resolution error (for example
+`ENOTDIR ... server/utils/<file>.ts/package.json`) after many hot-reloads or after
+moving or renaming route files, its module graph has gone stale. Restart the app:
+
+```bash
+docker compose restart app
+```
+
+If it persists, clear the Nuxt build cache and restart for a fully fresh build:
+
+```bash
+docker compose exec app rm -rf .nuxt
+docker compose restart app
+```
+
+This only affects dev. The production build is a clean `yarn build`, not HMR.
+
 ## Production build
 
 ```bash
