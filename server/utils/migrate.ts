@@ -59,6 +59,18 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )
     `
+  },
+  {
+    name: '0005_holidays',
+    up: `
+      CREATE TABLE holidays (
+        canton TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        name TEXT NOT NULL,
+        PRIMARY KEY (canton, year, date)
+      )
+    `
   }
 ]
 
