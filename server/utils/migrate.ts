@@ -214,6 +214,11 @@ const migrations: Migration[] = [
     name: '0014_articles_customer_id',
     // NULL customer_id = a global article (shared library); set = belongs to that customer.
     up: 'ALTER TABLE articles ADD COLUMN customer_id INTEGER REFERENCES customers(id) ON DELETE CASCADE'
+  },
+  {
+    name: '0015_drop_customer_rates',
+    // Superseded by per-customer articles; price overrides are no longer a separate concept.
+    up: 'DROP TABLE IF EXISTS customer_rates'
   }
 ]
 

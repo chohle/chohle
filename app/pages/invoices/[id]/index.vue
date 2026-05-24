@@ -16,13 +16,12 @@ interface ItemRow {
   discount_percent: number
   mwst_percent: number
 }
-interface Rate {
-  article_id: number
+interface Article {
+  id: number
   name: string
   unit: string
   default_price_rappen: number
   default_mwst: number
-  override_rappen: number | null
 }
 
 const route = useRoute()
@@ -33,9 +32,12 @@ const { data } = await useFetch<{ invoice: InvoiceRow, items: ItemRow[] }>(`/api
 const inv = data.value!.invoice
 const customerId = inv.customer_id
 
-const { data: rates } = await useFetch<Rate[]>(`/api/customers/${customerId}/rates`, {
-  default: () => []
-})
+const { data: globalArticles } = await useFetch<Article[]>('/api/articles', { default: () => [] })
+const { data: customerArticles } = await useFetch<Article[]>(
+  `/api/customers/${customerId}/articles`,
+  { default: () => [] }
+)
+const articles = computed(() => [...globalArticles.value, ...customerArticles.value])
 
 const header = reactive({
   number: inv.number,
@@ -67,7 +69,7 @@ const items = ref<EditRow[]>(
 )
 
 const articleItems = computed(() =>
-  rates.value.map((r) => ({ label: r.name, value: r.article_id }))
+  articles.value.map((a) => ({ label: a.name, value: a.id }))
 )
 const statusItems = [
   { label: 'Draft', value: 'draft' },
@@ -76,12 +78,12 @@ const statusItems = [
 ]
 
 function onArticle(row: EditRow) {
-  const r = rates.value.find((x) => x.article_id === row.articleId)
-  if (!r) return
-  row.description = r.name
-  row.unit = r.unit
-  row.unitPrice = (r.override_rappen ?? r.default_price_rappen) / 100
-  row.mwstPercent = r.default_mwst
+  const a = articles.value.find((x) => x.id === row.articleId)
+  if (!a) return
+  row.description = a.name
+  row.unit = a.unit
+  row.unitPrice = a.default_price_rappen / 100
+  row.mwstPercent = a.default_mwst
 }
 
 function addRow() {

@@ -24,27 +24,14 @@ interface Customer {
   logo_path: string | null
 }
 
-interface Rate {
-  article_id: number
-  name: string
-  unit: string
-  default_price_rappen: number
-  override_rappen: number | null
-}
-
 const route = useRoute()
 const id = route.params.id as string
-const toast = useToast()
 
 const { data: customer, refresh: refreshCustomer } = await useFetch<Customer>(
   `/api/customers/${id}`
 )
 const logoSrc = computed(() =>
   customer.value?.logo_path ? `/api/customers/${id}/logo?v=${customer.value.logo_path}` : null
-)
-const { data: rates, refresh: refreshRates } = await useFetch<Rate[]>(
-  `/api/customers/${id}/rates`,
-  { default: () => [] }
 )
 
 interface InvoiceRow {
@@ -66,31 +53,6 @@ async function newInvoice() {
     method: 'POST'
   })
   await navigateTo(`/invoices/${invoiceId}`)
-}
-
-const edits = ref<Record<number, string>>({})
-watchEffect(() => {
-  const m: Record<number, string> = {}
-  for (const r of rates.value) {
-    m[r.article_id] = r.override_rappen != null ? String(r.override_rappen / 100) : ''
-  }
-  edits.value = m
-})
-
-const savingRates = ref(false)
-async function saveRates() {
-  savingRates.value = true
-  try {
-    const payload = rates.value.map((r) => ({
-      articleId: r.article_id,
-      price: edits.value[r.article_id] === '' ? null : Number(edits.value[r.article_id])
-    }))
-    await $fetch(`/api/customers/${id}/rates`, { method: 'PUT', body: { rates: payload } })
-    await refreshRates()
-    toast.add({ title: 'Rates saved', color: 'success' })
-  } finally {
-    savingRates.value = false
-  }
 }
 
 function chf(rappen: number) {
@@ -160,42 +122,12 @@ const details = computed(() => {
 
     <UCard class="mt-6">
       <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="font-semibold">Rates</h2>
-          <UButton size="sm" :loading="savingRates" :disabled="!rates.length" @click="saveRates">
-            Save rates
-          </UButton>
-        </div>
+        <h2 class="font-semibold">Articles</h2>
       </template>
-
-      <p v-if="!rates.length" class="text-muted text-sm">
-        No articles yet. Add articles first to set per-customer rates.
-      </p>
-      <table v-else class="w-full text-sm">
-        <thead class="text-muted text-left">
-          <tr class="border-b border-default">
-            <th class="py-2 font-medium">Article</th>
-            <th class="py-2 font-medium text-right">Default</th>
-            <th class="py-2 font-medium text-right">This customer (CHF)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="r in rates" :key="r.article_id" class="border-b border-default last:border-0">
-            <td class="py-2">{{ r.name }}<span v-if="r.unit" class="text-muted"> / {{ r.unit }}</span></td>
-            <td class="py-2 text-right whitespace-nowrap">CHF {{ chf(r.default_price_rappen) }}</td>
-            <td class="py-2 text-right">
-              <UInput
-                v-model="edits[r.article_id]"
-                type="number"
-                min="0"
-                step="0.05"
-                :placeholder="chf(r.default_price_rappen)"
-                class="w-28"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <ArticleManager
+        :list-url="`/api/customers/${id}/articles`"
+        :create-url="`/api/customers/${id}/articles`"
+      />
     </UCard>
 
     <UCard class="mt-6">
