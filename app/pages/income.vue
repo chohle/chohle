@@ -15,6 +15,7 @@ interface IncomeSource {
   payout_rule: 'earlier' | 'later' | 'none'
   pay_date: string
   reason: string | null
+  paid: boolean
 }
 
 const month = ref(new Date().toISOString().slice(0, 7))
@@ -95,6 +96,14 @@ async function remove(id: number) {
   await refresh()
 }
 
+async function togglePaid(id: number) {
+  await $fetch(`/api/income/sources/${id}/toggle-paid`, {
+    method: 'POST',
+    body: { month: month.value }
+  })
+  await refresh()
+}
+
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
     minimumFractionDigits: 2,
@@ -159,13 +168,25 @@ function formatDate(iso: string) {
         <div class="text-sm text-muted mt-1">
           Pays on the {{ s.payout_day }}. · {{ s.canton }} · {{ ruleLabel(s.payout_rule) }}
         </div>
-        <div class="mt-3 pt-3 border-t border-default">
-          <div class="text-xs text-muted">Pays this month</div>
-          <div class="font-medium">{{ formatDate(s.pay_date) }}</div>
-          <UBadge v-if="s.reason" color="warning" variant="subtle" size="sm" class="mt-1">
-            Moved · {{ s.reason }}
-          </UBadge>
-          <div v-else class="text-xs text-muted mt-0.5">On the scheduled day</div>
+        <div class="mt-3 pt-3 border-t border-default flex items-start justify-between gap-2">
+          <div>
+            <div class="text-xs text-muted">Pays this month</div>
+            <div class="font-medium">{{ formatDate(s.pay_date) }}</div>
+            <UBadge v-if="s.reason" color="warning" variant="subtle" size="sm" class="mt-1">
+              Moved · {{ s.reason }}
+            </UBadge>
+            <div v-else class="text-xs text-muted mt-0.5">On the scheduled day</div>
+          </div>
+          <div class="text-right">
+            <UBadge :color="s.paid ? 'success' : 'neutral'" variant="subtle">
+              {{ s.paid ? 'Received' : 'Pending' }}
+            </UBadge>
+            <div>
+              <UButton size="xs" variant="link" class="px-0" @click="togglePaid(s.id)">
+                {{ s.paid ? 'Mark unpaid' : 'Mark as paid' }}
+              </UButton>
+            </div>
+          </div>
         </div>
       </UCard>
     </div>

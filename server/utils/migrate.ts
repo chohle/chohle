@@ -88,6 +88,20 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )
     `
+  },
+  {
+    name: '0007_income_payments',
+    up: `
+      CREATE TABLE income_payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source_id INTEGER NOT NULL REFERENCES income_sources(id) ON DELETE CASCADE,
+        month TEXT NOT NULL,
+        date TEXT NOT NULL,
+        amount_rappen INTEGER NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE (source_id, month)
+      )
+    `
   }
 ]
 

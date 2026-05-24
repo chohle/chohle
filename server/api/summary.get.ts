@@ -23,8 +23,11 @@ export default defineEventHandler(async (event) => {
       .get(`${month}%`) as { total: number }
   ).total
 
-  // Income sources do not exist yet; this becomes a real query with that feature.
-  const income = 0
+  const income = (
+    db
+      .prepare('SELECT COALESCE(SUM(amount_rappen), 0) AS total FROM income_payments WHERE month = ?')
+      .get(month) as { total: number }
+  ).total
 
   const byCategory = (
     db
@@ -52,7 +55,20 @@ export default defineEventHandler(async (event) => {
     )
     .all(months[0]) as Array<{ ym: string, total: number }>
   const expensesByMonth = Object.fromEntries(grouped.map((r) => [r.ym, r.total]))
-  const trend = months.map((m) => ({ month: m, income: 0, expenses: expensesByMonth[m] ?? 0 }))
+
+  const incomeGrouped = db
+    .prepare(
+      `SELECT month AS ym, SUM(amount_rappen) AS total
+       FROM income_payments WHERE month >= ? GROUP BY month`
+    )
+    .all(months[0]) as Array<{ ym: string, total: number }>
+  const incomeByMonth = Object.fromEntries(incomeGrouped.map((r) => [r.ym, r.total]))
+
+  const trend = months.map((m) => ({
+    month: m,
+    income: incomeByMonth[m] ?? 0,
+    expenses: expensesByMonth[m] ?? 0
+  }))
 
   return {
     month,

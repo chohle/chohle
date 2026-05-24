@@ -17,12 +17,19 @@ export default defineEventHandler(async (event) => {
     typeof q === 'string' && /^\d{4}-\d{2}$/.test(q) ? q : new Date().toISOString().slice(0, 7)
   const [year, mo] = month.split('-').map(Number)
 
-  const sources = useDb()
+  const db = useDb()
+  const sources = db
     .prepare(
       `SELECT id, company, job_title, salary_rappen, currency, payout_day, canton, payout_rule
        FROM income_sources ORDER BY company`
     )
     .all() as SourceRow[]
+
+  const paidIds = new Set(
+    (db.prepare('SELECT source_id FROM income_payments WHERE month = ?').all(month) as {
+      source_id: number
+    }[]).map((r) => r.source_id)
+  )
 
   const holidaysByCanton = new Map<string, Map<string, string>>()
   const result = []
@@ -37,7 +44,7 @@ export default defineEventHandler(async (event) => {
       s.payout_rule,
       holidaysByCanton.get(s.canton)!
     )
-    result.push({ ...s, pay_date: date, reason })
+    result.push({ ...s, pay_date: date, reason, paid: paidIds.has(s.id) })
   }
 
   return { month, sources: result }
