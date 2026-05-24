@@ -17,6 +17,7 @@ interface Expense {
   category_name: string | null
   category_color: string | null
   category_icon: string | null
+  attachments: { id: number, filename: string }[]
 }
 
 const month = ref(new Date().toISOString().slice(0, 7))
@@ -124,6 +125,7 @@ function chf(rappen: number) {
             <th class="py-2 font-medium">Title</th>
             <th class="py-2 font-medium">Category</th>
             <th class="py-2 font-medium">Vendor</th>
+            <th class="py-2 font-medium">Receipts</th>
             <th class="py-2 font-medium text-right">Amount</th>
             <th class="py-2" />
           </tr>
@@ -144,6 +146,13 @@ function chf(rappen: number) {
               <span v-else class="text-muted">-</span>
             </td>
             <td class="py-2">{{ e.vendor || '-' }}</td>
+            <td class="py-2">
+              <ExpenseReceipts
+                :expense-id="e.id"
+                :attachments="e.attachments"
+                @changed="refresh"
+              />
+            </td>
             <td class="py-2 text-right whitespace-nowrap">{{ e.currency }} {{ chf(e.amount_rappen) }}</td>
             <td class="py-2 text-right">
               <UButton

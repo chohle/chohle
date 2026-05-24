@@ -10,13 +10,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const files = db
-    .prepare('SELECT stored_name FROM attachments WHERE expense_id = ?')
-    .all(id) as { stored_name: string }[]
-  for (const f of files) {
-    await rm(join(uploadsDir(), f.stored_name), { force: true })
+  const row = db.prepare('SELECT stored_name FROM attachments WHERE id = ?').get(id) as
+    | { stored_name: string }
+    | undefined
+  if (row) {
+    await rm(join(uploadsDir(), row.stored_name), { force: true })
+    db.prepare('DELETE FROM attachments WHERE id = ?').run(id)
   }
-
-  db.prepare('DELETE FROM expenses WHERE id = ?').run(id)
   return { ok: true }
 })

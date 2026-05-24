@@ -45,6 +45,20 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )
     `
+  },
+  {
+    name: '0004_attachments',
+    up: `
+      CREATE TABLE attachments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        expense_id INTEGER NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
+        filename TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        mime_type TEXT NOT NULL,
+        size INTEGER NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `
   }
 ]
 
