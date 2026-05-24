@@ -124,6 +124,36 @@ const migrations: Migration[] = [
         founding_year INTEGER
       )
     `
+  },
+  {
+    name: '0009_customers',
+    up: `
+      CREATE TABLE customers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL DEFAULT 'company' CHECK (type IN ('person', 'company')),
+        name TEXT NOT NULL,
+        contact_person TEXT,
+        email TEXT,
+        phone TEXT,
+        street TEXT,
+        zip TEXT,
+        city TEXT,
+        country TEXT NOT NULL DEFAULT 'CH',
+        language TEXT NOT NULL DEFAULT 'de',
+        customer_number TEXT,
+        price_category TEXT,
+        discount_percent REAL NOT NULL DEFAULT 0,
+        payment_term_days INTEGER NOT NULL DEFAULT 30,
+        website TEXT,
+        founding_year INTEGER,
+        social TEXT,
+        uid TEXT,
+        mwst TEXT,
+        hr_number TEXT,
+        logo_path TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `
   }
 ]
 
