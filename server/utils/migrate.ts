@@ -209,6 +209,11 @@ const migrations: Migration[] = [
   {
     name: '0013_sender_logo',
     up: 'ALTER TABLE sender ADD COLUMN logo_path TEXT'
+  },
+  {
+    name: '0014_articles_customer_id',
+    // NULL customer_id = a global article (shared library); set = belongs to that customer.
+    up: 'ALTER TABLE articles ADD COLUMN customer_id INTEGER REFERENCES customers(id) ON DELETE CASCADE'
   }
 ]
 
