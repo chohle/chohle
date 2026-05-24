@@ -178,6 +178,33 @@ const migrations: Migration[] = [
         PRIMARY KEY (customer_id, article_id)
       )
     `
+  },
+  {
+    name: '0012_invoices',
+    up: `
+      CREATE TABLE invoices (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+        number TEXT NOT NULL,
+        title TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'paid')),
+        issue_date TEXT NOT NULL,
+        due_date TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE invoice_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        invoice_id INTEGER NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+        article_id INTEGER REFERENCES articles(id) ON DELETE SET NULL,
+        description TEXT NOT NULL DEFAULT '',
+        quantity REAL NOT NULL DEFAULT 1,
+        unit TEXT NOT NULL DEFAULT '',
+        unit_price_rappen INTEGER NOT NULL DEFAULT 0,
+        discount_percent REAL NOT NULL DEFAULT 0,
+        mwst_percent REAL NOT NULL DEFAULT 8.1,
+        position INTEGER NOT NULL DEFAULT 0
+      );
+    `
   }
 ]
 

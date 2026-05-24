@@ -1,0 +1,36 @@
+interface ItemRow {
+  quantity: number
+  unit_price_rappen: number
+  discount_percent: number
+  mwst_percent: number
+}
+
+export default defineEventHandler(async (event) => {
+  await requireUserSession(event)
+
+  const id = Number(getRouterParam(event, 'id'))
+  if (!Number.isInteger(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
+  }
+
+  const db = useDb()
+  const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id)
+  if (!invoice) {
+    throw createError({ statusCode: 404, statusMessage: 'Not found' })
+  }
+
+  const items = db
+    .prepare('SELECT * FROM invoice_items WHERE invoice_id = ? ORDER BY position, id')
+    .all(id) as ItemRow[]
+
+  const totals = computeInvoiceTotals(
+    items.map((i) => ({
+      quantity: i.quantity,
+      unitPriceRappen: i.unit_price_rappen,
+      discountPercent: i.discount_percent,
+      mwstPercent: i.mwst_percent
+    }))
+  )
+
+  return { invoice, items, totals }
+})
