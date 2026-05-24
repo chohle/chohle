@@ -4250,6 +4250,7 @@ __metadata:
     nodemailer: "npm:^8.0.8"
     nuxt: "npm:^4.4.6"
     nuxt-auth-utils: "npm:^0.5.29"
+    swissqrbill: "npm:^4.3.0"
     vitest: "npm:^4.1.7"
     vue: "npm:^3.5.34"
     vue-router: "npm:^5.0.7"
@@ -9080,6 +9081,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"svg-engine@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "svg-engine@npm:0.3.0"
+  checksum: 10c0/e735c769f07a13c3ed34d72e6ee4557c4fc18f5231e0f83d28abce6ee1e53c341b1f94940a1a8dc11257e7fd3fbb98922d6d4e6a7fa213fde2d0e530df7e5b11
+  languageName: node
+  linkType: hard
+
 "svgo@npm:^4.0.1":
   version: 4.0.1
   resolution: "svgo@npm:4.0.1"
@@ -9094,6 +9102,23 @@ __metadata:
   bin:
     svgo: ./bin/svgo.js
   checksum: 10c0/f61f9957b42e0c97593b49a01f3b93cb239b2e818efccb056fcc866d622704d9021c4ef8bd0287264c3e4f33da60e4af14d841b4a624b87ff8888e3b896d13d5
+  languageName: node
+  linkType: hard
+
+"swissqrbill@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "swissqrbill@npm:4.3.0"
+  dependencies:
+    svg-engine: "npm:^0.3.0"
+  peerDependencies:
+    pdfkit: ">=0.13.0"
+    typescript: ">=4.7.0"
+  peerDependenciesMeta:
+    pdfkit:
+      optional: true
+    typescript:
+      optional: true
+  checksum: 10c0/0af6bb866a49c94229f61a38aa6e78a09cb99b6b4f11159db57a5e0fdcb1ed58e8d73c9ae1b6460085099756b8df8bfec71fd704d89e4ebf351dd82a75a48bbb
   languageName: node
   linkType: hard
 

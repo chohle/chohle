@@ -44,6 +44,12 @@ const totals = data.value!.totals
 
 const { data: customer } = await useFetch<Party>(`/api/customers/${invoice.customer_id}`)
 const { data: sender } = await useFetch<Party>('/api/sender')
+const { data: qrbill } = await useFetch<string>(`/api/invoices/${id}/qrbill`, {
+  // Read as text (it's SVG markup we inline); 422 (e.g. no IBAN) just shows a hint.
+  responseType: 'text',
+  ignoreResponseError: true
+})
+const hasQrbill = computed(() => typeof qrbill.value === 'string' && qrbill.value.includes('<svg'))
 
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
@@ -138,6 +144,14 @@ function printPage() {
           </div>
         </dl>
       </div>
+    </div>
+
+    <div class="mx-auto max-w-[210mm] mt-8">
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <div v-if="hasQrbill" class="w-full" v-html="qrbill" />
+      <p v-else class="px-12 pb-8 text-xs text-gray-500">
+        Add a valid IBAN and sender address in Billing to show the Swiss QR-bill.
+      </p>
     </div>
   </div>
 </template>

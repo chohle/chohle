@@ -17,6 +17,7 @@
     "nodemailer": "^8.0.8",
     "nuxt": "^4.4.6",
     "nuxt-auth-utils": "^0.5.29",
+    "swissqrbill": "^4.3.0",
     "vue": "^3.5.34",
     "vue-router": "^5.0.7"
   },
