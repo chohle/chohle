@@ -128,6 +128,11 @@ async function removeInvoice() {
   await navigateTo(`/customers/${customerId}`)
 }
 
+async function previewPdf() {
+  await save()
+  await navigateTo(`/invoices/${id}/print`)
+}
+
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
     minimumFractionDigits: 2,
@@ -148,6 +153,7 @@ function chf(rappen: number) {
         <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="removeInvoice">
           Delete
         </UButton>
+        <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">PDF Vorschau</UButton>
         <UButton :loading="saving" @click="save">Save</UButton>
       </div>
     </div>
