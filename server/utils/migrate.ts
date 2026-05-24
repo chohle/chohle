@@ -16,6 +16,19 @@ const migrations: Migration[] = [
         password_hash TEXT NOT NULL
       )
     `
+  },
+  {
+    name: '0002_categories',
+    up: `
+      CREATE TABLE categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL CHECK (type IN ('expense', 'income')),
+        color TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `
   }
 ]
 
