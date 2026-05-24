@@ -154,6 +154,19 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )
     `
+  },
+  {
+    name: '0010_articles',
+    up: `
+      CREATE TABLE articles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        unit TEXT NOT NULL DEFAULT '',
+        default_price_rappen INTEGER NOT NULL DEFAULT 0,
+        default_mwst REAL NOT NULL DEFAULT 8.1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `
   }
 ]
 
