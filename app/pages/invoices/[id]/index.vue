@@ -142,7 +142,7 @@ function chf(rappen: number) {
 </script>
 
 <template>
-  <div class="max-w-4xl">
+  <div class="max-w-5xl">
     <NuxtLink :to="`/customers/${customerId}`" class="text-sm text-muted hover:underline">
       &larr; Customer
     </NuxtLink>
@@ -193,7 +193,7 @@ function chf(rappen: number) {
           :key="i"
           class="grid grid-cols-12 gap-2 items-end border-b border-default pb-3 last:border-0"
         >
-          <UFormField label="Article" class="col-span-3">
+          <UFormField label="Article" class="col-span-2">
             <USelect
               v-model="row.articleId"
               :items="articleItems"
@@ -219,7 +219,7 @@ function chf(rappen: number) {
           <UFormField label="MWST%" class="col-span-1">
             <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
           </UFormField>
-          <div class="col-span-1 flex items-center justify-end gap-1 pb-1">
+          <div class="col-span-2 flex items-center justify-end gap-1 pb-1">
             <span class="text-sm whitespace-nowrap">{{ chf(lineAmount(row)) }}</span>
             <UButton
               icon="i-lucide-x"

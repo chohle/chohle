@@ -30,6 +30,7 @@ interface Party {
   city: string | null
   country: string
   mwst?: string | null
+  logo_path?: string | null
 }
 
 const route = useRoute()
@@ -50,6 +51,9 @@ const { data: qrbill } = await useFetch<string>(`/api/invoices/${id}/qrbill`, {
   ignoreResponseError: true
 })
 const hasQrbill = computed(() => typeof qrbill.value === 'string' && qrbill.value.includes('<svg'))
+const senderLogo = computed(() =>
+  sender.value?.logo_path ? `/api/sender/logo?v=${sender.value.logo_path}` : null
+)
 
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
@@ -84,6 +88,7 @@ function printPage() {
     <div class="mx-auto max-w-[210mm] p-12 text-sm">
       <div class="flex justify-between gap-8">
         <div v-if="sender">
+          <img v-if="senderLogo" :src="senderLogo" alt="Logo" class="h-12 mb-2 object-contain">
           <div class="font-bold text-base">{{ sender.name || 'Your name' }}</div>
           <div>{{ sender.street }}</div>
           <div>{{ [sender.zip, sender.city].filter(Boolean).join(' ') }}</div>
@@ -107,7 +112,7 @@ function printPage() {
         </div>
       </div>
 
-      <table class="w-full mt-8 border-collapse">
+      <table class="w-full mt-8 border-collapse [&_th]:px-3 [&_td]:px-3 [&_th:first-child]:pl-0 [&_td:first-child]:pl-0 [&_th:last-child]:pr-0 [&_td:last-child]:pr-0">
         <thead>
           <tr class="border-b-2 border-black text-left">
             <th class="py-1 font-semibold">Bezeichnung</th>
