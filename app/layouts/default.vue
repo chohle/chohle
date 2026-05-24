@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
-// Targets are wired up as each feature lands (see docs/idea/FEATURES.md).
+const { clear } = useUserSession()
+
+async function onSignOut() {
+  await clear()
+  await navigateTo('/login')
+}
+
 const items: NavigationMenuItem[] = [
   { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/' },
   { label: 'Expenses', icon: 'i-lucide-receipt', to: '/expenses' },
@@ -21,6 +27,15 @@ const items: NavigationMenuItem[] = [
         <span class="text-lg font-semibold">batze</span>
       </div>
       <UNavigationMenu orientation="vertical" :items="items" class="flex-1" />
+      <UButton
+        icon="i-lucide-log-out"
+        color="neutral"
+        variant="ghost"
+        block
+        @click="onSignOut"
+      >
+        Sign out
+      </UButton>
     </aside>
     <main class="flex-1 p-6 overflow-auto">
       <slot />

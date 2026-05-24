@@ -6,8 +6,18 @@ interface Migration {
 }
 
 // Ordered, append-only. Each entry runs once; never edit an applied migration.
-// Feature tables are added here as their features land.
-const migrations: Migration[] = []
+const migrations: Migration[] = [
+  {
+    name: '0001_owner',
+    up: `
+      CREATE TABLE owner (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        username TEXT NOT NULL,
+        password_hash TEXT NOT NULL
+      )
+    `
+  }
+]
 
 // Applies any not-yet-run migrations inside a transaction each. Idempotent:
 // safe to call on every boot.

@@ -2,10 +2,11 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui'],
+  modules: ['@nuxt/ui', 'nuxt-auth-utils'],
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
-    // Overridden at runtime by NUXT_SMTP_HOST / NUXT_SMTP_PORT.
+    adminUsername: '',
+    adminPassword: '',
     smtp: {
       host: '',
       port: '1025'
