@@ -41,6 +41,27 @@ const { data: rates, refresh: refreshRates } = await useFetch<Rate[]>(
   { default: () => [] }
 )
 
+interface InvoiceRow {
+  id: number
+  number: string
+  title: string
+  status: 'draft' | 'sent' | 'paid'
+  issue_date: string
+  total_rappen: number
+}
+const { data: invoices } = await useFetch<InvoiceRow[]>(`/api/customers/${id}/invoices`, {
+  default: () => []
+})
+
+const statusColor: Record<string, string> = { draft: 'neutral', sent: 'warning', paid: 'success' }
+
+async function newInvoice() {
+  const { id: invoiceId } = await $fetch<{ id: number }>(`/api/customers/${id}/invoices`, {
+    method: 'POST'
+  })
+  await navigateTo(`/invoices/${invoiceId}`)
+}
+
 const edits = ref<Record<number, string>>({})
 watchEffect(() => {
   const m: Record<number, string> = {}
@@ -166,9 +187,25 @@ const details = computed(() => {
 
     <UCard class="mt-6">
       <template #header>
-        <h2 class="font-semibold">Invoices</h2>
+        <div class="flex items-center justify-between">
+          <h2 class="font-semibold">Invoices</h2>
+          <UButton size="sm" icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
+        </div>
       </template>
-      <p class="text-muted text-sm">Invoices for this customer will appear here.</p>
+
+      <p v-if="!invoices.length" class="text-muted text-sm">No invoices yet.</p>
+      <ul v-else class="divide-y divide-default">
+        <li v-for="inv in invoices" :key="inv.id" class="flex items-center gap-3 py-2">
+          <NuxtLink :to="`/invoices/${inv.id}`" class="flex-1 hover:underline">
+            <span class="font-medium">{{ inv.number }}</span>
+            <span class="text-muted"> · {{ inv.title }}</span>
+          </NuxtLink>
+          <UBadge :color="statusColor[inv.status]" variant="subtle" size="sm">
+            {{ inv.status }}
+          </UBadge>
+          <span class="text-sm whitespace-nowrap">CHF {{ chf(inv.total_rappen) }}</span>
+        </li>
+      </ul>
     </UCard>
   </div>
 </template>

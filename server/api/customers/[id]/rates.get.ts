@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
   return db
     .prepare(
-      `SELECT a.id AS article_id, a.name, a.unit, a.default_price_rappen,
+      `SELECT a.id AS article_id, a.name, a.unit, a.default_price_rappen, a.default_mwst,
               r.price_rappen AS override_rappen
        FROM articles a
        LEFT JOIN customer_rates r ON r.article_id = a.id AND r.customer_id = ?
