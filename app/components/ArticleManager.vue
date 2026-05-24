@@ -100,7 +100,11 @@ function chf(rappen: number) {
       </tbody>
     </table>
 
-    <UModal v-model:open="open" :title="form.id ? 'Edit article' : 'Add article'">
+    <USlideover
+      v-model:open="open"
+      :title="form.id ? 'Edit article' : 'Add article'"
+      :ui="{ content: 'max-w-md' }"
+    >
       <template #body>
         <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
           <UFormField label="Name" class="col-span-2">
@@ -123,6 +127,6 @@ function chf(rappen: number) {
           <UButton :loading="saving" @click="save">Save</UButton>
         </div>
       </template>
-    </UModal>
+    </USlideover>
   </div>
 </template>

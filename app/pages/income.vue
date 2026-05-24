@@ -191,7 +191,11 @@ function formatDate(iso: string) {
       </UCard>
     </div>
 
-    <UModal v-model:open="open" :title="form.id ? 'Edit job' : 'Add job'">
+    <USlideover
+      v-model:open="open"
+      :title="form.id ? 'Edit job' : 'Add job'"
+      :ui="{ content: 'max-w-xl' }"
+    >
       <template #body>
         <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
           <UFormField label="Company" class="col-span-2">
@@ -220,6 +224,6 @@ function formatDate(iso: string) {
           <UButton :loading="saving" @click="save">Save</UButton>
         </div>
       </template>
-    </UModal>
+    </USlideover>
   </div>
 </template>

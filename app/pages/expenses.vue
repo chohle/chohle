@@ -201,7 +201,11 @@ function chf(rappen: number) {
       </table>
     </UCard>
 
-    <UModal v-model:open="open" :title="form.id ? 'Edit expense' : 'Add expense'">
+    <USlideover
+      v-model:open="open"
+      :title="form.id ? 'Edit expense' : 'Add expense'"
+      :ui="{ content: 'max-w-xl' }"
+    >
       <template #body>
         <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
           <UFormField label="Title" class="col-span-2">
@@ -230,6 +234,6 @@ function chf(rappen: number) {
           <UButton :loading="saving" @click="save">Save</UButton>
         </div>
       </template>
-    </UModal>
+    </USlideover>
   </div>
 </template>
