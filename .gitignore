@@ -1,26 +1,24 @@
-# dependencies
-node_modules
-
-# nuxt build output
-.nuxt
+# Nuxt dev/build outputs
 .output
+.data
+.nuxt
 .nitro
+.cache
 dist
 
-# local data: database and uploads (the backup folder, never committed)
-data
+# Node dependencies
+node_modules
 
-# env and secrets
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
 .env
 .env.*
 !.env.example
-
-# test artifacts
-coverage
-playwright-report
-test-results
-
-# editor / os
-.idea
-.DS_Store
-*.log
