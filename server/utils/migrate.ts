@@ -71,6 +71,23 @@ const migrations: Migration[] = [
         PRIMARY KEY (canton, year, date)
       )
     `
+  },
+  {
+    name: '0006_income_sources',
+    up: `
+      CREATE TABLE income_sources (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company TEXT NOT NULL,
+        job_title TEXT,
+        salary_rappen INTEGER NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'CHF',
+        payout_day INTEGER NOT NULL,
+        canton TEXT NOT NULL,
+        payout_rule TEXT NOT NULL DEFAULT 'earlier'
+          CHECK (payout_rule IN ('earlier', 'later', 'none')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `
   }
 ]
 
