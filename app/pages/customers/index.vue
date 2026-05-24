@@ -136,7 +136,7 @@ async function remove(id: number) {
             <td class="py-2">
               <div class="flex items-center gap-2">
                 <UAvatar :alt="c.name" size="2xs" />
-                <span>{{ c.name }}</span>
+                <NuxtLink :to="`/customers/${c.id}`" class="hover:underline">{{ c.name }}</NuxtLink>
               </div>
             </td>
             <td class="py-2">{{ c.customer_number || '-' }}</td>

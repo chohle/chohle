@@ -167,6 +167,17 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )
     `
+  },
+  {
+    name: '0011_customer_rates',
+    up: `
+      CREATE TABLE customer_rates (
+        customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+        article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+        price_rappen INTEGER NOT NULL,
+        PRIMARY KEY (customer_id, article_id)
+      )
+    `
   }
 ]
 
