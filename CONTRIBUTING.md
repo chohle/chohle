@@ -25,14 +25,8 @@ understanding of the project are unlikely to be accepted.
 
 ## Development setup
 
-batze runs in Docker.
-
-```bash
-cp .env.example .env   # then edit the secrets
-docker compose up
-```
-
-The app is served on http://localhost:3000 and Mailpit on http://localhost:8125.
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for local setup, environment variables,
+the database, and project structure.
 
 ## Commit messages
 
