@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.output
+.nitro
+.cache
+.git
+data
+*.log
+.DS_Store
+.yarn/cache
+.yarn/install-state.gz
