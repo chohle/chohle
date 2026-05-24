@@ -70,12 +70,58 @@ export default defineEventHandler(async (event) => {
     expenses: expensesByMonth[m] ?? 0
   }))
 
+  const sources = db
+    .prepare(
+      'SELECT id, company, salary_rappen, payout_day, canton, payout_rule FROM income_sources ORDER BY company'
+    )
+    .all() as Array<{
+    id: number
+    company: string
+    salary_rappen: number
+    payout_day: number
+    canton: string
+    payout_rule: 'earlier' | 'later' | 'none'
+  }>
+  const paidIds = new Set(
+    (db.prepare('SELECT source_id FROM income_payments WHERE month = ?').all(month) as {
+      source_id: number
+    }[]).map((r) => r.source_id)
+  )
+
+  const [year, mo] = month.split('-').map(Number)
+  const holidaysByCanton = new Map<string, Map<string, string>>()
+  const recurring = []
+  let expected = 0
+  for (const s of sources) {
+    expected += s.salary_rappen
+    if (!holidaysByCanton.has(s.canton)) {
+      holidaysByCanton.set(s.canton, await getHolidays(s.canton, year))
+    }
+    const { date, reason } = computePayout(
+      year,
+      mo,
+      s.payout_day,
+      s.payout_rule,
+      holidaysByCanton.get(s.canton)!
+    )
+    recurring.push({
+      company: s.company,
+      salary_rappen: s.salary_rappen,
+      paid: paidIds.has(s.id),
+      pay_date: date,
+      reason
+    })
+  }
+
   return {
     month,
     income,
     expenses,
     net: income - expenses,
+    expected,
+    outstanding: expected - income,
     byCategory,
-    trend
+    trend,
+    recurring
   }
 })

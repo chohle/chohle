@@ -4,8 +4,11 @@ interface Summary {
   income: number
   expenses: number
   net: number
+  expected: number
+  outstanding: number
   byCategory: { name: string, color: string, icon: string, total: number }[]
   trend: { month: string, income: number, expenses: number }[]
+  recurring: { company: string, salary_rappen: number, paid: boolean, pay_date: string, reason: string | null }[]
 }
 
 const month = ref(new Date().toISOString().slice(0, 7))
@@ -29,6 +32,11 @@ const trendMax = computed(() =>
 function monthLabel(ym: string) {
   return new Date(`${ym}-01`).toLocaleDateString('de-CH', { month: 'short' })
 }
+
+function formatDate(iso: string) {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('de-CH', { day: '2-digit', month: 'short' })
+}
 </script>
 
 <template>
@@ -45,7 +53,7 @@ function monthLabel(ym: string) {
       >
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
       <UCard>
         <div class="text-sm text-muted">Income</div>
         <div class="text-2xl font-semibold text-success mt-1">CHF {{ chf(data.income) }}</div>
@@ -61,6 +69,13 @@ function monthLabel(ym: string) {
           :class="data.net >= 0 ? 'text-success' : 'text-error'"
         >
           CHF {{ chf(data.net) }}
+        </div>
+      </UCard>
+      <UCard>
+        <div class="text-sm text-muted">Expected</div>
+        <div class="text-2xl font-semibold mt-1">CHF {{ chf(data.expected) }}</div>
+        <div v-if="data.outstanding > 0" class="text-xs text-muted mt-0.5">
+          CHF {{ chf(data.outstanding) }} outstanding
         </div>
       </UCard>
     </div>
@@ -120,5 +135,24 @@ function monthLabel(ym: string) {
         </div>
       </UCard>
     </div>
+
+    <UCard class="mt-6">
+      <template #header>
+        <h2 class="font-semibold">Recurring income this month</h2>
+      </template>
+      <p v-if="!data.recurring.length" class="text-muted text-sm">No income sources yet.</p>
+      <ul v-else class="divide-y divide-default">
+        <li v-for="r in data.recurring" :key="r.company" class="flex items-center gap-3 py-2">
+          <div class="flex-1">
+            <div class="font-medium">{{ r.company }}</div>
+            <div class="text-xs text-muted">Pays {{ formatDate(r.pay_date) }}</div>
+          </div>
+          <span class="text-sm whitespace-nowrap">CHF {{ chf(r.salary_rappen) }}</span>
+          <UBadge :color="r.paid ? 'success' : 'neutral'" variant="subtle" size="sm">
+            {{ r.paid ? 'Received' : 'Pending' }}
+          </UBadge>
+        </li>
+      </ul>
+    </UCard>
   </div>
 </template>
