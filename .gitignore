@@ -9,6 +9,11 @@ dist
 # Node dependencies
 node_modules
 
+# Yarn (node-modules linker): keep the release binary, ignore the rest
+.yarn/*
+!.yarn/releases
+.yarn/install-state.gz
+
 # Logs
 logs
 *.log
