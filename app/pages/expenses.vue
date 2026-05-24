@@ -3,6 +3,8 @@ interface Category {
   id: number
   name: string
   type: 'expense' | 'income'
+  color: string
+  icon: string
 }
 
 interface Expense {
@@ -30,30 +32,70 @@ const { data: categories } = await useFetch<Category[]>('/api/categories', {
   default: () => []
 })
 
+const expenseCategories = computed(() => categories.value.filter((c) => c.type === 'expense'))
 const categoryItems = computed(() => [
   { label: 'No category', value: null },
-  ...categories.value
-    .filter((c) => c.type === 'expense')
-    .map((c) => ({ label: c.name, value: c.id }))
+  ...expenseCategories.value.map((c) => ({ label: c.name, value: c.id }))
 ])
 
+const activeCategories = ref<Set<number>>(new Set())
+function toggleCategory(id: number) {
+  const next = new Set(activeCategories.value)
+  next.has(id) ? next.delete(id) : next.add(id)
+  activeCategories.value = next
+}
+
+const filtered = computed(() =>
+  activeCategories.value.size === 0
+    ? expenses.value
+    : expenses.value.filter((e) => e.category_id != null && activeCategories.value.has(e.category_id))
+)
+const total = computed(() => filtered.value.reduce((sum, e) => sum + e.amount_rappen, 0))
+
 const today = new Date().toISOString().slice(0, 10)
-const form = reactive({
-  title: '',
-  amount: undefined as number | undefined,
-  date: today,
-  categoryId: null as number | null,
-  vendor: '',
-  notes: ''
-})
+function blank() {
+  return {
+    id: null as number | null,
+    title: '',
+    amount: undefined as number | undefined,
+    date: today,
+    categoryId: null as number | null,
+    vendor: '',
+    notes: ''
+  }
+}
+const form = reactive(blank())
+const open = ref(false)
 const saving = ref(false)
 
-async function addExpense() {
+function openCreate() {
+  Object.assign(form, blank())
+  open.value = true
+}
+function openEdit(e: Expense) {
+  Object.assign(form, {
+    id: e.id,
+    title: e.title,
+    amount: e.amount_rappen / 100,
+    date: e.date,
+    categoryId: e.category_id,
+    vendor: e.vendor ?? '',
+    notes: e.notes ?? ''
+  })
+  open.value = true
+}
+
+async function save() {
   if (!form.title.trim() || !form.amount) return
   saving.value = true
   try {
-    await $fetch('/api/expenses', { method: 'POST', body: { ...form } })
-    Object.assign(form, { title: '', amount: undefined, vendor: '', notes: '' })
+    const { id, ...body } = form
+    if (id) {
+      await $fetch(`/api/expenses/${id}`, { method: 'PUT', body })
+    } else {
+      await $fetch('/api/expenses', { method: 'POST', body })
+    }
+    open.value = false
     await refresh()
   } finally {
     saving.value = false
@@ -64,8 +106,6 @@ async function removeExpense(id: number) {
   await $fetch(`/api/expenses/${id}`, { method: 'DELETE' })
   await refresh()
 }
-
-const total = computed(() => expenses.value.reduce((sum, e) => sum + e.amount_rappen, 0))
 
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
@@ -92,32 +132,26 @@ function chf(rappen: number) {
           <div class="text-xs text-muted">Total</div>
           <div class="font-semibold">CHF {{ chf(total) }}</div>
         </div>
+        <UButton icon="i-lucide-plus" @click="openCreate">Add</UButton>
       </div>
     </div>
 
-    <UCard class="mt-6">
-      <form class="flex flex-wrap items-end gap-3" @submit.prevent="addExpense">
-        <UFormField label="Title" class="flex-1 min-w-40">
-          <UInput v-model="form.title" placeholder="e.g. Office chair" class="w-full" />
-        </UFormField>
-        <UFormField label="Amount (CHF)">
-          <UInput v-model.number="form.amount" type="number" min="0" step="0.05" class="w-28" />
-        </UFormField>
-        <UFormField label="Date">
-          <UInput v-model="form.date" type="date" class="w-40" />
-        </UFormField>
-        <UFormField label="Category">
-          <USelect v-model="form.categoryId" :items="categoryItems" class="w-40" />
-        </UFormField>
-        <UFormField label="Vendor">
-          <UInput v-model="form.vendor" class="w-36" />
-        </UFormField>
-        <UButton type="submit" icon="i-lucide-plus" :loading="saving">Add</UButton>
-      </form>
-    </UCard>
+    <div v-if="expenseCategories.length" class="flex flex-wrap gap-2 mt-4">
+      <UButton
+        v-for="c in expenseCategories"
+        :key="c.id"
+        size="xs"
+        color="neutral"
+        :variant="activeCategories.has(c.id) ? 'solid' : 'outline'"
+        @click="toggleCategory(c.id)"
+      >
+        <UIcon :name="c.icon" :style="{ color: c.color }" class="size-3" />
+        {{ c.name }}
+      </UButton>
+    </div>
 
     <UCard class="mt-6">
-      <p v-if="!expenses.length" class="text-muted text-sm">No expenses this month.</p>
+      <p v-if="!filtered.length" class="text-muted text-sm">No expenses to show.</p>
       <table v-else class="w-full text-sm">
         <thead class="text-muted text-left">
           <tr class="border-b border-default">
@@ -131,30 +165,29 @@ function chf(rappen: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in expenses" :key="e.id" class="border-b border-default last:border-0">
+          <tr v-for="e in filtered" :key="e.id" class="border-b border-default last:border-0">
             <td class="py-2 whitespace-nowrap">{{ e.date }}</td>
             <td class="py-2">{{ e.title }}</td>
             <td class="py-2">
               <span v-if="e.category_name" class="inline-flex items-center gap-1.5">
-                <UIcon
-                  :name="e.category_icon!"
-                  :style="{ color: e.category_color! }"
-                  class="size-4"
-                />
+                <UIcon :name="e.category_icon!" :style="{ color: e.category_color! }" class="size-4" />
                 {{ e.category_name }}
               </span>
               <span v-else class="text-muted">-</span>
             </td>
             <td class="py-2">{{ e.vendor || '-' }}</td>
             <td class="py-2">
-              <ExpenseReceipts
-                :expense-id="e.id"
-                :attachments="e.attachments"
-                @changed="refresh"
-              />
+              <ExpenseReceipts :expense-id="e.id" :attachments="e.attachments" @changed="refresh" />
             </td>
             <td class="py-2 text-right whitespace-nowrap">{{ e.currency }} {{ chf(e.amount_rappen) }}</td>
-            <td class="py-2 text-right">
+            <td class="py-2 text-right whitespace-nowrap">
+              <UButton
+                icon="i-lucide-pencil"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                @click="openEdit(e)"
+              />
               <UButton
                 icon="i-lucide-trash-2"
                 color="error"
@@ -167,5 +200,36 @@ function chf(rappen: number) {
         </tbody>
       </table>
     </UCard>
+
+    <UModal v-model:open="open" :title="form.id ? 'Edit expense' : 'Add expense'">
+      <template #body>
+        <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
+          <UFormField label="Title" class="col-span-2">
+            <UInput v-model="form.title" placeholder="e.g. Office chair" class="w-full" />
+          </UFormField>
+          <UFormField label="Amount (CHF)">
+            <UInput v-model.number="form.amount" type="number" min="0" step="0.05" class="w-full" />
+          </UFormField>
+          <UFormField label="Date">
+            <UInput v-model="form.date" type="date" class="w-full" />
+          </UFormField>
+          <UFormField label="Category">
+            <USelect v-model="form.categoryId" :items="categoryItems" class="w-full" />
+          </UFormField>
+          <UFormField label="Vendor">
+            <UInput v-model="form.vendor" class="w-full" />
+          </UFormField>
+          <UFormField label="Notes" class="col-span-2">
+            <UTextarea v-model="form.notes" class="w-full" />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton color="neutral" variant="ghost" @click="open = false">Cancel</UButton>
+          <UButton :loading="saving" @click="save">Save</UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
