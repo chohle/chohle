@@ -21,6 +21,7 @@ interface Customer {
   uid: string | null
   mwst: string | null
   hr_number: string | null
+  logo_path: string | null
 }
 
 interface Rate {
@@ -35,7 +36,12 @@ const route = useRoute()
 const id = route.params.id as string
 const toast = useToast()
 
-const { data: customer } = await useFetch<Customer>(`/api/customers/${id}`)
+const { data: customer, refresh: refreshCustomer } = await useFetch<Customer>(
+  `/api/customers/${id}`
+)
+const logoSrc = computed(() =>
+  customer.value?.logo_path ? `/api/customers/${id}/logo?v=${customer.value.logo_path}` : null
+)
 const { data: rates, refresh: refreshRates } = await useFetch<Rate[]>(
   `/api/customers/${id}/rates`,
   { default: () => [] }
@@ -127,7 +133,7 @@ const details = computed(() => {
     <NuxtLink to="/customers" class="text-sm text-muted hover:underline">&larr; Customers</NuxtLink>
 
     <div class="flex items-center gap-3 mt-2">
-      <UAvatar :alt="customer.name" />
+      <UAvatar :alt="customer.name" :src="logoSrc ?? undefined" size="lg" />
       <div>
         <h1 class="text-2xl font-bold">{{ customer.name }}</h1>
         <UBadge :color="customer.type === 'company' ? 'primary' : 'neutral'" variant="subtle">
@@ -137,6 +143,13 @@ const details = computed(() => {
     </div>
 
     <UCard class="mt-6">
+      <LogoUpload
+        :src="logoSrc"
+        :upload-url="`/api/customers/${id}/logo`"
+        :remove-url="`/api/customers/${id}/logo`"
+        class="mb-6 pb-6 border-b border-default"
+        @changed="refreshCustomer"
+      />
       <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
         <div v-for="[label, value] in details" :key="label" class="flex flex-col">
           <dt class="text-muted text-xs">{{ label }}</dt>

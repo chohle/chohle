@@ -14,11 +14,16 @@ interface Sender {
   mwst: string
   hr_number: string
   founding_year: number | null
+  logo_path: string | null
 }
 
-const { data } = await useFetch<Sender>('/api/sender')
+const { data, refresh } = await useFetch<Sender>('/api/sender')
 const toast = useToast()
 const d = data.value!
+
+const logoSrc = computed(() =>
+  data.value?.logo_path ? `/api/sender/logo?v=${data.value.logo_path}` : null
+)
 
 const form = reactive({
   type: d.type,
@@ -61,6 +66,12 @@ async function save() {
 
     <UCard class="mt-6">
       <form class="space-y-6" @submit.prevent="save">
+        <LogoUpload
+          :src="logoSrc"
+          upload-url="/api/sender/logo"
+          remove-url="/api/sender/logo"
+          @changed="refresh"
+        />
         <UFormField label="You invoice as">
           <USelect v-model="form.type" :items="typeItems" class="w-48" />
         </UFormField>

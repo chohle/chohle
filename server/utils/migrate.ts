@@ -205,6 +205,10 @@ const migrations: Migration[] = [
         position INTEGER NOT NULL DEFAULT 0
       );
     `
+  },
+  {
+    name: '0013_sender_logo',
+    up: 'ALTER TABLE sender ADD COLUMN logo_path TEXT'
   }
 ]
 
