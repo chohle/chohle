@@ -2,6 +2,8 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  modules: ['@nuxt/ui'],
+  css: ['~/assets/css/main.css'],
   runtimeConfig: {
     // Overridden at runtime by NUXT_SMTP_HOST / NUXT_SMTP_PORT.
     smtp: {
