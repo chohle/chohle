@@ -102,6 +102,28 @@ const migrations: Migration[] = [
         UNIQUE (source_id, month)
       )
     `
+  },
+  {
+    name: '0008_sender',
+    up: `
+      CREATE TABLE sender (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        type TEXT NOT NULL DEFAULT 'person' CHECK (type IN ('person', 'company')),
+        name TEXT NOT NULL DEFAULT '',
+        street TEXT NOT NULL DEFAULT '',
+        zip TEXT NOT NULL DEFAULT '',
+        city TEXT NOT NULL DEFAULT '',
+        country TEXT NOT NULL DEFAULT 'CH',
+        email TEXT NOT NULL DEFAULT '',
+        phone TEXT NOT NULL DEFAULT '',
+        website TEXT NOT NULL DEFAULT '',
+        iban TEXT NOT NULL DEFAULT '',
+        uid TEXT NOT NULL DEFAULT '',
+        mwst TEXT NOT NULL DEFAULT '',
+        hr_number TEXT NOT NULL DEFAULT '',
+        founding_year INTEGER
+      )
+    `
   }
 ]
 
