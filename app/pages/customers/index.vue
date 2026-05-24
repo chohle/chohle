@@ -163,10 +163,10 @@ async function remove(id: number) {
       </table>
     </UCard>
 
-    <UModal
+    <USlideover
       v-model:open="open"
       :title="form.id ? 'Edit customer' : 'Add customer'"
-      :ui="{ content: 'max-w-2xl' }"
+      :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
         <form class="space-y-5" @submit.prevent="save">
@@ -218,7 +218,7 @@ async function remove(id: number) {
             </UFormField>
           </div>
 
-          <div class="grid sm:grid-cols-3 gap-4">
+          <div class="grid sm:grid-cols-2 gap-4">
             <UFormField label="Price category">
               <UInput v-model="form.priceCategory" class="w-full" />
             </UFormField>
@@ -255,6 +255,6 @@ async function remove(id: number) {
           <UButton :loading="saving" @click="save">Save</UButton>
         </div>
       </template>
-    </UModal>
+    </USlideover>
   </div>
 </template>
