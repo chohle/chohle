@@ -110,26 +110,20 @@ async function remove(id: number) {
 </script>
 
 <template>
-  <div class="max-w-4xl">
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold">Customers</h1>
-        <p class="text-muted mt-1">Your customer book.</p>
-      </div>
-      <UButton icon="i-lucide-plus" @click="openCreate">Add customer</UButton>
-    </div>
+  <div>
+    <PageHeader title="Customers" description="Your customer book." />
 
-    <UCard class="mt-6">
+    <UCard>
+      <div class="flex justify-end mb-4">
+        <UButton icon="i-lucide-plus" @click="openCreate">Add customer</UButton>
+      </div>
+
       <EmptyState
         v-if="!customers.length"
         icon="i-lucide-users"
         title="No customers"
         description="Add a customer to start billing them."
-      >
-        <template #action>
-          <UButton icon="i-lucide-plus" @click="openCreate">Add customer</UButton>
-        </template>
-      </EmptyState>
+      />
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[600px] text-sm">
         <thead class="text-muted text-left">
@@ -142,7 +136,11 @@ async function remove(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="c in customers" :key="c.id" class="border-b border-default last:border-0">
+          <tr
+            v-for="c in customers"
+            :key="c.id"
+            class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
+          >
             <td class="py-2">
               <div class="flex items-center gap-2">
                 <UAvatar :alt="c.name" size="2xs" />
@@ -180,69 +178,81 @@ async function remove(id: number) {
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
-        <form class="space-y-5" @submit.prevent="save">
-          <div class="grid sm:grid-cols-2 gap-4">
-            <UFormField label="Type">
-              <USelect v-model="form.type" :items="typeItems" class="w-full" />
-            </UFormField>
-            <UFormField label="Language">
-              <USelect v-model="form.language" :items="languageItems" class="w-full" />
-            </UFormField>
-            <UFormField :label="form.type === 'company' ? 'Company name' : 'Name'" class="sm:col-span-2">
-              <UInput v-model="form.name" class="w-full" />
-            </UFormField>
-            <UFormField label="Contact person">
-              <UInput v-model="form.contactPerson" class="w-full" />
-            </UFormField>
-            <UFormField label="Customer number">
-              <UInput v-model="form.customerNumber" class="w-full" />
-            </UFormField>
+        <form class="space-y-6" @submit.prevent="save">
+          <div class="space-y-3">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Details</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <UFormField label="Type">
+                <USelect v-model="form.type" :items="typeItems" class="w-full" />
+              </UFormField>
+              <UFormField label="Language">
+                <USelect v-model="form.language" :items="languageItems" class="w-full" />
+              </UFormField>
+              <UFormField :label="form.type === 'company' ? 'Company name' : 'Name'" class="sm:col-span-2">
+                <UInput v-model="form.name" class="w-full" />
+              </UFormField>
+              <UFormField label="Contact person">
+                <UInput v-model="form.contactPerson" class="w-full" />
+              </UFormField>
+              <UFormField label="Customer number">
+                <UInput v-model="form.customerNumber" class="w-full" />
+              </UFormField>
+            </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <UFormField label="Email">
-              <UInput v-model="form.email" type="email" class="w-full" />
-            </UFormField>
-            <UFormField label="Phone">
-              <UInput v-model="form.phone" class="w-full" />
-            </UFormField>
-            <UFormField label="Website">
-              <UInput v-model="form.website" class="w-full" />
-            </UFormField>
-            <UFormField label="Social">
-              <UInput v-model="form.social" class="w-full" />
-            </UFormField>
+          <div class="space-y-3">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Contact</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <UFormField label="Email">
+                <UInput v-model="form.email" type="email" class="w-full" />
+              </UFormField>
+              <UFormField label="Phone">
+                <UInput v-model="form.phone" class="w-full" />
+              </UFormField>
+              <UFormField label="Website">
+                <UInput v-model="form.website" class="w-full" />
+              </UFormField>
+              <UFormField label="Social">
+                <UInput v-model="form.social" class="w-full" />
+              </UFormField>
+            </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <UFormField label="Street" class="sm:col-span-2">
-              <UInput v-model="form.street" class="w-full" />
-            </UFormField>
-            <UFormField label="ZIP">
-              <UInput v-model="form.zip" class="w-full" />
-            </UFormField>
-            <UFormField label="City">
-              <UInput v-model="form.city" class="w-full" />
-            </UFormField>
-            <UFormField label="Country">
-              <UInput v-model="form.country" class="w-full" />
-            </UFormField>
+          <div class="space-y-3">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Address</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <UFormField label="Street" class="sm:col-span-2">
+                <UInput v-model="form.street" class="w-full" />
+              </UFormField>
+              <UFormField label="ZIP">
+                <UInput v-model="form.zip" class="w-full" />
+              </UFormField>
+              <UFormField label="City">
+                <UInput v-model="form.city" class="w-full" />
+              </UFormField>
+              <UFormField label="Country">
+                <UInput v-model="form.country" class="w-full" />
+              </UFormField>
+            </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <UFormField label="Price category">
-              <UInput v-model="form.priceCategory" class="w-full" />
-            </UFormField>
-            <UFormField label="Discount %">
-              <UInput v-model.number="form.discountPercent" type="number" min="0" step="0.1" class="w-full" />
-            </UFormField>
-            <UFormField label="Payment term (days)">
-              <UInput v-model.number="form.paymentTermDays" type="number" min="0" class="w-full" />
-            </UFormField>
+          <div class="space-y-3">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Billing</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <UFormField label="Price category">
+                <UInput v-model="form.priceCategory" class="w-full" />
+              </UFormField>
+              <UFormField label="Discount %">
+                <UInput v-model.number="form.discountPercent" type="number" min="0" step="0.1" class="w-full" />
+              </UFormField>
+              <UFormField label="Payment term (days)">
+                <UInput v-model.number="form.paymentTermDays" type="number" min="0" class="w-full" />
+              </UFormField>
+            </div>
           </div>
 
-          <div v-if="form.type === 'company'" class="border-t border-default pt-5">
-            <h3 class="font-semibold mb-3">Business details</h3>
+          <div v-if="form.type === 'company'" class="space-y-3">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Business details</h3>
             <div class="grid sm:grid-cols-2 gap-4">
               <UFormField label="UID">
                 <UInput v-model="form.uid" placeholder="CHE-123.456.789" class="w-full" />

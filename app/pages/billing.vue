@@ -60,11 +60,10 @@ async function save() {
 </script>
 
 <template>
-  <div class="max-w-2xl">
-    <h1 class="text-2xl font-bold">Billing</h1>
-    <p class="text-muted mt-1">Who appears as the sender on your invoices and QR-bill.</p>
+  <div class="mx-auto max-w-2xl">
+    <PageHeader title="Billing" description="Who appears as the sender on your invoices and QR-bill." />
 
-    <UCard class="mt-6">
+    <UCard>
       <form class="space-y-6" @submit.prevent="save">
         <LogoUpload
           :src="logoSrc"

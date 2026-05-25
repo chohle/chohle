@@ -144,23 +144,22 @@ function chf(rappen: number) {
 </script>
 
 <template>
-  <div class="max-w-5xl">
-    <NuxtLink :to="`/customers/${customerId}`" class="text-sm text-muted hover:underline">
-      &larr; Customer
-    </NuxtLink>
-
-    <div class="flex items-center justify-between gap-4 mt-2">
-      <h1 class="text-2xl font-bold">Invoice {{ header.number }}</h1>
-      <div class="flex gap-2">
+  <div>
+    <PageHeader
+      :title="`Invoice ${header.number}`"
+      :back-to="`/customers/${customerId}`"
+      back-label="Customer"
+    >
+      <template #actions>
         <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="removeInvoice">
           Delete
         </UButton>
         <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">PDF Vorschau</UButton>
         <UButton :loading="saving" @click="save">Save</UButton>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
-    <UCard class="mt-6">
+    <UCard>
       <div class="grid sm:grid-cols-2 gap-4">
         <UFormField label="Title" class="sm:col-span-2">
           <UInput v-model="header.title" class="w-full" />
@@ -190,6 +189,7 @@ function chf(rappen: number) {
 
       <EmptyState
         v-if="!items.length"
+        :bordered="false"
         icon="i-lucide-list"
         title="No line items"
         description="Add a line, then pick an article to auto-fill it."
@@ -198,50 +198,72 @@ function chf(rappen: number) {
           <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">Add line</UButton>
         </template>
       </EmptyState>
-      <div v-else class="overflow-x-auto">
-        <div class="space-y-3 min-w-[720px]">
-        <div
-          v-for="(row, i) in items"
-          :key="i"
-          class="grid grid-cols-12 gap-2 items-end border-b border-default pb-3 last:border-0"
-        >
-          <UFormField label="Article" class="col-span-2">
-            <USelect
-              v-model="row.articleId"
-              :items="articleItems"
-              class="w-full"
-              @update:model-value="onArticle(row)"
-            />
-          </UFormField>
-          <UFormField label="Description" class="col-span-3">
-            <UInput v-model="row.description" class="w-full" />
-          </UFormField>
-          <UFormField label="Qty" class="col-span-1">
-            <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
-          </UFormField>
-          <UFormField label="Unit" class="col-span-1">
-            <UInput v-model="row.unit" class="w-full" />
-          </UFormField>
-          <UFormField label="Price" class="col-span-1">
-            <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
-          </UFormField>
-          <UFormField label="Disc%" class="col-span-1">
-            <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
-          </UFormField>
-          <UFormField label="MWST%" class="col-span-1">
-            <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
-          </UFormField>
-          <div class="col-span-2 flex items-center justify-end gap-1 pb-1">
-            <span class="text-sm whitespace-nowrap">{{ chf(lineAmount(row)) }}</span>
-            <UButton
-              icon="i-lucide-x"
-              color="error"
-              variant="ghost"
-              size="xs"
-              @click="removeRow(i)"
-            />
-          </div>
+      <div v-else>
+        <div class="hidden sm:grid grid-cols-12 gap-2 pb-2 text-xs font-medium text-muted">
+          <div class="col-span-2">Article</div>
+          <div class="col-span-3">Description</div>
+          <div class="col-span-1">Qty</div>
+          <div class="col-span-1">Unit</div>
+          <div class="col-span-1">Price</div>
+          <div class="col-span-1">Disc%</div>
+          <div class="col-span-1">MWST%</div>
+          <div class="col-span-2 text-right">Amount</div>
         </div>
+
+        <div class="space-y-3 sm:space-y-0">
+          <div
+            v-for="(row, i) in items"
+            :key="i"
+            class="grid grid-cols-2 sm:grid-cols-12 gap-x-2 gap-y-3 items-start sm:items-center rounded-lg border border-default p-3 sm:rounded-none sm:border-x-0 sm:border-t-0 sm:p-0 sm:pb-3 sm:last:border-b-0 sm:last:pb-0"
+          >
+            <div class="col-span-2">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Article</label>
+              <USelect
+                v-model="row.articleId"
+                :items="articleItems"
+                class="w-full"
+                @update:model-value="onArticle(row)"
+              />
+            </div>
+            <div class="col-span-2 sm:col-span-3">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Description</label>
+              <UInput v-model="row.description" class="w-full" />
+            </div>
+            <div class="col-span-1">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Qty</label>
+              <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
+            </div>
+            <div class="col-span-1">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Unit</label>
+              <UInput v-model="row.unit" class="w-full" />
+            </div>
+            <div class="col-span-1">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Price</label>
+              <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
+            </div>
+            <div class="col-span-1">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Disc%</label>
+              <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
+            </div>
+            <div class="col-span-1">
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">MWST%</label>
+              <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
+            </div>
+            <div
+              class="col-span-2 flex items-center justify-between sm:justify-end gap-2 border-t border-default pt-3 mt-1 sm:mt-0 sm:border-0 sm:pt-0"
+            >
+              <span class="text-sm font-medium tabular-nums whitespace-nowrap">
+                CHF {{ chf(lineAmount(row)) }}
+              </span>
+              <UButton
+                icon="i-lucide-x"
+                color="error"
+                variant="ghost"
+                size="xs"
+                @click="removeRow(i)"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </UCard>

@@ -35,11 +35,10 @@ async function changePassword() {
 </script>
 
 <template>
-  <div class="max-w-md">
-    <h1 class="text-2xl font-bold">Profile</h1>
-    <p class="text-muted mt-1">Your account and password.</p>
+  <div class="mx-auto max-w-2xl">
+    <PageHeader title="Profile" description="Your account and password." />
 
-    <UCard class="mt-6">
+    <UCard>
       <UFormField label="Username">
         <UInput :model-value="user?.username" disabled class="w-full" />
       </UFormField>

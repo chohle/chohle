@@ -45,8 +45,37 @@ interface InvoiceRow {
 const { data: invoices } = await useFetch<InvoiceRow[]>(`/api/customers/${id}/invoices`, {
   default: () => []
 })
+const { data: customerArticles } = await useFetch<{ id: number }[]>(
+  `/api/customers/${id}/articles`,
+  { default: () => [] }
+)
 
 const statusColor: Record<string, string> = { draft: 'neutral', sent: 'warning', paid: 'success' }
+
+const stats = computed(() => {
+  const list = invoices.value
+  return {
+    count: list.length,
+    paid: list.filter((i) => i.status === 'paid').reduce((s, i) => s + i.total_rappen, 0),
+    outstanding: list.filter((i) => i.status === 'sent').reduce((s, i) => s + i.total_rappen, 0)
+  }
+})
+
+const tabItems = computed(() => [
+  { label: 'Details', icon: 'i-lucide-id-card', slot: 'details' },
+  {
+    label: 'Articles',
+    icon: 'i-lucide-package',
+    slot: 'articles',
+    badge: customerArticles.value.length || undefined
+  },
+  {
+    label: 'Invoices',
+    icon: 'i-lucide-file-text',
+    slot: 'invoices',
+    badge: invoices.value.length || undefined
+  }
+])
 
 async function newInvoice() {
   const { id: invoiceId } = await $fetch<{ id: number }>(`/api/customers/${id}/invoices`, {
@@ -91,75 +120,112 @@ const details = computed(() => {
 </script>
 
 <template>
-  <div v-if="customer" class="max-w-3xl">
-    <NuxtLink to="/customers" class="text-sm text-muted hover:underline">&larr; Customers</NuxtLink>
-
-    <div class="flex items-center gap-3 mt-2">
-      <UAvatar :alt="customer.name" :src="logoSrc ?? undefined" size="lg" />
-      <div>
-        <h1 class="text-2xl font-bold">{{ customer.name }}</h1>
+  <div v-if="customer">
+    <PageHeader :title="customer.name" back-to="/customers" back-label="Customers">
+      <template #leading>
+        <UAvatar :alt="customer.name" :src="logoSrc ?? undefined" size="lg" />
+      </template>
+      <template #description>
         <UBadge :color="customer.type === 'company' ? 'primary' : 'neutral'" variant="subtle">
           {{ customer.type === 'company' ? 'Company' : 'Private person' }}
         </UBadge>
-      </div>
+      </template>
+      <template #actions>
+        <UButton icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
+      </template>
+    </PageHeader>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <UCard>
+        <div class="flex items-center gap-3">
+          <span class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-file-text" class="size-5" />
+          </span>
+          <div class="min-w-0">
+            <div class="text-sm text-muted">Invoices</div>
+            <div class="text-xl font-semibold tabular-nums">{{ stats.count }}</div>
+          </div>
+        </div>
+      </UCard>
+      <UCard>
+        <div class="flex items-center gap-3">
+          <span class="size-10 rounded-lg bg-success/10 text-success flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-circle-check" class="size-5" />
+          </span>
+          <div class="min-w-0">
+            <div class="text-sm text-muted">Paid</div>
+            <div class="text-xl font-semibold tabular-nums">CHF {{ chf(stats.paid) }}</div>
+          </div>
+        </div>
+      </UCard>
+      <UCard>
+        <div class="flex items-center gap-3">
+          <span class="size-10 rounded-lg bg-warning/10 text-warning flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-clock" class="size-5" />
+          </span>
+          <div class="min-w-0">
+            <div class="text-sm text-muted">Outstanding</div>
+            <div class="text-xl font-semibold tabular-nums">CHF {{ chf(stats.outstanding) }}</div>
+          </div>
+        </div>
+      </UCard>
     </div>
 
-    <UCard class="mt-6">
-      <LogoUpload
-        :src="logoSrc"
-        :upload-url="`/api/customers/${id}/logo`"
-        :remove-url="`/api/customers/${id}/logo`"
-        class="mb-6 pb-6 border-b border-default"
-        @changed="refreshCustomer"
-      />
-      <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-        <div v-for="[label, value] in details" :key="label" class="flex flex-col">
-          <dt class="text-muted text-xs">{{ label }}</dt>
-          <dd>{{ value }}</dd>
-        </div>
-      </dl>
-    </UCard>
-
-    <UCard class="mt-6">
-      <template #header>
-        <h2 class="font-semibold">Articles</h2>
-      </template>
-      <ArticleManager
-        :list-url="`/api/customers/${id}/articles`"
-        :create-url="`/api/customers/${id}/articles`"
-      />
-    </UCard>
-
-    <UCard class="mt-6">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="font-semibold">Invoices</h2>
-          <UButton size="sm" icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
-        </div>
+    <UTabs :items="tabItems" variant="link" class="w-full">
+      <template #details>
+        <UCard class="mt-4">
+          <LogoUpload
+            :src="logoSrc"
+            :upload-url="`/api/customers/${id}/logo`"
+            :remove-url="`/api/customers/${id}/logo`"
+            class="mb-6 pb-6 border-b border-default"
+            @changed="refreshCustomer"
+          />
+          <dl class="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+            <div v-for="[label, value] in details" :key="label" class="flex flex-col">
+              <dt class="text-muted text-xs">{{ label }}</dt>
+              <dd>{{ value }}</dd>
+            </div>
+          </dl>
+        </UCard>
       </template>
 
-      <EmptyState
-        v-if="!invoices.length"
-        icon="i-lucide-file-text"
-        title="No invoices yet"
-        description="Create the first invoice for this customer."
-      >
-        <template #action>
-          <UButton size="sm" icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
-        </template>
-      </EmptyState>
-      <ul v-else class="divide-y divide-default">
-        <li v-for="inv in invoices" :key="inv.id" class="flex items-center gap-3 py-2">
-          <NuxtLink :to="`/invoices/${inv.id}`" class="flex-1 hover:underline">
-            <span class="font-medium">{{ inv.number }}</span>
-            <span class="text-muted"> · {{ inv.title }}</span>
-          </NuxtLink>
-          <UBadge :color="statusColor[inv.status]" variant="subtle" size="sm">
-            {{ inv.status }}
-          </UBadge>
-          <span class="text-sm whitespace-nowrap">CHF {{ chf(inv.total_rappen) }}</span>
-        </li>
-      </ul>
-    </UCard>
+      <template #articles>
+        <UCard class="mt-4">
+          <ArticleManager
+            :list-url="`/api/customers/${id}/articles`"
+            :create-url="`/api/customers/${id}/articles`"
+          />
+        </UCard>
+      </template>
+
+      <template #invoices>
+        <UCard class="mt-4">
+          <EmptyState
+            v-if="!invoices.length"
+            :bordered="false"
+            icon="i-lucide-file-text"
+            title="No invoices yet"
+            description="Create the first invoice for this customer."
+          >
+            <template #action>
+              <UButton icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
+            </template>
+          </EmptyState>
+          <ul v-else class="divide-y divide-default -my-2">
+            <li v-for="inv in invoices" :key="inv.id" class="flex items-center gap-3 py-3">
+              <NuxtLink :to="`/invoices/${inv.id}`" class="flex-1 min-w-0 hover:underline">
+                <span class="font-medium">{{ inv.number }}</span>
+                <span class="text-muted"> · {{ inv.title || 'Untitled' }}</span>
+              </NuxtLink>
+              <UBadge :color="statusColor[inv.status]" variant="subtle" size="sm">
+                {{ inv.status }}
+              </UBadge>
+              <span class="text-sm whitespace-nowrap tabular-nums">CHF {{ chf(inv.total_rappen) }}</span>
+            </li>
+          </ul>
+        </UCard>
+      </template>
+    </UTabs>
   </div>
 </template>

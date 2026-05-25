@@ -71,8 +71,8 @@ function chf(rappen: number) {
 
 <template>
   <div>
-    <div class="flex justify-end mb-3">
-      <UButton size="sm" icon="i-lucide-plus" @click="openCreate">Add article</UButton>
+    <div class="flex justify-end mb-4">
+      <UButton icon="i-lucide-plus" @click="openCreate">Add article</UButton>
     </div>
 
     <EmptyState
@@ -93,7 +93,11 @@ function chf(rappen: number) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="a in articles" :key="a.id" class="border-b border-default last:border-0">
+        <tr
+          v-for="a in articles"
+          :key="a.id"
+          class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
+        >
           <td class="py-2">{{ a.name }}</td>
           <td class="py-2">{{ a.unit || '-' }}</td>
           <td class="py-2 text-right whitespace-nowrap">CHF {{ chf(a.default_price_rappen) }}</td>
@@ -113,8 +117,8 @@ function chf(rappen: number) {
       :ui="{ content: 'max-w-md' }"
     >
       <template #body>
-        <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField label="Name" class="col-span-2">
+        <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
+          <UFormField label="Name" class="sm:col-span-2">
             <UInput v-model="form.name" placeholder="e.g. Wartungsarbeiten" class="w-full" />
           </UFormField>
           <UFormField label="Unit">
@@ -123,7 +127,7 @@ function chf(rappen: number) {
           <UFormField label="Price (CHF)">
             <UInput v-model.number="form.price" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
-          <UFormField label="MWST %" class="col-span-2">
+          <UFormField label="MWST %" class="sm:col-span-2">
             <UInput v-model.number="form.mwst" type="number" min="0" step="0.1" class="w-full" />
           </UFormField>
         </form>

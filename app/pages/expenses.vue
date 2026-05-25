@@ -116,51 +116,41 @@ function chf(rappen: number) {
 </script>
 
 <template>
-  <div class="max-w-4xl">
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold">Expenses</h1>
-        <p class="text-muted mt-1">Track what you buy, with the receipt.</p>
-      </div>
-      <div class="flex items-center gap-3 flex-wrap">
-        <input
-          v-model="month"
-          type="month"
-          class="h-8 rounded border border-default bg-default px-2"
-        >
-        <div class="text-right">
-          <div class="text-xs text-muted">Total</div>
-          <div class="font-semibold">CHF {{ chf(total) }}</div>
+  <div>
+    <PageHeader title="Expenses" description="Track what you buy, with the receipt.">
+      <template #actions>
+        <MonthSelect v-model="month" />
+        <div class="inline-flex items-center gap-2 rounded-md bg-elevated px-3 h-8">
+          <span class="text-xs text-muted">Total</span>
+          <span class="text-sm font-semibold tabular-nums text-highlighted">CHF {{ chf(total) }}</span>
         </div>
-        <UButton icon="i-lucide-plus" @click="openCreate">Add</UButton>
+      </template>
+    </PageHeader>
+
+    <UCard>
+      <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <div class="flex flex-wrap gap-2">
+          <UButton
+            v-for="c in expenseCategories"
+            :key="c.id"
+            size="xs"
+            color="neutral"
+            :variant="activeCategories.has(c.id) ? 'solid' : 'outline'"
+            @click="toggleCategory(c.id)"
+          >
+            <UIcon :name="c.icon" :style="{ color: c.color }" class="size-3" />
+            {{ c.name }}
+          </UButton>
+        </div>
+        <UButton icon="i-lucide-plus" @click="openCreate">Add expense</UButton>
       </div>
-    </div>
 
-    <div v-if="expenseCategories.length" class="flex flex-wrap gap-2 mt-4">
-      <UButton
-        v-for="c in expenseCategories"
-        :key="c.id"
-        size="xs"
-        color="neutral"
-        :variant="activeCategories.has(c.id) ? 'solid' : 'outline'"
-        @click="toggleCategory(c.id)"
-      >
-        <UIcon :name="c.icon" :style="{ color: c.color }" class="size-3" />
-        {{ c.name }}
-      </UButton>
-    </div>
-
-    <UCard class="mt-6">
       <EmptyState
         v-if="!filtered.length"
         icon="i-lucide-receipt"
         title="No expenses"
         description="Add your first expense to start tracking where the money goes."
-      >
-        <template #action>
-          <UButton icon="i-lucide-plus" @click="openCreate">Add expense</UButton>
-        </template>
-      </EmptyState>
+      />
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[680px] text-sm">
         <thead class="text-muted text-left">
@@ -175,7 +165,11 @@ function chf(rappen: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in filtered" :key="e.id" class="border-b border-default last:border-0">
+          <tr
+            v-for="e in filtered"
+            :key="e.id"
+            class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
+          >
             <td class="py-2 whitespace-nowrap">{{ e.date }}</td>
             <td class="py-2">{{ e.title }}</td>
             <td class="py-2">
@@ -218,8 +212,8 @@ function chf(rappen: number) {
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
-        <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField label="Title" class="col-span-2">
+        <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
+          <UFormField label="Title" class="sm:col-span-2">
             <UInput v-model="form.title" placeholder="e.g. Office chair" class="w-full" />
           </UFormField>
           <UFormField label="Amount (CHF)">
@@ -234,8 +228,8 @@ function chf(rappen: number) {
           <UFormField label="Vendor">
             <UInput v-model="form.vendor" class="w-full" />
           </UFormField>
-          <UFormField label="Notes" class="col-span-2">
-            <UTextarea v-model="form.notes" class="w-full" />
+          <UFormField label="Notes" class="sm:col-span-2">
+            <UTextarea v-model="form.notes" :rows="3" autoresize class="w-full" />
           </UFormField>
         </form>
       </template>

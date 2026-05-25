@@ -62,7 +62,9 @@ const userMenu: DropdownMenuItem[][] = [
         <UDashboardNavbar title="batze" class="lg:hidden" />
       </template>
       <template #body>
-        <slot />
+        <div class="mx-auto w-full max-w-6xl">
+          <slot />
+        </div>
       </template>
     </UDashboardPanel>
   </UDashboardGroup>

@@ -8,11 +8,10 @@ const appearanceItems = [
 </script>
 
 <template>
-  <div class="max-w-md">
-    <h1 class="text-2xl font-bold">Settings</h1>
-    <p class="text-muted mt-1">App preferences.</p>
+  <div class="mx-auto max-w-2xl">
+    <PageHeader title="Settings" description="App preferences." />
 
-    <UCard class="mt-6">
+    <UCard>
       <UFormField label="Appearance" help="Choose the colour theme.">
         <USelect v-model="colorMode.preference" :items="appearanceItems" class="w-40" />
       </UFormField>

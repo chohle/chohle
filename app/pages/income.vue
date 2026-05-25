@@ -123,25 +123,30 @@ function formatDate(iso: string) {
 </script>
 
 <template>
-  <div class="max-w-4xl">
-e    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold">Income</h1>
-        <p class="text-muted mt-1">Salary and jobs with Swiss pay-date calculation.</p>
-      </div>
-      <div class="flex items-center gap-3 flex-wrap">
-        <input
-          v-model="month"
-          type="month"
-          class="h-8 rounded border border-default bg-default px-2"
-        >
+  <div>
+    <PageHeader title="Income" description="Salary and jobs with Swiss pay-date calculation.">
+      <template #actions>
+        <MonthSelect v-model="month" />
+      </template>
+    </PageHeader>
+
+    <UCard>
+      <div class="flex justify-end mb-4">
         <UButton icon="i-lucide-plus" @click="openCreate">Add job</UButton>
       </div>
-    </div>
 
-    <p v-if="!data.sources.length" class="text-muted text-sm mt-6">No jobs yet.</p>
-    <div v-else class="grid sm:grid-cols-2 gap-4 mt-6">
-      <UCard v-for="s in data.sources" :key="s.id">
+      <EmptyState
+        v-if="!data.sources.length"
+        icon="i-lucide-briefcase"
+        title="No jobs yet"
+        description="Add a job to track salary and Swiss pay dates."
+      />
+      <div v-else class="grid sm:grid-cols-2 gap-4">
+        <div
+          v-for="s in data.sources"
+          :key="s.id"
+          class="rounded-lg border border-default p-4"
+        >
         <div class="flex items-start justify-between gap-2">
           <div>
             <div class="font-semibold">{{ s.company }}</div>
@@ -188,8 +193,9 @@ e    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4
             </div>
           </div>
         </div>
-      </UCard>
-    </div>
+        </div>
+      </div>
+    </UCard>
 
     <USlideover
       v-model:open="open"
@@ -197,11 +203,11 @@ e    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
-        <form class="grid grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField label="Company" class="col-span-2">
+        <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
+          <UFormField label="Company" class="sm:col-span-2">
             <UInput v-model="form.company" class="w-full" />
           </UFormField>
-          <UFormField label="Job title" class="col-span-2">
+          <UFormField label="Job title" class="sm:col-span-2">
             <UInput v-model="form.jobTitle" class="w-full" />
           </UFormField>
           <UFormField label="Monthly salary (CHF)">

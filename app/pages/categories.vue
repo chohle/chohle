@@ -72,19 +72,25 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
 </script>
 
 <template>
-  <div class="max-w-3xl">
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold">Categories</h1>
-        <p class="text-muted mt-1">Labels for organizing expenses and income.</p>
-      </div>
-      <UButton icon="i-lucide-plus" @click="openCreate">Add category</UButton>
-    </div>
+  <div>
+    <PageHeader title="Categories" description="Labels for organizing expenses and income." />
 
-    <div class="grid sm:grid-cols-2 gap-6 mt-6">
-      <CategoryList title="Expenses" :categories="expense" @edit="openEdit" @remove="removeCategory" />
-      <CategoryList title="Income" :categories="income" @edit="openEdit" @remove="removeCategory" />
-    </div>
+    <UCard>
+      <div class="flex justify-end mb-4">
+        <UButton icon="i-lucide-plus" @click="openCreate">Add category</UButton>
+      </div>
+
+      <EmptyState
+        v-if="!expense.length && !income.length"
+        icon="i-lucide-tags"
+        title="No categories"
+        description="Create categories to organize your expenses and income."
+      />
+      <div v-else class="grid sm:grid-cols-2 gap-6">
+        <CategoryList title="Expenses" :categories="expense" @edit="openEdit" @remove="removeCategory" />
+        <CategoryList title="Income" :categories="income" @edit="openEdit" @remove="removeCategory" />
+      </div>
+    </UCard>
 
     <USlideover
       v-model:open="open"
