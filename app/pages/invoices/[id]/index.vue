@@ -424,9 +424,13 @@ const emailMessage = computed({
           </UFormField>
           <UFormField :label="$t('invoices.emailMessage')">
             <ClientOnly>
-              <UEditor v-model="emailMessage" content-type="html" :extensions="emailEditorExtensions" class="min-h-40 w-full rounded-md border border-default">
+              <UEditor v-model="emailMessage" content-type="html" :extensions="emailEditorExtensions" :handlers="emailEditorHandlers" class="min-h-40 w-full rounded-md border border-default">
                 <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1" />
+                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1">
+                    <template #link>
+                      <EditorLinkPopover :editor="editor" />
+                    </template>
+                  </UEditorToolbar>
                 </template>
               </UEditor>
               <template #fallback>

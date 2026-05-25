@@ -1,12 +1,25 @@
+import type { Editor } from '@tiptap/vue-3'
 import { TaskList, TaskItem } from '@tiptap/extension-list'
 import TextAlign from '@tiptap/extension-text-align'
+import { ImageUpload } from './imageUploadExtension'
 
 // Extra extensions on top of the editor's defaults (StarterKit + image/link).
 export const emailEditorExtensions = [
   TaskList,
   TaskItem.configure({ nested: true }),
-  TextAlign.configure({ types: ['heading', 'paragraph'] })
+  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  ImageUpload
 ]
+
+// Insert an upload widget instead of the default image handler's URL prompt.
+export const emailEditorHandlers = {
+  imageUpload: {
+    canExecute: (editor: Editor) => editor.can().insertContent({ type: 'imageUpload' }),
+    execute: (editor: Editor) => editor.chain().focus().insertContent({ type: 'imageUpload' }),
+    isActive: (editor: Editor) => editor.isActive('imageUpload'),
+    isDisabled: undefined
+  }
+}
 
 // Full toolbar shared by the Settings template editor and the invoice Send step.
 export const emailEditorItems = [
@@ -41,8 +54,8 @@ export const emailEditorItems = [
     { kind: 'textAlign', align: 'right', icon: 'i-lucide-align-right' }
   ],
   [
-    { kind: 'link', icon: 'i-lucide-link' },
-    { kind: 'image', icon: 'i-lucide-image' },
+    { slot: 'link', icon: 'i-lucide-link' },
+    { kind: 'imageUpload', icon: 'i-lucide-image' },
     { kind: 'horizontalRule', icon: 'i-lucide-minus' }
   ],
   [

@@ -234,6 +234,10 @@
     "deleteConfirmTitle": "Eliminare la fattura?",
     "deleteConfirmText": "Questo elimina definitivamente la fattura. L'azione non può essere annullata."
   },
+  "editor": {
+    "uploadImage": "Carica un'immagine",
+    "uploadHint": "SVG, PNG, JPG o GIF"
+  },
   "email": {
     "subject": "Fattura {number}",
     "body": "Buongiorno {customer}\n\nin allegato la fattura {number}, pagabile entro il {due}.\n\nCordiali saluti\n{sender}"

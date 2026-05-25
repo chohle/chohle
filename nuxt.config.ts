@@ -44,7 +44,18 @@ export default defineNuxtConfig({
       watch: process.env.DOCKER ? { usePolling: true } : undefined
     },
     optimizeDeps: {
-      include: ['@tiptap/extension-list', '@tiptap/extension-text-align']
+      include: [
+        '@tiptap/extension-list',
+        '@tiptap/extension-text-align',
+        '@tiptap/core',
+        '@tiptap/vue-3',
+        // Dedupe ProseMirror so direct tiptap imports share Nuxt UI's instance.
+        '@nuxt/ui > prosemirror-state',
+        '@nuxt/ui > prosemirror-transform',
+        '@nuxt/ui > prosemirror-model',
+        '@nuxt/ui > prosemirror-view',
+        '@nuxt/ui > prosemirror-gapcursor'
+      ]
     }
   }
 })

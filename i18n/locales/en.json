@@ -234,6 +234,10 @@
     "deleteConfirmTitle": "Delete invoice?",
     "deleteConfirmText": "This permanently deletes the invoice. This cannot be undone."
   },
+  "editor": {
+    "uploadImage": "Upload an image",
+    "uploadHint": "SVG, PNG, JPG or GIF"
+  },
   "email": {
     "subject": "Invoice {number}",
     "body": "Dear {customer}\n\nPlease find attached invoice {number}, payable by {due}.\n\nKind regards\n{sender}"

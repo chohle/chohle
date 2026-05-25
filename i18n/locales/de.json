@@ -234,6 +234,10 @@
     "deleteConfirmTitle": "Rechnung löschen?",
     "deleteConfirmText": "Dies löscht die Rechnung dauerhaft. Dies kann nicht rückgängig gemacht werden."
   },
+  "editor": {
+    "uploadImage": "Bild hochladen",
+    "uploadHint": "SVG, PNG, JPG oder GIF"
+  },
   "email": {
     "subject": "Rechnung {number}",
     "body": "Guten Tag {customer}\n\nanbei erhalten Sie die Rechnung {number}, zahlbar bis {due}.\n\nFreundliche Grüsse\n{sender}"

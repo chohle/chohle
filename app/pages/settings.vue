@@ -87,9 +87,13 @@ function cancelChange() {
       </template>
       <p class="mb-4 text-sm text-muted">{{ $t('settings.emailTemplateHelp') }}</p>
       <ClientOnly>
-        <UEditor v-model="template" content-type="html" :extensions="emailEditorExtensions" class="min-h-40 rounded-md border border-default">
+        <UEditor v-model="template" content-type="html" :extensions="emailEditorExtensions" :handlers="emailEditorHandlers" class="min-h-40 rounded-md border border-default">
           <template #default="{ editor }">
-            <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1" />
+            <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1">
+              <template #link>
+                <EditorLinkPopover :editor="editor" />
+              </template>
+            </UEditorToolbar>
           </template>
         </UEditor>
         <template #fallback>

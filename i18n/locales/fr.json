@@ -234,6 +234,10 @@
     "deleteConfirmTitle": "Supprimer la facture ?",
     "deleteConfirmText": "Cela supprime définitivement la facture. Cette action est irréversible."
   },
+  "editor": {
+    "uploadImage": "Téléverser une image",
+    "uploadHint": "SVG, PNG, JPG ou GIF"
+  },
   "email": {
     "subject": "Facture {number}",
     "body": "Bonjour {customer}\n\nveuillez trouver ci-joint la facture {number}, payable jusqu'au {due}.\n\nMeilleures salutations\n{sender}"
