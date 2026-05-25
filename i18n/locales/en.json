@@ -211,7 +211,23 @@
     "vatPct": "VAT %",
     "netto": "Net",
     "qrHint": "Add a valid IBAN and sender address in Billing to show the Swiss QR-bill.",
-    "toastSaved": "Invoice saved"
+    "toastSaved": "Invoice saved",
+    "send": "Send",
+    "continue": "Continue",
+    "markSent": "Mark as sent",
+    "markPaid": "Mark as paid",
+    "markUnpaid": "Mark as unpaid",
+    "recipient": "Recipient",
+    "noEmail": "This customer has no email address yet.",
+    "emailSubject": "Subject",
+    "emailMessage": "Message",
+    "awaitingPayment": "Waiting for payment",
+    "paidDone": "Marked as paid",
+    "sendNote": "Email sending is wired up in the next step; for now this just marks the invoice as sent."
+  },
+  "email": {
+    "subject": "Invoice {number}",
+    "body": "Dear {customer}\n\nPlease find attached invoice {number}, payable by {due}.\n\nKind regards\n{sender}"
   },
   "invoiceDoc": {
     "invoice": "Invoice",

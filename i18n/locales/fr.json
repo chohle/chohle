@@ -211,7 +211,23 @@
     "vatPct": "TVA %",
     "netto": "Net",
     "qrHint": "Ajoutez un IBAN valide et une adresse d'expéditeur dans Facturation pour afficher le bulletin QR suisse.",
-    "toastSaved": "Facture enregistrée"
+    "toastSaved": "Facture enregistrée",
+    "send": "Envoyer",
+    "continue": "Continuer",
+    "markSent": "Marquer comme envoyée",
+    "markPaid": "Marquer comme payée",
+    "markUnpaid": "Marquer comme impayée",
+    "recipient": "Destinataire",
+    "noEmail": "Ce client n'a pas encore d'adresse e-mail.",
+    "emailSubject": "Objet",
+    "emailMessage": "Message",
+    "awaitingPayment": "En attente de paiement",
+    "paidDone": "Marquée comme payée",
+    "sendNote": "L'envoi de l'e-mail sera ajouté à l'étape suivante ; pour l'instant, la facture est seulement marquée comme envoyée."
+  },
+  "email": {
+    "subject": "Facture {number}",
+    "body": "Bonjour {customer}\n\nveuillez trouver ci-joint la facture {number}, payable jusqu'au {due}.\n\nMeilleures salutations\n{sender}"
   },
   "invoiceDoc": {
     "invoice": "Facture",

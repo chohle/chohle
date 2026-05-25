@@ -211,7 +211,23 @@
     "vatPct": "MWST %",
     "netto": "Netto",
     "qrHint": "Füge in der Abrechnung eine gültige IBAN und Absenderadresse hinzu, um den QR-Einzahlungsschein anzuzeigen.",
-    "toastSaved": "Rechnung gespeichert"
+    "toastSaved": "Rechnung gespeichert",
+    "send": "Senden",
+    "continue": "Weiter",
+    "markSent": "Als gesendet markieren",
+    "markPaid": "Als bezahlt markieren",
+    "markUnpaid": "Als unbezahlt markieren",
+    "recipient": "Empfänger",
+    "noEmail": "Dieser Kunde hat noch keine E-Mail-Adresse.",
+    "emailSubject": "Betreff",
+    "emailMessage": "Nachricht",
+    "awaitingPayment": "Warten auf Zahlung",
+    "paidDone": "Als bezahlt markiert",
+    "sendNote": "Der E-Mail-Versand folgt im nächsten Schritt; vorerst wird die Rechnung nur als gesendet markiert."
+  },
+  "email": {
+    "subject": "Rechnung {number}",
+    "body": "Guten Tag {customer}\n\nanbei erhalten Sie die Rechnung {number}, zahlbar bis {due}.\n\nFreundliche Grüsse\n{sender}"
   },
   "invoiceDoc": {
     "invoice": "Rechnung",

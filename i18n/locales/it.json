@@ -211,7 +211,23 @@
     "vatPct": "IVA %",
     "netto": "Netto",
     "qrHint": "Aggiungi un IBAN valido e un indirizzo del mittente in Fatturazione per mostrare la polizza QR svizzera.",
-    "toastSaved": "Fattura salvata"
+    "toastSaved": "Fattura salvata",
+    "send": "Invia",
+    "continue": "Continua",
+    "markSent": "Segna come inviata",
+    "markPaid": "Segna come pagata",
+    "markUnpaid": "Segna come non pagata",
+    "recipient": "Destinatario",
+    "noEmail": "Questo cliente non ha ancora un indirizzo e-mail.",
+    "emailSubject": "Oggetto",
+    "emailMessage": "Messaggio",
+    "awaitingPayment": "In attesa di pagamento",
+    "paidDone": "Segnata come pagata",
+    "sendNote": "L'invio dell'e-mail sarà aggiunto nel prossimo passaggio; per ora la fattura viene solo segnata come inviata."
+  },
+  "email": {
+    "subject": "Fattura {number}",
+    "body": "Buongiorno {customer}\n\nin allegato la fattura {number}, pagabile entro il {due}.\n\nCordiali saluti\n{sender}"
   },
   "invoiceDoc": {
     "invoice": "Fattura",
