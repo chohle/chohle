@@ -124,12 +124,12 @@ function formatDate(iso: string) {
 
 <template>
   <div class="max-w-4xl">
-    <div class="flex items-end justify-between gap-4 flex-wrap">
+e    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold">Income</h1>
         <p class="text-muted mt-1">Salary and jobs with Swiss pay-date calculation.</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
         <input
           v-model="month"
           type="month"

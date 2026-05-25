@@ -117,12 +117,12 @@ function chf(rappen: number) {
 
 <template>
   <div class="max-w-4xl">
-    <div class="flex items-end justify-between gap-4 flex-wrap">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold">Expenses</h1>
         <p class="text-muted mt-1">Track what you buy, with the receipt.</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
         <input
           v-model="month"
           type="month"

@@ -111,7 +111,7 @@ async function remove(id: number) {
 
 <template>
   <div class="max-w-4xl">
-    <div class="flex items-end justify-between gap-4 flex-wrap">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold">Customers</h1>
         <p class="text-muted mt-1">Your customer book.</p>

@@ -73,7 +73,7 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
 
 <template>
   <div class="max-w-3xl">
-    <div class="flex items-end justify-between gap-4 flex-wrap">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold">Categories</h1>
         <p class="text-muted mt-1">Labels for organizing expenses and income.</p>
