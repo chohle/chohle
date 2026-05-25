@@ -29,25 +29,41 @@ const userMenu: DropdownMenuItem[][] = [
 </script>
 
 <template>
-  <div class="min-h-screen flex bg-default text-default">
-    <aside class="w-60 shrink-0 border-r border-default p-4 flex flex-col gap-6">
-      <div class="flex items-center gap-2 px-2">
-        <UIcon name="i-lucide-wallet" class="size-6 text-primary" />
-        <span class="text-lg font-semibold">batze</span>
-      </div>
-      <UNavigationMenu orientation="vertical" :items="items" class="flex-1" />
-      <UDropdownMenu :items="userMenu" :ui="{ content: 'w-(--reka-dropdown-menu-trigger-width)' }">
-        <button
-          class="w-full flex items-center gap-2 rounded-md p-2 text-left hover:bg-elevated"
+  <UDashboardGroup>
+    <UDashboardSidebar>
+      <template #header>
+        <div class="flex items-center gap-2 px-1">
+          <UIcon name="i-lucide-wallet" class="size-6 text-primary" />
+          <span class="text-lg font-semibold">batze</span>
+        </div>
+      </template>
+
+      <UNavigationMenu orientation="vertical" :items="items" />
+
+      <template #footer>
+        <UDropdownMenu
+          :items="userMenu"
+          :ui="{ content: 'w-(--reka-dropdown-menu-trigger-width)' }"
+          class="w-full"
         >
-          <UAvatar :alt="username" size="2xs" />
-          <span class="flex-1 truncate text-sm font-medium">{{ username }}</span>
-          <UIcon name="i-lucide-chevrons-up-down" class="size-4 text-muted shrink-0" />
-        </button>
-      </UDropdownMenu>
-    </aside>
-    <main class="flex-1 p-6 overflow-auto">
-      <slot />
-    </main>
-  </div>
+          <button
+            class="w-full flex items-center gap-2 rounded-md p-2 text-left hover:bg-elevated"
+          >
+            <UAvatar :alt="username" size="2xs" />
+            <span class="flex-1 truncate text-sm font-medium">{{ username }}</span>
+            <UIcon name="i-lucide-chevrons-up-down" class="size-4 text-muted shrink-0" />
+          </button>
+        </UDropdownMenu>
+      </template>
+    </UDashboardSidebar>
+
+    <UDashboardPanel>
+      <template #header>
+        <UDashboardNavbar title="batze" class="lg:hidden" />
+      </template>
+      <template #body>
+        <slot />
+      </template>
+    </UDashboardPanel>
+  </UDashboardGroup>
 </template>
