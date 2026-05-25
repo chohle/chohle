@@ -9,7 +9,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed": "node scripts/seed-dev.mjs"
   },
   "dependencies": {
     "@nuxt/ui": "^4.8.0",

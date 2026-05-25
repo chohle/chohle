@@ -56,6 +56,13 @@ Migrations are an append-only list in `server/utils/migrate.ts`, tracked in a
 append an entry with the next ordered name and its SQL. Never edit a migration that has
 already been applied; add a new one instead.
 
+### Demo data
+
+`yarn seed` (or `docker compose exec app yarn seed`) wipes the business tables, keeps the
+owner login, and fills the database with a realistic month at a glance: categories, six
+months of expenses, salary and freelance income, customers, articles, and invoices. Run
+it once the app has started (so the schema exists).
+
 ## Project structure
 
 ```
