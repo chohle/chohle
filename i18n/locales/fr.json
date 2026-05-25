@@ -226,7 +226,9 @@
     "sendInvoice": "Envoyer la facture",
     "toastSent": "Facture envoyée",
     "sendError": "Impossible d'envoyer la facture",
-    "sendNote": "Le client reçoit cet e-mail avec la facture en PDF en pièce jointe."
+    "sendNote": "Le client reçoit cet e-mail avec la facture en PDF en pièce jointe.",
+    "deleteConfirmTitle": "Supprimer la facture ?",
+    "deleteConfirmText": "Cela supprime définitivement la facture. Cette action est irréversible."
   },
   "email": {
     "subject": "Facture {number}",

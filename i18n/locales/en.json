@@ -226,7 +226,9 @@
     "sendInvoice": "Send invoice",
     "toastSent": "Invoice sent",
     "sendError": "Could not send the invoice",
-    "sendNote": "The customer receives this email with the invoice PDF attached."
+    "sendNote": "The customer receives this email with the invoice PDF attached.",
+    "deleteConfirmTitle": "Delete invoice?",
+    "deleteConfirmText": "This permanently deletes the invoice. This cannot be undone."
   },
   "email": {
     "subject": "Invoice {number}",

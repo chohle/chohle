@@ -126,6 +126,7 @@ function lineAmount(r: EditRow) {
 }
 
 const saving = ref(false)
+const confirmDelete = ref(false)
 async function save() {
   saving.value = true
   try {
@@ -218,12 +219,23 @@ const emailMessage = computed({
       :back-label="$t('customers.colCustomer')"
     >
       <template #actions>
-        <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="removeInvoice">
+        <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="confirmDelete = true">
           {{ $t('common.delete') }}
         </UButton>
-        <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
       </template>
     </PageHeader>
+
+    <UModal v-model:open="confirmDelete" :title="$t('invoices.deleteConfirmTitle')">
+      <template #body>
+        <p class="text-sm text-muted">{{ $t('invoices.deleteConfirmText') }}</p>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton color="neutral" variant="ghost" :label="$t('common.cancel')" @click="confirmDelete = false" />
+          <UButton color="error" :label="$t('common.delete')" @click="removeInvoice" />
+        </div>
+      </template>
+    </UModal>
 
     <div class="mb-8 flex items-start">
       <template v-for="(s, i) in steps" :key="i">
@@ -368,7 +380,10 @@ const emailMessage = computed({
         </dl>
       </UCard>
 
-      <div class="mt-6 flex justify-end">
+      <div class="mt-6 flex justify-between">
+        <UButton color="neutral" variant="ghost" :loading="saving" @click="save">
+          {{ $t('common.save') }}
+        </UButton>
         <UButton trailing-icon="i-lucide-arrow-right" :loading="saving" @click="continueToSend">
           {{ $t('invoices.continue') }}
         </UButton>

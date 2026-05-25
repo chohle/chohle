@@ -226,7 +226,9 @@
     "sendInvoice": "Rechnung senden",
     "toastSent": "Rechnung gesendet",
     "sendError": "Rechnung konnte nicht gesendet werden",
-    "sendNote": "Der Kunde erhält diese E-Mail mit der Rechnung als PDF im Anhang."
+    "sendNote": "Der Kunde erhält diese E-Mail mit der Rechnung als PDF im Anhang.",
+    "deleteConfirmTitle": "Rechnung löschen?",
+    "deleteConfirmText": "Dies löscht die Rechnung dauerhaft. Dies kann nicht rückgängig gemacht werden."
   },
   "email": {
     "subject": "Rechnung {number}",

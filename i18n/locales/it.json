@@ -226,7 +226,9 @@
     "sendInvoice": "Invia fattura",
     "toastSent": "Fattura inviata",
     "sendError": "Impossibile inviare la fattura",
-    "sendNote": "Il cliente riceve questa e-mail con la fattura in PDF allegata."
+    "sendNote": "Il cliente riceve questa e-mail con la fattura in PDF allegata.",
+    "deleteConfirmTitle": "Eliminare la fattura?",
+    "deleteConfirmText": "Questo elimina definitivamente la fattura. L'azione non può essere annullata."
   },
   "email": {
     "subject": "Fattura {number}",
