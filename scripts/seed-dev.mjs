@@ -109,7 +109,8 @@ db.prepare(
   `UPDATE sender SET type='company', name='batze GmbH', street='Bahnhofstrasse 12',
      zip='6003', city='Luzern', country='CH', email='hello@batze.ch', phone='+41 41 555 12 34',
      website='batze.ch', iban='CH93 0076 2011 6238 5295 7', uid='CHE-123.456.789',
-     mwst='CHE-123.456.789 MWST', hr_number='CH-100.4.789.012-3', founding_year=2021 WHERE id=1`
+     mwst='CHE-123.456.789 MWST', hr_number='CH-100.4.789.012-3', founding_year=2021,
+     vat_registered=1 WHERE id=1`
 ).run()
 
 const insertCustomer = db.prepare(

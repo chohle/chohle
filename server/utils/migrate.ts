@@ -219,6 +219,12 @@ const migrations: Migration[] = [
     name: '0015_drop_customer_rates',
     // Superseded by per-customer articles; price overrides are no longer a separate concept.
     up: 'DROP TABLE IF EXISTS customer_rates'
+  },
+  {
+    name: '0016_sender_vat',
+    // Whether the owner charges MWST. Off (e.g. a private person under the CHF 100k
+    // threshold) means invoices carry no VAT.
+    up: 'ALTER TABLE sender ADD COLUMN vat_registered INTEGER NOT NULL DEFAULT 0'
   }
 ]
 

@@ -14,6 +14,7 @@ interface Sender {
   mwst: string
   hr_number: string
   founding_year: number | null
+  vat_registered: number
   logo_path: string | null
 }
 
@@ -39,7 +40,14 @@ const form = reactive({
   uid: d.uid,
   mwst: d.mwst,
   hrNumber: d.hr_number,
-  foundingYear: d.founding_year ?? undefined as number | undefined
+  foundingYear: d.founding_year ?? undefined as number | undefined,
+  vatRegistered: !!d.vat_registered
+})
+
+// Re-suggest VAT status when the legal form changes (company is usually registered,
+// a private person usually not), but it stays an explicit, overridable choice.
+watch(() => form.type, (t) => {
+  form.vatRegistered = t === 'company'
 })
 
 const typeItems = [
@@ -74,6 +82,12 @@ async function save() {
         <UFormField label="You invoice as">
           <USelect v-model="form.type" :items="typeItems" class="w-48" />
         </UFormField>
+
+        <USwitch
+          v-model="form.vatRegistered"
+          label="Charge MWST (VAT-registered)"
+          description="Turn on if you are registered for Swiss VAT (mandatory above CHF 100,000 turnover). When off, your invoices carry no MWST."
+        />
 
         <div class="grid sm:grid-cols-2 gap-4">
           <UFormField
