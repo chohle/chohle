@@ -75,8 +75,14 @@ function chf(rappen: number) {
       <UButton size="sm" icon="i-lucide-plus" @click="openCreate">Add article</UButton>
     </div>
 
-    <p v-if="!articles.length" class="text-muted text-sm">No articles yet.</p>
-    <table v-else class="w-full text-sm">
+    <EmptyState
+      v-if="!articles.length"
+      icon="i-lucide-package"
+      title="No articles"
+      description="Add reusable line items to drop onto invoices."
+    />
+    <div v-else class="overflow-x-auto">
+      <table class="w-full min-w-[480px] text-sm">
       <thead class="text-muted text-left">
         <tr class="border-b border-default">
           <th class="py-2 font-medium">Name</th>
@@ -98,7 +104,8 @@ function chf(rappen: number) {
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
 
     <USlideover
       v-model:open="open"

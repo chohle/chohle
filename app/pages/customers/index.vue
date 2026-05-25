@@ -120,8 +120,18 @@ async function remove(id: number) {
     </div>
 
     <UCard class="mt-6">
-      <p v-if="!customers.length" class="text-muted text-sm">No customers yet.</p>
-      <table v-else class="w-full text-sm">
+      <EmptyState
+        v-if="!customers.length"
+        icon="i-lucide-users"
+        title="No customers"
+        description="Add a customer to start billing them."
+      >
+        <template #action>
+          <UButton icon="i-lucide-plus" @click="openCreate">Add customer</UButton>
+        </template>
+      </EmptyState>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full min-w-[600px] text-sm">
         <thead class="text-muted text-left">
           <tr class="border-b border-default">
             <th class="py-2 font-medium">Customer</th>
@@ -160,7 +170,8 @@ async function remove(id: number) {
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
     </UCard>
 
     <USlideover

@@ -138,7 +138,16 @@ const details = computed(() => {
         </div>
       </template>
 
-      <p v-if="!invoices.length" class="text-muted text-sm">No invoices yet.</p>
+      <EmptyState
+        v-if="!invoices.length"
+        icon="i-lucide-file-text"
+        title="No invoices yet"
+        description="Create the first invoice for this customer."
+      >
+        <template #action>
+          <UButton size="sm" icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
+        </template>
+      </EmptyState>
       <ul v-else class="divide-y divide-default">
         <li v-for="inv in invoices" :key="inv.id" class="flex items-center gap-3 py-2">
           <NuxtLink :to="`/invoices/${inv.id}`" class="flex-1 hover:underline">

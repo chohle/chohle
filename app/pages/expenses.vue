@@ -151,8 +151,18 @@ function chf(rappen: number) {
     </div>
 
     <UCard class="mt-6">
-      <p v-if="!filtered.length" class="text-muted text-sm">No expenses to show.</p>
-      <table v-else class="w-full text-sm">
+      <EmptyState
+        v-if="!filtered.length"
+        icon="i-lucide-receipt"
+        title="No expenses"
+        description="Add your first expense to start tracking where the money goes."
+      >
+        <template #action>
+          <UButton icon="i-lucide-plus" @click="openCreate">Add expense</UButton>
+        </template>
+      </EmptyState>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full min-w-[680px] text-sm">
         <thead class="text-muted text-left">
           <tr class="border-b border-default">
             <th class="py-2 font-medium">Date</th>
@@ -198,7 +208,8 @@ function chf(rappen: number) {
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
     </UCard>
 
     <USlideover

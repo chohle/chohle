@@ -188,8 +188,18 @@ function chf(rappen: number) {
         </div>
       </template>
 
-      <p v-if="!items.length" class="text-muted text-sm">No line items yet.</p>
-      <div v-else class="space-y-3">
+      <EmptyState
+        v-if="!items.length"
+        icon="i-lucide-list"
+        title="No line items"
+        description="Add a line, then pick an article to auto-fill it."
+      >
+        <template #action>
+          <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">Add line</UButton>
+        </template>
+      </EmptyState>
+      <div v-else class="overflow-x-auto">
+        <div class="space-y-3 min-w-[720px]">
         <div
           v-for="(row, i) in items"
           :key="i"
@@ -231,6 +241,7 @@ function chf(rappen: number) {
               @click="removeRow(i)"
             />
           </div>
+        </div>
         </div>
       </div>
     </UCard>
