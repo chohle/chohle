@@ -25,10 +25,7 @@ async function onSubmit() {
   <div class="min-h-screen flex items-center justify-center bg-default text-default p-4">
     <UCard class="w-full max-w-sm">
       <template #header>
-        <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-wallet" class="size-6 text-primary" />
-          <span class="text-lg font-semibold">batze</span>
-        </div>
+        <img src="/logo.svg" alt="batze" class="h-7 w-auto mx-auto dark:invert">
       </template>
 
       <form class="flex flex-col gap-4" @submit.prevent="onSubmit">

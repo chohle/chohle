@@ -4,6 +4,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxt/ui', 'nuxt-auth-utils'],
   css: ['~/assets/css/main.css'],
+  app: {
+    head: {
+      title: 'batze',
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }]
+    }
+  },
   runtimeConfig: {
     adminUsername: '',
     adminPassword: '',

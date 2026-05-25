@@ -32,10 +32,9 @@ const userMenu: DropdownMenuItem[][] = [
   <UDashboardGroup>
     <UDashboardSidebar>
       <template #header>
-        <div class="flex items-center gap-2 px-1">
-          <UIcon name="i-lucide-wallet" class="size-6 text-primary" />
-          <span class="text-lg font-semibold">batze</span>
-        </div>
+        <NuxtLink to="/" class="flex items-center px-1 py-0.5">
+          <img src="/logo.svg" alt="batze" class="h-6 w-auto dark:invert">
+        </NuxtLink>
       </template>
 
       <UNavigationMenu orientation="vertical" :items="items" />
@@ -59,7 +58,11 @@ const userMenu: DropdownMenuItem[][] = [
 
     <UDashboardPanel>
       <template #header>
-        <UDashboardNavbar title="batze" class="lg:hidden" />
+        <UDashboardNavbar class="lg:hidden">
+          <template #title>
+            <img src="/logo.svg" alt="batze" class="h-5 w-auto dark:invert">
+          </template>
+        </UDashboardNavbar>
       </template>
       <template #body>
         <div class="mx-auto w-full max-w-6xl">
