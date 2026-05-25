@@ -131,9 +131,6 @@ const details = computed(() => {
           {{ customer.type === 'company' ? $t('customers.typeCompany') : $t('customers.typePerson') }}
         </UBadge>
       </template>
-      <template #actions>
-        <UButton icon="i-lucide-plus" @click="newInvoice">{{ $t('customers.newInvoice') }}</UButton>
-      </template>
     </PageHeader>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -202,17 +199,17 @@ const details = computed(() => {
 
       <template #invoices>
         <UCard class="mt-4">
+          <div class="flex justify-end mb-4">
+            <UButton icon="i-lucide-plus" @click="newInvoice">{{ $t('customers.newInvoice') }}</UButton>
+          </div>
+
           <EmptyState
             v-if="!invoices.length"
             :bordered="false"
             icon="i-lucide-file-text"
             :title="$t('customers.noInvoicesTitle')"
             :description="$t('customers.noInvoicesText')"
-          >
-            <template #action>
-              <UButton icon="i-lucide-plus" @click="newInvoice">{{ $t('customers.newInvoice') }}</UButton>
-            </template>
-          </EmptyState>
+          />
           <ul v-else class="divide-y divide-default -my-2">
             <li v-for="inv in invoices" :key="inv.id" class="flex items-center gap-3 py-3">
               <NuxtLink :to="`/invoices/${inv.id}`" class="flex-1 min-w-0 hover:underline">
