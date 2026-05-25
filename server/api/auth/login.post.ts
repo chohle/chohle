@@ -5,8 +5,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const owner = useDb()
-    .prepare('SELECT username, password_hash FROM owner WHERE id = 1')
-    .get() as { username: string, password_hash: string } | undefined
+    .prepare('SELECT username, password_hash, locale FROM owner WHERE id = 1')
+    .get() as { username: string, password_hash: string, locale: string } | undefined
 
   const valid =
     owner && owner.username === username && (await verifyPassword(owner.password_hash, password))
@@ -14,6 +14,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
   }
 
-  await setUserSession(event, { user: { username: owner.username } })
+  await setUserSession(event, { user: { username: owner.username, locale: owner.locale } })
   return { ok: true }
 })

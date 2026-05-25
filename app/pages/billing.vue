@@ -18,6 +18,7 @@ interface Sender {
   logo_path: string | null
 }
 
+const { t } = useI18n()
 const { data, refresh } = await useFetch<Sender>('/api/sender')
 const toast = useToast()
 const d = data.value!
@@ -50,17 +51,17 @@ watch(() => form.type, (t) => {
   form.vatRegistered = t === 'company'
 })
 
-const typeItems = [
-  { label: 'Private person', value: 'person' },
-  { label: 'Company', value: 'company' }
-]
+const typeItems = computed(() => [
+  { label: t('customers.typePerson'), value: 'person' },
+  { label: t('customers.typeCompany'), value: 'company' }
+])
 
 const saving = ref(false)
 async function save() {
   saving.value = true
   try {
     await $fetch('/api/sender', { method: 'PUT', body: { ...form } })
-    toast.add({ title: 'Billing details saved', color: 'success' })
+    toast.add({ title: t('billing.toastSaved'), color: 'success' })
   } finally {
     saving.value = false
   }
@@ -69,7 +70,7 @@ async function save() {
 
 <template>
   <div class="mx-auto max-w-2xl">
-    <PageHeader title="Billing" description="Who appears as the sender on your invoices and QR-bill." />
+    <PageHeader :title="$t('user.billing')" :description="$t('billing.subtitle')" />
 
     <UCard>
       <form class="space-y-6" @submit.prevent="save">
@@ -79,69 +80,69 @@ async function save() {
           remove-url="/api/sender/logo"
           @changed="refresh"
         />
-        <UFormField label="You invoice as">
+        <UFormField :label="$t('billing.invoiceAs')">
           <USelect v-model="form.type" :items="typeItems" class="w-48" />
         </UFormField>
 
         <USwitch
           v-model="form.vatRegistered"
-          label="Charge MWST (VAT-registered)"
-          description="Turn on if you are registered for Swiss VAT (mandatory above CHF 100,000 turnover). When off, your invoices carry no MWST."
+          :label="$t('billing.vatLabel')"
+          :description="$t('billing.vatDescription')"
         />
 
         <div class="grid sm:grid-cols-2 gap-4">
           <UFormField
-            :label="form.type === 'company' ? 'Company name' : 'Name'"
+            :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')"
             class="sm:col-span-2"
           >
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
-          <UFormField label="Street" class="sm:col-span-2">
+          <UFormField :label="$t('customers.street')" class="sm:col-span-2">
             <UInput v-model="form.street" class="w-full" />
           </UFormField>
-          <UFormField label="ZIP">
+          <UFormField :label="$t('customers.zip')">
             <UInput v-model="form.zip" class="w-full" />
           </UFormField>
-          <UFormField label="City">
+          <UFormField :label="$t('customers.city')">
             <UInput v-model="form.city" class="w-full" />
           </UFormField>
-          <UFormField label="Country">
+          <UFormField :label="$t('customers.country')">
             <UInput v-model="form.country" class="w-full" />
           </UFormField>
-          <UFormField label="IBAN">
+          <UFormField :label="$t('billing.iban')">
             <UInput v-model="form.iban" placeholder="CH.." class="w-full" />
           </UFormField>
-          <UFormField label="Email">
+          <UFormField :label="$t('customers.email')">
             <UInput v-model="form.email" type="email" class="w-full" />
           </UFormField>
-          <UFormField label="Phone">
+          <UFormField :label="$t('customers.phone')">
             <UInput v-model="form.phone" class="w-full" />
           </UFormField>
-          <UFormField label="Website" class="sm:col-span-2">
+          <UFormField :label="$t('customers.website')" class="sm:col-span-2">
             <UInput v-model="form.website" class="w-full" />
           </UFormField>
         </div>
 
         <div v-if="form.type === 'company'" class="border-t border-default pt-6">
-          <h2 class="font-semibold mb-4">Company details</h2>
+          <h2 class="font-semibold mb-4">{{ $t('billing.companyDetails') }}</h2>
           <div class="grid sm:grid-cols-2 gap-4">
-            <UFormField label="UID">
+            <UFormField :label="$t('customers.uid')">
               <UInput v-model="form.uid" placeholder="CHE-123.456.789" class="w-full" />
             </UFormField>
-            <UFormField label="MWST number">
+            <UFormField :label="$t('customers.mwstNumber')">
               <UInput v-model="form.mwst" placeholder="CHE-123.456.789 MWST" class="w-full" />
             </UFormField>
-            <UFormField label="HR number">
+            <UFormField :label="$t('customers.hrNumber')">
               <UInput v-model="form.hrNumber" class="w-full" />
             </UFormField>
-            <UFormField label="Founding year">
+            <UFormField :label="$t('customers.foundingYear')">
               <UInput v-model.number="form.foundingYear" type="number" class="w-full" />
             </UFormField>
           </div>
         </div>
 
         <div class="flex justify-end">
-          <UButton type="submit" :loading="saving">Save</UButton>
+          <UButton type="submit" :loading="saving">{{ $t('common.save') }}</UButton>
         </div>
       </form>
     </UCard>

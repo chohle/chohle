@@ -73,28 +73,28 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
 
 <template>
   <div>
-    <PageHeader title="Categories" description="Labels for organizing expenses and income." />
+    <PageHeader :title="$t('nav.categories')" :description="$t('categories.subtitle')" />
 
     <UCard>
       <div class="flex justify-end mb-4">
-        <UButton icon="i-lucide-plus" @click="openCreate">Add category</UButton>
+        <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('categories.add') }}</UButton>
       </div>
 
       <EmptyState
         v-if="!expense.length && !income.length"
         icon="i-lucide-tags"
-        title="No categories"
-        description="Create categories to organize your expenses and income."
+        :title="$t('categories.emptyTitle')"
+        :description="$t('categories.emptyText')"
       />
       <div v-else class="grid sm:grid-cols-2 gap-6">
-        <CategoryList title="Expenses" :categories="expense" @edit="openEdit" @remove="removeCategory" />
-        <CategoryList title="Income" :categories="income" @edit="openEdit" @remove="removeCategory" />
+        <CategoryList :title="$t('nav.expenses')" :categories="expense" @edit="openEdit" @remove="removeCategory" />
+        <CategoryList :title="$t('nav.income')" :categories="income" @edit="openEdit" @remove="removeCategory" />
       </div>
     </UCard>
 
     <USlideover
       v-model:open="open"
-      :title="form.id ? 'Edit category' : 'Add category'"
+      :title="form.id ? $t('categories.edit') : $t('categories.add')"
       :ui="{ content: 'max-w-md' }"
     >
       <template #body>
@@ -106,33 +106,33 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
             >
               <UIcon :name="form.icon" class="size-5" />
             </span>
-            <span class="font-medium truncate">{{ form.name || 'New category' }}</span>
+            <span class="font-medium truncate">{{ form.name || $t('categories.newCategory') }}</span>
           </div>
 
-          <UFormField label="Name">
-            <UInput v-model="form.name" placeholder="e.g. Groceries" class="w-full" autofocus />
+          <UFormField :label="$t('common.name')">
+            <UInput v-model="form.name" :placeholder="$t('categories.namePlaceholder')" class="w-full" autofocus />
           </UFormField>
 
-          <UFormField label="Type">
+          <UFormField :label="$t('common.type')">
             <div class="flex gap-2">
               <UButton
                 :variant="form.type === 'expense' ? 'solid' : 'outline'"
                 color="neutral"
                 @click="form.type = 'expense'"
               >
-                Expense
+                {{ $t('categories.typeExpense') }}
               </UButton>
               <UButton
                 :variant="form.type === 'income' ? 'solid' : 'outline'"
                 color="neutral"
                 @click="form.type = 'income'"
               >
-                Income
+                {{ $t('categories.typeIncome') }}
               </UButton>
             </div>
           </UFormField>
 
-          <UFormField label="Icon">
+          <UFormField :label="$t('categories.icon')">
             <div class="grid grid-cols-6 gap-2">
               <button
                 v-for="ic in iconOptions"
@@ -149,7 +149,7 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
             </div>
           </UFormField>
 
-          <UFormField label="Color">
+          <UFormField :label="$t('categories.color')">
             <div class="flex flex-wrap gap-2.5">
               <button
                 v-for="col in colorOptions"
@@ -168,8 +168,8 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">Cancel</UButton>
-          <UButton :loading="saving" @click="save">Save</UButton>
+          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
+          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

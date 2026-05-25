@@ -15,7 +15,7 @@ defineEmits<{ edit: [Category], remove: [number] }>()
   <div>
     <h2 class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">{{ title }}</h2>
 
-    <p v-if="!categories.length" class="text-muted text-sm">Nothing here yet.</p>
+    <p v-if="!categories.length" class="text-muted text-sm">{{ $t('categories.nothingHere') }}</p>
     <div v-else class="space-y-2">
       <div
         v-for="c in categories"

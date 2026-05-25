@@ -61,7 +61,7 @@ async function remove(id: number) {
       :loading="uploading"
       @click="input?.click()"
     >
-      Receipt
+      {{ $t('expenses.receipt') }}
     </UButton>
     <input
       ref="input"

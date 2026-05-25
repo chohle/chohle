@@ -24,6 +24,7 @@ interface Customer {
   logo_path: string | null
 }
 
+const { t } = useI18n()
 const route = useRoute()
 const id = route.params.id as string
 
@@ -62,15 +63,15 @@ const stats = computed(() => {
 })
 
 const tabItems = computed(() => [
-  { label: 'Details', icon: 'i-lucide-id-card', slot: 'details' },
+  { label: t('customers.details'), icon: 'i-lucide-id-card', slot: 'details' },
   {
-    label: 'Articles',
+    label: t('nav.articles'),
     icon: 'i-lucide-package',
     slot: 'articles',
     badge: customerArticles.value.length || undefined
   },
   {
-    label: 'Invoices',
+    label: t('customers.invoices'),
     icon: 'i-lucide-file-text',
     slot: 'invoices',
     badge: invoices.value.length || undefined
@@ -99,21 +100,21 @@ const details = computed(() => {
     .join(', ')
   return (
     [
-      ['Contact person', c.contact_person],
-      ['Email', c.email],
-      ['Phone', c.phone],
-      ['Website', c.website],
-      ['Social', c.social],
-      ['Address', address],
-      ['Customer number', c.customer_number],
-      ['Language', c.language],
-      ['Price category', c.price_category],
-      ['Discount', c.discount_percent ? `${c.discount_percent}%` : null],
-      ['Payment term', `${c.payment_term_days} days`],
-      ['UID', c.uid],
-      ['MWST', c.mwst],
-      ['HR number', c.hr_number],
-      ['Founding year', c.founding_year]
+      [t('customers.contactPerson'), c.contact_person],
+      [t('customers.email'), c.email],
+      [t('customers.phone'), c.phone],
+      [t('customers.website'), c.website],
+      [t('customers.social'), c.social],
+      [t('customers.address'), address],
+      [t('customers.customerNumber'), c.customer_number],
+      [t('customers.language'), c.language ? t(`languages.${c.language}`) : null],
+      [t('customers.priceCategory'), c.price_category],
+      [t('customers.discount'), c.discount_percent ? `${c.discount_percent}%` : null],
+      [t('customers.paymentTerm'), t('customers.days', { n: c.payment_term_days })],
+      [t('customers.uid'), c.uid],
+      [t('common.vat'), c.mwst],
+      [t('customers.hrNumber'), c.hr_number],
+      [t('customers.foundingYear'), c.founding_year]
     ] as [string, unknown][]
   ).filter(([, v]) => v !== null && v !== undefined && v !== '')
 })
@@ -121,17 +122,17 @@ const details = computed(() => {
 
 <template>
   <div v-if="customer">
-    <PageHeader :title="customer.name" back-to="/customers" back-label="Customers">
+    <PageHeader :title="customer.name" back-to="/customers" :back-label="$t('nav.customers')">
       <template #leading>
         <UAvatar :alt="customer.name" :src="logoSrc ?? undefined" size="lg" />
       </template>
       <template #description>
         <UBadge :color="customer.type === 'company' ? 'primary' : 'neutral'" variant="subtle">
-          {{ customer.type === 'company' ? 'Company' : 'Private person' }}
+          {{ customer.type === 'company' ? $t('customers.typeCompany') : $t('customers.typePerson') }}
         </UBadge>
       </template>
       <template #actions>
-        <UButton icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
+        <UButton icon="i-lucide-plus" @click="newInvoice">{{ $t('customers.newInvoice') }}</UButton>
       </template>
     </PageHeader>
 
@@ -142,7 +143,7 @@ const details = computed(() => {
             <UIcon name="i-lucide-file-text" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Invoices</div>
+            <div class="text-sm text-muted">{{ $t('customers.invoices') }}</div>
             <div class="text-xl font-semibold tabular-nums">{{ stats.count }}</div>
           </div>
         </div>
@@ -153,7 +154,7 @@ const details = computed(() => {
             <UIcon name="i-lucide-circle-check" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Paid</div>
+            <div class="text-sm text-muted">{{ $t('status.paid') }}</div>
             <div class="text-xl font-semibold tabular-nums">CHF {{ chf(stats.paid) }}</div>
           </div>
         </div>
@@ -164,7 +165,7 @@ const details = computed(() => {
             <UIcon name="i-lucide-clock" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Outstanding</div>
+            <div class="text-sm text-muted">{{ $t('customers.outstanding') }}</div>
             <div class="text-xl font-semibold tabular-nums">CHF {{ chf(stats.outstanding) }}</div>
           </div>
         </div>
@@ -205,21 +206,21 @@ const details = computed(() => {
             v-if="!invoices.length"
             :bordered="false"
             icon="i-lucide-file-text"
-            title="No invoices yet"
-            description="Create the first invoice for this customer."
+            :title="$t('customers.noInvoicesTitle')"
+            :description="$t('customers.noInvoicesText')"
           >
             <template #action>
-              <UButton icon="i-lucide-plus" @click="newInvoice">New invoice</UButton>
+              <UButton icon="i-lucide-plus" @click="newInvoice">{{ $t('customers.newInvoice') }}</UButton>
             </template>
           </EmptyState>
           <ul v-else class="divide-y divide-default -my-2">
             <li v-for="inv in invoices" :key="inv.id" class="flex items-center gap-3 py-3">
               <NuxtLink :to="`/invoices/${inv.id}`" class="flex-1 min-w-0 hover:underline">
                 <span class="font-medium">{{ inv.number }}</span>
-                <span class="text-muted"> · {{ inv.title || 'Untitled' }}</span>
+                <span class="text-muted"> · {{ inv.title || $t('common.untitled') }}</span>
               </NuxtLink>
               <UBadge :color="statusColor[inv.status]" variant="subtle" size="sm">
-                {{ inv.status }}
+                {{ $t(`status.${inv.status}`) }}
               </UBadge>
               <span class="text-sm whitespace-nowrap tabular-nums">CHF {{ chf(inv.total_rappen) }}</span>
             </li>

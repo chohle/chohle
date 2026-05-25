@@ -54,6 +54,15 @@ const { data: qrbill } = await useFetch<string>(`/api/invoices/${id}/qrbill`, {
   responseType: 'text',
   ignoreResponseError: true
 })
+
+// The printed invoice is a document for the customer, so render it in their
+// language regardless of the owner's UI locale. Page controls stay on $t.
+const { t, loadLocaleMessages } = useI18n()
+const docLocale = customer.value?.language ?? 'en'
+await loadLocaleMessages(docLocale)
+function td(key: string, named?: Record<string, unknown>) {
+  return t(key, named ?? {}, { locale: docLocale })
+}
 const hasQrbill = computed(() => typeof qrbill.value === 'string' && qrbill.value.includes('<svg'))
 const senderLogo = computed(() =>
   sender.value?.logo_path ? `/api/sender/logo?v=${sender.value.logo_path}` : null
@@ -95,8 +104,8 @@ function printPage() {
 <template>
   <div class="min-h-screen bg-gray-100 text-black">
     <div class="print:hidden bg-white border-b border-gray-300 px-6 py-3 flex gap-2">
-      <UButton color="neutral" variant="ghost" :to="`/invoices/${id}`">&larr; Back to editor</UButton>
-      <UButton icon="i-lucide-printer" @click="printPage">Print / Save as PDF</UButton>
+      <UButton color="neutral" variant="ghost" :to="`/invoices/${id}`">&larr; {{ $t('invoices.backToEditor') }}</UButton>
+      <UButton icon="i-lucide-printer" @click="printPage">{{ $t('invoices.printSave') }}</UButton>
     </div>
 
     <div
@@ -113,25 +122,25 @@ function printPage() {
         <div class="flex justify-between gap-10">
           <div>
             <div class="mb-2 flex items-baseline gap-6">
-              <span class="font-bold">Rechnung</span>
-              <span class="text-gray-500">Seite 1 / 1</span>
+              <span class="font-bold">{{ td('invoiceDoc.invoice') }}</span>
+              <span class="text-gray-500">{{ td('invoiceDoc.page') }}</span>
             </div>
             <table>
               <tbody class="align-top">
                 <tr>
-                  <td class="pr-4 text-gray-600">Rechnungs-Nr.</td>
+                  <td class="pr-4 text-gray-600">{{ td('invoiceDoc.invoiceNo') }}</td>
                   <td>{{ invoice.number }}</td>
                 </tr>
                 <tr v-if="customer?.customer_number">
-                  <td class="pr-4 text-gray-600">Kunden-Nr.</td>
+                  <td class="pr-4 text-gray-600">{{ td('invoiceDoc.customerNo') }}</td>
                   <td>{{ customer.customer_number }}</td>
                 </tr>
                 <tr>
-                  <td class="pr-4 text-gray-600">Datum:</td>
+                  <td class="pr-4 text-gray-600">{{ td('invoiceDoc.date') }}</td>
                   <td>{{ dateDe(invoice.issue_date) }}</td>
                 </tr>
                 <tr>
-                  <td class="pr-4 text-gray-600">zahlbar bis:</td>
+                  <td class="pr-4 text-gray-600">{{ td('invoiceDoc.payableUntil') }}</td>
                   <td>{{ dateDe(invoice.due_date) }}</td>
                 </tr>
               </tbody>
@@ -155,11 +164,11 @@ function printPage() {
         <table class="mt-6 w-full border-collapse">
           <thead>
             <tr class="border-y border-black">
-              <th class="py-2 pr-3 text-left font-semibold">Bezeichnung</th>
-              <th class="py-2 px-3 text-right font-semibold">Menge</th>
-              <th class="py-2 px-3 text-left font-semibold">Einheit</th>
-              <th class="py-2 px-3 text-right font-semibold">Preis</th>
-              <th class="py-2 pl-3 text-right font-semibold">Betrag</th>
+              <th class="py-2 pr-3 text-left font-semibold">{{ td('invoiceDoc.description') }}</th>
+              <th class="py-2 px-3 text-right font-semibold">{{ td('invoiceDoc.quantity') }}</th>
+              <th class="py-2 px-3 text-left font-semibold">{{ td('invoiceDoc.unit') }}</th>
+              <th class="py-2 px-3 text-right font-semibold">{{ td('invoiceDoc.price') }}</th>
+              <th class="py-2 pl-3 text-right font-semibold">{{ td('invoiceDoc.amount') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -178,15 +187,15 @@ function printPage() {
           <table>
             <tbody>
               <tr>
-                <td class="py-0.5 pr-12 text-gray-600">Summe in CHF</td>
+                <td class="py-0.5 pr-12 text-gray-600">{{ td('invoiceDoc.sumInChf') }}</td>
                 <td class="py-0.5 text-right tabular-nums">{{ chf(totals.nettoRappen) }}</td>
               </tr>
               <tr v-for="r in totals.mwstByRate" :key="r.rate">
-                <td class="py-0.5 pr-12 text-gray-600">MWST {{ r.rate }} % zzgl.</td>
+                <td class="py-0.5 pr-12 text-gray-600">{{ td('invoiceDoc.vatLine', { rate: r.rate }) }}</td>
                 <td class="py-0.5 text-right tabular-nums">{{ chf(r.mwstRappen) }}</td>
               </tr>
               <tr class="border-t border-black font-bold">
-                <td class="py-1.5 pr-12">Rechnungsbetrag CHF</td>
+                <td class="py-1.5 pr-12">{{ td('invoiceDoc.invoiceAmountChf') }}</td>
                 <td class="py-1.5 text-right tabular-nums">{{ chf(totals.totalRappen) }}</td>
               </tr>
             </tbody>
@@ -202,7 +211,7 @@ function printPage() {
       <!-- Swiss QR-bill (bottom 105mm) -->
       <div v-if="hasQrbill" class="w-full" v-html="qrbill" />
       <p v-else class="px-[20mm] pb-8 text-[10px] text-gray-500">
-        Add a valid IBAN and sender address in Billing to show the Swiss QR-bill.
+        {{ $t('invoices.qrHint') }}
       </p>
     </div>
   </div>

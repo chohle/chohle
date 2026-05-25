@@ -18,18 +18,19 @@ interface IncomeSource {
   paid: boolean
 }
 
+const { t, locale } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
 const { data, refresh } = await useFetch<{ month: string, sources: IncomeSource[] }>(
   '/api/income/overview',
   { query: { month }, default: () => ({ month: '', sources: [] }) }
 )
 
-const ruleItems = [
-  { label: 'Pay earlier', value: 'earlier' },
-  { label: 'Pay later', value: 'later' },
-  { label: 'Leave as is', value: 'none' }
-]
-const ruleLabel = (r: string) => ruleItems.find((i) => i.value === r)?.label ?? r
+const ruleItems = computed(() => [
+  { label: t('income.ruleEarlier'), value: 'earlier' },
+  { label: t('income.ruleLater'), value: 'later' },
+  { label: t('income.ruleNone'), value: 'none' }
+])
+const ruleLabel = (r: string) => ruleItems.value.find((i) => i.value === r)?.label ?? r
 
 function blank() {
   return {
@@ -113,7 +114,7 @@ function chf(rappen: number) {
 
 function formatDate(iso: string) {
   const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d).toLocaleDateString('de-CH', {
+  return new Date(y, m - 1, d).toLocaleDateString(locale.value, {
     weekday: 'short',
     day: '2-digit',
     month: 'short',
@@ -124,7 +125,7 @@ function formatDate(iso: string) {
 
 <template>
   <div>
-    <PageHeader title="Income" description="Salary and jobs with Swiss pay-date calculation.">
+    <PageHeader :title="$t('nav.income')" :description="$t('income.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
       </template>
@@ -132,14 +133,14 @@ function formatDate(iso: string) {
 
     <UCard>
       <div class="flex justify-end mb-4">
-        <UButton icon="i-lucide-plus" @click="openCreate">Add job</UButton>
+        <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('income.add') }}</UButton>
       </div>
 
       <EmptyState
         v-if="!data.sources.length"
         icon="i-lucide-briefcase"
-        title="No jobs yet"
-        description="Add a job to track salary and Swiss pay dates."
+        :title="$t('income.emptyTitle')"
+        :description="$t('income.emptyText')"
       />
       <div v-else class="grid sm:grid-cols-2 gap-4">
         <div
@@ -171,24 +172,24 @@ function formatDate(iso: string) {
         </div>
         <div class="text-xl font-semibold mt-2">{{ s.currency }} {{ chf(s.salary_rappen) }}</div>
         <div class="text-sm text-muted mt-1">
-          Pays on the {{ s.payout_day }}. · {{ s.canton }} · {{ ruleLabel(s.payout_rule) }}
+          {{ $t('income.paysOn', { day: s.payout_day }) }} · {{ s.canton }} · {{ ruleLabel(s.payout_rule) }}
         </div>
         <div class="mt-3 pt-3 border-t border-default flex items-start justify-between gap-2">
           <div>
-            <div class="text-xs text-muted">Pays this month</div>
+            <div class="text-xs text-muted">{{ $t('income.paysThisMonth') }}</div>
             <div class="font-medium">{{ formatDate(s.pay_date) }}</div>
             <UBadge v-if="s.reason" color="warning" variant="subtle" size="sm" class="mt-1">
-              Moved · {{ s.reason }}
+              {{ $t('income.moved') }} · {{ s.reason }}
             </UBadge>
-            <div v-else class="text-xs text-muted mt-0.5">On the scheduled day</div>
+            <div v-else class="text-xs text-muted mt-0.5">{{ $t('income.onSchedule') }}</div>
           </div>
           <div class="text-right">
             <UBadge :color="s.paid ? 'success' : 'neutral'" variant="subtle">
-              {{ s.paid ? 'Received' : 'Pending' }}
+              {{ s.paid ? $t('common.received') : $t('common.pending') }}
             </UBadge>
             <div>
               <UButton size="xs" variant="link" class="px-0" @click="togglePaid(s.id)">
-                {{ s.paid ? 'Mark unpaid' : 'Mark as paid' }}
+                {{ s.paid ? $t('income.markUnpaid') : $t('income.markPaid') }}
               </UButton>
             </div>
           </div>
@@ -199,35 +200,35 @@ function formatDate(iso: string) {
 
     <USlideover
       v-model:open="open"
-      :title="form.id ? 'Edit job' : 'Add job'"
+      :title="form.id ? $t('income.edit') : $t('income.add')"
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
         <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField label="Company" class="sm:col-span-2">
+          <UFormField :label="$t('income.company')" class="sm:col-span-2">
             <UInput v-model="form.company" class="w-full" />
           </UFormField>
-          <UFormField label="Job title" class="sm:col-span-2">
+          <UFormField :label="$t('income.jobTitle')" class="sm:col-span-2">
             <UInput v-model="form.jobTitle" class="w-full" />
           </UFormField>
-          <UFormField label="Monthly salary (CHF)">
+          <UFormField :label="$t('income.salary')">
             <UInput v-model.number="form.salary" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
-          <UFormField label="Payout day">
+          <UFormField :label="$t('income.payoutDay')">
             <UInput v-model.number="form.payoutDay" type="number" min="1" max="31" class="w-full" />
           </UFormField>
-          <UFormField label="Canton">
+          <UFormField :label="$t('income.canton')">
             <USelect v-model="form.canton" :items="cantons" class="w-full" />
           </UFormField>
-          <UFormField label="Adjustment">
+          <UFormField :label="$t('income.adjustment')">
             <USelect v-model="form.payoutRule" :items="ruleItems" class="w-full" />
           </UFormField>
         </form>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">Cancel</UButton>
-          <UButton :loading="saving" @click="save">Save</UButton>
+          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
+          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

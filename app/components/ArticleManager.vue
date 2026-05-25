@@ -72,23 +72,23 @@ function chf(rappen: number) {
 <template>
   <div>
     <div class="flex justify-end mb-4">
-      <UButton icon="i-lucide-plus" @click="openCreate">Add article</UButton>
+      <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('articles.add') }}</UButton>
     </div>
 
     <EmptyState
       v-if="!articles.length"
       icon="i-lucide-package"
-      title="No articles"
-      description="Add reusable line items to drop onto invoices."
+      :title="$t('articles.emptyTitle')"
+      :description="$t('articles.emptyText')"
     />
     <div v-else class="overflow-x-auto">
       <table class="w-full min-w-[480px] text-sm">
       <thead class="text-muted text-left">
         <tr class="border-b border-default">
-          <th class="py-2 font-medium">Name</th>
-          <th class="py-2 font-medium">Unit</th>
-          <th class="py-2 font-medium text-right">Price</th>
-          <th class="py-2 font-medium text-right">MWST</th>
+          <th class="py-2 font-medium">{{ $t('common.name') }}</th>
+          <th class="py-2 font-medium">{{ $t('articles.colUnit') }}</th>
+          <th class="py-2 font-medium text-right">{{ $t('articles.colPrice') }}</th>
+          <th class="py-2 font-medium text-right">{{ $t('common.vat') }}</th>
           <th class="py-2" />
         </tr>
       </thead>
@@ -113,29 +113,29 @@ function chf(rappen: number) {
 
     <USlideover
       v-model:open="open"
-      :title="form.id ? 'Edit article' : 'Add article'"
+      :title="form.id ? $t('articles.edit') : $t('articles.add')"
       :ui="{ content: 'max-w-md' }"
     >
       <template #body>
         <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField label="Name" class="sm:col-span-2">
-            <UInput v-model="form.name" placeholder="e.g. Wartungsarbeiten" class="w-full" />
+          <UFormField :label="$t('common.name')" class="sm:col-span-2">
+            <UInput v-model="form.name" :placeholder="$t('articles.namePlaceholder')" class="w-full" />
           </UFormField>
-          <UFormField label="Unit">
-            <UInput v-model="form.unit" placeholder="Stunden, Pauschal, ..." class="w-full" />
+          <UFormField :label="$t('articles.unit')">
+            <UInput v-model="form.unit" :placeholder="$t('articles.unitPlaceholder')" class="w-full" />
           </UFormField>
-          <UFormField label="Price (CHF)">
+          <UFormField :label="$t('articles.price')">
             <UInput v-model.number="form.price" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
-          <UFormField label="MWST %" class="sm:col-span-2">
+          <UFormField :label="$t('articles.mwstPercent')" class="sm:col-span-2">
             <UInput v-model.number="form.mwst" type="number" min="0" step="0.1" class="w-full" />
           </UFormField>
         </form>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">Cancel</UButton>
-          <UButton :loading="saving" @click="save">Save</UButton>
+          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
+          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

@@ -225,6 +225,10 @@ const migrations: Migration[] = [
     // Whether the owner charges MWST. Off (e.g. a private person under the CHF 100k
     // threshold) means invoices carry no VAT.
     up: 'ALTER TABLE sender ADD COLUMN vat_registered INTEGER NOT NULL DEFAULT 0'
+  },
+  {
+    name: '0017_owner_locale',
+    up: "ALTER TABLE owner ADD COLUMN locale TEXT NOT NULL DEFAULT 'en'"
   }
 ]
 

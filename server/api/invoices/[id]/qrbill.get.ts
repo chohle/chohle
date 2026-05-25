@@ -13,6 +13,7 @@ interface Party {
   city: string | null
   country: string
   iban?: string | null
+  language?: string | null
 }
 interface ItemRow {
   quantity: number
@@ -95,10 +96,14 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Render the QR-bill in the customer's language so it matches the invoice.
+  const langMap: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = { de: 'DE', fr: 'FR', it: 'IT', en: 'EN' }
+  const language = langMap[customer?.language ?? ''] ?? 'DE'
+
   let svg: string
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    svg = new SwissQRBill(data as any).toString()
+    svg = new SwissQRBill(data as any, { language }).toString()
   } catch (e) {
     throw createError({
       statusCode: 422,

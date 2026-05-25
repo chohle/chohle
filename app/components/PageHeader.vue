@@ -10,7 +10,7 @@ defineProps<{ title?: string, description?: string, backTo?: string, backLabel?:
       class="inline-flex items-center gap-1 text-sm text-muted hover:text-default transition mb-3"
     >
       <UIcon name="i-lucide-arrow-left" class="size-4" />
-      {{ backLabel ?? 'Back' }}
+      {{ backLabel ?? $t('common.back') }}
     </NuxtLink>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

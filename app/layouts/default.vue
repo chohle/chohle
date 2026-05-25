@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
 
+const { t } = useI18n()
 const { user, clear } = useUserSession()
 const username = computed(() => user.value?.username ?? 'Owner')
 
@@ -9,23 +10,23 @@ async function onSignOut() {
   await navigateTo('/login')
 }
 
-const items: NavigationMenuItem[] = [
-  { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/' },
-  { label: 'Expenses', icon: 'i-lucide-receipt', to: '/expenses' },
-  { label: 'Income', icon: 'i-lucide-banknote', to: '/income' },
-  { label: 'Customers', icon: 'i-lucide-users', to: '/customers' },
-  { label: 'Articles', icon: 'i-lucide-package', to: '/articles' },
-  { label: 'Categories', icon: 'i-lucide-tags', to: '/categories' }
-]
+const items = computed<NavigationMenuItem[]>(() => [
+  { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
+  { label: t('nav.expenses'), icon: 'i-lucide-receipt', to: '/expenses' },
+  { label: t('nav.income'), icon: 'i-lucide-banknote', to: '/income' },
+  { label: t('nav.customers'), icon: 'i-lucide-users', to: '/customers' },
+  { label: t('nav.articles'), icon: 'i-lucide-package', to: '/articles' },
+  { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' }
+])
 
-const userMenu: DropdownMenuItem[][] = [
+const userMenu = computed<DropdownMenuItem[][]>(() => [
   [
-    { label: 'Profile', icon: 'i-lucide-user', to: '/profile' },
-    { label: 'Billing', icon: 'i-lucide-credit-card', to: '/billing' },
-    { label: 'Settings', icon: 'i-lucide-settings', to: '/settings' }
+    { label: t('user.profile'), icon: 'i-lucide-user', to: '/profile' },
+    { label: t('user.billing'), icon: 'i-lucide-credit-card', to: '/billing' },
+    { label: t('user.settings'), icon: 'i-lucide-settings', to: '/settings' }
   ],
-  [{ label: 'Log out', icon: 'i-lucide-log-out', onSelect: onSignOut }]
-]
+  [{ label: t('user.logout'), icon: 'i-lucide-log-out', onSelect: onSignOut }]
+])
 </script>
 
 <template>

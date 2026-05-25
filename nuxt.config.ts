@@ -2,8 +2,22 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui', 'nuxt-auth-utils'],
+  modules: ['@nuxt/ui', 'nuxt-auth-utils', '@nuxtjs/i18n'],
   css: ['~/assets/css/main.css'],
+  i18n: {
+    strategy: 'no_prefix',
+    defaultLocale: 'en',
+    langDir: 'locales',
+    lazy: true,
+    // Locale is a stored preference, not browser-sniffed; default stays English.
+    detectBrowserLanguage: false,
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'de', name: 'Deutsch', file: 'de.json' },
+      { code: 'fr', name: 'Français', file: 'fr.json' },
+      { code: 'it', name: 'Italiano', file: 'it.json' }
+    ]
+  },
   app: {
     head: {
       title: 'batze',

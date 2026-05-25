@@ -11,6 +11,7 @@ interface Summary {
   recurring: { company: string, salary_rappen: number, paid: boolean, pay_date: string, reason: string | null }[]
 }
 
+const { locale } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
 const { data } = await useFetch<Summary>('/api/summary', { query: { month } })
 
@@ -46,18 +47,18 @@ const netDelta = computed(() => {
 })
 
 function monthLabel(ym: string) {
-  return new Date(`${ym}-01`).toLocaleDateString('de-CH', { month: 'short' })
+  return new Date(`${ym}-01`).toLocaleDateString(locale.value, { month: 'short' })
 }
 
 function formatDate(iso: string) {
   const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d).toLocaleDateString('de-CH', { day: '2-digit', month: 'short' })
+  return new Date(y, m - 1, d).toLocaleDateString(locale.value, { day: '2-digit', month: 'short' })
 }
 </script>
 
 <template>
   <div v-if="data">
-    <PageHeader title="Dashboard" description="Your month at a glance.">
+    <PageHeader :title="$t('nav.dashboard')" :description="$t('dashboard.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
       </template>
@@ -70,13 +71,13 @@ function formatDate(iso: string) {
             <UIcon name="i-lucide-trending-up" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Income</div>
+            <div class="text-sm text-muted">{{ $t('dashboard.income') }}</div>
             <div class="text-xl font-semibold text-success tabular-nums">CHF {{ chf(data.income) }}</div>
             <div
               v-if="incomeDelta !== null"
               class="mt-0.5 flex items-center gap-0.5 text-xs"
               :class="incomeDelta >= 0 ? 'text-success' : 'text-error'"
-              title="vs. last month"
+              :title="$t('dashboard.vsLastMonth')"
             >
               <UIcon :name="incomeDelta >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
               {{ Math.abs(incomeDelta) }}%
@@ -90,13 +91,13 @@ function formatDate(iso: string) {
             <UIcon name="i-lucide-trending-down" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Expenses</div>
+            <div class="text-sm text-muted">{{ $t('dashboard.expenses') }}</div>
             <div class="text-xl font-semibold text-error tabular-nums">CHF {{ chf(data.expenses) }}</div>
             <div
               v-if="expensesDelta !== null"
               class="mt-0.5 flex items-center gap-0.5 text-xs"
               :class="expensesDelta <= 0 ? 'text-success' : 'text-error'"
-              title="vs. last month"
+              :title="$t('dashboard.vsLastMonth')"
             >
               <UIcon :name="expensesDelta >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
               {{ Math.abs(expensesDelta) }}%
@@ -113,7 +114,7 @@ function formatDate(iso: string) {
             <UIcon name="i-lucide-wallet" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Net</div>
+            <div class="text-sm text-muted">{{ $t('dashboard.net') }}</div>
             <div
               class="text-xl font-semibold tabular-nums"
               :class="data.net >= 0 ? 'text-success' : 'text-error'"
@@ -124,7 +125,7 @@ function formatDate(iso: string) {
               v-if="netDelta !== null"
               class="mt-0.5 flex items-center gap-0.5 text-xs"
               :class="netDelta >= 0 ? 'text-success' : 'text-error'"
-              title="vs. last month"
+              :title="$t('dashboard.vsLastMonth')"
             >
               <UIcon :name="netDelta >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
               {{ Math.abs(netDelta) }}%
@@ -138,10 +139,10 @@ function formatDate(iso: string) {
             <UIcon name="i-lucide-calendar-clock" class="size-5" />
           </span>
           <div class="min-w-0">
-            <div class="text-sm text-muted">Expected</div>
+            <div class="text-sm text-muted">{{ $t('dashboard.expected') }}</div>
             <div class="text-xl font-semibold tabular-nums">CHF {{ chf(data.expected) }}</div>
             <div v-if="data.outstanding > 0" class="text-xs text-muted">
-              CHF {{ chf(data.outstanding) }} outstanding
+              {{ $t('dashboard.outstanding', { amount: chf(data.outstanding) }) }}
             </div>
           </div>
         </div>
@@ -151,14 +152,14 @@ function formatDate(iso: string) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start">
       <UCard>
         <template #header>
-          <h2 class="font-semibold">Expenses by category</h2>
+          <h2 class="font-semibold">{{ $t('dashboard.expensesByCategory') }}</h2>
         </template>
         <EmptyState
           v-if="!data.byCategory.length"
           :bordered="false"
           icon="i-lucide-pie-chart"
-          title="No expenses this month"
-          description="Expenses you add will break down here by category."
+          :title="$t('dashboard.noExpensesTitle')"
+          :description="$t('dashboard.noExpensesText')"
         />
         <ul v-else class="space-y-3">
           <li v-for="c in data.byCategory" :key="c.name">
@@ -183,13 +184,13 @@ function formatDate(iso: string) {
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="font-semibold">6-month trend</h2>
+            <h2 class="font-semibold">{{ $t('dashboard.trend') }}</h2>
             <div class="flex items-center gap-3 text-xs text-muted">
               <span class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-success" />Income
+                <span class="size-2 rounded-full bg-success" />{{ $t('dashboard.income') }}
               </span>
               <span class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-error" />Expenses
+                <span class="size-2 rounded-full bg-error" />{{ $t('dashboard.expenses') }}
               </span>
             </div>
           </div>
@@ -207,12 +208,12 @@ function formatDate(iso: string) {
               <div
                 class="w-1/3 max-w-5 rounded-t bg-success transition-all"
                 :style="{ height: `${Math.max(1.5, (t.income / trendMax) * 100)}%` }"
-                :title="`Income: CHF ${chf(t.income)}`"
+                :title="`${$t('dashboard.income')}: CHF ${chf(t.income)}`"
               />
               <div
                 class="w-1/3 max-w-5 rounded-t bg-error transition-all"
                 :style="{ height: `${Math.max(1.5, (t.expenses / trendMax) * 100)}%` }"
-                :title="`Expenses: CHF ${chf(t.expenses)}`"
+                :title="`${$t('dashboard.expenses')}: CHF ${chf(t.expenses)}`"
               />
             </div>
           </div>
@@ -231,24 +232,24 @@ function formatDate(iso: string) {
 
     <UCard class="mt-6">
       <template #header>
-        <h2 class="font-semibold">Recurring income this month</h2>
+        <h2 class="font-semibold">{{ $t('dashboard.recurring') }}</h2>
       </template>
       <EmptyState
         v-if="!data.recurring.length"
         :bordered="false"
         icon="i-lucide-banknote"
-        title="No income sources yet"
-        description="Add a job on the Income page to track recurring pay."
+        :title="$t('dashboard.noIncomeTitle')"
+        :description="$t('dashboard.noIncomeText')"
       />
       <ul v-else class="divide-y divide-default -my-2">
         <li v-for="r in data.recurring" :key="r.company" class="flex items-center gap-3 py-3">
           <div class="flex-1 min-w-0">
             <div class="font-medium truncate">{{ r.company }}</div>
-            <div class="text-xs text-muted">Pays {{ formatDate(r.pay_date) }}</div>
+            <div class="text-xs text-muted">{{ $t('dashboard.pays', { date: formatDate(r.pay_date) }) }}</div>
           </div>
           <span class="text-sm whitespace-nowrap tabular-nums">CHF {{ chf(r.salary_rappen) }}</span>
           <UBadge :color="r.paid ? 'success' : 'neutral'" variant="subtle" size="sm">
-            {{ r.paid ? 'Received' : 'Pending' }}
+            {{ r.paid ? $t('dashboard.received') : $t('dashboard.pending') }}
           </UBadge>
         </li>
       </ul>

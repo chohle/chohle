@@ -1,6 +1,6 @@
 <template>
   <div>
-    <PageHeader title="Articles" description="Reusable line items shared across all customers." />
+    <PageHeader :title="$t('nav.articles')" :description="$t('articles.subtitle')" />
 
     <UCard>
       <ArticleManager list-url="/api/articles" create-url="/api/articles" />

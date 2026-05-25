@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
+const { t } = useI18n()
 const { fetch: refreshSession } = useUserSession()
 const state = reactive({ username: '', password: '' })
 const error = ref('')
@@ -14,7 +15,7 @@ async function onSubmit() {
     await refreshSession()
     await navigateTo('/')
   } catch {
-    error.value = 'Invalid username or password.'
+    error.value = t('login.invalid')
   } finally {
     loading.value = false
   }
@@ -29,10 +30,10 @@ async function onSubmit() {
       </template>
 
       <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-        <UFormField label="Username">
+        <UFormField :label="$t('common.username')">
           <UInput v-model="state.username" autocomplete="username" class="w-full" />
         </UFormField>
-        <UFormField label="Password">
+        <UFormField :label="$t('common.password')">
           <UInput
             v-model="state.password"
             type="password"
@@ -41,7 +42,7 @@ async function onSubmit() {
           />
         </UFormField>
         <p v-if="error" class="text-error text-sm">{{ error }}</p>
-        <UButton type="submit" :loading="loading" block>Sign in</UButton>
+        <UButton type="submit" :loading="loading" block>{{ $t('login.signIn') }}</UButton>
       </form>
     </UCard>
   </div>

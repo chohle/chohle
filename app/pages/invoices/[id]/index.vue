@@ -24,6 +24,7 @@ interface Article {
   default_mwst: number
 }
 
+const { t } = useI18n()
 const route = useRoute()
 const id = route.params.id as string
 const toast = useToast()
@@ -73,11 +74,11 @@ const items = ref<EditRow[]>(
 const articleItems = computed(() =>
   articles.value.map((a) => ({ label: a.name, value: a.id }))
 )
-const statusItems = [
-  { label: 'Draft', value: 'draft' },
-  { label: 'Sent', value: 'sent' },
-  { label: 'Paid', value: 'paid' }
-]
+const statusItems = computed(() => [
+  { label: t('status.draft'), value: 'draft' },
+  { label: t('status.sent'), value: 'sent' },
+  { label: t('status.paid'), value: 'paid' }
+])
 
 function onArticle(row: EditRow) {
   const a = articles.value.find((x) => x.id === row.articleId)
@@ -122,7 +123,7 @@ async function save() {
   saving.value = true
   try {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
-    toast.add({ title: 'Invoice saved', color: 'success' })
+    toast.add({ title: t('invoices.toastSaved'), color: 'success' })
   } finally {
     saving.value = false
   }
@@ -148,34 +149,34 @@ function chf(rappen: number) {
 <template>
   <div>
     <PageHeader
-      :title="`Invoice ${header.number}`"
+      :title="$t('invoices.titleNumber', { number: header.number })"
       :back-to="`/customers/${customerId}`"
-      back-label="Customer"
+      :back-label="$t('customers.colCustomer')"
     >
       <template #actions>
         <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="removeInvoice">
-          Delete
+          {{ $t('common.delete') }}
         </UButton>
-        <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">PDF Vorschau</UButton>
-        <UButton :loading="saving" @click="save">Save</UButton>
+        <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">{{ $t('invoices.pdfPreview') }}</UButton>
+        <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
       </template>
     </PageHeader>
 
     <UCard>
       <div class="grid sm:grid-cols-2 gap-4">
-        <UFormField label="Title" class="sm:col-span-2">
+        <UFormField :label="$t('common.title')" class="sm:col-span-2">
           <UInput v-model="header.title" class="w-full" />
         </UFormField>
-        <UFormField label="Number">
+        <UFormField :label="$t('invoices.number')">
           <UInput v-model="header.number" class="w-full" />
         </UFormField>
-        <UFormField label="Status">
+        <UFormField :label="$t('invoices.statusLabel')">
           <USelect v-model="header.status" :items="statusItems" class="w-full" />
         </UFormField>
-        <UFormField label="Issue date">
+        <UFormField :label="$t('invoices.issueDate')">
           <UInput v-model="header.issueDate" type="date" class="w-full" />
         </UFormField>
-        <UFormField label="Payable until">
+        <UFormField :label="$t('invoices.dueDate')">
           <UInput v-model="header.dueDate" type="date" class="w-full" />
         </UFormField>
       </div>
@@ -184,8 +185,8 @@ function chf(rappen: number) {
     <UCard class="mt-6">
       <template #header>
         <div class="flex items-center justify-between">
-          <h2 class="font-semibold">Line items</h2>
-          <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">Add line</UButton>
+          <h2 class="font-semibold">{{ $t('invoices.lineItems') }}</h2>
+          <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">{{ $t('invoices.addLine') }}</UButton>
         </div>
       </template>
 
@@ -193,23 +194,23 @@ function chf(rappen: number) {
         v-if="!items.length"
         :bordered="false"
         icon="i-lucide-list"
-        title="No line items"
-        description="Add a line, then pick an article to auto-fill it."
+        :title="$t('invoices.noLinesTitle')"
+        :description="$t('invoices.noLinesText')"
       >
         <template #action>
-          <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">Add line</UButton>
+          <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">{{ $t('invoices.addLine') }}</UButton>
         </template>
       </EmptyState>
       <div v-else>
         <div class="hidden sm:grid grid-cols-12 gap-2 pb-2 text-xs font-medium text-muted">
-          <div class="col-span-2">Article</div>
-          <div :class="vat ? 'col-span-3' : 'col-span-4'">Description</div>
-          <div class="col-span-1">Qty</div>
-          <div class="col-span-1">Unit</div>
-          <div class="col-span-1">Price</div>
-          <div class="col-span-1">Disc%</div>
-          <div v-if="vat" class="col-span-1">MWST%</div>
-          <div class="col-span-2 text-right">Amount</div>
+          <div class="col-span-2">{{ $t('invoices.article') }}</div>
+          <div :class="vat ? 'col-span-3' : 'col-span-4'">{{ $t('invoices.description') }}</div>
+          <div class="col-span-1">{{ $t('invoices.qty') }}</div>
+          <div class="col-span-1">{{ $t('articles.colUnit') }}</div>
+          <div class="col-span-1">{{ $t('articles.colPrice') }}</div>
+          <div class="col-span-1">{{ $t('invoices.discPct') }}</div>
+          <div v-if="vat" class="col-span-1">{{ $t('invoices.vatPct') }}</div>
+          <div class="col-span-2 text-right">{{ $t('common.amount') }}</div>
         </div>
 
         <div class="space-y-3 sm:space-y-0">
@@ -219,7 +220,7 @@ function chf(rappen: number) {
             class="grid grid-cols-2 sm:grid-cols-12 gap-x-2 gap-y-3 items-start sm:items-center rounded-lg border border-default p-3 sm:rounded-none sm:border-x-0 sm:border-t-0 sm:p-0 sm:pb-3 sm:last:border-b-0 sm:last:pb-0"
           >
             <div class="col-span-2">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Article</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.article') }}</label>
               <USelect
                 v-model="row.articleId"
                 :items="articleItems"
@@ -228,27 +229,27 @@ function chf(rappen: number) {
               />
             </div>
             <div class="col-span-2" :class="vat ? 'sm:col-span-3' : 'sm:col-span-4'">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Description</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.description') }}</label>
               <UInput v-model="row.description" class="w-full" />
             </div>
             <div class="col-span-1">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Qty</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.qty') }}</label>
               <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
             </div>
             <div class="col-span-1">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Unit</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('articles.colUnit') }}</label>
               <UInput v-model="row.unit" class="w-full" />
             </div>
             <div class="col-span-1">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Price</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('articles.colPrice') }}</label>
               <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
             </div>
             <div class="col-span-1">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Disc%</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.discPct') }}</label>
               <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
             </div>
             <div v-if="vat" class="col-span-1">
-              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">MWST%</label>
+              <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.vatPct') }}</label>
               <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
             </div>
             <div
@@ -273,15 +274,15 @@ function chf(rappen: number) {
     <UCard class="mt-6">
       <dl class="space-y-1 text-sm max-w-xs ml-auto">
         <div v-if="vat" class="flex justify-between">
-          <dt class="text-muted">Netto</dt>
+          <dt class="text-muted">{{ $t('invoices.netto') }}</dt>
           <dd>CHF {{ chf(totals.nettoRappen) }}</dd>
         </div>
         <div v-for="r in totals.mwstByRate" :key="r.rate" class="flex justify-between">
-          <dt class="text-muted">MWST {{ r.rate }}%</dt>
+          <dt class="text-muted">{{ $t('common.vat') }} {{ r.rate }}%</dt>
           <dd>CHF {{ chf(r.mwstRappen) }}</dd>
         </div>
         <div class="flex justify-between font-semibold border-t border-default pt-1">
-          <dt>Total</dt>
+          <dt>{{ $t('common.total') }}</dt>
           <dd>CHF {{ chf(totals.totalRappen) }}</dd>
         </div>
       </dl>

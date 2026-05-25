@@ -47,7 +47,7 @@ async function remove() {
         :loading="busy"
         @click="input?.click()"
       >
-        {{ src ? 'Replace logo' : 'Upload logo' }}
+        {{ src ? $t('logoUpload.replace') : $t('logoUpload.upload') }}
       </UButton>
       <UButton
         v-if="src"
@@ -57,7 +57,7 @@ async function remove() {
         icon="i-lucide-trash-2"
         @click="remove"
       >
-        Remove
+        {{ $t('logoUpload.remove') }}
       </UButton>
       <input ref="input" type="file" accept="image/*" class="hidden" @change="onFile">
     </div>

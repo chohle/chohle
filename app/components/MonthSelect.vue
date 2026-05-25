@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const model = defineModel<string>({ required: true })
+const { locale } = useI18n()
 
 function shift(delta: number) {
   const [y, m] = model.value.split('-').map(Number)
@@ -9,7 +10,7 @@ function shift(delta: number) {
 
 const label = computed(() => {
   const [y, m] = model.value.split('-').map(Number)
-  return new Date(y, m - 1, 1).toLocaleDateString('de-CH', { month: 'long', year: 'numeric' })
+  return new Date(y, m - 1, 1).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
 })
 </script>
 
@@ -19,7 +20,7 @@ const label = computed(() => {
       icon="i-lucide-chevron-left"
       color="neutral"
       variant="ghost"
-      aria-label="Previous month"
+      :aria-label="$t('common.prevMonth')"
       class="rounded-r-none"
       @click="shift(-1)"
     />
@@ -30,7 +31,7 @@ const label = computed(() => {
       icon="i-lucide-chevron-right"
       color="neutral"
       variant="ghost"
-      aria-label="Next month"
+      :aria-label="$t('common.nextMonth')"
       class="rounded-l-none"
       @click="shift(1)"
     />

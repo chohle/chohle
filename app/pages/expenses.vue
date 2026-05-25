@@ -22,6 +22,7 @@ interface Expense {
   attachments: { id: number, filename: string }[]
 }
 
+const { t } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
 
 const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
@@ -34,7 +35,7 @@ const { data: categories } = await useFetch<Category[]>('/api/categories', {
 
 const expenseCategories = computed(() => categories.value.filter((c) => c.type === 'expense'))
 const categoryItems = computed(() => [
-  { label: 'No category', value: null },
+  { label: t('expenses.noCategory'), value: null },
   ...expenseCategories.value.map((c) => ({ label: c.name, value: c.id }))
 ])
 
@@ -117,11 +118,11 @@ function chf(rappen: number) {
 
 <template>
   <div>
-    <PageHeader title="Expenses" description="Track what you buy, with the receipt.">
+    <PageHeader :title="$t('nav.expenses')" :description="$t('expenses.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
         <div class="inline-flex items-center gap-2 rounded-md bg-elevated px-3 h-8">
-          <span class="text-xs text-muted">Total</span>
+          <span class="text-xs text-muted">{{ $t('common.total') }}</span>
           <span class="text-sm font-semibold tabular-nums text-highlighted">CHF {{ chf(total) }}</span>
         </div>
       </template>
@@ -142,25 +143,25 @@ function chf(rappen: number) {
             {{ c.name }}
           </UButton>
         </div>
-        <UButton icon="i-lucide-plus" @click="openCreate">Add expense</UButton>
+        <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('expenses.add') }}</UButton>
       </div>
 
       <EmptyState
         v-if="!filtered.length"
         icon="i-lucide-receipt"
-        title="No expenses"
-        description="Add your first expense to start tracking where the money goes."
+        :title="$t('expenses.emptyTitle')"
+        :description="$t('expenses.emptyText')"
       />
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[680px] text-sm">
         <thead class="text-muted text-left">
           <tr class="border-b border-default">
-            <th class="py-2 font-medium">Date</th>
-            <th class="py-2 font-medium">Title</th>
-            <th class="py-2 font-medium">Category</th>
-            <th class="py-2 font-medium">Vendor</th>
-            <th class="py-2 font-medium">Receipts</th>
-            <th class="py-2 font-medium text-right">Amount</th>
+            <th class="py-2 font-medium">{{ $t('common.date') }}</th>
+            <th class="py-2 font-medium">{{ $t('common.title') }}</th>
+            <th class="py-2 font-medium">{{ $t('common.category') }}</th>
+            <th class="py-2 font-medium">{{ $t('common.vendor') }}</th>
+            <th class="py-2 font-medium">{{ $t('expenses.receipts') }}</th>
+            <th class="py-2 font-medium text-right">{{ $t('common.amount') }}</th>
             <th class="py-2" />
           </tr>
         </thead>
@@ -208,35 +209,35 @@ function chf(rappen: number) {
 
     <USlideover
       v-model:open="open"
-      :title="form.id ? 'Edit expense' : 'Add expense'"
+      :title="form.id ? $t('expenses.edit') : $t('expenses.add')"
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
         <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField label="Title" class="sm:col-span-2">
-            <UInput v-model="form.title" placeholder="e.g. Office chair" class="w-full" />
+          <UFormField :label="$t('common.title')" class="sm:col-span-2">
+            <UInput v-model="form.title" :placeholder="$t('expenses.titlePlaceholder')" class="w-full" />
           </UFormField>
-          <UFormField label="Amount (CHF)">
+          <UFormField :label="$t('expenses.amountField')">
             <UInput v-model.number="form.amount" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
-          <UFormField label="Date">
+          <UFormField :label="$t('common.date')">
             <UInput v-model="form.date" type="date" class="w-full" />
           </UFormField>
-          <UFormField label="Category">
+          <UFormField :label="$t('common.category')">
             <USelect v-model="form.categoryId" :items="categoryItems" class="w-full" />
           </UFormField>
-          <UFormField label="Vendor">
+          <UFormField :label="$t('common.vendor')">
             <UInput v-model="form.vendor" class="w-full" />
           </UFormField>
-          <UFormField label="Notes" class="sm:col-span-2">
+          <UFormField :label="$t('common.notes')" class="sm:col-span-2">
             <UTextarea v-model="form.notes" :rows="3" autoresize class="w-full" />
           </UFormField>
         </form>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">Cancel</UButton>
-          <UButton :loading="saving" @click="save">Save</UButton>
+          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
+          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

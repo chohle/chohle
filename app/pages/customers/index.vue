@@ -9,20 +9,21 @@ interface CustomerRow {
   logo_path: string | null
 }
 
+const { t } = useI18n()
 const { data: customers, refresh } = await useFetch<CustomerRow[]>('/api/customers', {
   default: () => []
 })
 
-const typeItems = [
-  { label: 'Company', value: 'company' },
-  { label: 'Private person', value: 'person' }
-]
-const languageItems = [
-  { label: 'German', value: 'de' },
-  { label: 'French', value: 'fr' },
-  { label: 'Italian', value: 'it' },
-  { label: 'English', value: 'en' }
-]
+const typeItems = computed(() => [
+  { label: t('customers.typeCompany'), value: 'company' },
+  { label: t('customers.typePerson'), value: 'person' }
+])
+const languageItems = computed(() => [
+  { label: t('languages.de'), value: 'de' },
+  { label: t('languages.fr'), value: 'fr' },
+  { label: t('languages.it'), value: 'it' },
+  { label: t('languages.en'), value: 'en' }
+])
 
 function blank() {
   return {
@@ -111,27 +112,27 @@ async function remove(id: number) {
 
 <template>
   <div>
-    <PageHeader title="Customers" description="Your customer book." />
+    <PageHeader :title="$t('nav.customers')" :description="$t('customers.subtitle')" />
 
     <UCard>
       <div class="flex justify-end mb-4">
-        <UButton icon="i-lucide-plus" @click="openCreate">Add customer</UButton>
+        <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('customers.add') }}</UButton>
       </div>
 
       <EmptyState
         v-if="!customers.length"
         icon="i-lucide-users"
-        title="No customers"
-        description="Add a customer to start billing them."
+        :title="$t('customers.emptyTitle')"
+        :description="$t('customers.emptyText')"
       />
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[600px] text-sm">
         <thead class="text-muted text-left">
           <tr class="border-b border-default">
-            <th class="py-2 font-medium">Customer</th>
-            <th class="py-2 font-medium">Number</th>
-            <th class="py-2 font-medium">City</th>
-            <th class="py-2 font-medium">Payment term</th>
+            <th class="py-2 font-medium">{{ $t('customers.colCustomer') }}</th>
+            <th class="py-2 font-medium">{{ $t('customers.colNumber') }}</th>
+            <th class="py-2 font-medium">{{ $t('customers.city') }}</th>
+            <th class="py-2 font-medium">{{ $t('customers.paymentTerm') }}</th>
             <th class="py-2" />
           </tr>
         </thead>
@@ -149,7 +150,7 @@ async function remove(id: number) {
             </td>
             <td class="py-2">{{ c.customer_number || '-' }}</td>
             <td class="py-2">{{ c.city || '-' }}</td>
-            <td class="py-2">{{ c.payment_term_days }} days</td>
+            <td class="py-2">{{ $t('customers.days', { n: c.payment_term_days }) }}</td>
             <td class="py-2 text-right whitespace-nowrap">
               <UButton
                 icon="i-lucide-pencil"
@@ -174,96 +175,96 @@ async function remove(id: number) {
 
     <USlideover
       v-model:open="open"
-      :title="form.id ? 'Edit customer' : 'Add customer'"
+      :title="form.id ? $t('customers.edit') : $t('customers.add')"
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
         <form class="space-y-6" @submit.prevent="save">
           <div class="space-y-3">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Details</h3>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">{{ $t('customers.details') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField label="Type">
+              <UFormField :label="$t('common.type')">
                 <USelect v-model="form.type" :items="typeItems" class="w-full" />
               </UFormField>
-              <UFormField label="Language">
+              <UFormField :label="$t('customers.language')">
                 <USelect v-model="form.language" :items="languageItems" class="w-full" />
               </UFormField>
-              <UFormField :label="form.type === 'company' ? 'Company name' : 'Name'" class="sm:col-span-2">
+              <UFormField :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')" class="sm:col-span-2">
                 <UInput v-model="form.name" class="w-full" />
               </UFormField>
-              <UFormField label="Contact person">
+              <UFormField :label="$t('customers.contactPerson')">
                 <UInput v-model="form.contactPerson" class="w-full" />
               </UFormField>
-              <UFormField label="Customer number">
+              <UFormField :label="$t('customers.customerNumber')">
                 <UInput v-model="form.customerNumber" class="w-full" />
               </UFormField>
             </div>
           </div>
 
           <div class="space-y-3">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Contact</h3>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">{{ $t('customers.secContact') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField label="Email">
+              <UFormField :label="$t('customers.email')">
                 <UInput v-model="form.email" type="email" class="w-full" />
               </UFormField>
-              <UFormField label="Phone">
+              <UFormField :label="$t('customers.phone')">
                 <UInput v-model="form.phone" class="w-full" />
               </UFormField>
-              <UFormField label="Website">
+              <UFormField :label="$t('customers.website')">
                 <UInput v-model="form.website" class="w-full" />
               </UFormField>
-              <UFormField label="Social">
+              <UFormField :label="$t('customers.social')">
                 <UInput v-model="form.social" class="w-full" />
               </UFormField>
             </div>
           </div>
 
           <div class="space-y-3">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Address</h3>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">{{ $t('customers.secAddress') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField label="Street" class="sm:col-span-2">
+              <UFormField :label="$t('customers.street')" class="sm:col-span-2">
                 <UInput v-model="form.street" class="w-full" />
               </UFormField>
-              <UFormField label="ZIP">
+              <UFormField :label="$t('customers.zip')">
                 <UInput v-model="form.zip" class="w-full" />
               </UFormField>
-              <UFormField label="City">
+              <UFormField :label="$t('customers.city')">
                 <UInput v-model="form.city" class="w-full" />
               </UFormField>
-              <UFormField label="Country">
+              <UFormField :label="$t('customers.country')">
                 <UInput v-model="form.country" class="w-full" />
               </UFormField>
             </div>
           </div>
 
           <div class="space-y-3">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Billing</h3>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">{{ $t('customers.secBilling') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField label="Price category">
+              <UFormField :label="$t('customers.priceCategory')">
                 <UInput v-model="form.priceCategory" class="w-full" />
               </UFormField>
-              <UFormField label="Discount %">
+              <UFormField :label="$t('customers.discountPercent')">
                 <UInput v-model.number="form.discountPercent" type="number" min="0" step="0.1" class="w-full" />
               </UFormField>
-              <UFormField label="Payment term (days)">
+              <UFormField :label="$t('customers.paymentTermDays')">
                 <UInput v-model.number="form.paymentTermDays" type="number" min="0" class="w-full" />
               </UFormField>
             </div>
           </div>
 
           <div v-if="form.type === 'company'" class="space-y-3">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Business details</h3>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">{{ $t('customers.secBusiness') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField label="UID">
+              <UFormField :label="$t('customers.uid')">
                 <UInput v-model="form.uid" placeholder="CHE-123.456.789" class="w-full" />
               </UFormField>
-              <UFormField label="MWST number">
+              <UFormField :label="$t('customers.mwstNumber')">
                 <UInput v-model="form.mwst" class="w-full" />
               </UFormField>
-              <UFormField label="HR number">
+              <UFormField :label="$t('customers.hrNumber')">
                 <UInput v-model="form.hrNumber" class="w-full" />
               </UFormField>
-              <UFormField label="Founding year">
+              <UFormField :label="$t('customers.foundingYear')">
                 <UInput v-model.number="form.foundingYear" type="number" class="w-full" />
               </UFormField>
             </div>
@@ -272,8 +273,8 @@ async function remove(id: number) {
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">Cancel</UButton>
-          <UButton :loading="saving" @click="save">Save</UButton>
+          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
+          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>
