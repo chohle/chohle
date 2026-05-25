@@ -3,6 +3,7 @@
 # Base image: Node 22 LTS with Corepack-managed Yarn 4.
 FROM node:22-bookworm-slim AS base
 ENV YARN_ENABLE_GLOBAL_CACHE=false
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 WORKDIR /app
 RUN corepack enable
 
@@ -13,7 +14,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn/releases ./.yarn/releases
 RUN yarn install --immutable
 
 # Dev stage used by docker-compose: source is bind-mounted over /app at runtime.
