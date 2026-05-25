@@ -7,17 +7,6 @@ const { current, options, set } = useAppLocale()
 const { data: sender } = await useFetch<{ email_template: string }>('/api/sender')
 const template = ref(sender.value?.email_template ?? '')
 const savingTemplate = ref(false)
-const editorItems = [
-  [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold' },
-    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic' },
-    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough' }
-  ],
-  [
-    { kind: 'bulletList', icon: 'i-lucide-list' },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered' }
-  ]
-]
 async function saveTemplate() {
   savingTemplate.value = true
   try {
@@ -98,9 +87,9 @@ function cancelChange() {
       </template>
       <p class="mb-4 text-sm text-muted">{{ $t('settings.emailTemplateHelp') }}</p>
       <ClientOnly>
-        <UEditor v-model="template" content-type="html" class="min-h-40 rounded-md border border-default">
+        <UEditor v-model="template" content-type="html" :extensions="emailEditorExtensions" class="min-h-40 rounded-md border border-default">
           <template #default="{ editor }">
-            <UEditorToolbar :editor="editor" :items="editorItems" class="border-b border-default px-1 py-1" />
+            <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1" />
           </template>
         </UEditor>
         <template #fallback>

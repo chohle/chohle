@@ -42,6 +42,9 @@ export default defineNuxtConfig({
   vite: {
     server: {
       watch: process.env.DOCKER ? { usePolling: true } : undefined
+    },
+    optimizeDeps: {
+      include: ['@tiptap/extension-list', '@tiptap/extension-text-align']
     }
   }
 })

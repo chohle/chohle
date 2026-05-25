@@ -210,18 +210,6 @@ const emailMessage = computed({
   get: () => messageOverride.value ?? fillTemplate(sender.value?.email_template ?? ''),
   set: (v: string) => { messageOverride.value = v }
 })
-
-const editorItems = [
-  [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold' },
-    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic' },
-    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough' }
-  ],
-  [
-    { kind: 'bulletList', icon: 'i-lucide-list' },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered' }
-  ]
-]
 </script>
 
 <template>
@@ -436,9 +424,9 @@ const editorItems = [
           </UFormField>
           <UFormField :label="$t('invoices.emailMessage')">
             <ClientOnly>
-              <UEditor v-model="emailMessage" content-type="html" class="min-h-40 w-full rounded-md border border-default">
+              <UEditor v-model="emailMessage" content-type="html" :extensions="emailEditorExtensions" class="min-h-40 w-full rounded-md border border-default">
                 <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="editorItems" class="border-b border-default px-1 py-1" />
+                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1" />
                 </template>
               </UEditor>
               <template #fallback>

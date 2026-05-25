@@ -4031,6 +4031,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-text-align@npm:^3.23.6":
+  version: 3.23.6
+  resolution: "@tiptap/extension-text-align@npm:3.23.6"
+  peerDependencies:
+    "@tiptap/core": 3.23.6
+  checksum: 10c0/6b655f3b7a5aedd8af64355e4307fad26faa86dfd94a199b12ced9ca29eb5d2cb21d6318dddf90d8b19927dfbdafd4c471367358126138eb82ff087396c3785e
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-text@npm:^3.23.6":
   version: 3.23.6
   resolution: "@tiptap/extension-text@npm:3.23.6"
@@ -5131,6 +5140,7 @@ __metadata:
     "@iconify-json/lucide": "npm:^1.2.109"
     "@nuxt/ui": "npm:^4.8.0"
     "@nuxtjs/i18n": "npm:^10.4.0"
+    "@tiptap/extension-text-align": "npm:^3.23.6"
     "@types/better-sqlite3": "npm:^7.6.13"
     "@types/nodemailer": "npm:^8.0.0"
     "@types/pdfkit": "npm:^0.17.6"
