@@ -23,6 +23,10 @@
     "themeDark": "Sombre",
     "yourData": "Vos données",
     "yourDataText": "Tout se trouve dans le dossier {folder} : la base de données SQLite et vos fichiers téléversés. Sauvegardez ce dossier et vous avez tout sauvegardé.",
+    "emailTemplate": "Modèle d'e-mail",
+    "emailTemplateHelp": "Le message d'accompagnement envoyé avec chaque facture. Un en-tête et un pied de page sont ajoutés automatiquement.",
+    "emailTemplatePlaceholders": "Espaces réservés",
+    "emailTemplateSaved": "Modèle d'e-mail enregistré",
     "languageConfirmTitle": "Changer de langue ?",
     "languageConfirmText": "Toute l'application passera immédiatement à la langue sélectionnée."
   },

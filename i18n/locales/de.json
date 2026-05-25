@@ -23,6 +23,10 @@
     "themeDark": "Dunkel",
     "yourData": "Deine Daten",
     "yourDataText": "Alles liegt im Ordner {folder}: die SQLite-Datenbank und deine hochgeladenen Dateien. Sichere diesen Ordner und du hast alles gesichert.",
+    "emailTemplate": "E-Mail-Vorlage",
+    "emailTemplateHelp": "Die Begleitnachricht, die mit jeder Rechnung gesendet wird. Kopf- und Fusszeile werden automatisch ergänzt.",
+    "emailTemplatePlaceholders": "Platzhalter",
+    "emailTemplateSaved": "E-Mail-Vorlage gespeichert",
     "languageConfirmTitle": "Sprache ändern?",
     "languageConfirmText": "Die gesamte App wird sofort auf die gewählte Sprache umgestellt."
   },

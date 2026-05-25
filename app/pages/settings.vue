@@ -1,7 +1,32 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 const { t } = useI18n()
+const toast = useToast()
 const { current, options, set } = useAppLocale()
+
+const { data: sender } = await useFetch<{ email_template: string }>('/api/sender')
+const template = ref(sender.value?.email_template ?? '')
+const savingTemplate = ref(false)
+const editorItems = [
+  [
+    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold' },
+    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic' },
+    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough' }
+  ],
+  [
+    { kind: 'bulletList', icon: 'i-lucide-list' },
+    { kind: 'orderedList', icon: 'i-lucide-list-ordered' }
+  ]
+]
+async function saveTemplate() {
+  savingTemplate.value = true
+  try {
+    await $fetch('/api/email-template', { method: 'PUT', body: { template: template.value } })
+    toast.add({ title: t('settings.emailTemplateSaved'), color: 'success' })
+  } finally {
+    savingTemplate.value = false
+  }
+}
 const appearanceItems = computed(() => [
   { label: t('settings.themeSystem'), value: 'system' },
   { label: t('settings.themeLight'), value: 'light' },
@@ -66,6 +91,30 @@ function cancelChange() {
         </div>
       </template>
     </UModal>
+
+    <UCard class="mt-6">
+      <template #header>
+        <h2 class="font-semibold">{{ $t('settings.emailTemplate') }}</h2>
+      </template>
+      <p class="mb-4 text-sm text-muted">{{ $t('settings.emailTemplateHelp') }}</p>
+      <ClientOnly>
+        <UEditor v-model="template" content-type="html" class="min-h-40 rounded-md border border-default">
+          <template #default="{ editor }">
+            <UEditorToolbar :editor="editor" :items="editorItems" class="border-b border-default px-1 py-1" />
+          </template>
+        </UEditor>
+        <template #fallback>
+          <div class="min-h-40 rounded-md border border-default" />
+        </template>
+      </ClientOnly>
+      <p class="mt-2 text-xs text-muted">
+        {{ $t('settings.emailTemplatePlaceholders') }}:
+        <code>{customer}</code> <code>{number}</code> <code>{due}</code> <code>{sender}</code>
+      </p>
+      <div class="mt-4 flex justify-end">
+        <UButton :loading="savingTemplate" @click="saveTemplate">{{ $t('common.save') }}</UButton>
+      </div>
+    </UCard>
 
     <UCard class="mt-6">
       <template #header>

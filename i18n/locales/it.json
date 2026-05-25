@@ -23,6 +23,10 @@
     "themeDark": "Scuro",
     "yourData": "I tuoi dati",
     "yourDataText": "Tutto si trova nella cartella {folder}: il database SQLite e i tuoi file caricati. Esegui il backup di questa cartella e avrai eseguito il backup di tutto.",
+    "emailTemplate": "Modello e-mail",
+    "emailTemplateHelp": "Il messaggio di accompagnamento inviato con ogni fattura. Intestazione e piè di pagina vengono aggiunti automaticamente.",
+    "emailTemplatePlaceholders": "Segnaposto",
+    "emailTemplateSaved": "Modello e-mail salvato",
     "languageConfirmTitle": "Cambiare lingua?",
     "languageConfirmText": "L'intera app passerà subito alla lingua selezionata."
   },

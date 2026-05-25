@@ -23,6 +23,10 @@
     "themeDark": "Dark",
     "yourData": "Your data",
     "yourDataText": "Everything lives in the {folder} folder: the SQLite database and your uploaded files. Back up that folder and you have backed up everything.",
+    "emailTemplate": "Email template",
+    "emailTemplateHelp": "The cover message sent with each invoice. A header and footer are added automatically.",
+    "emailTemplatePlaceholders": "Placeholders",
+    "emailTemplateSaved": "Email template saved",
     "languageConfirmTitle": "Change language?",
     "languageConfirmText": "The whole app will switch to the selected language right away."
   },

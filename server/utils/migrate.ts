@@ -229,6 +229,12 @@ const migrations: Migration[] = [
   {
     name: '0017_owner_locale',
     up: "ALTER TABLE owner ADD COLUMN locale TEXT NOT NULL DEFAULT 'en'"
+  },
+  {
+    name: '0018_sender_email_template',
+    // HTML cover message sent with the invoice. Placeholders {customer} {number}
+    // {due} {sender} are filled in per send; header/footer are added on send.
+    up: "ALTER TABLE sender ADD COLUMN email_template TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>anbei erhalten Sie die Rechnung {number}, zahlbar bis {due}.</p><p>Freundliche Grüsse<br>{sender}</p>'"
   }
 ]
 
