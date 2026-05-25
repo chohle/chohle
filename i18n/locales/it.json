@@ -223,7 +223,10 @@
     "emailMessage": "Messaggio",
     "awaitingPayment": "In attesa di pagamento",
     "paidDone": "Segnata come pagata",
-    "sendNote": "L'invio dell'e-mail sarà aggiunto nel prossimo passaggio; per ora la fattura viene solo segnata come inviata."
+    "sendInvoice": "Invia fattura",
+    "toastSent": "Fattura inviata",
+    "sendError": "Impossibile inviare la fattura",
+    "sendNote": "Il cliente riceve questa e-mail con la fattura in PDF allegata."
   },
   "email": {
     "subject": "Fattura {number}",

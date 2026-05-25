@@ -223,7 +223,10 @@
     "emailMessage": "Message",
     "awaitingPayment": "Waiting for payment",
     "paidDone": "Marked as paid",
-    "sendNote": "Email sending is wired up in the next step; for now this just marks the invoice as sent."
+    "sendInvoice": "Send invoice",
+    "toastSent": "Invoice sent",
+    "sendError": "Could not send the invoice",
+    "sendNote": "The customer receives this email with the invoice PDF attached."
   },
   "email": {
     "subject": "Invoice {number}",

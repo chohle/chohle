@@ -223,7 +223,10 @@
     "emailMessage": "Nachricht",
     "awaitingPayment": "Warten auf Zahlung",
     "paidDone": "Als bezahlt markiert",
-    "sendNote": "Der E-Mail-Versand folgt im nächsten Schritt; vorerst wird die Rechnung nur als gesendet markiert."
+    "sendInvoice": "Rechnung senden",
+    "toastSent": "Rechnung gesendet",
+    "sendError": "Rechnung konnte nicht gesendet werden",
+    "sendNote": "Der Kunde erhält diese E-Mail mit der Rechnung als PDF im Anhang."
   },
   "email": {
     "subject": "Rechnung {number}",

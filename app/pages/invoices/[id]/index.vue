@@ -149,10 +149,26 @@ async function continueToSend() {
   await save()
   step.value = 1
 }
-async function markSent() {
-  header.status = 'sent'
-  await save()
-  step.value = 2
+async function sendInvoice() {
+  saving.value = true
+  try {
+    await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
+    await $fetch(`/api/invoices/${id}/send`, {
+      method: 'POST',
+      body: { subject: emailSubject.value, message: emailMessage.value }
+    })
+    header.status = 'sent'
+    toast.add({ title: t('invoices.toastSent'), color: 'success' })
+    step.value = 2
+  } catch (e) {
+    toast.add({
+      title: t('invoices.sendError'),
+      description: (e as { statusMessage?: string }).statusMessage,
+      color: 'error'
+    })
+  } finally {
+    saving.value = false
+  }
 }
 async function setStatus(status: InvoiceRow['status']) {
   header.status = status
@@ -383,8 +399,8 @@ const emailMessage = computed({
         <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" @click="step = 0">
           {{ $t('common.back') }}
         </UButton>
-        <UButton icon="i-lucide-send" :loading="saving" @click="markSent">
-          {{ $t('invoices.markSent') }}
+        <UButton icon="i-lucide-send" :loading="saving" :disabled="!customer?.email" @click="sendInvoice">
+          {{ $t('invoices.sendInvoice') }}
         </UButton>
       </div>
     </template>
