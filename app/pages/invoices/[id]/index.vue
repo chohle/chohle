@@ -38,7 +38,7 @@ const { data: customerArticles } = await useFetch<Article[]>(
   `/api/customers/${customerId}/articles`,
   { default: () => [] }
 )
-const { data: sender } = await useFetch<{ vat_registered: number, name: string }>('/api/sender')
+const { data: sender } = await useFetch<{ vat_registered: number, name: string, email_template: string }>('/api/sender')
 const { data: customer } = await useFetch<{ name: string, email: string | null, language: string }>(
   `/api/customers/${customerId}`
 )
@@ -198,17 +198,30 @@ const emailSubject = computed({
   get: () => subjectOverride.value ?? td('email.subject', { number: header.number }),
   set: (v: string) => { subjectOverride.value = v }
 })
+// Fill the configurable HTML template with this invoice's values.
+function fillTemplate(html: string) {
+  return html
+    .replaceAll('{customer}', customer.value?.name ?? '')
+    .replaceAll('{number}', header.number ?? '')
+    .replaceAll('{due}', dateFmt(header.dueDate))
+    .replaceAll('{sender}', sender.value?.name ?? '')
+}
 const emailMessage = computed({
-  get: () =>
-    messageOverride.value ??
-    td('email.body', {
-      customer: customer.value?.name ?? '',
-      number: header.number,
-      due: dateFmt(header.dueDate),
-      sender: sender.value?.name ?? ''
-    }),
+  get: () => messageOverride.value ?? fillTemplate(sender.value?.email_template ?? ''),
   set: (v: string) => { messageOverride.value = v }
 })
+
+const editorItems = [
+  [
+    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold' },
+    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic' },
+    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough' }
+  ],
+  [
+    { kind: 'bulletList', icon: 'i-lucide-list' },
+    { kind: 'orderedList', icon: 'i-lucide-list-ordered' }
+  ]
+]
 </script>
 
 <template>
@@ -422,7 +435,16 @@ const emailMessage = computed({
             <UInput v-model="emailSubject" class="w-full" />
           </UFormField>
           <UFormField :label="$t('invoices.emailMessage')">
-            <UTextarea v-model="emailMessage" :rows="7" autoresize class="w-full" />
+            <ClientOnly>
+              <UEditor v-model="emailMessage" content-type="html" class="min-h-40 w-full rounded-md border border-default">
+                <template #default="{ editor }">
+                  <UEditorToolbar :editor="editor" :items="editorItems" class="border-b border-default px-1 py-1" />
+                </template>
+              </UEditor>
+              <template #fallback>
+                <div class="min-h-40 w-full rounded-md border border-default" />
+              </template>
+            </ClientOnly>
           </UFormField>
 
           <p class="text-xs text-muted">{{ $t('invoices.sendNote') }}</p>
