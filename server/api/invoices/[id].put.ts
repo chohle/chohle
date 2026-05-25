@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
   const status = ['draft', 'sent', 'paid'].includes(b?.status) ? b.status : 'draft'
   const issueDate = /^\d{4}-\d{2}-\d{2}$/.test(b?.issueDate) ? b.issueDate : null
   const dueDate = /^\d{4}-\d{2}-\d{2}$/.test(b?.dueDate) ? b.dueDate : null
-  if (!number || !issueDate || !dueDate) {
+  // Number is optional: invoices start blank and the owner fills it in.
+  if (!issueDate || !dueDate) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid invoice' })
   }
 

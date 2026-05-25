@@ -78,11 +78,11 @@ const articleItems = computed(() =>
   articles.value.map((a) => ({ label: a.name, value: a.id }))
 )
 
-// The stepper drives the status: draft -> (send) -> sent/paid.
+// Presentational stepper; navigation is driven by the step buttons, not clicks.
 const steps = computed(() => [
-  { slot: 'draft', title: t('status.draft'), icon: 'i-lucide-file-pen-line' },
-  { slot: 'send', title: t('invoices.send'), icon: 'i-lucide-send' },
-  { slot: 'paid', title: t('status.paid'), icon: 'i-lucide-circle-check' }
+  { title: t('status.draft'), icon: 'i-lucide-file-pen-line' },
+  { title: t('invoices.send'), icon: 'i-lucide-send' },
+  { title: t('status.paid'), icon: 'i-lucide-circle-check' }
 ])
 const statusToStep: Record<string, number> = { draft: 0, sent: 2, paid: 2 }
 const step = ref(statusToStep[inv.status] ?? 0)
@@ -225,7 +225,26 @@ const emailMessage = computed({
       </template>
     </PageHeader>
 
-    <UStepper v-model="step" :items="steps" :linear="false" class="mb-6" />
+    <div class="mb-8 flex items-start">
+      <template v-for="(s, i) in steps" :key="i">
+        <div class="flex w-24 shrink-0 flex-col items-center gap-2">
+          <div
+            class="size-9 rounded-full flex items-center justify-center transition-colors"
+            :class="i <= step ? 'bg-primary text-inverted' : 'bg-elevated text-muted'"
+          >
+            <UIcon :name="s.icon" class="size-4" />
+          </div>
+          <span class="text-center text-xs" :class="i === step ? 'font-medium text-default' : 'text-muted'">
+            {{ s.title }}
+          </span>
+        </div>
+        <div
+          v-if="i < steps.length - 1"
+          class="mt-4 h-0.5 flex-1 transition-colors"
+          :class="i < step ? 'bg-primary' : 'bg-accented'"
+        />
+      </template>
+    </div>
 
     <!-- Step 1: Draft -->
     <template v-if="step === 0">
@@ -426,6 +445,9 @@ const emailMessage = computed({
           </div>
 
           <div class="flex gap-2">
+            <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" @click="step = 1">
+              {{ $t('common.back') }}
+            </UButton>
             <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">
               {{ $t('invoices.pdfPreview') }}
             </UButton>
