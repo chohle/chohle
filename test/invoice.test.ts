@@ -46,4 +46,17 @@ describe('computeInvoiceTotals', () => {
       totalRappen: 0
     })
   })
+
+  it('charges no MWST when the sender is not VAT-registered', () => {
+    const totals = computeInvoiceTotals(
+      [{ quantity: 1, unitPriceRappen: 536250, discountPercent: 0, mwstPercent: 8.1 }],
+      false
+    )
+    expect(totals).toEqual({
+      nettoRappen: 536250,
+      mwstByRate: [],
+      totalMwstRappen: 0,
+      totalRappen: 536250
+    })
+  })
 })

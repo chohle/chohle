@@ -53,13 +53,15 @@ export default defineEventHandler(async (event) => {
   const items = db
     .prepare('SELECT quantity, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?')
     .all(id) as ItemRow[]
+  const vat = !!(sender as { vat_registered?: number }).vat_registered
   const { totalRappen } = computeInvoiceTotals(
     items.map((i) => ({
       quantity: i.quantity,
       unitPriceRappen: i.unit_price_rappen,
       discountPercent: i.discount_percent,
       mwstPercent: i.mwst_percent
-    }))
+    })),
+    vat
   )
 
   // QR-IBAN mandates a QRR reference; a regular IBAN uses a SCOR reference.

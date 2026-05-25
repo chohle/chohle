@@ -28,7 +28,9 @@ export function lineNetRappen(line: InvoiceLine): number {
   return Math.round(gross * (1 - line.discountPercent / 100))
 }
 
-export function computeInvoiceTotals(lines: InvoiceLine[]): InvoiceTotals {
+// When vatRegistered is false (e.g. a private person under the CHF 100k threshold),
+// no MWST is charged: the total is just the net and there are no rate breakdowns.
+export function computeInvoiceTotals(lines: InvoiceLine[], vatRegistered = true): InvoiceTotals {
   let netto = 0
   const netByRate = new Map<number, number>()
 
@@ -36,6 +38,10 @@ export function computeInvoiceTotals(lines: InvoiceLine[]): InvoiceTotals {
     const net = lineNetRappen(line)
     netto += net
     netByRate.set(line.mwstPercent, (netByRate.get(line.mwstPercent) ?? 0) + net)
+  }
+
+  if (!vatRegistered) {
+    return { nettoRappen: netto, mwstByRate: [], totalMwstRappen: 0, totalRappen: netto }
   }
 
   const mwstByRate = [...netByRate.entries()]

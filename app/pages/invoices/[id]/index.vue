@@ -37,6 +37,8 @@ const { data: customerArticles } = await useFetch<Article[]>(
   `/api/customers/${customerId}/articles`,
   { default: () => [] }
 )
+const { data: sender } = await useFetch<{ vat_registered: number }>('/api/sender')
+const vat = computed(() => !!sender.value?.vat_registered)
 const articles = computed(() => [...globalArticles.value, ...customerArticles.value])
 
 const header = reactive({
@@ -109,7 +111,7 @@ function toLine(r: EditRow) {
     mwstPercent: r.mwstPercent || 0
   }
 }
-const totals = computed(() => computeInvoiceTotals(items.value.map(toLine)))
+const totals = computed(() => computeInvoiceTotals(items.value.map(toLine), vat.value))
 
 function lineAmount(r: EditRow) {
   return lineNetRappen(toLine(r))
@@ -201,12 +203,12 @@ function chf(rappen: number) {
       <div v-else>
         <div class="hidden sm:grid grid-cols-12 gap-2 pb-2 text-xs font-medium text-muted">
           <div class="col-span-2">Article</div>
-          <div class="col-span-3">Description</div>
+          <div :class="vat ? 'col-span-3' : 'col-span-4'">Description</div>
           <div class="col-span-1">Qty</div>
           <div class="col-span-1">Unit</div>
           <div class="col-span-1">Price</div>
           <div class="col-span-1">Disc%</div>
-          <div class="col-span-1">MWST%</div>
+          <div v-if="vat" class="col-span-1">MWST%</div>
           <div class="col-span-2 text-right">Amount</div>
         </div>
 
@@ -225,7 +227,7 @@ function chf(rappen: number) {
                 @update:model-value="onArticle(row)"
               />
             </div>
-            <div class="col-span-2 sm:col-span-3">
+            <div class="col-span-2" :class="vat ? 'sm:col-span-3' : 'sm:col-span-4'">
               <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Description</label>
               <UInput v-model="row.description" class="w-full" />
             </div>
@@ -245,7 +247,7 @@ function chf(rappen: number) {
               <label class="mb-1 block text-xs font-medium text-muted sm:hidden">Disc%</label>
               <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
             </div>
-            <div class="col-span-1">
+            <div v-if="vat" class="col-span-1">
               <label class="mb-1 block text-xs font-medium text-muted sm:hidden">MWST%</label>
               <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
             </div>
@@ -270,7 +272,7 @@ function chf(rappen: number) {
 
     <UCard class="mt-6">
       <dl class="space-y-1 text-sm max-w-xs ml-auto">
-        <div class="flex justify-between">
+        <div v-if="vat" class="flex justify-between">
           <dt class="text-muted">Netto</dt>
           <dd>CHF {{ chf(totals.nettoRappen) }}</dd>
         </div>
