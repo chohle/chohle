@@ -21,6 +21,9 @@ logs
 .fleet
 .idea
 
+# Local screenshot helper scripts
+scripts/shoot*.mjs
+
 # Local env files
 .env
 .env.*
