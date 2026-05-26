@@ -15,18 +15,24 @@ export default defineNitroPlugin(() => {
   )
   const update = db.prepare('UPDATE invoices SET total_rappen = ? WHERE id = ?')
 
+  let filled = 0
   for (const { id } of pending) {
-    const items = itemsStmt.all(id) as Array<{ quantity: number, unit_price_rappen: number, discount_percent: number, mwst_percent: number }>
-    const { totalRappen } = computeInvoiceTotals(
-      items.map((i) => ({
-        quantity: i.quantity,
-        unitPriceRappen: i.unit_price_rappen,
-        discountPercent: i.discount_percent,
-        mwstPercent: i.mwst_percent
-      })),
-      vat
-    )
-    update.run(totalRappen, id)
+    try {
+      const items = itemsStmt.all(id) as Array<{ quantity: number, unit_price_rappen: number, discount_percent: number, mwst_percent: number }>
+      const { totalRappen } = computeInvoiceTotals(
+        items.map((i) => ({
+          quantity: i.quantity,
+          unitPriceRappen: i.unit_price_rappen,
+          discountPercent: i.discount_percent,
+          mwstPercent: i.mwst_percent
+        })),
+        vat
+      )
+      update.run(totalRappen, id)
+      filled++
+    } catch (err) {
+      console.error(`[invoices] backfill failed for invoice ${id}:`, err)
+    }
   }
-  console.log(`[invoices] backfilled frozen total for ${pending.length} paid invoice(s)`)
+  console.log(`[invoices] backfilled frozen total for ${filled} paid invoice(s)`)
 })
