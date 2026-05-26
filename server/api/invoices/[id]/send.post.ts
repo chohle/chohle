@@ -75,6 +75,6 @@ export default defineEventHandler(async (event) => {
     ]
   })
 
-  db.prepare("UPDATE invoices SET status = 'sent', paid_at = NULL WHERE id = ?").run(id)
+  db.prepare("UPDATE invoices SET status = 'sent', paid_at = NULL, total_rappen = NULL WHERE id = ?").run(id)
   return { ok: true }
 })

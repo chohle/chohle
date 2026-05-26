@@ -244,6 +244,13 @@ const migrations: Migration[] = [
       ALTER TABLE invoices ADD COLUMN paid_at TEXT;
       UPDATE invoices SET paid_at = issue_date WHERE status = 'paid';
     `
+  },
+  {
+    name: '0020_invoice_total_snapshot',
+    // Total frozen when an invoice is marked paid, so realized revenue stays
+    // stable even if items or VAT registration change later. Backfilled for
+    // existing paid invoices by the backfill-invoice-totals server plugin.
+    up: 'ALTER TABLE invoices ADD COLUMN total_rappen INTEGER'
   }
 ]
 

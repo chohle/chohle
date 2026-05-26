@@ -29,28 +29,14 @@ export default defineEventHandler(async (event) => {
       .get(month) as { total: number }
   ).total
 
-  // Invoice revenue: totals of invoices marked paid, attributed by paid_at month.
-  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined)?.vat_registered
-  const invItemsStmt = db.prepare(
-    'SELECT quantity, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?'
-  )
-  const invoiceTotal = (invId: number) => {
-    const items = invItemsStmt.all(invId) as Array<{ quantity: number, unit_price_rappen: number, discount_percent: number, mwst_percent: number }>
-    return computeInvoiceTotals(
-      items.map((i) => ({
-        quantity: i.quantity,
-        unitPriceRappen: i.unit_price_rappen,
-        discountPercent: i.discount_percent,
-        mwstPercent: i.mwst_percent
-      })),
-      vat
-    ).totalRappen
-  }
+  // Invoice revenue: the total frozen on each invoice when it was marked paid,
+  // attributed by paid_at month. Reads the stored snapshot, so past income does
+  // not shift when items or VAT registration change later.
   const invoiceIncome = (
-    db.prepare("SELECT id FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) = ?").all(month) as { id: number }[]
-  ).reduce((sum, r) => sum + invoiceTotal(r.id), 0)
+    db
+      .prepare("SELECT COALESCE(SUM(total_rappen), 0) AS total FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) = ?")
+      .get(month) as { total: number }
+  ).total
 
   const income = salaryIncome + invoiceIncome
 
@@ -89,12 +75,14 @@ export default defineEventHandler(async (event) => {
     .all(months[0]) as Array<{ ym: string, total: number }>
   const incomeByMonth = Object.fromEntries(incomeGrouped.map((r) => [r.ym, r.total]))
 
-  const invoiceByMonth: Record<string, number> = {}
-  for (const r of db
-    .prepare("SELECT id, substr(paid_at, 1, 7) AS ym FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) >= ?")
-    .all(months[0]) as Array<{ id: number, ym: string }>) {
-    invoiceByMonth[r.ym] = (invoiceByMonth[r.ym] ?? 0) + invoiceTotal(r.id)
-  }
+  const invoiceByMonth = Object.fromEntries(
+    (db
+      .prepare(
+        `SELECT substr(paid_at, 1, 7) AS ym, COALESCE(SUM(total_rappen), 0) AS total
+         FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) >= ? GROUP BY ym`
+      )
+      .all(months[0]) as Array<{ ym: string, total: number }>).map((r) => [r.ym, r.total])
+  )
 
   const trend = months.map((m) => ({
     month: m,
