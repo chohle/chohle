@@ -259,6 +259,9 @@
     "vatLine": "IVA {rate} % escl.",
     "invoiceAmountChf": "Importo fattura CHF"
   },
+  "validation": {
+    "required": "Questo campo è obbligatorio"
+  },
   "common": {
     "cancel": "Annulla",
     "confirm": "Cambia",

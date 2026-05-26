@@ -8,6 +8,8 @@ interface Article {
 }
 
 const props = defineProps<{ listUrl: string, createUrl: string }>()
+const { t } = useI18n()
+const formRef = ref()
 
 const { data: articles, refresh } = await useFetch<Article[]>(props.listUrl, { default: () => [] })
 const { data: sender } = await useFetch<{ vat_registered: number }>('/api/sender')
@@ -47,8 +49,14 @@ function openEdit(a: Article) {
   open.value = true
 }
 
+function validate(state: typeof form) {
+  const errors: { name: string, message: string }[] = []
+  if (!state.name?.trim()) errors.push({ name: 'name', message: t('validation.required') })
+  if (state.price == null) errors.push({ name: 'price', message: t('validation.required') })
+  return errors
+}
+
 async function save() {
-  if (!form.name.trim() || form.price === undefined) return
   saving.value = true
   try {
     const body = { name: form.name, unit: form.unit, price: form.price, mwst: form.mwst }
@@ -125,28 +133,28 @@ function chf(rappen: number) {
       :ui="{ content: 'max-w-md' }"
     >
       <template #body>
-        <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField :label="$t('common.name')" class="sm:col-span-2">
+        <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+          <UFormField name="name" :label="$t('common.name')" class="sm:col-span-2">
             <UInput v-model="form.name" :placeholder="$t('articles.namePlaceholder')" class="w-full" />
           </UFormField>
-          <UFormField :label="$t('articles.unit')">
+          <UFormField name="unit" :label="$t('articles.unit')">
             <UInput v-model="form.unit" :placeholder="$t('articles.unitPlaceholder')" class="w-full" />
           </UFormField>
-          <UFormField :label="$t('articles.price')">
+          <UFormField name="price" :label="$t('articles.price')">
             <UInput v-model.number="form.price" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
           <div class="sm:col-span-2">
             <USwitch v-model="hasMwst" :label="$t('articles.chargeMwst')" />
           </div>
-          <UFormField v-if="hasMwst" :label="$t('articles.mwstPercent')" class="sm:col-span-2">
+          <UFormField v-if="hasMwst" name="mwst" :label="$t('articles.mwstPercent')" class="sm:col-span-2">
             <UInput v-model.number="form.mwst" type="number" min="0" step="0.1" class="w-full" />
           </UFormField>
-        </form>
+        </UForm>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
           <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
+          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

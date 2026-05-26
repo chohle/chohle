@@ -86,8 +86,15 @@ function openEdit(e: Expense) {
   open.value = true
 }
 
+const formRef = ref()
+function validate(state: typeof form) {
+  const errors: { name: string, message: string }[] = []
+  if (!state.title.trim()) errors.push({ name: 'title', message: t('validation.required') })
+  if (!state.amount) errors.push({ name: 'amount', message: t('validation.required') })
+  return errors
+}
+
 async function save() {
-  if (!form.title.trim() || !form.amount) return
   saving.value = true
   try {
     const { id, ...body } = form
@@ -213,11 +220,11 @@ function chf(rappen: number) {
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
-        <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField :label="$t('common.title')" class="sm:col-span-2">
+        <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+          <UFormField name="title" :label="$t('common.title')" class="sm:col-span-2">
             <UInput v-model="form.title" :placeholder="$t('expenses.titlePlaceholder')" class="w-full" />
           </UFormField>
-          <UFormField :label="$t('expenses.amountField')">
+          <UFormField name="amount" :label="$t('expenses.amountField')">
             <UInput v-model.number="form.amount" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
           <UFormField :label="$t('common.date')">
@@ -232,12 +239,12 @@ function chf(rappen: number) {
           <UFormField :label="$t('common.notes')" class="sm:col-span-2">
             <UTextarea v-model="form.notes" :rows="3" autoresize class="w-full" />
           </UFormField>
-        </form>
+        </UForm>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
           <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
+          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

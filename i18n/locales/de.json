@@ -259,6 +259,9 @@
     "vatLine": "MWST {rate} % zzgl.",
     "invoiceAmountChf": "Rechnungsbetrag CHF"
   },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich"
+  },
   "common": {
     "cancel": "Abbrechen",
     "confirm": "Ändern",

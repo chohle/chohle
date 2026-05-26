@@ -259,6 +259,9 @@
     "vatLine": "TVA {rate} % en sus",
     "invoiceAmountChf": "Montant de la facture CHF"
   },
+  "validation": {
+    "required": "Ce champ est obligatoire"
+  },
   "common": {
     "cancel": "Annuler",
     "confirm": "Changer",

@@ -7,6 +7,8 @@ interface Category {
   icon: string
 }
 
+const { t } = useI18n()
+const formRef = ref()
 const { data: categories, refresh } = await useFetch<Category[]>('/api/categories', {
   default: () => []
 })
@@ -45,8 +47,13 @@ function openEdit(c: Category) {
   open.value = true
 }
 
+function validate(state: typeof form) {
+  const errors: { name: string, message: string }[] = []
+  if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
+  return errors
+}
+
 async function save() {
-  if (!form.name.trim()) return
   saving.value = true
   try {
     const body = { name: form.name, type: form.type, color: form.color, icon: form.icon }
@@ -98,7 +105,7 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
       :ui="{ content: 'max-w-md' }"
     >
       <template #body>
-        <div class="space-y-6">
+        <UForm ref="formRef" :state="form" :validate="validate" class="space-y-6" @submit="save">
           <div class="flex items-center gap-3 rounded-lg border border-default p-3">
             <span
               class="size-10 rounded-full flex items-center justify-center shrink-0"
@@ -109,7 +116,7 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
             <span class="font-medium truncate">{{ form.name || $t('categories.newCategory') }}</span>
           </div>
 
-          <UFormField :label="$t('common.name')">
+          <UFormField name="name" :label="$t('common.name')">
             <UInput v-model="form.name" :placeholder="$t('categories.namePlaceholder')" class="w-full" autofocus />
           </UFormField>
 
@@ -164,12 +171,12 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
               </button>
             </div>
           </UFormField>
-        </div>
+        </UForm>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
           <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
+          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>

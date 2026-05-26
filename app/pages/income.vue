@@ -67,8 +67,15 @@ function openEdit(s: IncomeSource) {
   open.value = true
 }
 
+const formRef = ref()
+function validate(state: typeof form) {
+  const errors: { name: string, message: string }[] = []
+  if (!state.company.trim()) errors.push({ name: 'company', message: t('validation.required') })
+  if (!state.salary) errors.push({ name: 'salary', message: t('validation.required') })
+  return errors
+}
+
 async function save() {
-  if (!form.company.trim() || !form.salary) return
   saving.value = true
   try {
     const body = {
@@ -204,14 +211,14 @@ function formatDate(iso: string) {
       :ui="{ content: 'max-w-xl' }"
     >
       <template #body>
-        <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="save">
-          <UFormField :label="$t('income.company')" class="sm:col-span-2">
+        <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+          <UFormField name="company" :label="$t('income.company')" class="sm:col-span-2">
             <UInput v-model="form.company" class="w-full" />
           </UFormField>
           <UFormField :label="$t('income.jobTitle')" class="sm:col-span-2">
             <UInput v-model="form.jobTitle" class="w-full" />
           </UFormField>
-          <UFormField :label="$t('income.salary')">
+          <UFormField name="salary" :label="$t('income.salary')">
             <UInput v-model.number="form.salary" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
           <UFormField :label="$t('income.payoutDay')">
@@ -223,12 +230,12 @@ function formatDate(iso: string) {
           <UFormField :label="$t('income.adjustment')">
             <USelect v-model="form.payoutRule" :items="ruleItems" class="w-full" />
           </UFormField>
-        </form>
+        </UForm>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
           <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="save">{{ $t('common.save') }}</UButton>
+          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
         </div>
       </template>
     </USlideover>
