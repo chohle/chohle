@@ -7,6 +7,13 @@ const state = reactive({ username: '', password: '' })
 const error = ref('')
 const loading = ref(false)
 
+function validate(s: typeof state) {
+  const errors: { name: string, message: string }[] = []
+  if (!s.username) errors.push({ name: 'username', message: t('validation.required') })
+  if (!s.password) errors.push({ name: 'password', message: t('validation.required') })
+  return errors
+}
+
 async function onSubmit() {
   loading.value = true
   error.value = ''
@@ -29,11 +36,11 @@ async function onSubmit() {
         <img src="/logo.svg" alt="batze" class="h-7 w-auto mx-auto dark:invert">
       </template>
 
-      <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-        <UFormField :label="$t('common.username')">
+      <UForm :state="state" :validate="validate" class="flex flex-col gap-4" @submit="onSubmit">
+        <UFormField name="username" :label="$t('common.username')">
           <UInput v-model="state.username" autocomplete="username" class="w-full" />
         </UFormField>
-        <UFormField :label="$t('common.password')">
+        <UFormField name="password" :label="$t('common.password')">
           <UInput
             v-model="state.password"
             type="password"
@@ -43,7 +50,7 @@ async function onSubmit() {
         </UFormField>
         <p v-if="error" class="text-error text-sm">{{ error }}</p>
         <UButton type="submit" :loading="loading" block>{{ $t('login.signIn') }}</UButton>
-      </form>
+      </UForm>
     </UCard>
   </div>
 </template>
