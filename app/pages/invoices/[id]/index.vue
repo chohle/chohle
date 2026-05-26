@@ -127,6 +127,20 @@ function lineAmount(r: EditRow) {
 
 const saving = ref(false)
 const confirmDelete = ref(false)
+const formRef = ref()
+const lineState = reactive({ items })
+
+function validate() {
+  const errors: { name: string, message: string }[] = []
+  items.value.forEach((row, i) => {
+    if (!row.description.trim()) errors.push({ name: `items.${i}.description`, message: t('validation.required') })
+    if (row.quantity == null) errors.push({ name: `items.${i}.quantity`, message: t('validation.required') })
+    else if (row.quantity <= 0) errors.push({ name: `items.${i}.quantity`, message: t('validation.positive') })
+    if (row.unitPrice == null) errors.push({ name: `items.${i}.unitPrice`, message: t('validation.required') })
+    else if (row.unitPrice <= 0) errors.push({ name: `items.${i}.unitPrice`, message: t('validation.positive') })
+  })
+  return errors
+}
 async function save() {
   saving.value = true
   try {
@@ -261,6 +275,7 @@ const emailMessage = computed({
 
     <!-- Step 1: Draft -->
     <template v-if="step === 0">
+      <UForm ref="formRef" :state="lineState" :validate="validate" @submit="continueToSend">
       <UCard>
         <div class="grid sm:grid-cols-2 gap-4">
           <UFormField :label="$t('common.title')" class="sm:col-span-2">
@@ -323,11 +338,15 @@ const emailMessage = computed({
               </div>
               <div class="col-span-2" :class="vat ? 'sm:col-span-3' : 'sm:col-span-4'">
                 <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.description') }}</label>
-                <UInput v-model="row.description" class="w-full" />
+                <UFormField :name="`items.${i}.description`">
+                  <UInput v-model="row.description" class="w-full" />
+                </UFormField>
               </div>
               <div class="col-span-1">
                 <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.qty') }}</label>
-                <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
+                <UFormField :name="`items.${i}.quantity`">
+                  <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
+                </UFormField>
               </div>
               <div class="col-span-1">
                 <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('articles.colUnit') }}</label>
@@ -335,7 +354,9 @@ const emailMessage = computed({
               </div>
               <div class="col-span-1">
                 <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('articles.colPrice') }}</label>
-                <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
+                <UFormField :name="`items.${i}.unitPrice`">
+                  <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
+                </UFormField>
               </div>
               <div class="col-span-1">
                 <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.discPct') }}</label>
@@ -380,12 +401,13 @@ const emailMessage = computed({
           </div>
         </dl>
       </UCard>
+      </UForm>
 
       <div class="mt-6 flex justify-between">
         <UButton color="neutral" variant="ghost" :loading="saving" @click="save">
           {{ $t('common.save') }}
         </UButton>
-        <UButton trailing-icon="i-lucide-arrow-right" :loading="saving" @click="continueToSend">
+        <UButton trailing-icon="i-lucide-arrow-right" :loading="saving" @click="formRef?.submit()">
           {{ $t('invoices.continue') }}
         </UButton>
       </div>
