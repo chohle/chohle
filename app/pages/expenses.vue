@@ -90,7 +90,8 @@ const formRef = ref()
 function validate(state: typeof form) {
   const errors: { name: string, message: string }[] = []
   if (!state.title.trim()) errors.push({ name: 'title', message: t('validation.required') })
-  if (!state.amount) errors.push({ name: 'amount', message: t('validation.required') })
+  if (state.amount == null) errors.push({ name: 'amount', message: t('validation.required') })
+  else if (state.amount <= 0) errors.push({ name: 'amount', message: t('validation.positive') })
   return errors
 }
 

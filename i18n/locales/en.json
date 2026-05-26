@@ -260,7 +260,8 @@
     "invoiceAmountChf": "Invoice amount CHF"
   },
   "validation": {
-    "required": "This field is required"
+    "required": "This field is required",
+    "positive": "Must be greater than 0"
   },
   "common": {
     "cancel": "Cancel",

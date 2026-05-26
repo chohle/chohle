@@ -260,7 +260,8 @@
     "invoiceAmountChf": "Montant de la facture CHF"
   },
   "validation": {
-    "required": "Ce champ est obligatoire"
+    "required": "Ce champ est obligatoire",
+    "positive": "Doit être supérieur à 0"
   },
   "common": {
     "cancel": "Annuler",

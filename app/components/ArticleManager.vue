@@ -53,6 +53,7 @@ function validate(state: typeof form) {
   const errors: { name: string, message: string }[] = []
   if (!state.name?.trim()) errors.push({ name: 'name', message: t('validation.required') })
   if (state.price == null) errors.push({ name: 'price', message: t('validation.required') })
+  else if (state.price <= 0) errors.push({ name: 'price', message: t('validation.positive') })
   return errors
 }
 

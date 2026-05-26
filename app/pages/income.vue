@@ -71,7 +71,8 @@ const formRef = ref()
 function validate(state: typeof form) {
   const errors: { name: string, message: string }[] = []
   if (!state.company.trim()) errors.push({ name: 'company', message: t('validation.required') })
-  if (!state.salary) errors.push({ name: 'salary', message: t('validation.required') })
+  if (state.salary == null) errors.push({ name: 'salary', message: t('validation.required') })
+  else if (state.salary <= 0) errors.push({ name: 'salary', message: t('validation.positive') })
   return errors
 }
 

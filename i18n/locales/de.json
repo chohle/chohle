@@ -260,7 +260,8 @@
     "invoiceAmountChf": "Rechnungsbetrag CHF"
   },
   "validation": {
-    "required": "Dieses Feld ist erforderlich"
+    "required": "Dieses Feld ist erforderlich",
+    "positive": "Muss grösser als 0 sein"
   },
   "common": {
     "cancel": "Abbrechen",
