@@ -35,7 +35,7 @@ function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number)
+  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
   return new Date(y, m - 1, d).toLocaleDateString(locale.value, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 function open(id: number) {

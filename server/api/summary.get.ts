@@ -1,5 +1,5 @@
 function lastSixMonths(month: string): string[] {
-  const [year, mo] = month.split('-').map(Number)
+  const [year, mo] = month.split('-').map(Number) as [number, number]
   const months: string[] = []
   for (let i = 5; i >= 0; i--) {
     const d = new Date(year, mo - 1 - i, 1)
@@ -108,7 +108,7 @@ export default defineEventHandler(async (event) => {
     }[]).map((r) => r.source_id)
   )
 
-  const [year, mo] = month.split('-').map(Number)
+  const [year, mo] = month.split('-').map(Number) as [number, number]
   const holidaysByCanton = new Map<string, Map<string, string>>()
   const recurring = []
   let expected = 0

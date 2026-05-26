@@ -121,7 +121,7 @@ function chf(rappen: number) {
 }
 
 function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number)
+  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
   return new Date(y, m - 1, d).toLocaleDateString(locale.value, {
     weekday: 'short',
     day: '2-digit',
