@@ -235,6 +235,15 @@ const migrations: Migration[] = [
     // HTML cover message sent with the invoice. Placeholders {customer} {number}
     // {due} {sender} are filled in per send; header/footer are added on send.
     up: "ALTER TABLE sender ADD COLUMN email_template TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>anbei erhalten Sie die Rechnung {number}, zahlbar bis {due}.</p><p>Freundliche Grüsse<br>{sender}</p>'"
+  },
+  {
+    name: '0019_invoice_paid_at',
+    // When an invoice was marked paid; drives realized revenue per month.
+    // Backfill existing paid invoices to their issue date.
+    up: `
+      ALTER TABLE invoices ADD COLUMN paid_at TEXT;
+      UPDATE invoices SET paid_at = issue_date WHERE status = 'paid';
+    `
   }
 ]
 

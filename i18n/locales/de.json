@@ -38,6 +38,7 @@
     "net": "Netto",
     "expected": "Erwartet",
     "outstanding": "CHF {amount} ausstehend",
+    "fromInvoices": "davon CHF {amount} aus Rechnungen",
     "vsLastMonth": "ggü. Vormonat",
     "expensesByCategory": "Ausgaben nach Kategorie",
     "noExpensesTitle": "Keine Ausgaben diesen Monat",

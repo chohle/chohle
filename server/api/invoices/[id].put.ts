@@ -30,10 +30,14 @@ export default defineEventHandler(async (event) => {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
 
+  // Stamp paid_at when entering 'paid' (keep the original date if already set); clear otherwise.
+  const current = db.prepare('SELECT paid_at FROM invoices WHERE id = ?').get(id) as { paid_at: string | null } | undefined
+  const paidAt = status === 'paid' ? (current?.paid_at || new Date().toISOString().slice(0, 10)) : null
+
   db.transaction(() => {
     db.prepare(
-      'UPDATE invoices SET number = ?, title = ?, status = ?, issue_date = ?, due_date = ? WHERE id = ?'
-    ).run(number, title, status, issueDate, dueDate, id)
+      'UPDATE invoices SET number = ?, title = ?, status = ?, issue_date = ?, due_date = ?, paid_at = ? WHERE id = ?'
+    ).run(number, title, status, issueDate, dueDate, paidAt, id)
 
     db.prepare('DELETE FROM invoice_items WHERE invoice_id = ?').run(id)
     items.forEach((it: Record<string, unknown>, index: number) => {

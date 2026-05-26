@@ -38,6 +38,7 @@
     "net": "Net",
     "expected": "Attendu",
     "outstanding": "CHF {amount} en attente",
+    "fromInvoices": "dont CHF {amount} de factures",
     "vsLastMonth": "vs mois dernier",
     "expensesByCategory": "Dépenses par catégorie",
     "noExpensesTitle": "Aucune dépense ce mois-ci",
