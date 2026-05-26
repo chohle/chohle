@@ -4,6 +4,7 @@
     "expenses": "Spese",
     "income": "Entrate",
     "customers": "Clienti",
+    "invoices": "Fatture",
     "articles": "Articoli",
     "categories": "Categorie"
   },
@@ -197,6 +198,10 @@
     "remove": "Rimuovi"
   },
   "invoices": {
+    "allSubtitle": "Tutte le fatture di tutti i clienti.",
+    "filterAll": "Tutte",
+    "emptyTitle": "Nessuna fattura",
+    "emptyText": "Le fatture che crei per i clienti compaiono qui.",
     "titleNumber": "Fattura {number}",
     "pdfPreview": "Anteprima PDF",
     "backToEditor": "Torna all'editor",

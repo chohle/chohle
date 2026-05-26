@@ -4,6 +4,7 @@
     "expenses": "Expenses",
     "income": "Income",
     "customers": "Customers",
+    "invoices": "Invoices",
     "articles": "Articles",
     "categories": "Categories"
   },
@@ -197,6 +198,10 @@
     "remove": "Remove"
   },
   "invoices": {
+    "allSubtitle": "All invoices across your customers.",
+    "filterAll": "All",
+    "emptyTitle": "No invoices",
+    "emptyText": "Invoices you create for customers show up here.",
     "titleNumber": "Invoice {number}",
     "pdfPreview": "PDF preview",
     "backToEditor": "Back to editor",

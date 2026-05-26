@@ -4,6 +4,7 @@
     "expenses": "Ausgaben",
     "income": "Einnahmen",
     "customers": "Kunden",
+    "invoices": "Rechnungen",
     "articles": "Artikel",
     "categories": "Kategorien"
   },
@@ -197,6 +198,10 @@
     "remove": "Entfernen"
   },
   "invoices": {
+    "allSubtitle": "Alle Rechnungen über alle Kunden.",
+    "filterAll": "Alle",
+    "emptyTitle": "Keine Rechnungen",
+    "emptyText": "Rechnungen, die du für Kunden erstellst, erscheinen hier.",
     "titleNumber": "Rechnung {number}",
     "pdfPreview": "PDF-Vorschau",
     "backToEditor": "Zurück zum Editor",
