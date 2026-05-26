@@ -142,7 +142,7 @@ function chf(rappen: number) {
             <UInput v-model="form.unit" :placeholder="$t('articles.unitPlaceholder')" class="w-full" />
           </UFormField>
           <UFormField name="price" :label="$t('articles.price')">
-            <UInput v-model.number="form.price" type="number" min="0" step="0.05" class="w-full" />
+            <UInput v-model.number="form.price" type="number" step="0.05" class="w-full" />
           </UFormField>
           <div class="sm:col-span-2">
             <USwitch v-model="hasMwst" :label="$t('articles.chargeMwst')" />

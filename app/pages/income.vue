@@ -220,7 +220,7 @@ function formatDate(iso: string) {
             <UInput v-model="form.jobTitle" class="w-full" />
           </UFormField>
           <UFormField name="salary" :label="$t('income.salary')">
-            <UInput v-model.number="form.salary" type="number" min="0" step="0.05" class="w-full" />
+            <UInput v-model.number="form.salary" type="number" step="0.05" class="w-full" />
           </UFormField>
           <UFormField :label="$t('income.payoutDay')">
             <UInput v-model.number="form.payoutDay" type="number" min="1" max="31" class="w-full" />

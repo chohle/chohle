@@ -226,7 +226,7 @@ function chf(rappen: number) {
             <UInput v-model="form.title" :placeholder="$t('expenses.titlePlaceholder')" class="w-full" />
           </UFormField>
           <UFormField name="amount" :label="$t('expenses.amountField')">
-            <UInput v-model.number="form.amount" type="number" min="0" step="0.05" class="w-full" />
+            <UInput v-model.number="form.amount" type="number" step="0.05" class="w-full" />
           </UFormField>
           <UFormField :label="$t('common.date')">
             <UInput v-model="form.date" type="date" class="w-full" />
