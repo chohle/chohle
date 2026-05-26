@@ -19,15 +19,28 @@ export default defineEventHandler(async (event) => {
     )
     .all() as Array<Record<string, unknown> & { id: number }>
 
-  const itemsStmt = db.prepare(
-    'SELECT quantity, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?'
-  )
+  // Fetch all line items in one query, grouped by invoice (avoids N+1).
+  const ids = invoices.map((i) => i.id)
+  const itemsByInvoice = new Map<number, ItemRow[]>()
+  if (ids.length) {
+    const rows = db
+      .prepare(
+        `SELECT invoice_id, quantity, unit_price_rappen, discount_percent, mwst_percent
+         FROM invoice_items WHERE invoice_id IN (${ids.map(() => '?').join(',')})`
+      )
+      .all(...ids) as Array<ItemRow & { invoice_id: number }>
+    for (const r of rows) {
+      const list = itemsByInvoice.get(r.invoice_id)
+      if (list) list.push(r)
+      else itemsByInvoice.set(r.invoice_id, [r])
+    }
+  }
   const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
     | { vat_registered: number }
     | undefined)?.vat_registered
 
   return invoices.map((inv) => {
-    const items = itemsStmt.all(inv.id) as ItemRow[]
+    const items = itemsByInvoice.get(inv.id) ?? []
     const { totalRappen } = computeInvoiceTotals(
       items.map((i) => ({
         quantity: i.quantity,

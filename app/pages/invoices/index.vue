@@ -38,6 +38,9 @@ function formatDate(iso: string) {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d).toLocaleDateString(locale.value, { day: '2-digit', month: 'short', year: 'numeric' })
 }
+function open(id: number) {
+  navigateTo(`/invoices/${id}`)
+}
 </script>
 
 <template>
@@ -116,8 +119,13 @@ function formatDate(iso: string) {
             <tr
               v-for="inv in filtered"
               :key="inv.id"
-              class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors cursor-pointer"
-              @click="navigateTo(`/invoices/${inv.id}`)"
+              tabindex="0"
+              role="button"
+              :aria-label="`${inv.number || inv.title || $t('common.untitled')}, ${inv.customer_name}`"
+              class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              @click="open(inv.id)"
+              @keydown.enter="open(inv.id)"
+              @keydown.space.prevent="open(inv.id)"
             >
               <td class="py-2 font-medium whitespace-nowrap">{{ inv.number || '-' }}</td>
               <td class="py-2">{{ inv.customer_name }}</td>
