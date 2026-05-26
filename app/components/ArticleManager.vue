@@ -10,6 +10,8 @@ interface Article {
 const props = defineProps<{ listUrl: string, createUrl: string }>()
 
 const { data: articles, refresh } = await useFetch<Article[]>(props.listUrl, { default: () => [] })
+const { data: sender } = await useFetch<{ vat_registered: number }>('/api/sender')
+const vatRegistered = computed(() => !!sender.value?.vat_registered)
 
 function blank() {
   return {
@@ -17,12 +19,18 @@ function blank() {
     name: '',
     unit: '',
     price: undefined as number | undefined,
-    mwst: 8.1
+    // No MWST by default when the owner isn't VAT-registered (e.g. solo < CHF 100k).
+    mwst: vatRegistered.value ? 8.1 : 0
   }
 }
 const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
+
+const hasMwst = computed({
+  get: () => (form.mwst ?? 0) > 0,
+  set: (v: boolean) => { form.mwst = v ? (form.mwst > 0 ? form.mwst : 8.1) : 0 }
+})
 
 function openCreate() {
   Object.assign(form, blank())
@@ -101,7 +109,7 @@ function chf(rappen: number) {
           <td class="py-2">{{ a.name }}</td>
           <td class="py-2">{{ a.unit || '-' }}</td>
           <td class="py-2 text-right whitespace-nowrap">CHF {{ chf(a.default_price_rappen) }}</td>
-          <td class="py-2 text-right">{{ a.default_mwst }}%</td>
+          <td class="py-2 text-right">{{ a.default_mwst ? `${a.default_mwst}%` : '-' }}</td>
           <td class="py-2 text-right whitespace-nowrap">
             <UButton icon="i-lucide-pencil" color="neutral" variant="ghost" size="sm" @click="openEdit(a)" />
             <UButton icon="i-lucide-trash-2" color="error" variant="ghost" size="sm" @click="remove(a.id)" />
@@ -127,7 +135,10 @@ function chf(rappen: number) {
           <UFormField :label="$t('articles.price')">
             <UInput v-model.number="form.price" type="number" min="0" step="0.05" class="w-full" />
           </UFormField>
-          <UFormField :label="$t('articles.mwstPercent')" class="sm:col-span-2">
+          <div class="sm:col-span-2">
+            <USwitch v-model="hasMwst" :label="$t('articles.chargeMwst')" />
+          </div>
+          <UFormField v-if="hasMwst" :label="$t('articles.mwstPercent')" class="sm:col-span-2">
             <UInput v-model.number="form.mwst" type="number" min="0" step="0.1" class="w-full" />
           </UFormField>
         </form>

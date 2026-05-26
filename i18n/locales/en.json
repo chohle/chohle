@@ -139,7 +139,8 @@
     "unit": "Unit",
     "unitPlaceholder": "Hours, Flat rate, ...",
     "price": "Price (CHF)",
-    "mwstPercent": "VAT %"
+    "mwstPercent": "VAT %",
+    "chargeMwst": "Charge VAT"
   },
   "categories": {
     "subtitle": "Labels for organizing expenses and income.",

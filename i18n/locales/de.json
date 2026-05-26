@@ -139,7 +139,8 @@
     "unit": "Einheit",
     "unitPlaceholder": "Stunden, Pauschal, ...",
     "price": "Preis (CHF)",
-    "mwstPercent": "MWST %"
+    "mwstPercent": "MWST %",
+    "chargeMwst": "MWST berechnen"
   },
   "categories": {
     "subtitle": "Bezeichnungen zur Organisation von Ausgaben und Einnahmen.",

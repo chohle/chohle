@@ -139,7 +139,8 @@
     "unit": "Unità",
     "unitPlaceholder": "Ore, Forfait, ...",
     "price": "Prezzo (CHF)",
-    "mwstPercent": "IVA %"
+    "mwstPercent": "IVA %",
+    "chargeMwst": "Addebitare l'IVA"
   },
   "categories": {
     "subtitle": "Etichette per organizzare spese ed entrate.",

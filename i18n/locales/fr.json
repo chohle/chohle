@@ -139,7 +139,8 @@
     "unit": "Unité",
     "unitPlaceholder": "Heures, Forfait, ...",
     "price": "Prix (CHF)",
-    "mwstPercent": "TVA %"
+    "mwstPercent": "TVA %",
+    "chargeMwst": "Facturer la TVA"
   },
   "categories": {
     "subtitle": "Étiquettes pour organiser les dépenses et les revenus.",
