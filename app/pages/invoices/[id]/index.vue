@@ -330,10 +330,10 @@ const emailMessage = computed({
               <div class="col-span-2">
                 <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.article') }}</label>
                 <USelect
-                  v-model="row.articleId"
+                  :model-value="row.articleId ?? undefined"
                   :items="articleItems"
                   class="w-full"
-                  @update:model-value="onArticle(row)"
+                  @update:model-value="row.articleId = $event; onArticle(row)"
                 />
               </div>
               <div class="col-span-2" :class="vat ? 'sm:col-span-3' : 'sm:col-span-4'">
