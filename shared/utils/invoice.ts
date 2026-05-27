@@ -24,10 +24,20 @@ function round5(rappen: number): number {
 }
 
 // Coerce an incoming article id to a positive integer, or null when absent.
-// Number(null), Number(undefined) and Number('') collapse to 0/NaN, so a bare
-// Number.isInteger check would store 0 and break the articles foreign key.
+// Only numbers and integer-shaped strings are accepted; booleans, objects and
+// the like are rejected outright so they can't slip past Number() coercion and
+// break the articles foreign key.
 export function normalizeArticleId(value: unknown): number | null {
-  const n = Number(value)
+  let n: number
+  if (typeof value === 'number') {
+    n = value
+  } else if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!/^\d+$/.test(trimmed)) return null
+    n = Number(trimmed)
+  } else {
+    return null
+  }
   return Number.isInteger(n) && n > 0 ? n : null
 }
 

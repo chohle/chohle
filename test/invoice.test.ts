@@ -79,4 +79,10 @@ describe('normalizeArticleId', () => {
     expect(normalizeArticleId(-3)).toBeNull()
     expect(normalizeArticleId('abc')).toBeNull()
   })
+
+  it('rejects non-number/string types instead of coercing them', () => {
+    expect(normalizeArticleId(true)).toBeNull()
+    expect(normalizeArticleId([5])).toBeNull()
+    expect(normalizeArticleId({})).toBeNull()
+  })
 })
