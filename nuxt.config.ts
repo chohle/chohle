@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     strategy: 'no_prefix',
     defaultLocale: 'en',
     langDir: 'locales',
-    lazy: true,
     // Locale is a stored preference, not browser-sniffed; default stays English.
     detectBrowserLanguage: false,
     locales: [
