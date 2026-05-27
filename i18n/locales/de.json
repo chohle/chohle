@@ -17,6 +17,7 @@
   },
   "settings": {
     "subtitle": "App-Einstellungen.",
+    "tabGeneral": "Allgemein",
     "appearance": "Erscheinungsbild",
     "appearanceHelp": "Wähle das Farbschema.",
     "themeSystem": "System",
@@ -27,6 +28,10 @@
     "emailTemplate": "E-Mail-Vorlage",
     "emailTemplateHelp": "Die Begleitnachricht, die mit jeder Rechnung gesendet wird. Kopf- und Fusszeile werden automatisch ergänzt.",
     "emailTemplatePlaceholders": "Platzhalter",
+    "placeholderCustomer": "Kundenname",
+    "placeholderNumber": "Rechnungsnummer",
+    "placeholderDue": "Fälligkeitsdatum",
+    "placeholderSender": "Dein Name",
     "emailTemplateSaved": "E-Mail-Vorlage gespeichert",
     "languageConfirmTitle": "Sprache ändern?",
     "languageConfirmText": "Die gesamte App wird sofort auf die gewählte Sprache umgestellt."

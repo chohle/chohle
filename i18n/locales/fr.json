@@ -17,6 +17,7 @@
   },
   "settings": {
     "subtitle": "Préférences de l'application.",
+    "tabGeneral": "Général",
     "appearance": "Apparence",
     "appearanceHelp": "Choisissez le thème de couleur.",
     "themeSystem": "Système",
@@ -27,6 +28,10 @@
     "emailTemplate": "Modèle d'e-mail",
     "emailTemplateHelp": "Le message d'accompagnement envoyé avec chaque facture. Un en-tête et un pied de page sont ajoutés automatiquement.",
     "emailTemplatePlaceholders": "Espaces réservés",
+    "placeholderCustomer": "Nom du client",
+    "placeholderNumber": "Numéro de facture",
+    "placeholderDue": "Date d’échéance",
+    "placeholderSender": "Votre nom",
     "emailTemplateSaved": "Modèle d'e-mail enregistré",
     "languageConfirmTitle": "Changer de langue ?",
     "languageConfirmText": "Toute l'application passera immédiatement à la langue sélectionnée."

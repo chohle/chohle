@@ -17,6 +17,7 @@
   },
   "settings": {
     "subtitle": "Preferenze dell'app.",
+    "tabGeneral": "Generale",
     "appearance": "Aspetto",
     "appearanceHelp": "Scegli il tema dei colori.",
     "themeSystem": "Sistema",
@@ -27,6 +28,10 @@
     "emailTemplate": "Modello e-mail",
     "emailTemplateHelp": "Il messaggio di accompagnamento inviato con ogni fattura. Intestazione e piè di pagina vengono aggiunti automaticamente.",
     "emailTemplatePlaceholders": "Segnaposto",
+    "placeholderCustomer": "Nome cliente",
+    "placeholderNumber": "Numero fattura",
+    "placeholderDue": "Data di scadenza",
+    "placeholderSender": "Il tuo nome",
     "emailTemplateSaved": "Modello e-mail salvato",
     "languageConfirmTitle": "Cambiare lingua?",
     "languageConfirmText": "L'intera app passerà subito alla lingua selezionata."

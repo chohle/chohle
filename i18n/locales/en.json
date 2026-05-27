@@ -17,6 +17,7 @@
   },
   "settings": {
     "subtitle": "App preferences.",
+    "tabGeneral": "General",
     "appearance": "Appearance",
     "appearanceHelp": "Choose the colour theme.",
     "themeSystem": "System",
@@ -27,6 +28,10 @@
     "emailTemplate": "Email template",
     "emailTemplateHelp": "The cover message sent with each invoice. A header and footer are added automatically.",
     "emailTemplatePlaceholders": "Placeholders",
+    "placeholderCustomer": "Customer name",
+    "placeholderNumber": "Invoice number",
+    "placeholderDue": "Due date",
+    "placeholderSender": "Your name",
     "emailTemplateSaved": "Email template saved",
     "languageConfirmTitle": "Change language?",
     "languageConfirmText": "The whole app will switch to the selected language right away."
