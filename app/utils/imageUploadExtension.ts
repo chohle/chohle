@@ -1,4 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core'
+import type { NodeViewRenderer } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import ImageUploadNode from '../components/EditorImageUploadNode.vue'
 
@@ -15,7 +16,7 @@ export const ImageUpload = Node.create({
   renderHTML({ HTMLAttributes }) {
     return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'image-upload' })]
   },
-  addNodeView() {
+  addNodeView(): NodeViewRenderer {
     return VueNodeViewRenderer(ImageUploadNode)
   }
 })
