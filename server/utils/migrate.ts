@@ -251,6 +251,16 @@ const migrations: Migration[] = [
     // stable even if items or VAT registration change later. Backfilled for
     // existing paid invoices by the backfill-invoice-totals server plugin.
     up: 'ALTER TABLE invoices ADD COLUMN total_rappen INTEGER'
+  },
+  {
+    name: '0021_invoice_step',
+    // Wizard position (0 draft, 1 send, 2 paid) so reopening a draft resumes on
+    // the send screen instead of resetting to draft. Once sent/paid the status
+    // decides, so backfill those to the final step.
+    up: `
+      ALTER TABLE invoices ADD COLUMN step INTEGER NOT NULL DEFAULT 0;
+      UPDATE invoices SET step = 2 WHERE status IN ('sent', 'paid');
+    `
   }
 ]
 

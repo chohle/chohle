@@ -6,6 +6,7 @@ interface InvoiceRow {
   status: 'draft' | 'sent' | 'paid'
   issue_date: string
   due_date: string
+  step: number
 }
 interface ItemRow {
   article_id: number | null
@@ -84,8 +85,12 @@ const steps = computed(() => [
   { title: t('invoices.send'), icon: 'i-lucide-send' },
   { title: t('status.paid'), icon: 'i-lucide-circle-check' }
 ])
-const statusToStep: Record<string, number> = { draft: 0, sent: 2, paid: 2 }
-const step = ref(statusToStep[inv.status] ?? 0)
+// Resume where the owner left off: a draft remembers its wizard step; once the
+// invoice is sent or paid the status decides (you can't be before "send" anymore).
+const step = ref(inv.status === 'draft' ? inv.step : 2)
+watch(step, (v) => {
+  $fetch(`/api/invoices/${id}/step`, { method: 'PATCH', body: { step: v } }).catch(() => {})
+})
 
 function onArticle(row: EditRow) {
   const a = articles.value.find((x) => x.id === row.articleId)
