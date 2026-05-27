@@ -13,7 +13,7 @@ interface InvoiceRow {
 const { t, locale } = useI18n()
 const { data: invoices } = await useFetch<InvoiceRow[]>('/api/invoices', { default: () => [] })
 
-const statusColor: Record<string, string> = { draft: 'neutral', sent: 'warning', paid: 'success' }
+const statusColor = { draft: 'neutral', sent: 'warning', paid: 'success' } as const
 
 const filter = ref<'all' | 'draft' | 'sent' | 'paid'>('all')
 const filterItems = computed(() => [

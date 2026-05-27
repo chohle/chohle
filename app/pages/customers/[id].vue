@@ -51,7 +51,7 @@ const { data: customerArticles } = await useFetch<{ id: number }[]>(
   { default: () => [] }
 )
 
-const statusColor: Record<string, string> = { draft: 'neutral', sent: 'warning', paid: 'success' }
+const statusColor = { draft: 'neutral', sent: 'warning', paid: 'success' } as const
 
 const stats = computed(() => {
   const list = invoices.value
