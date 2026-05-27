@@ -2,6 +2,7 @@
 interface Summary {
   month: string
   income: number
+  invoiceIncome: number
   expenses: number
   net: number
   expected: number
@@ -51,7 +52,7 @@ function monthLabel(ym: string) {
 }
 
 function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number)
+  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
   return new Date(y, m - 1, d).toLocaleDateString(locale.value, { day: '2-digit', month: 'short' })
 }
 </script>
@@ -73,8 +74,11 @@ function formatDate(iso: string) {
           <div class="min-w-0">
             <div class="text-sm text-muted">{{ $t('dashboard.income') }}</div>
             <div class="text-xl font-semibold text-success tabular-nums">CHF {{ chf(data.income) }}</div>
+            <div v-if="data.invoiceIncome" class="text-xs text-muted">
+              {{ $t('dashboard.fromInvoices', { amount: chf(data.invoiceIncome) }) }}
+            </div>
             <div
-              v-if="incomeDelta !== null"
+              v-else-if="incomeDelta !== null"
               class="mt-0.5 flex items-center gap-0.5 text-xs"
               :class="incomeDelta >= 0 ? 'text-success' : 'text-error'"
               :title="$t('dashboard.vsLastMonth')"

@@ -4,6 +4,7 @@
     "expenses": "Spese",
     "income": "Entrate",
     "customers": "Clienti",
+    "invoices": "Fatture",
     "articles": "Articoli",
     "categories": "Categorie"
   },
@@ -37,6 +38,7 @@
     "net": "Netto",
     "expected": "Previsto",
     "outstanding": "CHF {amount} in sospeso",
+    "fromInvoices": "di cui CHF {amount} da fatture",
     "vsLastMonth": "vs mese scorso",
     "expensesByCategory": "Spese per categoria",
     "noExpensesTitle": "Nessuna spesa questo mese",
@@ -197,6 +199,10 @@
     "remove": "Rimuovi"
   },
   "invoices": {
+    "allSubtitle": "Tutte le fatture di tutti i clienti.",
+    "filterAll": "Tutte",
+    "emptyTitle": "Nessuna fattura",
+    "emptyText": "Le fatture che crei per i clienti compaiono qui.",
     "titleNumber": "Fattura {number}",
     "pdfPreview": "Anteprima PDF",
     "backToEditor": "Torna all'editor",

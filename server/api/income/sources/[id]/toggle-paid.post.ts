@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     return { paid: false }
   }
 
-  const [year, mo] = month.split('-').map(Number)
+  const [year, mo] = month.split('-').map(Number) as [number, number]
   const holidays = await getHolidays(source.canton, year)
   const { date } = computePayout(year, mo, source.payout_day, source.payout_rule, holidays)
   db.prepare(

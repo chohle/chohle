@@ -30,10 +30,29 @@ export default defineEventHandler(async (event) => {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
 
+  // Stamp paid_at when entering 'paid' (keep the original date if already set); clear otherwise.
+  const current = db.prepare('SELECT paid_at FROM invoices WHERE id = ?').get(id) as { paid_at: string | null } | undefined
+  const paidAt = status === 'paid' ? (current?.paid_at || new Date().toISOString().slice(0, 10)) : null
+
+  // Freeze the total when paid so realized revenue is stable; null while unpaid.
+  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
+    | { vat_registered: number }
+    | undefined)?.vat_registered
+  const { totalRappen } = computeInvoiceTotals(
+    items.map((it: Record<string, unknown>) => ({
+      quantity: Number(it?.quantity) || 0,
+      unitPriceRappen: Math.round((Number(it?.unitPrice) || 0) * 100),
+      discountPercent: Number(it?.discountPercent) || 0,
+      mwstPercent: Number(it?.mwstPercent) || 0
+    })),
+    vat
+  )
+  const totalSnapshot = status === 'paid' ? totalRappen : null
+
   db.transaction(() => {
     db.prepare(
-      'UPDATE invoices SET number = ?, title = ?, status = ?, issue_date = ?, due_date = ? WHERE id = ?'
-    ).run(number, title, status, issueDate, dueDate, id)
+      'UPDATE invoices SET number = ?, title = ?, status = ?, issue_date = ?, due_date = ?, paid_at = ?, total_rappen = ? WHERE id = ?'
+    ).run(number, title, status, issueDate, dueDate, paidAt, totalSnapshot, id)
 
     db.prepare('DELETE FROM invoice_items WHERE invoice_id = ?').run(id)
     items.forEach((it: Record<string, unknown>, index: number) => {

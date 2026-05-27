@@ -1,5 +1,5 @@
 function lastSixMonths(month: string): string[] {
-  const [year, mo] = month.split('-').map(Number)
+  const [year, mo] = month.split('-').map(Number) as [number, number]
   const months: string[] = []
   for (let i = 5; i >= 0; i--) {
     const d = new Date(year, mo - 1 - i, 1)
@@ -23,11 +23,22 @@ export default defineEventHandler(async (event) => {
       .get(`${month}%`) as { total: number }
   ).total
 
-  const income = (
+  const salaryIncome = (
     db
       .prepare('SELECT COALESCE(SUM(amount_rappen), 0) AS total FROM income_payments WHERE month = ?')
       .get(month) as { total: number }
   ).total
+
+  // Invoice revenue: the total frozen on each invoice when it was marked paid,
+  // attributed by paid_at month. Reads the stored snapshot, so past income does
+  // not shift when items or VAT registration change later.
+  const invoiceIncome = (
+    db
+      .prepare("SELECT COALESCE(SUM(total_rappen), 0) AS total FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) = ?")
+      .get(month) as { total: number }
+  ).total
+
+  const income = salaryIncome + invoiceIncome
 
   const byCategory = (
     db
@@ -64,9 +75,18 @@ export default defineEventHandler(async (event) => {
     .all(months[0]) as Array<{ ym: string, total: number }>
   const incomeByMonth = Object.fromEntries(incomeGrouped.map((r) => [r.ym, r.total]))
 
+  const invoiceByMonth = Object.fromEntries(
+    (db
+      .prepare(
+        `SELECT substr(paid_at, 1, 7) AS ym, COALESCE(SUM(total_rappen), 0) AS total
+         FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) >= ? GROUP BY ym`
+      )
+      .all(months[0]) as Array<{ ym: string, total: number }>).map((r) => [r.ym, r.total])
+  )
+
   const trend = months.map((m) => ({
     month: m,
-    income: incomeByMonth[m] ?? 0,
+    income: (incomeByMonth[m] ?? 0) + (invoiceByMonth[m] ?? 0),
     expenses: expensesByMonth[m] ?? 0
   }))
 
@@ -88,7 +108,7 @@ export default defineEventHandler(async (event) => {
     }[]).map((r) => r.source_id)
   )
 
-  const [year, mo] = month.split('-').map(Number)
+  const [year, mo] = month.split('-').map(Number) as [number, number]
   const holidaysByCanton = new Map<string, Map<string, string>>()
   const recurring = []
   let expected = 0
@@ -116,10 +136,13 @@ export default defineEventHandler(async (event) => {
   return {
     month,
     income,
+    invoiceIncome,
     expenses,
     net: income - expenses,
     expected,
-    outstanding: expected - income,
+    // Outstanding stays a salary measure (unpaid expected salary); invoice
+    // receivables live on the /invoices page.
+    outstanding: expected - salaryIncome,
     byCategory,
     trend,
     recurring

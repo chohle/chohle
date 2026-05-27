@@ -235,6 +235,22 @@ const migrations: Migration[] = [
     // HTML cover message sent with the invoice. Placeholders {customer} {number}
     // {due} {sender} are filled in per send; header/footer are added on send.
     up: "ALTER TABLE sender ADD COLUMN email_template TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>anbei erhalten Sie die Rechnung {number}, zahlbar bis {due}.</p><p>Freundliche Grüsse<br>{sender}</p>'"
+  },
+  {
+    name: '0019_invoice_paid_at',
+    // When an invoice was marked paid; drives realized revenue per month.
+    // Backfill existing paid invoices to their issue date.
+    up: `
+      ALTER TABLE invoices ADD COLUMN paid_at TEXT;
+      UPDATE invoices SET paid_at = issue_date WHERE status = 'paid';
+    `
+  },
+  {
+    name: '0020_invoice_total_snapshot',
+    // Total frozen when an invoice is marked paid, so realized revenue stays
+    // stable even if items or VAT registration change later. Backfilled for
+    // existing paid invoices by the backfill-invoice-totals server plugin.
+    up: 'ALTER TABLE invoices ADD COLUMN total_rappen INTEGER'
   }
 ]
 

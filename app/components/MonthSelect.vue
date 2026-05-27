@@ -3,13 +3,13 @@ const model = defineModel<string>({ required: true })
 const { locale } = useI18n()
 
 function shift(delta: number) {
-  const [y, m] = model.value.split('-').map(Number)
+  const [y, m] = model.value.split('-').map(Number) as [number, number]
   const d = new Date(y, m - 1 + delta, 1)
   model.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
 const label = computed(() => {
-  const [y, m] = model.value.split('-').map(Number)
+  const [y, m] = model.value.split('-').map(Number) as [number, number]
   return new Date(y, m - 1, 1).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
 })
 </script>

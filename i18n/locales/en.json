@@ -4,6 +4,7 @@
     "expenses": "Expenses",
     "income": "Income",
     "customers": "Customers",
+    "invoices": "Invoices",
     "articles": "Articles",
     "categories": "Categories"
   },
@@ -37,6 +38,7 @@
     "net": "Net",
     "expected": "Expected",
     "outstanding": "CHF {amount} outstanding",
+    "fromInvoices": "incl. CHF {amount} from invoices",
     "vsLastMonth": "vs. last month",
     "expensesByCategory": "Expenses by category",
     "noExpensesTitle": "No expenses this month",
@@ -197,6 +199,10 @@
     "remove": "Remove"
   },
   "invoices": {
+    "allSubtitle": "All invoices across your customers.",
+    "filterAll": "All",
+    "emptyTitle": "No invoices",
+    "emptyText": "Invoices you create for customers show up here.",
     "titleNumber": "Invoice {number}",
     "pdfPreview": "PDF preview",
     "backToEditor": "Back to editor",
