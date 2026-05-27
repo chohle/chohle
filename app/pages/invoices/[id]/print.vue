@@ -35,6 +35,7 @@ interface Party {
   website?: string | null
   mwst?: string | null
   logo_path?: string | null
+  language?: string | null
 }
 
 const route = useRoute()
@@ -58,7 +59,7 @@ const { data: qrbill } = await useFetch<string>(`/api/invoices/${id}/qrbill`, {
 // The printed invoice is a document for the customer, so render it in their
 // language regardless of the owner's UI locale. Page controls stay on $t.
 const { t, loadLocaleMessages } = useI18n()
-const docLocale = customer.value?.language ?? 'en'
+const docLocale = (customer.value?.language ?? 'en') as Parameters<typeof loadLocaleMessages>[0]
 await loadLocaleMessages(docLocale)
 function td(key: string, named?: Record<string, unknown>) {
   return t(key, named ?? {}, { locale: docLocale })

@@ -29,7 +29,7 @@ const confirmOpen = ref(false)
 const target = ref(current.value)
 const saving = ref(false)
 
-function onPick(code: string) {
+function onPick(code: typeof current.value) {
   if (code === current.value) return
   target.value = code
   confirmOpen.value = true

@@ -202,7 +202,7 @@ function dateFmt(iso: string) {
 }
 
 // Compose the email in the customer's language; fields stay editable per send.
-const custLocale = customer.value?.language ?? 'en'
+const custLocale = (customer.value?.language ?? 'en') as Parameters<typeof loadLocaleMessages>[0]
 await loadLocaleMessages(custLocale)
 const td = (key: string, named?: Record<string, unknown>) => t(key, named ?? {}, { locale: custLocale })
 
