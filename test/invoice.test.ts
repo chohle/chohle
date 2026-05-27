@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeInvoiceTotals, lineNetRappen } from '../shared/utils/invoice'
+import { computeInvoiceTotals, lineNetRappen, normalizeArticleId } from '../shared/utils/invoice'
 
 describe('computeInvoiceTotals', () => {
   it('matches the FEATURES verification case', () => {
@@ -58,5 +58,25 @@ describe('computeInvoiceTotals', () => {
       totalMwstRappen: 0,
       totalRappen: 536250
     })
+  })
+})
+
+describe('normalizeArticleId', () => {
+  it('keeps a positive integer id', () => {
+    expect(normalizeArticleId(7)).toBe(7)
+    expect(normalizeArticleId('7')).toBe(7)
+  })
+
+  it('returns null for an absent id instead of 0 (would break the FK)', () => {
+    expect(normalizeArticleId(null)).toBeNull()
+    expect(normalizeArticleId(undefined)).toBeNull()
+    expect(normalizeArticleId('')).toBeNull()
+    expect(normalizeArticleId(0)).toBeNull()
+  })
+
+  it('returns null for non-integer or invalid values', () => {
+    expect(normalizeArticleId(2.5)).toBeNull()
+    expect(normalizeArticleId(-3)).toBeNull()
+    expect(normalizeArticleId('abc')).toBeNull()
   })
 })

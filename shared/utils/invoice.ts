@@ -23,6 +23,14 @@ function round5(rappen: number): number {
   return Math.round(rappen / 5) * 5
 }
 
+// Coerce an incoming article id to a positive integer, or null when absent.
+// Number(null), Number(undefined) and Number('') collapse to 0/NaN, so a bare
+// Number.isInteger check would store 0 and break the articles foreign key.
+export function normalizeArticleId(value: unknown): number | null {
+  const n = Number(value)
+  return Number.isInteger(n) && n > 0 ? n : null
+}
+
 export function lineNetRappen(line: InvoiceLine): number {
   const gross = line.quantity * line.unitPriceRappen
   return Math.round(gross * (1 - line.discountPercent / 100))

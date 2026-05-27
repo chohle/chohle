@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     items.forEach((it: Record<string, unknown>, index: number) => {
       insert.run(
         id,
-        Number.isInteger(Number(it?.articleId)) ? Number(it?.articleId) : null,
+        normalizeArticleId(it?.articleId),
         String(it?.description ?? ''),
         Number(it?.quantity) || 0,
         String(it?.unit ?? ''),
