@@ -38,7 +38,7 @@ interface Party {
   vat_registered?: number
 }
 
-const catalogs: Record<string, { invoiceDoc: Record<string, string> }> = {
+const catalogs: Record<string, { invoiceDoc: typeof enLocale.invoiceDoc }> = {
   en: enLocale,
   de: deLocale,
   fr: frLocale,
@@ -67,7 +67,7 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
     .all(id) as ItemRow[]
 
   const lang = customer?.language ?? 'en'
-  const L = (catalogs[lang] ?? catalogs.en).invoiceDoc
+  const L = (catalogs[lang] ?? enLocale).invoiceDoc
   const vat = !!sender.vat_registered
   const totals = computeInvoiceTotals(
     items.map((i) => ({
@@ -151,9 +151,10 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
     { x: 475, w: 70, align: 'right' as const }
   ]
   const drawRow = (cells: string[], rowY: number) =>
-    cells.forEach((v, idx) =>
-      pdf.text(v, cols[idx].x, rowY, { width: cols[idx].w, align: cols[idx].align, lineBreak: false })
-    )
+    cells.forEach((v, idx) => {
+      const col = cols[idx]!
+      pdf.text(v, col.x, rowY, { width: col.w, align: col.align, lineBreak: false })
+    })
 
   pdf.fontSize(9).font('Helvetica-Bold')
   drawRow([L.description, L.quantity, L.unit, L.price, L.amount], y)
