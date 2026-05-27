@@ -59,7 +59,8 @@ const { data: qrbill } = await useFetch<string>(`/api/invoices/${id}/qrbill`, {
 // The printed invoice is a document for the customer, so render it in their
 // language regardless of the owner's UI locale. Page controls stay on $t.
 const { t, loadLocaleMessages } = useI18n()
-const docLocale = (customer.value?.language ?? 'en') as Parameters<typeof loadLocaleMessages>[0]
+const { toLocale } = useAppLocale()
+const docLocale = toLocale(customer.value?.language)
 await loadLocaleMessages(docLocale)
 function td(key: string, named?: Record<string, unknown>) {
   return t(key, named ?? {}, { locale: docLocale })

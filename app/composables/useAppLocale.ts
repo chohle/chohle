@@ -16,5 +16,12 @@ export function useAppLocale() {
     await refreshSession()
   }
 
-  return { current: locale, options, set }
+  // Narrow a free-form string (e.g. a customer's stored language) to a
+  // configured locale, falling back to 'en' when it isn't one we ship.
+  function toLocale(value: string | null | undefined): typeof locale.value {
+    const codes = (locales.value as LocaleObject[]).map(l => String(l.code))
+    return value && codes.includes(value) ? (value as typeof locale.value) : 'en'
+  }
+
+  return { current: locale, options, set, toLocale }
 }
