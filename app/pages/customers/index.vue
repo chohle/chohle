@@ -9,9 +9,22 @@ interface CustomerRow {
   logo_path: string | null
 }
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { data: customers, refresh } = await useFetch<CustomerRow[]>('/api/customers', {
   default: () => []
+})
+
+const grouped = computed(() => {
+  const collator = new Intl.Collator(locale.value, { sensitivity: 'base' })
+  const sorted = [...customers.value].sort((a, b) => collator.compare(a.name, b.name))
+  const groups = new Map<string, CustomerRow[]>()
+  for (const row of sorted) {
+    const first = row.name.trim().charAt(0).toLocaleUpperCase(locale.value) || '#'
+    const key = /[A-Z]/.test(first) ? first : '#'
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key)!.push(row)
+  }
+  return [...groups.entries()].map(([letter, rows]) => ({ letter, rows }))
 })
 
 const typeItems = computed(() => [
@@ -149,37 +162,44 @@ async function remove(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="c in customers"
-            :key="c.id"
-            class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
-          >
-            <td class="py-2">
-              <div class="flex items-center gap-2">
-                <UAvatar :alt="c.name" size="2xs" />
-                <NuxtLink :to="`/customers/${c.id}`" class="hover:underline">{{ c.name }}</NuxtLink>
-              </div>
-            </td>
-            <td class="py-2">{{ c.customer_number || '-' }}</td>
-            <td class="py-2">{{ c.city || '-' }}</td>
-            <td class="py-2">{{ $t('customers.days', { n: c.payment_term_days }) }}</td>
-            <td class="py-2 text-right whitespace-nowrap">
-              <UButton
-                icon="i-lucide-pencil"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                @click="openEdit(c.id)"
-              />
-              <UButton
-                icon="i-lucide-trash-2"
-                color="error"
-                variant="ghost"
-                size="sm"
-                @click="remove(c.id)"
-              />
-            </td>
-          </tr>
+          <template v-for="g in grouped" :key="g.letter">
+            <tr class="bg-elevated/40">
+              <td colspan="5" class="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
+                {{ g.letter }}
+              </td>
+            </tr>
+            <tr
+              v-for="c in g.rows"
+              :key="c.id"
+              class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
+            >
+              <td class="py-2">
+                <div class="flex items-center gap-2">
+                  <UAvatar :alt="c.name" size="2xs" />
+                  <NuxtLink :to="`/customers/${c.id}`" class="hover:underline">{{ c.name }}</NuxtLink>
+                </div>
+              </td>
+              <td class="py-2">{{ c.customer_number || '-' }}</td>
+              <td class="py-2">{{ c.city || '-' }}</td>
+              <td class="py-2">{{ $t('customers.days', { n: c.payment_term_days }) }}</td>
+              <td class="py-2 text-right whitespace-nowrap">
+                <UButton
+                  icon="i-lucide-pencil"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click="openEdit(c.id)"
+                />
+                <UButton
+                  icon="i-lucide-trash-2"
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  @click="remove(c.id)"
+                />
+              </td>
+            </tr>
+          </template>
         </tbody>
         </table>
       </div>
