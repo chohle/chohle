@@ -15,6 +15,14 @@
     "language": "Lingua",
     "logout": "Esci"
   },
+  "errors": {
+    "notFoundTitle": "Qui non c'è nulla",
+    "notFoundText": "La pagina non esiste, è stata rimossa o spostata.",
+    "genericTitle": "Qualcosa è andato storto",
+    "genericText": "Riprova o torna alla dashboard.",
+    "backHome": "Torna alla dashboard",
+    "reload": "Ricarica"
+  },
   "settings": {
     "subtitle": "Preferenze dell'app.",
     "tabGeneral": "Generale",

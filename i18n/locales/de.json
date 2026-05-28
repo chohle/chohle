@@ -15,6 +15,14 @@
     "language": "Sprache",
     "logout": "Abmelden"
   },
+  "errors": {
+    "notFoundTitle": "Hier ist nichts",
+    "notFoundText": "Die Seite gibt es nicht, wurde entfernt oder verschoben.",
+    "genericTitle": "Da ist etwas schiefgelaufen",
+    "genericText": "Versuch es noch einmal oder kehre zum Dashboard zurück.",
+    "backHome": "Zum Dashboard",
+    "reload": "Neu laden"
+  },
   "settings": {
     "subtitle": "App-Einstellungen.",
     "tabGeneral": "Allgemein",

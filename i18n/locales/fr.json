@@ -15,6 +15,14 @@
     "language": "Langue",
     "logout": "Déconnexion"
   },
+  "errors": {
+    "notFoundTitle": "Il n'y a rien ici",
+    "notFoundText": "Cette page n'existe pas, a été supprimée ou déplacée.",
+    "genericTitle": "Une erreur s'est produite",
+    "genericText": "Réessayez ou revenez au tableau de bord.",
+    "backHome": "Retour au tableau de bord",
+    "reload": "Recharger"
+  },
   "settings": {
     "subtitle": "Préférences de l'application.",
     "tabGeneral": "Général",

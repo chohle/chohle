@@ -15,6 +15,14 @@
     "language": "Language",
     "logout": "Log out"
   },
+  "errors": {
+    "notFoundTitle": "Nothing here",
+    "notFoundText": "The page doesn't exist, was removed, or got moved.",
+    "genericTitle": "Something went wrong",
+    "genericText": "Try again or head back to your dashboard.",
+    "backHome": "Back to dashboard",
+    "reload": "Reload"
+  },
   "settings": {
     "subtitle": "App preferences.",
     "tabGeneral": "General",
