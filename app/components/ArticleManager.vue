@@ -97,7 +97,13 @@ function chf(rappen: number) {
       icon="i-lucide-package"
       :title="$t('articles.emptyTitle')"
       :description="$t('articles.emptyText')"
-    />
+    >
+      <template #action>
+        <UButton icon="i-lucide-plus" @click="openCreate">
+          {{ $t('articles.add') }}
+        </UButton>
+      </template>
+    </EmptyState>
     <div v-else class="overflow-x-auto">
       <table class="w-full min-w-[480px] text-sm">
       <thead class="text-muted text-left">

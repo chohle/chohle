@@ -159,7 +159,13 @@ function chf(rappen: number) {
         icon="i-lucide-receipt"
         :title="$t('expenses.emptyTitle')"
         :description="$t('expenses.emptyText')"
-      />
+      >
+        <template #action>
+          <UButton icon="i-lucide-plus" @click="openCreate">
+            {{ $t('expenses.add') }}
+          </UButton>
+        </template>
+      </EmptyState>
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[680px] text-sm">
         <thead class="text-muted text-left">

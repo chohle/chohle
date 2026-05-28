@@ -208,6 +208,7 @@
     "filterAll": "Alle",
     "emptyTitle": "Keine Rechnungen",
     "emptyText": "Rechnungen, die du für Kunden erstellst, erscheinen hier.",
+    "emptyCta": "Kunden öffnen",
     "titleNumber": "Rechnung {number}",
     "pdfPreview": "PDF-Vorschau",
     "backToEditor": "Zurück zum Editor",

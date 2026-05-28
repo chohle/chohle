@@ -92,7 +92,13 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
         icon="i-lucide-tags"
         :title="$t('categories.emptyTitle')"
         :description="$t('categories.emptyText')"
-      />
+      >
+        <template #action>
+          <UButton icon="i-lucide-plus" @click="openCreate">
+            {{ $t('categories.add') }}
+          </UButton>
+        </template>
+      </EmptyState>
       <div v-else class="grid sm:grid-cols-2 gap-6">
         <CategoryList :title="$t('nav.expenses')" :categories="expense" @edit="openEdit" @remove="removeCategory" />
         <CategoryList :title="$t('nav.income')" :categories="income" @edit="openEdit" @remove="removeCategory" />

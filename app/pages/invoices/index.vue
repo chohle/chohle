@@ -102,7 +102,13 @@ function open(id: number) {
         icon="i-lucide-file-text"
         :title="$t('invoices.emptyTitle')"
         :description="$t('invoices.emptyText')"
-      />
+      >
+        <template #action>
+          <UButton icon="i-lucide-users" @click="navigateTo('/customers')">
+            {{ $t('invoices.emptyCta') }}
+          </UButton>
+        </template>
+      </EmptyState>
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[640px] text-sm">
           <thead class="text-muted text-left">

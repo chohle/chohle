@@ -130,7 +130,13 @@ async function remove(id: number) {
         icon="i-lucide-users"
         :title="$t('customers.emptyTitle')"
         :description="$t('customers.emptyText')"
-      />
+      >
+        <template #action>
+          <UButton icon="i-lucide-plus" @click="openCreate">
+            {{ $t('customers.add') }}
+          </UButton>
+        </template>
+      </EmptyState>
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[600px] text-sm">
         <thead class="text-muted text-left">

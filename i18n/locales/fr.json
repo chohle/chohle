@@ -208,6 +208,7 @@
     "filterAll": "Toutes",
     "emptyTitle": "Aucune facture",
     "emptyText": "Les factures que vous créez pour vos clients apparaissent ici.",
+    "emptyCta": "Ouvrir les clients",
     "titleNumber": "Facture {number}",
     "pdfPreview": "Aperçu PDF",
     "backToEditor": "Retour à l'éditeur",

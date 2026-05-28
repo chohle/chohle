@@ -149,7 +149,13 @@ function formatDate(iso: string) {
         icon="i-lucide-briefcase"
         :title="$t('income.emptyTitle')"
         :description="$t('income.emptyText')"
-      />
+      >
+        <template #action>
+          <UButton icon="i-lucide-plus" @click="openCreate">
+            {{ $t('income.add') }}
+          </UButton>
+        </template>
+      </EmptyState>
       <div v-else class="grid sm:grid-cols-2 gap-4">
         <div
           v-for="s in data.sources"
