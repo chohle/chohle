@@ -15,6 +15,11 @@
     "language": "Sprache",
     "logout": "Abmelden"
   },
+  "search": {
+    "placeholder": "Suchen ...",
+    "hint": "Tippe, um Rechnungen, Kunden, Artikel und Ausgaben zu durchsuchen.",
+    "empty": "Keine Treffer."
+  },
   "errors": {
     "notFoundTitle": "Hier ist nichts",
     "notFoundText": "Die Seite gibt es nicht, wurde entfernt oder verschoben.",

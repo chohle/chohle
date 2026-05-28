@@ -15,6 +15,11 @@
     "language": "Language",
     "logout": "Log out"
   },
+  "search": {
+    "placeholder": "Search ...",
+    "hint": "Type to search invoices, customers, articles, and expenses.",
+    "empty": "No matches."
+  },
   "errors": {
     "notFoundTitle": "Nothing here",
     "notFoundText": "The page doesn't exist, was removed, or got moved.",

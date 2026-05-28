@@ -10,6 +10,18 @@ async function onSignOut() {
   await navigateTo('/login')
 }
 
+const paletteOpen = ref(false)
+onMounted(() => {
+  function onKey(e: KeyboardEvent) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault()
+      paletteOpen.value = !paletteOpen.value
+    }
+  }
+  window.addEventListener('keydown', onKey)
+  onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
+})
+
 const items = computed<NavigationMenuItem[]>(() => [
   { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
   { label: t('nav.expenses'), icon: 'i-lucide-receipt', to: '/expenses' },
@@ -72,5 +84,7 @@ const userMenu = computed<DropdownMenuItem[][]>(() => [
         </div>
       </template>
     </UDashboardPanel>
+
+    <CommandPalette v-model:open="paletteOpen" />
   </UDashboardGroup>
 </template>
