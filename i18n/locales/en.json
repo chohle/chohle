@@ -286,6 +286,9 @@
   "common": {
     "cancel": "Cancel",
     "confirm": "Change",
+    "leaveDirtyTitle": "Unsaved changes",
+    "leaveDirty": "You have unsaved changes. Leave anyway?",
+    "leaveAnyway": "Leave",
     "back": "Back",
     "prevMonth": "Previous month",
     "nextMonth": "Next month",

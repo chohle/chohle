@@ -286,6 +286,9 @@
   "common": {
     "cancel": "Annuler",
     "confirm": "Changer",
+    "leaveDirtyTitle": "Modifications non enregistrées",
+    "leaveDirty": "Vous avez des modifications non enregistrées. Quitter quand même ?",
+    "leaveAnyway": "Quitter",
     "back": "Retour",
     "prevMonth": "Mois précédent",
     "nextMonth": "Mois suivant",

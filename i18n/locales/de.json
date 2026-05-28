@@ -286,6 +286,9 @@
   "common": {
     "cancel": "Abbrechen",
     "confirm": "Ändern",
+    "leaveDirtyTitle": "Ungespeicherte Änderungen",
+    "leaveDirty": "Du hast nicht gespeicherte Änderungen. Trotzdem verlassen?",
+    "leaveAnyway": "Verlassen",
     "back": "Zurück",
     "prevMonth": "Vorheriger Monat",
     "nextMonth": "Nächster Monat",

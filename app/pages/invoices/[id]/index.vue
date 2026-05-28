@@ -135,6 +135,28 @@ const confirmDelete = ref(false)
 const formRef = ref()
 const lineState = reactive({ items })
 
+function snapshot() {
+  return JSON.stringify({ ...header, items: items.value })
+}
+const baseline = ref(snapshot())
+const dirty = computed(() => snapshot() !== baseline.value)
+
+const showLeaveDialog = ref(false)
+let resolveLeave: ((v: boolean) => void) | null = null
+function confirmLeave(): Promise<boolean> {
+  resolveLeave?.(false)
+  return new Promise((res) => {
+    resolveLeave = res
+    showLeaveDialog.value = true
+  })
+}
+function answerLeave(v: boolean) {
+  showLeaveDialog.value = false
+  resolveLeave?.(v)
+  resolveLeave = null
+}
+useDirtyGuard(() => dirty.value, confirmLeave)
+
 function validate() {
   const errors: { name: string, message: string }[] = []
   items.value.forEach((row, i) => {
@@ -150,6 +172,7 @@ async function save() {
   saving.value = true
   try {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
+    baseline.value = snapshot()
     toast.add({ title: t('invoices.toastSaved'), color: 'success' })
   } finally {
     saving.value = false
@@ -157,6 +180,7 @@ async function save() {
 }
 async function removeInvoice() {
   await $fetch(`/api/invoices/${id}`, { method: 'DELETE' })
+  baseline.value = snapshot()
   await navigateTo(`/customers/${customerId}`)
 }
 
@@ -178,6 +202,7 @@ async function sendInvoice() {
       body: { subject: emailSubject.value, message: emailMessage.value }
     })
     header.status = 'sent'
+    baseline.value = snapshot()
     toast.add({ title: t('invoices.toastSent'), color: 'success' })
     step.value = 2
   } catch (e) {
@@ -528,5 +553,21 @@ const emailMessage = computed({
         </div>
       </UCard>
     </template>
+
+    <UModal
+      v-model:open="showLeaveDialog"
+      :title="$t('common.leaveDirtyTitle')"
+      :description="$t('common.leaveDirty')"
+      :dismissible="false"
+    >
+      <template #footer>
+        <UButton color="neutral" variant="ghost" @click="answerLeave(false)">
+          {{ $t('common.cancel') }}
+        </UButton>
+        <UButton color="error" @click="answerLeave(true)">
+          {{ $t('common.leaveAnyway') }}
+        </UButton>
+      </template>
+    </UModal>
   </div>
 </template>

@@ -286,6 +286,9 @@
   "common": {
     "cancel": "Annulla",
     "confirm": "Cambia",
+    "leaveDirtyTitle": "Modifiche non salvate",
+    "leaveDirty": "Hai modifiche non salvate. Uscire comunque?",
+    "leaveAnyway": "Esci",
     "back": "Indietro",
     "prevMonth": "Mese precedente",
     "nextMonth": "Mese successivo",
