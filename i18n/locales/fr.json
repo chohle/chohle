@@ -5,8 +5,19 @@
     "income": "Revenus",
     "customers": "Clients",
     "invoices": "Factures",
+    "payments": "Paiements",
     "articles": "Articles",
     "categories": "Catégories"
+  },
+  "payments": {
+    "title": "Paiements",
+    "subtitle": "Paiements reçus des factures et des salaires.",
+    "total": "Total annuel",
+    "colDate": "Date",
+    "colSource": "Source",
+    "colAmount": "Montant",
+    "emptyTitle": "Aucun paiement",
+    "emptyText": "Dès que vous marquez une facture comme payée ou enregistrez un salaire, ils apparaissent ici."
   },
   "user": {
     "profile": "Profil",

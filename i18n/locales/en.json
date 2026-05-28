@@ -5,8 +5,19 @@
     "income": "Income",
     "customers": "Customers",
     "invoices": "Invoices",
+    "payments": "Payments",
     "articles": "Articles",
     "categories": "Categories"
+  },
+  "payments": {
+    "title": "Payments",
+    "subtitle": "Money received from invoices and salaries.",
+    "total": "Year total",
+    "colDate": "Date",
+    "colSource": "Source",
+    "colAmount": "Amount",
+    "emptyTitle": "No payments",
+    "emptyText": "Once you mark invoices as paid or record salaries, they show up here."
   },
   "user": {
     "profile": "Profile",

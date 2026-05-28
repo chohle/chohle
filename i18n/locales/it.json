@@ -5,8 +5,19 @@
     "income": "Entrate",
     "customers": "Clienti",
     "invoices": "Fatture",
+    "payments": "Pagamenti",
     "articles": "Articoli",
     "categories": "Categorie"
+  },
+  "payments": {
+    "title": "Pagamenti",
+    "subtitle": "Pagamenti ricevuti da fatture e stipendi.",
+    "total": "Totale annuo",
+    "colDate": "Data",
+    "colSource": "Fonte",
+    "colAmount": "Importo",
+    "emptyTitle": "Nessun pagamento",
+    "emptyText": "Quando contrassegni le fatture come pagate o registri stipendi, compariranno qui."
   },
   "user": {
     "profile": "Profilo",

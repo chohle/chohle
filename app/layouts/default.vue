@@ -28,6 +28,7 @@ const items = computed<NavigationMenuItem[]>(() => [
   { label: t('nav.income'), icon: 'i-lucide-banknote', to: '/income' },
   { label: t('nav.customers'), icon: 'i-lucide-users', to: '/customers' },
   { label: t('nav.invoices'), icon: 'i-lucide-file-text', to: '/invoices' },
+  { label: t('nav.payments'), icon: 'i-lucide-banknote', to: '/payments' },
   { label: t('nav.articles'), icon: 'i-lucide-package', to: '/articles' },
   { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' }
 ])

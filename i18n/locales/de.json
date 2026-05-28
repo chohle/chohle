@@ -5,8 +5,19 @@
     "income": "Einnahmen",
     "customers": "Kunden",
     "invoices": "Rechnungen",
+    "payments": "Zahlungen",
     "articles": "Artikel",
     "categories": "Kategorien"
+  },
+  "payments": {
+    "title": "Zahlungen",
+    "subtitle": "Eingegangene Zahlungen aus Rechnungen und Gehältern.",
+    "total": "Jahressumme",
+    "colDate": "Datum",
+    "colSource": "Quelle",
+    "colAmount": "Betrag",
+    "emptyTitle": "Keine Zahlungen",
+    "emptyText": "Sobald Rechnungen als bezahlt markiert oder Gehälter erfasst werden, erscheinen sie hier."
   },
   "user": {
     "profile": "Profil",
