@@ -12,9 +12,21 @@ interface Summary {
   recurring: { company: string, salary_rappen: number, paid: boolean, pay_date: string, reason: string | null }[]
 }
 
+interface YearSummary {
+  year: number
+  months: { ym: string, income: number, expenses: number, net: number }[]
+  totals: { income: number, expenses: number, net: number }
+}
+
 const { locale } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
+const year = ref(new Date().getFullYear())
 const { data } = await useFetch<Summary>('/api/summary', { query: { month } })
+const { data: yearData } = await useFetch<YearSummary>('/api/summary/year', { query: { year } })
+
+const yearMax = computed(() =>
+  Math.max(1, ...(yearData.value?.months ?? []).flatMap((m) => [m.income, m.expenses]))
+)
 
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
@@ -257,6 +269,83 @@ function formatDate(iso: string) {
           </UBadge>
         </li>
       </ul>
+    </UCard>
+
+    <UCard v-if="yearData" class="mt-6">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h2 class="font-semibold">{{ $t('dashboard.cashflow', { year: yearData.year }) }}</h2>
+          <div class="flex items-center gap-1">
+            <UButton
+              icon="i-lucide-chevron-left"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              :aria-label="$t('common.prevYear')"
+              @click="year--"
+            />
+            <span class="text-sm tabular-nums px-1">{{ yearData.year }}</span>
+            <UButton
+              icon="i-lucide-chevron-right"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              :aria-label="$t('common.nextYear')"
+              @click="year++"
+            />
+          </div>
+        </div>
+      </template>
+
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-muted">{{ $t('dashboard.income') }}</div>
+          <div class="text-lg font-semibold text-success tabular-nums">CHF {{ chf(yearData.totals.income) }}</div>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-muted">{{ $t('dashboard.expenses') }}</div>
+          <div class="text-lg font-semibold text-error tabular-nums">CHF {{ chf(yearData.totals.expenses) }}</div>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-muted">{{ $t('dashboard.net') }}</div>
+          <div class="text-lg font-semibold tabular-nums" :class="yearData.totals.net >= 0 ? 'text-highlighted' : 'text-error'">
+            CHF {{ chf(yearData.totals.net) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="relative h-56">
+        <div class="absolute inset-0 flex flex-col justify-between">
+          <div v-for="n in 4" :key="n" class="border-t border-default" />
+        </div>
+        <div class="relative flex h-full items-end justify-between gap-2">
+          <div
+            v-for="m in yearData.months"
+            :key="m.ym"
+            class="flex h-full flex-1 items-end justify-center gap-1"
+          >
+            <div
+              class="w-1/3 max-w-4 rounded-t bg-success transition-all"
+              :style="{ height: `${Math.max(1.5, (m.income / yearMax) * 100)}%` }"
+              :title="`${$t('dashboard.income')}: CHF ${chf(m.income)}`"
+            />
+            <div
+              class="w-1/3 max-w-4 rounded-t bg-error transition-all"
+              :style="{ height: `${Math.max(1.5, (m.expenses / yearMax) * 100)}%` }"
+              :title="`${$t('dashboard.expenses')}: CHF ${chf(m.expenses)}`"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="mt-2 flex justify-between gap-2">
+        <span
+          v-for="m in yearData.months"
+          :key="m.ym"
+          class="flex-1 text-center text-xs text-muted"
+        >
+          {{ monthLabel(m.ym) }}
+        </span>
+      </div>
     </UCard>
   </div>
 </template>
