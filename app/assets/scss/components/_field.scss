@@ -1,0 +1,31 @@
+.ed-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--border-strong);
+    padding: 8px 0;
+    font-size: 13.5px;
+    color: var(--ink);
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s ease;
+
+    &:focus { border-color: var(--ink); }
+  }
+}

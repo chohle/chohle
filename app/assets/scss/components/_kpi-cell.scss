@@ -1,0 +1,72 @@
+.kpi-cell {
+  padding: 18px 22px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+
+  &:last-child { border-right: 0; }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  &__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--ink);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  &__label {
+    color: var(--ink-3);
+    min-width: 0;
+    flex: 1;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  &__value {
+    font-size: 38px;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  &__cur { font-size: 0.5em; color: var(--ink-3); margin-right: 2px; }
+  &__delta {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &--inverted {
+    background: var(--ink);
+    color: var(--accent-ink);
+
+    .kpi-cell__dot { background: var(--accent-ink); }
+    .kpi-cell__label,
+    .kpi-cell__delta { color: color-mix(in srgb, var(--accent-ink) 70%, transparent); }
+    .kpi-cell__value,
+    .kpi-cell__cur { color: var(--accent-ink); }
+  }
+
+  @media (max-width: 800px) {
+    padding: 14px 16px;
+
+    &__value { font-size: 30px; }
+    &__label { letter-spacing: 0.08em; }
+  }
+
+  @media (max-width: 480px) {
+    padding: 14px 12px;
+
+    // Last cell sits on its own row in single-column mode; restore the
+    // bottom border that the row no longer separates.
+    &:last-child { border-right: 0; }
+  }
+}

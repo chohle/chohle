@@ -103,7 +103,7 @@ const groups = computed(() => [
 </script>
 
 <template>
-  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-2xl' }">
+  <UModal v-model:open="open" :ui="{ content: 'max-w-full sm:max-w-2xl' }">
     <template #content>
       <UCommandPalette
         v-model:search-term="query"

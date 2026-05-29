@@ -1,0 +1,105 @@
+.page-income {
+  .src-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .src {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .src-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .src-meta { min-width: 0; }
+  .src-name { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .src-sub {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .src-actions { display: flex; gap: 4px; }
+  .src-amt {
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .src-line {
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .src-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .pay-date { font-size: 12px; color: var(--ink); margin-top: 2px; }
+  .reason {
+    font-size: 10.5px;
+    margin-top: 2px;
+    color: var(--ink-2);
+
+    &.muted { color: var(--ink-3); }
+  }
+
+  .src-pay {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .link {
+    background: transparent;
+    border: 0;
+    font-size: 10.5px;
+    color: var(--ink-2);
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+
+    &:hover { color: var(--ink); }
+  }
+
+  @media (max-width: 700px) {
+    .src-grid { grid-template-columns: 1fr; }
+
+    .src-foot {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .src-pay {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+}

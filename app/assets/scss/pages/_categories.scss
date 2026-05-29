@@ -1,0 +1,69 @@
+// Category create/edit form lives inside USlideover (portaled), so classes
+// don't get scoped under .page-categories. Use BEM names instead.
+.category-form {
+  &__preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  &__ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--ink);
+  }
+
+  &__name {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  &__type-row {
+    display: flex;
+    gap: 8px;
+
+    .ed-btn.is-active {
+      background: var(--ink);
+      color: var(--accent-ink);
+      border-color: var(--ink);
+    }
+  }
+
+  &__icon-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+  }
+
+  &__icon-swatch {
+    aspect-ratio: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--ink-2);
+    cursor: pointer;
+
+    &:hover { border-color: var(--border-strong); color: var(--ink); }
+    &.is-active {
+      background: var(--ink);
+      color: var(--accent-ink);
+      border-color: var(--ink);
+    }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ink);
+    }
+  }
+}

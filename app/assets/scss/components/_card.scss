@@ -1,0 +1,10 @@
+.ed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+
+  @media (max-width: 700px) {
+    padding: 16px;
+  }
+}

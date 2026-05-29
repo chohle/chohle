@@ -26,6 +26,14 @@
     "language": "Language",
     "logout": "Log out"
   },
+  "topbar": {
+    "newInvoice": "New invoice",
+    "menu": "Open menu"
+  },
+  "sidebar": {
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
   "search": {
     "placeholder": "Search ...",
     "hint": "Type to search invoices, customers, articles, and expenses.",
@@ -301,6 +309,7 @@
     "positive": "Must be greater than 0"
   },
   "common": {
+    "close": "Close",
     "cancel": "Cancel",
     "confirm": "Change",
     "leaveDirtyTitle": "Unsaved changes",

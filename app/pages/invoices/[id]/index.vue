@@ -35,14 +35,9 @@ const inv = data.value!.invoice
 const customerId = inv.customer_id
 
 const { data: globalArticles } = await useFetch<Article[]>('/api/articles', { default: () => [] })
-const { data: customerArticles } = await useFetch<Article[]>(
-  `/api/customers/${customerId}/articles`,
-  { default: () => [] }
-)
+const { data: customerArticles } = await useFetch<Article[]>(`/api/customers/${customerId}/articles`, { default: () => [] })
 const { data: sender } = await useFetch<{ vat_registered: number, name: string, email_template: string }>('/api/sender')
-const { data: customer } = await useFetch<{ name: string, email: string | null, language: string }>(
-  `/api/customers/${customerId}`
-)
+const { data: customer } = await useFetch<{ name: string, email: string | null, language: string }>(`/api/customers/${customerId}`)
 const vat = computed(() => !!sender.value?.vat_registered)
 const articles = computed(() => [...globalArticles.value, ...customerArticles.value])
 
@@ -75,18 +70,9 @@ const items = ref<EditRow[]>(
   }))
 )
 
-const articleItems = computed(() =>
-  articles.value.map((a) => ({ label: a.name, value: a.id }))
-)
+const articleItems = computed(() => articles.value.map((a) => ({ label: a.name, value: a.id })))
 
-// Presentational stepper; navigation is driven by the step buttons, not clicks.
-const steps = computed(() => [
-  { title: t('status.draft'), icon: 'i-lucide-file-pen-line' },
-  { title: t('invoices.send'), icon: 'i-lucide-send' },
-  { title: t('status.paid'), icon: 'i-lucide-circle-check' }
-])
-// Resume where the owner left off: a draft remembers its wizard step; once the
-// invoice is sent or paid the status decides (you can't be before "send" anymore).
+const stepLabels = computed(() => [t('status.draft'), t('invoices.send'), t('status.paid')])
 const step = ref(inv.status === 'draft' ? inv.step : 2)
 watch(step, (v) => {
   $fetch(`/api/invoices/${id}/step`, { method: 'PATCH', body: { step: v } }).catch(() => {})
@@ -100,21 +86,10 @@ function onArticle(row: EditRow) {
   row.unitPrice = a.default_price_rappen / 100
   row.mwstPercent = a.default_mwst
 }
-
 function addRow() {
-  items.value.push({
-    articleId: null,
-    description: '',
-    quantity: 1,
-    unit: '',
-    unitPrice: 0,
-    discountPercent: 0,
-    mwstPercent: 8.1
-  })
+  items.value.push({ articleId: null, description: '', quantity: 1, unit: '', unitPrice: 0, discountPercent: 0, mwstPercent: 8.1 })
 }
-function removeRow(i: number) {
-  items.value.splice(i, 1)
-}
+function removeRow(i: number) { items.value.splice(i, 1) }
 
 function toLine(r: EditRow) {
   return {
@@ -125,19 +100,14 @@ function toLine(r: EditRow) {
   }
 }
 const totals = computed(() => computeInvoiceTotals(items.value.map(toLine), vat.value))
-
-function lineAmount(r: EditRow) {
-  return lineNetRappen(toLine(r))
-}
+function lineAmount(r: EditRow) { return lineNetRappen(toLine(r)) }
 
 const saving = ref(false)
 const confirmDelete = ref(false)
 const formRef = ref()
 const lineState = reactive({ items })
 
-function snapshot() {
-  return JSON.stringify({ ...header, items: items.value })
-}
+function snapshot() { return JSON.stringify({ ...header, items: items.value }) }
 const baseline = ref(snapshot())
 const dirty = computed(() => snapshot() !== baseline.value)
 
@@ -145,15 +115,11 @@ const showLeaveDialog = ref(false)
 let resolveLeave: ((v: boolean) => void) | null = null
 function confirmLeave(): Promise<boolean> {
   resolveLeave?.(false)
-  return new Promise((res) => {
-    resolveLeave = res
-    showLeaveDialog.value = true
-  })
+  return new Promise((res) => { resolveLeave = res; showLeaveDialog.value = true })
 }
 function answerLeave(v: boolean) {
   showLeaveDialog.value = false
-  resolveLeave?.(v)
-  resolveLeave = null
+  resolveLeave?.(v); resolveLeave = null
 }
 useDirtyGuard(() => dirty.value, confirmLeave)
 
@@ -174,64 +140,34 @@ async function save() {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
     baseline.value = snapshot()
     toast.add({ title: t('invoices.toastSaved'), color: 'success' })
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 async function removeInvoice() {
   await $fetch(`/api/invoices/${id}`, { method: 'DELETE' })
   baseline.value = snapshot()
   await navigateTo(`/customers/${customerId}`)
 }
-
-async function previewPdf() {
-  await save()
-  await navigateTo(`/invoices/${id}/print`)
-}
-
-async function continueToSend() {
-  await save()
-  step.value = 1
-}
+async function previewPdf() { await save(); await navigateTo(`/invoices/${id}/print`) }
+async function continueToSend() { await save(); step.value = 1 }
 async function sendInvoice() {
   saving.value = true
   try {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
-    await $fetch(`/api/invoices/${id}/send`, {
-      method: 'POST',
-      body: { subject: emailSubject.value, message: emailMessage.value }
-    })
+    await $fetch(`/api/invoices/${id}/send`, { method: 'POST', body: { subject: emailSubject.value, message: emailMessage.value } })
     header.status = 'sent'
     baseline.value = snapshot()
     toast.add({ title: t('invoices.toastSent'), color: 'success' })
     step.value = 2
   } catch (e) {
-    toast.add({
-      title: t('invoices.sendError'),
-      description: (e as { statusMessage?: string }).statusMessage,
-      color: 'error'
-    })
-  } finally {
-    saving.value = false
-  }
+    toast.add({ title: t('invoices.sendError'), description: (e as { statusMessage?: string }).statusMessage, color: 'error' })
+  } finally { saving.value = false }
 }
-async function setStatus(status: InvoiceRow['status']) {
-  header.status = status
-  await save()
-}
+async function setStatus(status: InvoiceRow['status']) { header.status = status; await save() }
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
-function dateFmt(iso: string) {
-  const [y, m, d] = iso.split('-')
-  return d ? `${d}.${m}.${y}` : ''
+  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-// Compose the email in the customer's language; fields stay editable per send.
 const custLocale = (customer.value?.language ?? 'en') as Parameters<typeof loadLocaleMessages>[0]
 await loadLocaleMessages(custLocale)
 const td = (key: string, named?: Record<string, unknown>) => t(key, named ?? {}, { locale: custLocale })
@@ -242,12 +178,10 @@ const emailSubject = computed({
   get: () => subjectOverride.value ?? td('email.subject', { number: header.number }),
   set: (v: string) => { subjectOverride.value = v }
 })
-// Fill the configurable HTML template with this invoice's values.
 function fillTemplate(html: string) {
-  return html
-    .replaceAll('{customer}', customer.value?.name ?? '')
+  return html.replaceAll('{customer}', customer.value?.name ?? '')
     .replaceAll('{number}', header.number ?? '')
-    .replaceAll('{due}', dateFmt(header.dueDate))
+    .replaceAll('{due}', dateCh(header.dueDate))
     .replaceAll('{sender}', sender.value?.name ?? '')
 }
 const emailMessage = computed({
@@ -257,317 +191,235 @@ const emailMessage = computed({
 </script>
 
 <template>
-  <div>
-    <PageHeader
-      :title="$t('invoices.titleNumber', { number: header.number })"
-      :back-to="`/customers/${customerId}`"
-      :back-label="$t('customers.colCustomer')"
-    >
+  <div class="page-invoice-detail">
+    <NuxtLink :to="`/customers/${customerId}`" class="back">
+      <UIcon name="i-lucide-arrow-left" class="size-3.5" />
+      <span class="mono">{{ customer?.name || $t('customers.colCustomer') }}</span>
+    </NuxtLink>
+
+    <UiPageHead :title="$t('invoices.titleNumber', { number: header.number })">
       <template #actions>
-        <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="confirmDelete = true">
-          {{ $t('common.delete') }}
-        </UButton>
+        <button class="ed-btn-ghost" @click="confirmDelete = true">
+          <UIcon name="i-lucide-trash-2" class="size-3.5" /> {{ $t('common.delete') }}
+        </button>
       </template>
-    </PageHeader>
+    </UiPageHead>
+
+    <div class="progress">
+      <div
+        v-for="(label, i) in stepLabels"
+        :key="i"
+        class="seg"
+        :class="{ done: i <= step, active: i === step }"
+        @click="step = i"
+      >
+        <span class="seg-num mono">0{{ i + 1 }}</span>
+        <span class="seg-label mono">{{ label }}</span>
+      </div>
+    </div>
 
     <UModal v-model:open="confirmDelete" :title="$t('invoices.deleteConfirmTitle')">
-      <template #body>
-        <p class="text-sm text-muted">{{ $t('invoices.deleteConfirmText') }}</p>
-      </template>
+      <template #body><p>{{ $t('invoices.deleteConfirmText') }}</p></template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <UButton color="neutral" variant="ghost" :label="$t('common.cancel')" @click="confirmDelete = false" />
-          <UButton color="error" :label="$t('common.delete')" @click="removeInvoice" />
+          <button class="ed-btn-ghost" @click="confirmDelete = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" @click="removeInvoice">{{ $t('common.delete') }}</button>
         </div>
       </template>
     </UModal>
 
-    <div class="mb-8 flex items-start">
-      <template v-for="(s, i) in steps" :key="i">
-        <div class="flex w-24 shrink-0 flex-col items-center gap-2">
-          <div
-            class="size-9 rounded-full flex items-center justify-center transition-colors"
-            :class="i <= step ? 'bg-primary text-inverted' : 'bg-elevated text-muted'"
-          >
-            <UIcon :name="s.icon" class="size-4" />
-          </div>
-          <span class="text-center text-xs" :class="i === step ? 'font-medium text-default' : 'text-muted'">
-            {{ s.title }}
-          </span>
-        </div>
-        <div
-          v-if="i < steps.length - 1"
-          class="mt-4 h-0.5 flex-1 transition-colors"
-          :class="i < step ? 'bg-primary' : 'bg-accented'"
-        />
-      </template>
-    </div>
-
     <!-- Step 1: Draft -->
     <template v-if="step === 0">
       <UForm ref="formRef" :state="lineState" :validate="validate" @submit="continueToSend">
-      <UCard>
-        <div class="grid sm:grid-cols-2 gap-4">
-          <UFormField :label="$t('common.title')" class="sm:col-span-2">
-            <UInput v-model="header.title" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('invoices.number')">
-            <UInput v-model="header.number" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('invoices.issueDate')">
-            <UInput v-model="header.issueDate" type="date" class="w-full" />
-          </UFormField>
-        </div>
-      </UCard>
-
-      <UCard class="mt-6">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="font-semibold">{{ $t('invoices.lineItems') }}</h2>
-            <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">{{ $t('invoices.addLine') }}</UButton>
+        <UiCard>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <UFormField :label="$t('common.title')" class="sm:col-span-2">
+              <UInput v-model="header.title" class="w-full" />
+            </UFormField>
+            <UFormField :label="$t('invoices.number')">
+              <UInput v-model="header.number" class="w-full" />
+            </UFormField>
+            <UFormField :label="$t('invoices.issueDate')">
+              <UiDatePicker v-model="header.issueDate" />
+            </UFormField>
           </div>
-        </template>
+        </UiCard>
 
-        <EmptyState
-          v-if="!items.length"
-          :bordered="false"
-          icon="i-lucide-list"
-          :title="$t('invoices.noLinesTitle')"
-          :description="$t('invoices.noLinesText')"
-        >
-          <template #action>
-            <UButton size="sm" icon="i-lucide-plus" variant="soft" @click="addRow">{{ $t('invoices.addLine') }}</UButton>
-          </template>
-        </EmptyState>
-        <div v-else>
-          <div class="hidden sm:grid grid-cols-12 gap-2 pb-2 text-xs font-medium text-muted">
-            <div class="col-span-2">{{ $t('invoices.article') }}</div>
-            <div :class="vat ? 'col-span-3' : 'col-span-4'">{{ $t('invoices.description') }}</div>
-            <div class="col-span-1">{{ $t('invoices.qty') }}</div>
-            <div class="col-span-1">{{ $t('articles.colUnit') }}</div>
-            <div class="col-span-1">{{ $t('articles.colPrice') }}</div>
-            <div class="col-span-1">{{ $t('invoices.discPct') }}</div>
-            <div v-if="vat" class="col-span-1">{{ $t('invoices.vatPct') }}</div>
-            <div class="col-span-2 text-right">{{ $t('common.amount') }}</div>
-          </div>
+        <UiSectionLabel>{{ $t('invoices.lineItems') }}</UiSectionLabel>
 
-          <div class="space-y-3 sm:space-y-0">
-            <div
-              v-for="(row, i) in items"
-              :key="i"
-              class="grid grid-cols-2 sm:grid-cols-12 gap-x-2 gap-y-3 items-start sm:items-center rounded-lg border border-default p-3 sm:rounded-none sm:border-x-0 sm:border-t-0 sm:p-0 sm:pb-3 sm:last:border-b-0 sm:last:pb-0"
-            >
-              <div class="col-span-2">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.article') }}</label>
-                <USelect
-                  :model-value="row.articleId ?? undefined"
-                  :items="articleItems"
-                  class="w-full"
-                  @update:model-value="row.articleId = $event; onArticle(row)"
-                />
-              </div>
-              <div class="col-span-2" :class="vat ? 'sm:col-span-3' : 'sm:col-span-4'">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.description') }}</label>
-                <UFormField :name="`items.${i}.description`">
-                  <UInput v-model="row.description" class="w-full" />
-                </UFormField>
-              </div>
-              <div class="col-span-1">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.qty') }}</label>
-                <UFormField :name="`items.${i}.quantity`">
-                  <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
-                </UFormField>
-              </div>
-              <div class="col-span-1">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('articles.colUnit') }}</label>
+        <UiCard>
+          <EmptyState
+            v-if="!items.length"
+            :bordered="false"
+            icon="i-lucide-list"
+            :title="$t('invoices.noLinesTitle')"
+            :description="$t('invoices.noLinesText')"
+          >
+            <template #action>
+              <button class="ed-btn" type="button" @click="addRow">
+                <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
+              </button>
+            </template>
+          </EmptyState>
+          <div v-else>
+            <div class="lines-head mono">
+              <div class="c-art">{{ $t('invoices.article') }}</div>
+              <div class="c-desc">{{ $t('invoices.description') }}</div>
+              <div class="c-qty">{{ $t('invoices.qty') }}</div>
+              <div class="c-unit">{{ $t('articles.colUnit') }}</div>
+              <div class="c-price">{{ $t('articles.colPrice') }}</div>
+              <div class="c-disc">{{ $t('invoices.discPct') }}</div>
+              <div v-if="vat" class="c-vat">{{ $t('invoices.vatPct') }}</div>
+              <div class="c-amt right">{{ $t('common.amount') }}</div>
+            </div>
+            <div v-for="(row, i) in items" :key="i" class="line-row">
+              <USelect
+                :model-value="row.articleId ?? undefined"
+                :items="articleItems"
+                class="w-full"
+                @update:model-value="row.articleId = $event; onArticle(row)"
+              />
+              <UFormField :name="`items.${i}.description`">
+                <UInput v-model="row.description" class="w-full" />
+              </UFormField>
+              <UFormField :name="`items.${i}.quantity`">
+                <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
+              </UFormField>
+              <UFormField :name="`items.${i}.unit`">
                 <UInput v-model="row.unit" class="w-full" />
-              </div>
-              <div class="col-span-1">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('articles.colPrice') }}</label>
-                <UFormField :name="`items.${i}.unitPrice`">
-                  <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
-                </UFormField>
-              </div>
-              <div class="col-span-1">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.discPct') }}</label>
+              </UFormField>
+              <UFormField :name="`items.${i}.unitPrice`">
+                <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
+              </UFormField>
+              <UFormField :name="`items.${i}.discountPercent`">
                 <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
-              </div>
-              <div v-if="vat" class="col-span-1">
-                <label class="mb-1 block text-xs font-medium text-muted sm:hidden">{{ $t('invoices.vatPct') }}</label>
+              </UFormField>
+              <UFormField v-if="vat" :name="`items.${i}.mwstPercent`">
                 <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
-              </div>
-              <div
-                class="col-span-2 flex items-center justify-between sm:justify-end gap-2 border-t border-default pt-3 mt-1 sm:mt-0 sm:border-0 sm:pt-0"
-              >
-                <span class="text-sm font-medium tabular-nums whitespace-nowrap">
-                  CHF {{ chf(lineAmount(row)) }}
-                </span>
-                <UButton
-                  icon="i-lucide-x"
-                  color="error"
-                  variant="ghost"
-                  size="xs"
-                  @click="removeRow(i)"
-                />
+              </UFormField>
+              <div class="amt mono">
+                <span>CHF {{ chf(lineAmount(row)) }}</span>
+                <button type="button" class="icon-btn" @click="removeRow(i)"><UIcon name="i-lucide-x" /></button>
               </div>
             </div>
+            <div class="add-row">
+              <button class="ed-btn-ghost" type="button" @click="addRow">
+                <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
+              </button>
+            </div>
           </div>
-        </div>
-      </UCard>
+        </UiCard>
 
-      <UCard class="mt-6">
-        <dl class="space-y-1 text-sm max-w-xs ml-auto">
-          <div v-if="vat" class="flex justify-between">
-            <dt class="text-muted">{{ $t('invoices.netto') }}</dt>
-            <dd>CHF {{ chf(totals.nettoRappen) }}</dd>
-          </div>
-          <div v-for="r in totals.mwstByRate" :key="r.rate" class="flex justify-between">
-            <dt class="text-muted">{{ $t('common.vat') }} {{ r.rate }}%</dt>
-            <dd>CHF {{ chf(r.mwstRappen) }}</dd>
-          </div>
-          <div class="flex justify-between font-semibold border-t border-default pt-1">
-            <dt>{{ $t('common.total') }}</dt>
-            <dd>CHF {{ chf(totals.totalRappen) }}</dd>
-          </div>
-        </dl>
-      </UCard>
+        <UiCard class="mt-4">
+          <dl class="totals">
+            <div v-if="vat" class="t-row">
+              <dt class="eyebrow">{{ $t('invoices.netto') }}</dt>
+              <dd class="mono">CHF {{ chf(totals.nettoRappen) }}</dd>
+            </div>
+            <div v-for="r in totals.mwstByRate" :key="r.rate" class="t-row">
+              <dt class="eyebrow">{{ $t('common.vat') }} {{ r.rate }}%</dt>
+              <dd class="mono">CHF {{ chf(r.mwstRappen) }}</dd>
+            </div>
+            <div class="t-row total">
+              <dt class="eyebrow">{{ $t('common.total') }}</dt>
+              <dd class="mono">CHF {{ chf(totals.totalRappen) }}</dd>
+            </div>
+          </dl>
+        </UiCard>
       </UForm>
 
-      <div class="mt-6 flex justify-between">
-        <UButton color="neutral" variant="ghost" :loading="saving" @click="save">
-          {{ $t('common.save') }}
-        </UButton>
-        <UButton trailing-icon="i-lucide-arrow-right" :loading="saving" @click="formRef?.submit()">
-          {{ $t('invoices.continue') }}
-        </UButton>
+      <div class="foot">
+        <button class="ed-btn-ghost" :disabled="saving" @click="save">{{ $t('common.save') }}</button>
+        <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">
+          {{ $t('invoices.continue') }} <UIcon name="i-lucide-arrow-right" class="size-3.5" />
+        </button>
       </div>
     </template>
 
     <!-- Step 2: Send -->
     <template v-else-if="step === 1">
-      <UCard>
+      <UiCard>
         <div class="space-y-6">
           <UFormField :label="$t('invoices.dueDate')">
-            <UInput v-model="header.dueDate" type="date" class="w-56" />
+            <UiDatePicker v-model="header.dueDate" />
           </UFormField>
 
-          <div class="flex items-center justify-between gap-3 rounded-lg border border-default p-3">
-            <div class="min-w-0">
-              <div class="text-xs text-muted">{{ $t('common.total') }}</div>
-              <div class="font-semibold tabular-nums">CHF {{ chf(totals.totalRappen) }}</div>
+          <div class="preview-row">
+            <div>
+              <div class="eyebrow">{{ $t('common.total') }}</div>
+              <div class="preview-amt mono">CHF {{ chf(totals.totalRappen) }}</div>
             </div>
-            <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">
-              {{ $t('invoices.pdfPreview') }}
-            </UButton>
+            <button class="ed-btn" @click="previewPdf">
+              <UIcon name="i-lucide-file-text" class="size-3.5" /> {{ $t('invoices.pdfPreview') }}
+            </button>
           </div>
 
           <UFormField :label="$t('invoices.recipient')">
-            <UInput
-              v-if="customer?.email"
-              :model-value="customer.email"
-              disabled
-              class="w-full"
-            />
-            <p v-else class="text-sm text-warning">{{ $t('invoices.noEmail') }}</p>
+            <UInput v-if="customer?.email" :model-value="customer.email" disabled class="w-full" />
+            <p v-else class="warn">{{ $t('invoices.noEmail') }}</p>
           </UFormField>
-
           <UFormField :label="$t('invoices.emailSubject')">
             <UInput v-model="emailSubject" class="w-full" />
           </UFormField>
           <UFormField :label="$t('invoices.emailMessage')">
             <ClientOnly>
-              <UEditor v-model="emailMessage" content-type="html" :extensions="emailEditorExtensions" :handlers="emailEditorHandlers" class="min-h-40 w-full rounded-md border border-default">
+              <UEditor v-model="emailMessage" content-type="html" :extensions="emailEditorExtensions" :handlers="emailEditorHandlers" class="email-editor email-editor--tall">
                 <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap border-b border-default px-1 py-1">
-                    <template #link>
-                      <EditorLinkPopover :editor="editor" />
-                    </template>
+                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap email-editor__toolbar">
+                    <template #link><EditorLinkPopover :editor="editor" /></template>
                   </UEditorToolbar>
                 </template>
               </UEditor>
               <template #fallback>
-                <div class="min-h-40 w-full rounded-md border border-default" />
+                <div class="email-editor email-editor--tall email-editor--fallback" />
               </template>
             </ClientOnly>
           </UFormField>
 
-          <p class="text-xs text-muted">{{ $t('invoices.sendNote') }}</p>
+          <p class="muted-note">{{ $t('invoices.sendNote') }}</p>
         </div>
-      </UCard>
+      </UiCard>
 
-      <div class="mt-6 flex justify-between">
-        <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" @click="step = 0">
-          {{ $t('common.back') }}
-        </UButton>
-        <UButton icon="i-lucide-send" :loading="saving" :disabled="!customer?.email" @click="sendInvoice">
-          {{ $t('invoices.sendInvoice') }}
-        </UButton>
+      <div class="foot">
+        <button class="ed-btn-ghost" @click="step = 0">
+          <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('common.back') }}
+        </button>
+        <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendInvoice">
+          <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('invoices.sendInvoice') }}
+        </button>
       </div>
     </template>
 
     <!-- Step 3: Paid -->
     <template v-else>
-      <UCard>
-        <div class="flex flex-col items-center gap-4 py-6 text-center">
-          <span
-            class="size-14 rounded-2xl flex items-center justify-center"
-            :class="header.status === 'paid' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'"
-          >
-            <UIcon
-              :name="header.status === 'paid' ? 'i-lucide-circle-check' : 'i-lucide-clock'"
-              class="size-7"
-            />
-          </span>
-          <div>
-            <div class="font-semibold">
-              {{ header.status === 'paid' ? $t('invoices.paidDone') : $t('invoices.awaitingPayment') }}
-            </div>
-            <div class="text-sm text-muted tabular-nums">CHF {{ chf(totals.totalRappen) }}</div>
-          </div>
-
-          <div class="flex gap-2">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" @click="step = 1">
-              {{ $t('common.back') }}
-            </UButton>
-            <UButton variant="soft" icon="i-lucide-file-text" @click="previewPdf">
-              {{ $t('invoices.pdfPreview') }}
-            </UButton>
-            <UButton
-              v-if="header.status !== 'paid'"
-              icon="i-lucide-circle-check"
-              :loading="saving"
-              @click="setStatus('paid')"
-            >
-              {{ $t('invoices.markPaid') }}
-            </UButton>
-            <UButton
-              v-else
-              color="neutral"
-              variant="outline"
-              :loading="saving"
-              @click="setStatus('sent')"
-            >
+      <UiCard>
+        <div class="paid-card">
+          <div class="paid-label eyebrow">{{ header.status === 'paid' ? $t('invoices.paidDone') : $t('invoices.awaitingPayment') }}</div>
+          <div class="paid-amt tabular">CHF {{ chf(totals.totalRappen) }}</div>
+          <div class="paid-actions">
+            <button class="ed-btn-ghost" @click="step = 1">
+              <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('common.back') }}
+            </button>
+            <button class="ed-btn" @click="previewPdf">
+              <UIcon name="i-lucide-file-text" class="size-3.5" /> {{ $t('invoices.pdfPreview') }}
+            </button>
+            <button v-if="header.status !== 'paid'" class="ed-btn-primary" :disabled="saving" @click="setStatus('paid')">
+              <UIcon name="i-lucide-circle-check" class="size-3.5" /> {{ $t('invoices.markPaid') }}
+            </button>
+            <button v-else class="ed-btn" :disabled="saving" @click="setStatus('sent')">
               {{ $t('invoices.markUnpaid') }}
-            </UButton>
+            </button>
           </div>
         </div>
-      </UCard>
+      </UiCard>
     </template>
 
-    <UModal
-      v-model:open="showLeaveDialog"
-      :title="$t('common.leaveDirtyTitle')"
-      :description="$t('common.leaveDirty')"
-      :dismissible="false"
-    >
+    <UModal v-model:open="showLeaveDialog" :title="$t('common.leaveDirtyTitle')" :description="$t('common.leaveDirty')" :dismissible="false">
       <template #footer>
-        <UButton color="neutral" variant="ghost" @click="answerLeave(false)">
-          {{ $t('common.cancel') }}
-        </UButton>
-        <UButton color="error" @click="answerLeave(true)">
-          {{ $t('common.leaveAnyway') }}
-        </UButton>
+        <button class="ed-btn-ghost" @click="answerLeave(false)">{{ $t('common.cancel') }}</button>
+        <button class="ed-btn-primary" @click="answerLeave(true)">{{ $t('common.leaveAnyway') }}</button>
       </template>
     </UModal>
   </div>
 </template>
+

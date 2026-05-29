@@ -1,0 +1,16 @@
+.page-billing {
+  max-width: 720px;
+  margin: 0 auto;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  &__foot {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+  }
+}

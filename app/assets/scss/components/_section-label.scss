@@ -1,0 +1,19 @@
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0 16px;
+
+  &__dash {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+
+    &:first-child { max-width: 24px; }
+  }
+
+  &__text {
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+}

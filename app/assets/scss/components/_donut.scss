@@ -1,0 +1,22 @@
+.donut {
+  position: relative;
+
+  &__center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  &__lbl {
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__val { font-size: 22px; color: var(--ink); margin-top: 2px; }
+}

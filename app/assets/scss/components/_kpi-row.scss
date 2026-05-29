@@ -1,0 +1,16 @@
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(var(--kpi-cols, 4), minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+// On tablet, fall back to a 2-column layout regardless of the requested cols.
+@media (max-width: 800px) {
+  .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+// On the smallest screens collapse to a single column so labels don't truncate.
+@media (max-width: 480px) {
+  .kpi-row { grid-template-columns: 1fr; }
+}

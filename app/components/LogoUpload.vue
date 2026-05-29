@@ -25,41 +25,26 @@ async function remove() {
   try {
     await $fetch(props.removeUrl, { method: 'DELETE' })
     emit('changed')
-  } finally {
-    busy.value = false
-  }
+  } finally { busy.value = false }
 }
 </script>
 
 <template>
-  <div class="flex items-center gap-4">
-    <div
-      class="size-20 rounded border border-default bg-elevated flex items-center justify-center overflow-hidden shrink-0"
-    >
-      <img v-if="src" :src="src" alt="Logo" class="max-h-full max-w-full object-contain">
-      <UIcon v-else name="i-lucide-image" class="size-6 text-muted" />
+  <div class="logo-upload">
+    <div class="logo-upload__frame">
+      <img v-if="src" :src="src" alt="Logo" class="logo-upload__img">
+      <UIcon v-else name="i-lucide-image" class="logo-upload__empty" />
     </div>
-    <div class="flex flex-col gap-2">
-      <UButton
-        size="sm"
-        variant="soft"
-        icon="i-lucide-upload"
-        :loading="busy"
-        @click="input?.click()"
-      >
+    <div class="logo-upload__actions">
+      <button class="ed-btn ed-btn-sm" :disabled="busy" @click="input?.click()">
+        <UIcon name="i-lucide-upload" class="size-3" />
         {{ src ? $t('logoUpload.replace') : $t('logoUpload.upload') }}
-      </UButton>
-      <UButton
-        v-if="src"
-        size="sm"
-        variant="ghost"
-        color="error"
-        icon="i-lucide-trash-2"
-        @click="remove"
-      >
+      </button>
+      <button v-if="src" class="ed-btn-ghost ed-btn-sm" :disabled="busy" @click="remove">
+        <UIcon name="i-lucide-trash-2" class="size-3" />
         {{ $t('logoUpload.remove') }}
-      </UButton>
-      <input ref="input" type="file" accept="image/*" class="hidden" @change="onFile">
+      </button>
+      <input ref="input" type="file" accept="image/*" class="logo-upload__file" @change="onFile">
     </div>
   </div>
 </template>

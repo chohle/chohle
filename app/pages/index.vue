@@ -18,32 +18,18 @@ interface YearSummary {
   totals: { income: number, expenses: number, net: number }
 }
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
+const { user } = useUserSession()
+const username = computed(() => user.value?.username ?? 'there')
 const month = ref(new Date().toISOString().slice(0, 7))
 const year = ref(new Date().getFullYear())
 const { data } = await useFetch<Summary>('/api/summary', { query: { month } })
 const { data: yearData } = await useFetch<YearSummary>('/api/summary/year', { query: { year } })
 
-const yearMax = computed(() =>
-  Math.max(1, ...(yearData.value?.months ?? []).flatMap((m) => [m.income, m.expenses]))
-)
-
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
+  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
-const categoryTotal = computed(() =>
-  (data.value?.byCategory ?? []).reduce((sum, c) => sum + c.total, 0)
-)
-
-const trendMax = computed(() =>
-  Math.max(1, ...(data.value?.trend ?? []).flatMap((t) => [t.income, t.expenses]))
-)
-
-// Month-over-month change for the headline figures.
 const prevMonth = computed(() => {
   const t = data.value?.trend ?? []
   return t[t.length - 2]
@@ -51,6 +37,10 @@ const prevMonth = computed(() => {
 function pctDelta(current: number, previous?: number) {
   if (previous == null || previous === 0) return null
   return Math.round(((current - previous) / previous) * 100)
+}
+function deltaText(d: number | null) {
+  if (d == null) return ''
+  return `${d >= 0 ? '+' : ''}${d}% vs last month`
 }
 const incomeDelta = computed(() => pctDelta(data.value?.income ?? 0, prevMonth.value?.income))
 const expensesDelta = computed(() => pctDelta(data.value?.expenses ?? 0, prevMonth.value?.expenses))
@@ -63,289 +53,130 @@ function monthLabel(ym: string) {
   return new Date(`${ym}-01`).toLocaleDateString(locale.value, { month: 'short' })
 }
 
-function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
-  return new Date(y, m - 1, d).toLocaleDateString(locale.value, { day: '2-digit', month: 'short' })
-}
+const sparkValues = computed(() => (data.value?.trend ?? []).map(t => Math.max(0, t.income - t.expenses)))
+const trendSeries = computed(() => [
+  { values: (data.value?.trend ?? []).map(t => t.income), weight: 1 as const },
+  { values: (data.value?.trend ?? []).map(t => t.expenses), weight: 3 as const }
+])
+const trendLabels = computed(() => (data.value?.trend ?? []).map(t => monthLabel(t.month)))
+
+const yearSeries = computed(() => [
+  { values: (yearData.value?.months ?? []).map(m => m.income), weight: 1 as const },
+  { values: (yearData.value?.months ?? []).map(m => m.expenses), weight: 3 as const }
+])
+const yearLabels = computed(() => (yearData.value?.months ?? []).map(m => monthLabel(m.ym)))
+
+const greeting = computed(() => {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
+})
 </script>
 
 <template>
-  <div v-if="data">
-    <PageHeader :title="$t('nav.dashboard')" :description="$t('dashboard.subtitle')">
+  <div v-if="data" class="page-overview">
+    <UiPageHead crumb="Workspace / Overview" :title="`${greeting}, ${username}.`">
+      <template #title>
+        {{ greeting }}, <em class="page-overview__italic">{{ username }}</em>.
+      </template>
+      <template #subtitle>{{ $t('dashboard.subtitle') }}</template>
       <template #actions>
         <MonthSelect v-model="month" />
       </template>
-    </PageHeader>
+    </UiPageHead>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <UCard>
-        <div class="flex items-center gap-3">
-          <span class="size-10 rounded-lg bg-success/10 text-success flex items-center justify-center shrink-0">
-            <UIcon name="i-lucide-trending-up" class="size-5" />
-          </span>
-          <div class="min-w-0">
-            <div class="text-sm text-muted">{{ $t('dashboard.income') }}</div>
-            <div class="text-xl font-semibold text-success tabular-nums">CHF {{ chf(data.income) }}</div>
-            <div v-if="data.invoiceIncome" class="text-xs text-muted">
-              {{ $t('dashboard.fromInvoices', { amount: chf(data.invoiceIncome) }) }}
-            </div>
-            <div
-              v-else-if="incomeDelta !== null"
-              class="mt-0.5 flex items-center gap-0.5 text-xs"
-              :class="incomeDelta >= 0 ? 'text-success' : 'text-error'"
-              :title="$t('dashboard.vsLastMonth')"
-            >
-              <UIcon :name="incomeDelta >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
-              {{ Math.abs(incomeDelta) }}%
-            </div>
-          </div>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="flex items-center gap-3">
-          <span class="size-10 rounded-lg bg-error/10 text-error flex items-center justify-center shrink-0">
-            <UIcon name="i-lucide-trending-down" class="size-5" />
-          </span>
-          <div class="min-w-0">
-            <div class="text-sm text-muted">{{ $t('dashboard.expenses') }}</div>
-            <div class="text-xl font-semibold text-error tabular-nums">CHF {{ chf(data.expenses) }}</div>
-            <div
-              v-if="expensesDelta !== null"
-              class="mt-0.5 flex items-center gap-0.5 text-xs"
-              :class="expensesDelta <= 0 ? 'text-success' : 'text-error'"
-              :title="$t('dashboard.vsLastMonth')"
-            >
-              <UIcon :name="expensesDelta >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
-              {{ Math.abs(expensesDelta) }}%
-            </div>
-          </div>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="flex items-center gap-3">
-          <span
-            class="size-10 rounded-lg flex items-center justify-center shrink-0"
-            :class="data.net >= 0 ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
-          >
-            <UIcon name="i-lucide-wallet" class="size-5" />
-          </span>
-          <div class="min-w-0">
-            <div class="text-sm text-muted">{{ $t('dashboard.net') }}</div>
-            <div
-              class="text-xl font-semibold tabular-nums"
-              :class="data.net >= 0 ? 'text-success' : 'text-error'"
-            >
-              CHF {{ chf(data.net) }}
-            </div>
-            <div
-              v-if="netDelta !== null"
-              class="mt-0.5 flex items-center gap-0.5 text-xs"
-              :class="netDelta >= 0 ? 'text-success' : 'text-error'"
-              :title="$t('dashboard.vsLastMonth')"
-            >
-              <UIcon :name="netDelta >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
-              {{ Math.abs(netDelta) }}%
-            </div>
-          </div>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="flex items-center gap-3">
-          <span class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <UIcon name="i-lucide-calendar-clock" class="size-5" />
-          </span>
-          <div class="min-w-0">
-            <div class="text-sm text-muted">{{ $t('dashboard.expected') }}</div>
-            <div class="text-xl font-semibold tabular-nums">CHF {{ chf(data.expected) }}</div>
-            <div v-if="data.outstanding > 0" class="text-xs text-muted">
-              {{ $t('dashboard.outstanding', { amount: chf(data.outstanding) }) }}
-            </div>
-          </div>
-        </div>
-      </UCard>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start">
-      <UCard>
-        <template #header>
-          <h2 class="font-semibold">{{ $t('dashboard.expensesByCategory') }}</h2>
-        </template>
-        <EmptyState
-          v-if="!data.byCategory.length"
-          :bordered="false"
-          icon="i-lucide-pie-chart"
-          :title="$t('dashboard.noExpensesTitle')"
-          :description="$t('dashboard.noExpensesText')"
-        />
-        <ul v-else class="space-y-3">
-          <li v-for="c in data.byCategory" :key="c.name">
-            <div class="flex items-center gap-2 text-sm">
-              <UIcon :name="c.icon" :style="{ color: c.color }" class="size-4 shrink-0" />
-              <span class="flex-1 truncate">{{ c.name }}</span>
-              <span class="text-muted tabular-nums">CHF {{ chf(c.total) }}</span>
-            </div>
-            <div class="h-2 rounded-full bg-elevated mt-1.5 overflow-hidden">
-              <div
-                class="h-full rounded-full"
-                :style="{
-                  width: `${(c.total / categoryTotal) * 100}%`,
-                  backgroundColor: c.color
-                }"
-              />
-            </div>
-          </li>
-        </ul>
-      </UCard>
-
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="font-semibold">{{ $t('dashboard.trend') }}</h2>
-            <div class="flex items-center gap-3 text-xs text-muted">
-              <span class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-success" />{{ $t('dashboard.income') }}
-              </span>
-              <span class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-error" />{{ $t('dashboard.expenses') }}
-              </span>
-            </div>
-          </div>
-        </template>
-        <div class="relative h-72">
-          <div class="absolute inset-0 flex flex-col justify-between">
-            <div v-for="n in 4" :key="n" class="border-t border-default" />
-          </div>
-          <div class="relative flex h-full items-end justify-between gap-3">
-            <div
-              v-for="t in data.trend"
-              :key="t.month"
-              class="flex h-full flex-1 items-end justify-center gap-1.5"
-            >
-              <div
-                class="w-1/3 max-w-5 rounded-t bg-success transition-all"
-                :style="{ height: `${Math.max(1.5, (t.income / trendMax) * 100)}%` }"
-                :title="`${$t('dashboard.income')}: CHF ${chf(t.income)}`"
-              />
-              <div
-                class="w-1/3 max-w-5 rounded-t bg-error transition-all"
-                :style="{ height: `${Math.max(1.5, (t.expenses / trendMax) * 100)}%` }"
-                :title="`${$t('dashboard.expenses')}: CHF ${chf(t.expenses)}`"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="mt-2 flex justify-between gap-3">
-          <span
-            v-for="t in data.trend"
-            :key="t.month"
-            class="flex-1 text-center text-xs text-muted"
-          >
-            {{ monthLabel(t.month) }}
-          </span>
-        </div>
-      </UCard>
-    </div>
-
-    <UCard class="mt-6">
-      <template #header>
-        <h2 class="font-semibold">{{ $t('dashboard.recurring') }}</h2>
+    <UiHero
+      eyebrow="Net this month · after expenses"
+      currency="CHF"
+      :value="chf(data.net)"
+      :delta="deltaText(netDelta)"
+    >
+      <template #aside>
+        <UiSparkline :values="sparkValues" :width="220" :height="42" />
       </template>
-      <EmptyState
-        v-if="!data.recurring.length"
-        :bordered="false"
-        icon="i-lucide-banknote"
-        :title="$t('dashboard.noIncomeTitle')"
-        :description="$t('dashboard.noIncomeText')"
+    </UiHero>
+
+    <UiSubStrip>
+      <UiSubStripItem
+        label="From customers"
+        currency="CHF"
+        :value="chf(data.invoiceIncome || data.income)"
+        :delta="deltaText(incomeDelta)"
       />
-      <ul v-else class="divide-y divide-default -my-2">
-        <li v-for="r in data.recurring" :key="r.company" class="flex items-center gap-3 py-3">
-          <div class="flex-1 min-w-0">
-            <div class="font-medium truncate">{{ r.company }}</div>
-            <div class="text-xs text-muted">{{ $t('dashboard.pays', { date: formatDate(r.pay_date) }) }}</div>
-          </div>
-          <span class="text-sm whitespace-nowrap tabular-nums">CHF {{ chf(r.salary_rappen) }}</span>
-          <UBadge :color="r.paid ? 'success' : 'neutral'" variant="subtle" size="sm">
-            {{ r.paid ? $t('dashboard.received') : $t('dashboard.pending') }}
-          </UBadge>
-        </li>
-      </ul>
-    </UCard>
+      <UiSubStripItem
+        label="Expected this month"
+        currency="CHF"
+        :value="chf(data.expected)"
+        :delta="data.outstanding ? `CHF ${chf(data.outstanding)} outstanding` : ''"
+      />
+      <UiSubStripItem
+        label="Expenses out"
+        currency="CHF"
+        :value="chf(data.expenses)"
+        :delta="deltaText(expensesDelta)"
+      />
+    </UiSubStrip>
 
-    <UCard v-if="yearData" class="mt-6">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="font-semibold">{{ $t('dashboard.cashflow', { year: yearData.year }) }}</h2>
-          <div class="flex items-center gap-1">
-            <UButton
-              icon="i-lucide-chevron-left"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              :aria-label="$t('common.prevYear')"
-              @click="year--"
-            />
-            <span class="text-sm tabular-nums px-1">{{ yearData.year }}</span>
-            <UButton
-              icon="i-lucide-chevron-right"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              :aria-label="$t('common.nextYear')"
-              @click="year++"
-            />
+    <UiSectionLabel>Money in &amp; out · last 6 months</UiSectionLabel>
+
+    <div class="page-overview__grid">
+      <UiCard>
+        <div class="page-overview__card-head">
+          <div class="eyebrow">Income vs expenses</div>
+          <div class="page-overview__legend mono">
+            <span><span class="page-overview__lg-dot page-overview__lg-dot--ink" /> Income</span>
+            <span><span class="page-overview__lg-dot page-overview__lg-dot--muted" /> Expenses</span>
           </div>
         </div>
-      </template>
+        <UiBarChart :series="trendSeries" :labels="trendLabels" :stacked="false" :height="220" />
+      </UiCard>
 
-      <div class="grid grid-cols-3 gap-4 mb-6">
-        <div>
-          <div class="text-xs uppercase tracking-wider text-muted">{{ $t('dashboard.income') }}</div>
-          <div class="text-lg font-semibold text-success tabular-nums">CHF {{ chf(yearData.totals.income) }}</div>
+      <UiCard>
+        <div class="page-overview__card-head">
+          <div class="eyebrow">Recurring income</div>
+          <span class="mono page-overview__count">{{ data.recurring.length }}</span>
         </div>
-        <div>
-          <div class="text-xs uppercase tracking-wider text-muted">{{ $t('dashboard.expenses') }}</div>
-          <div class="text-lg font-semibold text-error tabular-nums">CHF {{ chf(yearData.totals.expenses) }}</div>
-        </div>
-        <div>
-          <div class="text-xs uppercase tracking-wider text-muted">{{ $t('dashboard.net') }}</div>
-          <div class="text-lg font-semibold tabular-nums" :class="yearData.totals.net >= 0 ? 'text-highlighted' : 'text-error'">
-            CHF {{ chf(yearData.totals.net) }}
-          </div>
-        </div>
-      </div>
-
-      <div class="relative h-56">
-        <div class="absolute inset-0 flex flex-col justify-between">
-          <div v-for="n in 4" :key="n" class="border-t border-default" />
-        </div>
-        <div class="relative flex h-full items-end justify-between gap-2">
-          <div
-            v-for="m in yearData.months"
-            :key="m.ym"
-            class="flex h-full flex-1 items-end justify-center gap-1"
+        <EmptyState
+          v-if="!data.recurring.length"
+          :bordered="false"
+          icon="i-lucide-banknote"
+          :title="$t('dashboard.noIncomeTitle')"
+          :description="$t('dashboard.noIncomeText')"
+        />
+        <UiNumberedList v-else>
+          <li
+            v-for="(r, i) in data.recurring"
+            :key="r.company"
+            class="item"
           >
-            <div
-              class="w-1/3 max-w-4 rounded-t bg-success transition-all"
-              :style="{ height: `${Math.max(1.5, (m.income / yearMax) * 100)}%` }"
-              :title="`${$t('dashboard.income')}: CHF ${chf(m.income)}`"
-            />
-            <div
-              class="w-1/3 max-w-4 rounded-t bg-error transition-all"
-              :style="{ height: `${Math.max(1.5, (m.expenses / yearMax) * 100)}%` }"
-              :title="`${$t('dashboard.expenses')}: CHF ${chf(m.expenses)}`"
-            />
-          </div>
+            <span class="num">{{ String(i + 1).padStart(2, '0') }}</span>
+            <span class="main">
+              <span class="title">{{ r.company }}</span>
+              <span class="sub">{{ $t('dashboard.pays', { date: dateCh(r.pay_date) }) }}</span>
+            </span>
+            <span class="value">CHF {{ chf(r.salary_rappen) }}</span>
+          </li>
+        </UiNumberedList>
+      </UiCard>
+    </div>
+
+    <UiSectionLabel v-if="yearData">Cashflow {{ yearData.year }}</UiSectionLabel>
+
+    <UiCard v-if="yearData">
+      <div class="page-overview__card-head">
+        <div class="page-overview__year-pick">
+          <button class="icon-btn" @click="year--"><UIcon name="i-lucide-chevron-left" /></button>
+          <span class="mono">{{ yearData.year }}</span>
+          <button class="icon-btn" @click="year++"><UIcon name="i-lucide-chevron-right" /></button>
+        </div>
+        <div class="page-overview__yr-totals mono">
+          <span>Income <b class="tabular">CHF {{ chf(yearData.totals.income) }}</b></span>
+          <span>Expenses <b class="tabular">CHF {{ chf(yearData.totals.expenses) }}</b></span>
+          <span>Net <b class="tabular">CHF {{ chf(yearData.totals.net) }}</b></span>
         </div>
       </div>
-      <div class="mt-2 flex justify-between gap-2">
-        <span
-          v-for="m in yearData.months"
-          :key="m.ym"
-          class="flex-1 text-center text-xs text-muted"
-        >
-          {{ monthLabel(m.ym) }}
-        </span>
-      </div>
-    </UCard>
+      <UiBarChart :series="yearSeries" :labels="yearLabels" :stacked="false" :height="220" />
+    </UiCard>
   </div>
 </template>

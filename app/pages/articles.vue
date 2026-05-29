@@ -1,9 +1,9 @@
 <template>
   <div>
-    <PageHeader :title="$t('nav.articles')" :description="$t('articles.subtitle')" />
+    <UiPageHead crumb="Workspace / Articles" :title="$t('nav.articles')" :subtitle="$t('articles.subtitle')" />
 
-    <UCard>
+    <UiCard>
       <ArticleManager list-url="/api/articles" create-url="/api/articles" />
-    </UCard>
+    </UiCard>
   </div>
 </template>

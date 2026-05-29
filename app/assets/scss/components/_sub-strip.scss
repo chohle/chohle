@@ -1,0 +1,39 @@
+.sub-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+
+  &-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &__row { display: flex; align-items: center; gap: 8px; }
+    &__dash {
+      display: inline-block;
+      width: 12px;
+      height: 1px;
+      background: var(--ink-3);
+    }
+    &__label { color: var(--ink-3); }
+    &__value {
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--ink);
+    }
+    &__cur { font-size: 0.5em; color: var(--ink-3); margin-right: 2px; }
+    &__delta {
+      font-size: 10.5px;
+      color: var(--ink-3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .sub-strip { grid-template-columns: 1fr; gap: 18px; }
+}

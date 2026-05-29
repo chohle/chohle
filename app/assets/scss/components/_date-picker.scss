@@ -1,0 +1,50 @@
+// The whole UInput is the popover trigger; the icon is just decorative.
+.date-picker {
+  input {
+    cursor: pointer;
+    caret-color: transparent;
+
+    &::selection { background: transparent; }
+  }
+}
+
+// Popover content is portaled to body, so it can't inherit from a parent.
+// Override Nuxt UI's component CSS vars (bg-default, text-muted, ring-default,
+// etc. all read these) so the calendar uses the editorial tokens. Use
+// !important for Tailwind shape utilities that win on specificity.
+.date-picker__pop {
+  --ui-bg: var(--surface);
+  --ui-bg-muted: var(--surface-2);
+  --ui-bg-elevated: var(--surface-3);
+  --ui-bg-accented: var(--surface-3);
+  --ui-bg-inverted: var(--ink);
+
+  --ui-border: var(--border);
+  --ui-border-muted: var(--border);
+  --ui-border-accented: var(--border-strong);
+  --ui-border-inverted: var(--ink);
+
+  --ui-text: var(--ink);
+  --ui-text-toned: var(--ink-2);
+  --ui-text-muted: var(--ink-3);
+  --ui-text-dimmed: var(--ink-4);
+  --ui-text-highlighted: var(--ink);
+  --ui-text-inverted: var(--accent-ink);
+
+  --ui-radius: var(--radius);
+
+  border-radius: var(--radius) !important;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.22) !important;
+  padding: 8px !important;
+
+  // The calendar itself has its own padding-via-space-y utilities; make
+  // sure the heading/nav row sits comfortably in the editorial tokens.
+  font-family: var(--font-sans);
+
+  // Header chevron buttons inherit Nuxt UI button styling; tighten them.
+  button { font-family: inherit; }
+
+  // Day cell triggers ship with rounded-full from Nuxt UI's theme; the
+  // editorial system has no pills inside the calendar.
+  .rounded-full { border-radius: var(--radius-sm) !important; }
+}

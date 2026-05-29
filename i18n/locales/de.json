@@ -26,6 +26,14 @@
     "language": "Sprache",
     "logout": "Abmelden"
   },
+  "topbar": {
+    "newInvoice": "Neue Rechnung",
+    "menu": "Menü öffnen"
+  },
+  "sidebar": {
+    "collapse": "Einklappen",
+    "expand": "Ausklappen"
+  },
   "search": {
     "placeholder": "Suchen ...",
     "hint": "Tippe, um Rechnungen, Kunden, Artikel und Ausgaben zu durchsuchen.",
@@ -301,6 +309,7 @@
     "positive": "Muss grösser als 0 sein"
   },
   "common": {
+    "close": "Schließen",
     "cancel": "Abbrechen",
     "confirm": "Ändern",
     "leaveDirtyTitle": "Ungespeicherte Änderungen",

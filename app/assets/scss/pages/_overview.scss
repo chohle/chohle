@@ -1,0 +1,80 @@
+.page-overview {
+  &__italic { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  &__card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 12px;
+  }
+
+  &__legend {
+    display: inline-flex;
+    gap: 14px;
+    font-size: 10.5px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  &__lg-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+
+    &--ink { background: var(--ink); }
+    &--muted { background: var(--ink-3); }
+  }
+
+  &__count { font-size: 11px; color: var(--ink-3); }
+
+  &__year-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__yr-totals {
+    display: inline-flex;
+    gap: 18px;
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+
+    b { color: var(--ink); font-weight: 500; margin-left: 4px; }
+  }
+
+  @media (max-width: 900px) {
+    &__grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 700px) {
+    &__card-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    &__yr-totals {
+      flex-wrap: wrap;
+      gap: 10px 14px;
+    }
+
+    &__legend {
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+  }
+}

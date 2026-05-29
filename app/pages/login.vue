@@ -3,6 +3,7 @@ definePageMeta({ layout: false })
 
 const { t } = useI18n()
 const { fetch: refreshSession } = useUserSession()
+useTweaks()
 const state = reactive({ username: '', password: '' })
 const error = ref('')
 const loading = ref(false)
@@ -23,34 +24,29 @@ async function onSubmit() {
     await navigateTo('/')
   } catch {
     error.value = t('login.invalid')
-  } finally {
-    loading.value = false
-  }
+  } finally { loading.value = false }
 }
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-default text-default p-4">
-    <UCard class="w-full max-w-sm">
-      <template #header>
-        <img src="/logo.svg" alt="batze" class="h-7 w-auto mx-auto dark:invert">
-      </template>
+  <div class="page-login">
+    <div class="page-login__card">
+      <div class="page-login__brand">
+        <span class="page-login__mark">b</span>
+        <span class="page-login__name">batze</span>
+      </div>
+      <p class="page-login__welcome">Sign in to your workspace<span class="page-login__serif">.</span></p>
 
-      <UForm :state="state" :validate="validate" class="flex flex-col gap-4" @submit="onSubmit">
+      <UForm :state="state" :validate="validate" class="page-login__form" @submit="onSubmit">
         <UFormField name="username" :label="$t('common.username')">
           <UInput v-model="state.username" autocomplete="username" class="w-full" />
         </UFormField>
         <UFormField name="password" :label="$t('common.password')">
-          <UInput
-            v-model="state.password"
-            type="password"
-            autocomplete="current-password"
-            class="w-full"
-          />
+          <UInput v-model="state.password" type="password" autocomplete="current-password" class="w-full" />
         </UFormField>
-        <p v-if="error" class="text-error text-sm">{{ error }}</p>
-        <UButton type="submit" :loading="loading" block>{{ $t('login.signIn') }}</UButton>
+        <p v-if="error" class="page-login__err">{{ error }}</p>
+        <button type="submit" class="ed-btn-primary page-login__submit" :disabled="loading">{{ $t('login.signIn') }}</button>
       </UForm>
-    </UCard>
+    </div>
   </div>
 </template>

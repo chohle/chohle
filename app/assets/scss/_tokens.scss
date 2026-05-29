@@ -1,0 +1,79 @@
+/* Design tokens — CSS custom properties.
+   Theme switching is driven by data-theme on <html>.
+   Radius can be tweaked live by setting --radius inline on <html>. */
+
+:root,
+:root[data-theme="light"] {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-2: #FAFAF9;
+  --surface-3: #F2F2F0;
+  --inset: #EDEDEA;
+  --border: #EEEEEC;
+  --border-strong: #DCDCD9;
+  --ink: #0A0A0A;
+  --ink-2: #525250;
+  --ink-3: #8E8E8A;
+  --ink-4: #BCBCB8;
+  --accent: #0A0A0A;
+  --accent-ink: #FFFFFF;
+}
+
+:root[data-theme="warm"] {
+  --bg: #F7F4EE;
+  --surface: #F7F4EE;
+  --surface-2: #F1EDE4;
+  --surface-3: #E9E4D7;
+  --inset: #E9E4D7;
+  --border: #E2DCCB;
+  --border-strong: #C9C2AE;
+  --ink: #1B1B17;
+  --ink-2: #5C5851;
+  --ink-3: #8E897F;
+  --ink-4: #BCB6A4;
+  --accent: #1B1B17;
+  --accent-ink: #F7F4EE;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0A0A0A;
+  --surface: #0A0A0A;
+  --surface-2: #131313;
+  --surface-3: #1B1B1B;
+  --inset: #1B1B1B;
+  --border: #1F1F1F;
+  --border-strong: #2A2A2A;
+  --ink: #FAFAF9;
+  --ink-2: #A0A0A0;
+  --ink-3: #6E6E6E;
+  --ink-4: #4A4A4A;
+  --accent: #FAFAF9;
+  --accent-ink: #0A0A0A;
+}
+
+:root {
+  --radius: 4px;
+  --radius-sm: 3px;
+  --radius-xs: 2px;
+  --radius-pill: 999px;
+
+  --sidebar-w: 232px;
+  --topbar-h: 60px;
+  --content-max: 1440px;
+  --content-pad: 40px;
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: "Instrument Serif", "Times New Roman", serif;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}

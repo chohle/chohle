@@ -21,7 +21,6 @@ function blank() {
     name: '',
     unit: '',
     price: undefined as number | undefined,
-    // No MWST by default when the owner isn't VAT-registered (e.g. solo < CHF 100k).
     mwst: vatRegistered.value ? 8.1 : 0
   }
 }
@@ -34,18 +33,9 @@ const hasMwst = computed({
   set: (v: boolean) => { form.mwst = v ? (form.mwst > 0 ? form.mwst : 8.1) : 0 }
 })
 
-function openCreate() {
-  Object.assign(form, blank())
-  open.value = true
-}
+function openCreate() { Object.assign(form, blank()); open.value = true }
 function openEdit(a: Article) {
-  Object.assign(form, {
-    id: a.id,
-    name: a.name,
-    unit: a.unit,
-    price: a.default_price_rappen / 100,
-    mwst: a.default_mwst
-  })
+  Object.assign(form, { id: a.id, name: a.name, unit: a.unit, price: a.default_price_rappen / 100, mwst: a.default_mwst })
   open.value = true
 }
 
@@ -61,16 +51,11 @@ async function save() {
   saving.value = true
   try {
     const body = { name: form.name, unit: form.unit, price: form.price, mwst: form.mwst }
-    if (form.id) {
-      await $fetch(`/api/articles/${form.id}`, { method: 'PUT', body })
-    } else {
-      await $fetch(props.createUrl, { method: 'POST', body })
-    }
+    if (form.id) await $fetch(`/api/articles/${form.id}`, { method: 'PUT', body })
+    else await $fetch(props.createUrl, { method: 'POST', body })
     open.value = false
     await refresh()
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
 
 async function remove(id: number) {
@@ -79,73 +64,68 @@ async function remove(id: number) {
 }
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
+  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 </script>
 
 <template>
-  <div>
-    <div class="flex justify-end mb-4">
-      <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('articles.add') }}</UButton>
+  <div class="article-manager">
+    <div v-if="articles.length" class="article-manager__head">
+      <div class="eyebrow">{{ articles.length }} {{ $t('nav.articles') }}</div>
+      <button class="ed-btn-primary" @click="openCreate">
+        <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('articles.add') }}
+      </button>
     </div>
 
     <EmptyState
       v-if="!articles.length"
+      :bordered="false"
       icon="i-lucide-package"
       :title="$t('articles.emptyTitle')"
       :description="$t('articles.emptyText')"
     >
       <template #action>
-        <UButton icon="i-lucide-plus" @click="openCreate">
-          {{ $t('articles.add') }}
-        </UButton>
+        <button class="ed-btn-primary" @click="openCreate">
+          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('articles.add') }}
+        </button>
       </template>
     </EmptyState>
-    <div v-else class="overflow-x-auto">
-      <table class="w-full min-w-[480px] text-sm">
-      <thead class="text-muted text-left">
-        <tr class="border-b border-default">
-          <th class="py-2 font-medium">{{ $t('common.name') }}</th>
-          <th class="py-2 font-medium">{{ $t('articles.colUnit') }}</th>
-          <th class="py-2 font-medium text-right">{{ $t('articles.colPrice') }}</th>
-          <th class="py-2 font-medium text-right">{{ $t('common.vat') }}</th>
-          <th class="py-2" />
+    <div v-else class="ed-scroll"><table class="ed-table">
+      <thead>
+        <tr>
+          <th>{{ $t('common.name') }}</th>
+          <th>{{ $t('articles.colUnit') }}</th>
+          <th class="right">{{ $t('articles.colPrice') }}</th>
+          <th class="right">{{ $t('common.vat') }}</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="a in articles"
-          :key="a.id"
-          class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
-        >
-          <td class="py-2">{{ a.name }}</td>
-          <td class="py-2">{{ a.unit || '-' }}</td>
-          <td class="py-2 text-right whitespace-nowrap">CHF {{ chf(a.default_price_rappen) }}</td>
-          <td class="py-2 text-right">{{ a.default_mwst ? `${a.default_mwst}%` : '-' }}</td>
-          <td class="py-2 text-right whitespace-nowrap">
-            <UButton icon="i-lucide-pencil" color="neutral" variant="ghost" size="sm" @click="openEdit(a)" />
-            <UButton icon="i-lucide-trash-2" color="error" variant="ghost" size="sm" @click="remove(a.id)" />
+        <tr v-for="a in articles" :key="a.id" class="row">
+          <td>{{ a.name }}</td>
+          <td class="mono">{{ a.unit || '—' }}</td>
+          <td class="right mono">CHF {{ chf(a.default_price_rappen) }}</td>
+          <td class="right mono">{{ a.default_mwst ? `${a.default_mwst}%` : '—' }}</td>
+          <td class="actions">
+            <button class="icon-btn" @click="openEdit(a)"><UIcon name="i-lucide-pencil" /></button>
+            <button class="icon-btn" @click="remove(a.id)"><UIcon name="i-lucide-trash-2" /></button>
           </td>
         </tr>
       </tbody>
-      </table>
-    </div>
+    </table></div>
 
     <USlideover
       v-model:open="open"
       :title="form.id ? $t('articles.edit') : $t('articles.add')"
-      :ui="{ content: 'max-w-md' }"
+      :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
         <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
           <UFormField name="name" :label="$t('common.name')" class="sm:col-span-2">
-            <UInput v-model="form.name" :placeholder="$t('articles.namePlaceholder')" class="w-full" />
+            <UInput v-model="form.name" class="w-full" />
           </UFormField>
           <UFormField name="unit" :label="$t('articles.unit')">
-            <UInput v-model="form.unit" :placeholder="$t('articles.unitPlaceholder')" class="w-full" />
+            <UInput v-model="form.unit" class="w-full" />
           </UFormField>
           <UFormField name="price" :label="$t('articles.price')">
             <UInput v-model.number="form.price" type="number" step="0.05" class="w-full" />
@@ -160,8 +140,8 @@ function chf(rappen: number) {
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
+          <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
         </div>
       </template>
     </USlideover>

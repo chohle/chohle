@@ -12,40 +12,21 @@ defineEmits<{ edit: [Category], remove: [number] }>()
 </script>
 
 <template>
-  <div>
-    <h2 class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">{{ title }}</h2>
+  <div class="cat-list">
+    <h2 class="eyebrow cat-list__title">{{ title }}</h2>
 
-    <p v-if="!categories.length" class="text-muted text-sm">{{ $t('categories.nothingHere') }}</p>
-    <div v-else class="space-y-2">
-      <div
-        v-for="c in categories"
-        :key="c.id"
-        class="flex items-center gap-3 rounded-lg border border-default p-3 hover:bg-elevated transition"
-      >
-        <span
-          class="size-9 rounded-full flex items-center justify-center shrink-0"
-          :style="{ backgroundColor: c.color + '20', color: c.color }"
-        >
-          <UIcon :name="c.icon" class="size-5" />
+    <p v-if="!categories.length" class="cat-list__empty">{{ $t('categories.nothingHere') }}</p>
+    <ul v-else class="cat-list__items">
+      <li v-for="c in categories" :key="c.id" class="cat-list__row">
+        <span class="cat-list__ico">
+          <UIcon :name="c.icon" class="size-4" />
         </span>
-        <span class="flex-1 truncate font-medium">{{ c.name }}</span>
-        <div class="flex gap-1">
-          <UButton
-            icon="i-lucide-pencil"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            @click="$emit('edit', c)"
-          />
-          <UButton
-            icon="i-lucide-trash-2"
-            color="error"
-            variant="ghost"
-            size="xs"
-            @click="$emit('remove', c.id)"
-          />
+        <span class="cat-list__name">{{ c.name }}</span>
+        <div class="cat-list__actions">
+          <button class="icon-btn" @click="$emit('edit', c)"><UIcon name="i-lucide-pencil" /></button>
+          <button class="icon-btn" @click="$emit('remove', c.id)"><UIcon name="i-lucide-trash-2" /></button>
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </template>

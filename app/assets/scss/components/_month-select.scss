@@ -1,0 +1,21 @@
+.month-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 2px;
+  background: var(--surface);
+
+  &__label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    min-width: 140px;
+    text-align: center;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    padding: 0 4px;
+    user-select: none;
+  }
+}

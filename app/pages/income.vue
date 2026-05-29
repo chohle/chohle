@@ -35,12 +35,9 @@ const ruleLabel = (r: string) => ruleItems.value.find((i) => i.value === r)?.lab
 function blank() {
   return {
     id: null as number | null,
-    company: '',
-    jobTitle: '',
+    company: '', jobTitle: '',
     salary: undefined as number | undefined,
-    currency: 'CHF',
-    payoutDay: 25,
-    canton: 'LU',
+    currency: 'CHF', payoutDay: 25, canton: 'LU',
     payoutRule: 'earlier' as IncomeSource['payout_rule']
   }
 }
@@ -48,21 +45,12 @@ const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
 
-function openCreate() {
-  Object.assign(form, blank())
-  open.value = true
-}
-
+function openCreate() { Object.assign(form, blank()); open.value = true }
 function openEdit(s: IncomeSource) {
   Object.assign(form, {
-    id: s.id,
-    company: s.company,
-    jobTitle: s.job_title ?? '',
-    salary: s.salary_rappen / 100,
-    currency: s.currency,
-    payoutDay: s.payout_day,
-    canton: s.canton,
-    payoutRule: s.payout_rule
+    id: s.id, company: s.company, jobTitle: s.job_title ?? '',
+    salary: s.salary_rappen / 100, currency: s.currency,
+    payoutDay: s.payout_day, canton: s.canton, payoutRule: s.payout_rule
   })
   open.value = true
 }
@@ -75,147 +63,106 @@ function validate(state: typeof form) {
   else if (state.salary <= 0) errors.push({ name: 'salary', message: t('validation.positive') })
   return errors
 }
-
 async function save() {
   saving.value = true
   try {
-    const body = {
-      company: form.company,
-      jobTitle: form.jobTitle,
-      salary: form.salary,
-      currency: form.currency,
-      payoutDay: form.payoutDay,
-      canton: form.canton,
-      payoutRule: form.payoutRule
-    }
-    if (form.id) {
-      await $fetch(`/api/income/sources/${form.id}`, { method: 'PUT', body })
-    } else {
-      await $fetch('/api/income/sources', { method: 'POST', body })
-    }
+    const body = { company: form.company, jobTitle: form.jobTitle, salary: form.salary,
+      currency: form.currency, payoutDay: form.payoutDay, canton: form.canton, payoutRule: form.payoutRule }
+    if (form.id) await $fetch(`/api/income/sources/${form.id}`, { method: 'PUT', body })
+    else await $fetch('/api/income/sources', { method: 'POST', body })
     open.value = false
     await refresh()
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
-
-async function remove(id: number) {
-  await $fetch(`/api/income/sources/${id}`, { method: 'DELETE' })
-  await refresh()
-}
-
+async function remove(id: number) { await $fetch(`/api/income/sources/${id}`, { method: 'DELETE' }); await refresh() }
 async function togglePaid(id: number) {
-  await $fetch(`/api/income/sources/${id}/toggle-paid`, {
-    method: 'POST',
-    body: { month: month.value }
-  })
+  await $fetch(`/api/income/sources/${id}/toggle-paid`, { method: 'POST', body: { month: month.value } })
   await refresh()
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
+function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }
 
-function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
-  return new Date(y, m - 1, d).toLocaleDateString(locale.value, {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
-}
+const totalMonth = computed(() => data.value.sources.reduce((s, x) => s + x.salary_rappen, 0))
+const totalPaid = computed(() => data.value.sources.filter(s => s.paid).reduce((s, x) => s + x.salary_rappen, 0))
+const totalPending = computed(() => totalMonth.value - totalPaid.value)
 </script>
 
 <template>
-  <div>
-    <PageHeader :title="$t('nav.income')" :description="$t('income.subtitle')">
+  <div class="page-income">
+    <UiPageHead crumb="Finance / Income" :title="$t('nav.income')" :subtitle="$t('income.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
+        <button class="ed-btn-primary" @click="openCreate">
+          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('income.add') }}
+        </button>
       </template>
-    </PageHeader>
+    </UiPageHead>
 
-    <UCard>
-      <div class="flex justify-end mb-4">
-        <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('income.add') }}</UButton>
-      </div>
+    <UiKpiRow>
+      <UiKpiCell label="Total this month" currency="CHF" :value="chf(totalMonth)" inverted />
+      <UiKpiCell label="Received" currency="CHF" :value="chf(totalPaid)" />
+      <UiKpiCell label="Pending" currency="CHF" :value="chf(totalPending)" />
+      <UiKpiCell label="Sources" :value="String(data.sources.length)" />
+    </UiKpiRow>
 
+    <UiSectionLabel>Recurring sources</UiSectionLabel>
+
+    <UiCard>
       <EmptyState
         v-if="!data.sources.length"
+        :bordered="false"
         icon="i-lucide-briefcase"
         :title="$t('income.emptyTitle')"
         :description="$t('income.emptyText')"
       >
         <template #action>
-          <UButton icon="i-lucide-plus" @click="openCreate">
-            {{ $t('income.add') }}
-          </UButton>
+          <button class="ed-btn-primary" @click="openCreate">
+            <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('income.add') }}
+          </button>
         </template>
       </EmptyState>
-      <div v-else class="grid sm:grid-cols-2 gap-4">
-        <div
-          v-for="s in data.sources"
-          :key="s.id"
-          class="rounded-lg border border-default p-4"
-        >
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            <div class="font-semibold">{{ s.company }}</div>
-            <div v-if="s.job_title" class="text-sm text-muted">{{ s.job_title }}</div>
-          </div>
-          <div class="flex gap-1">
-            <UButton
-              icon="i-lucide-pencil"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click="openEdit(s)"
-            />
-            <UButton
-              icon="i-lucide-trash-2"
-              color="error"
-              variant="ghost"
-              size="sm"
-              @click="remove(s.id)"
-            />
-          </div>
-        </div>
-        <div class="text-xl font-semibold mt-2">{{ s.currency }} {{ chf(s.salary_rappen) }}</div>
-        <div class="text-sm text-muted mt-1">
-          {{ $t('income.paysOn', { day: s.payout_day }) }} · {{ s.canton }} · {{ ruleLabel(s.payout_rule) }}
-        </div>
-        <div class="mt-3 pt-3 border-t border-default flex items-start justify-between gap-2">
-          <div>
-            <div class="text-xs text-muted">{{ $t('income.paysThisMonth') }}</div>
-            <div class="font-medium">{{ formatDate(s.pay_date) }}</div>
-            <UBadge v-if="s.reason" color="warning" variant="subtle" size="sm" class="mt-1">
-              {{ $t('income.moved') }} · {{ s.reason }}
-            </UBadge>
-            <div v-else class="text-xs text-muted mt-0.5">{{ $t('income.onSchedule') }}</div>
-          </div>
-          <div class="text-right">
-            <UBadge :color="s.paid ? 'success' : 'neutral'" variant="subtle">
-              {{ s.paid ? $t('common.received') : $t('common.pending') }}
-            </UBadge>
-            <div>
-              <UButton size="xs" variant="link" class="px-0" @click="togglePaid(s.id)">
-                {{ s.paid ? $t('income.markUnpaid') : $t('income.markPaid') }}
-              </UButton>
+      <div v-else class="src-grid">
+        <article v-for="s in data.sources" :key="s.id" class="src">
+          <header class="src-head">
+            <div class="src-meta">
+              <div class="src-name">{{ s.company }}</div>
+              <div v-if="s.job_title" class="src-sub mono">{{ s.job_title }}</div>
             </div>
+            <div class="src-actions">
+              <button class="icon-btn" @click="openEdit(s)"><UIcon name="i-lucide-pencil" /></button>
+              <button class="icon-btn" @click="remove(s.id)"><UIcon name="i-lucide-trash-2" /></button>
+            </div>
+          </header>
+          <div class="src-amt tabular">{{ s.currency }} {{ chf(s.salary_rappen) }}</div>
+          <div class="src-line mono">
+            <span>{{ $t('income.paysOn', { day: s.payout_day }) }}</span>
+            <span>· {{ s.canton }}</span>
+            <span>· {{ ruleLabel(s.payout_rule) }}</span>
           </div>
-        </div>
-        </div>
+          <footer class="src-foot">
+            <div>
+              <div class="eyebrow">{{ $t('income.paysThisMonth') }}</div>
+              <div class="mono pay-date">{{ dateCh(s.pay_date) }}</div>
+              <div v-if="s.reason" class="reason mono">{{ $t('income.moved') }} · {{ s.reason }}</div>
+              <div v-else class="reason mono muted">{{ $t('income.onSchedule') }}</div>
+            </div>
+            <div class="src-pay">
+              <UiOutlinedChip :status="s.paid ? 'paid' : 'sent'">
+                {{ s.paid ? $t('common.received') : $t('common.pending') }}
+              </UiOutlinedChip>
+              <button class="link mono" @click="togglePaid(s.id)">
+                {{ s.paid ? $t('income.markUnpaid') : $t('income.markPaid') }}
+              </button>
+            </div>
+          </footer>
+        </article>
       </div>
-    </UCard>
+    </UiCard>
 
     <USlideover
       v-model:open="open"
       :title="form.id ? $t('income.edit') : $t('income.add')"
-      :ui="{ content: 'max-w-xl' }"
+      :ui="{ content: 'max-w-full sm:max-w-xl' }"
     >
       <template #body>
         <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
@@ -241,10 +188,11 @@ function formatDate(iso: string) {
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
+          <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
         </div>
       </template>
     </USlideover>
   </div>
 </template>
+

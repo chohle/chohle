@@ -26,6 +26,14 @@
     "language": "Lingua",
     "logout": "Esci"
   },
+  "topbar": {
+    "newInvoice": "Nuova fattura",
+    "menu": "Apri il menu"
+  },
+  "sidebar": {
+    "collapse": "Riduci",
+    "expand": "Espandi"
+  },
   "search": {
     "placeholder": "Cerca ...",
     "hint": "Digita per cercare fatture, clienti, articoli e spese.",
@@ -301,6 +309,7 @@
     "positive": "Deve essere maggiore di 0"
   },
   "common": {
+    "close": "Chiudi",
     "cancel": "Annulla",
     "confirm": "Cambia",
     "leaveDirtyTitle": "Modifiche non salvate",

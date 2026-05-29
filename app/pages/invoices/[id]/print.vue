@@ -86,10 +86,6 @@ function chf(rappen: number) {
     maximumFractionDigits: 2
   })
 }
-function dateDe(iso: string) {
-  const [y, m, d] = iso.split('-')
-  return `${d}.${m}.${y}`
-}
 function lineAmount(i: Item) {
   return lineNetRappen({
     quantity: i.quantity,
@@ -105,9 +101,13 @@ function printPage() {
 
 <template>
   <div class="min-h-screen bg-gray-100 text-black">
-    <div class="print:hidden bg-white border-b border-gray-300 px-6 py-3 flex gap-2">
-      <UButton color="neutral" variant="ghost" :to="`/invoices/${id}`">&larr; {{ $t('invoices.backToEditor') }}</UButton>
-      <UButton icon="i-lucide-printer" @click="printPage">{{ $t('invoices.printSave') }}</UButton>
+    <div class="print:hidden print-toolbar">
+      <NuxtLink :to="`/invoices/${id}`" class="ed-btn-ghost">
+        <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('invoices.backToEditor') }}
+      </NuxtLink>
+      <button class="ed-btn-primary" @click="printPage">
+        <UIcon name="i-lucide-printer" class="size-3.5" /> {{ $t('invoices.printSave') }}
+      </button>
     </div>
 
     <div
@@ -139,11 +139,11 @@ function printPage() {
                 </tr>
                 <tr>
                   <td class="pr-4 text-gray-600">{{ td('invoiceDoc.date') }}</td>
-                  <td>{{ dateDe(invoice.issue_date) }}</td>
+                  <td>{{ dateCh(invoice.issue_date) }}</td>
                 </tr>
                 <tr>
                   <td class="pr-4 text-gray-600">{{ td('invoiceDoc.payableUntil') }}</td>
-                  <td>{{ dateDe(invoice.due_date) }}</td>
+                  <td>{{ dateCh(invoice.due_date) }}</td>
                 </tr>
               </tbody>
             </table>

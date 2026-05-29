@@ -1,0 +1,54 @@
+// batze editorial mono — main entry.
+// Loaded as a second CSS entry alongside main.css, so Tailwind v4 keeps
+// its CSS pipeline and SCSS handles tokens + component/page styles.
+
+@use "fonts";
+@use "tokens";
+@use "utilities";
+
+// Shell
+@use "shell/sidebar";
+@use "shell/topbar";
+@use "shell/layout";
+@use "shell/error";
+
+// UI primitives
+@use "components/hero";
+@use "components/kpi-row";
+@use "components/kpi-cell";
+@use "components/sub-strip";
+@use "components/numbered-list";
+@use "components/outlined-chip";
+@use "components/segmented-control";
+@use "components/donut";
+@use "components/bar-chart";
+@use "components/card";
+@use "components/field";
+@use "components/page-head";
+@use "components/section-label";
+@use "components/date-picker";
+
+// Inner components
+@use "components/article-manager";
+@use "components/category-list";
+@use "components/expense-receipts";
+@use "components/logo-upload";
+@use "components/empty-state";
+@use "components/month-select";
+@use "components/email-editor";
+
+// Pages
+@use "pages/overview";
+@use "pages/customers";
+@use "pages/customer-detail";
+@use "pages/invoices";
+@use "pages/invoice-detail";
+@use "pages/invoice-print";
+@use "pages/income";
+@use "pages/expenses";
+@use "pages/payments";
+@use "pages/categories";
+@use "pages/billing";
+@use "pages/profile";
+@use "pages/settings";
+@use "pages/login";

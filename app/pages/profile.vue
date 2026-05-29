@@ -20,10 +20,7 @@ async function changePassword() {
   error.value = ''
   saving.value = true
   try {
-    await $fetch('/api/auth/change-password', {
-      method: 'POST',
-      body: { currentPassword: form.current, newPassword: form.next }
-    })
+    await $fetch('/api/auth/change-password', { method: 'POST', body: { currentPassword: form.current, newPassword: form.next } })
     toast.add({ title: t('profile.toastChanged'), color: 'success' })
     form.current = ''
     form.next = ''
@@ -37,20 +34,19 @@ async function changePassword() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl">
-    <PageHeader :title="$t('user.profile')" :description="$t('profile.subtitle')" />
+  <div class="page-profile">
+    <UiPageHead crumb="System / Profile" :title="$t('user.profile')" :subtitle="$t('profile.subtitle')" />
 
-    <UCard>
+    <UiCard>
       <UFormField :label="$t('common.username')">
         <UInput :model-value="user?.username" disabled class="w-full" />
       </UFormField>
-    </UCard>
+    </UiCard>
 
-    <UCard class="mt-6">
-      <template #header>
-        <h2 class="font-semibold">{{ $t('profile.changePassword') }}</h2>
-      </template>
-      <UForm :state="form" :validate="validate" class="space-y-4" @submit="changePassword">
+    <UiSectionLabel>{{ $t('profile.changePassword') }}</UiSectionLabel>
+
+    <UiCard>
+      <UForm :state="form" :validate="validate" class="page-profile__form" @submit="changePassword">
         <UFormField name="current" :label="$t('profile.currentPassword')">
           <UInput v-model="form.current" type="password" autocomplete="current-password" class="w-full" />
         </UFormField>
@@ -60,11 +56,12 @@ async function changePassword() {
         <UFormField name="confirm" :label="$t('profile.confirmPassword')">
           <UInput v-model="form.confirm" type="password" autocomplete="new-password" class="w-full" />
         </UFormField>
-        <p v-if="error" class="text-error text-sm">{{ error }}</p>
-        <div class="flex justify-end">
-          <UButton type="submit" :loading="saving">{{ $t('profile.changePassword') }}</UButton>
+        <p v-if="error" class="page-profile__err">{{ error }}</p>
+        <div class="page-profile__foot">
+          <button type="submit" class="ed-btn-primary" :disabled="saving">{{ $t('profile.changePassword') }}</button>
         </div>
       </UForm>
-    </UCard>
+    </UiCard>
   </div>
 </template>
+

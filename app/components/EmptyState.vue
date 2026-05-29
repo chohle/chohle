@@ -6,18 +6,13 @@ withDefaults(
 </script>
 
 <template>
-  <div
-    class="flex flex-col items-center justify-center text-center px-6"
-    :class="bordered
-      ? 'rounded-xl border border-dashed border-default py-16 min-h-[60vh]'
-      : 'py-12'"
-  >
-    <div class="size-14 rounded-2xl bg-elevated flex items-center justify-center mb-4">
-      <UIcon :name="icon ?? 'i-lucide-inbox'" class="size-7 text-muted" />
+  <div class="empty-state" :class="{ 'empty-state--bordered': bordered }">
+    <div class="empty-state__ico">
+      <UIcon :name="icon ?? 'i-lucide-inbox'" class="size-5" />
     </div>
-    <p class="text-base font-semibold text-highlighted">{{ title }}</p>
-    <p v-if="description" class="text-sm text-muted mt-1.5 max-w-sm">{{ description }}</p>
-    <div v-if="$slots.action" class="mt-5">
+    <p class="empty-state__title">{{ title }}</p>
+    <p v-if="description" class="empty-state__desc">{{ description }}</p>
+    <div v-if="$slots.action" class="empty-state__action">
       <slot name="action" />
     </div>
   </div>

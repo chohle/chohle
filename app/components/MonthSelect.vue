@@ -15,25 +15,13 @@ const label = computed(() => {
 </script>
 
 <template>
-  <div class="inline-flex items-center rounded-md border border-default bg-default shadow-sm">
-    <UButton
-      icon="i-lucide-chevron-left"
-      color="neutral"
-      variant="ghost"
-      :aria-label="$t('common.prevMonth')"
-      class="rounded-r-none"
-      @click="shift(-1)"
-    />
-    <span class="px-1 text-sm font-medium tabular-nums min-w-32 text-center select-none">
-      {{ label }}
-    </span>
-    <UButton
-      icon="i-lucide-chevron-right"
-      color="neutral"
-      variant="ghost"
-      :aria-label="$t('common.nextMonth')"
-      class="rounded-l-none"
-      @click="shift(1)"
-    />
+  <div class="month-select">
+    <button class="icon-btn" :aria-label="$t('common.prevMonth')" @click="shift(-1)">
+      <UIcon name="i-lucide-chevron-left" />
+    </button>
+    <span class="month-select__label mono">{{ label }}</span>
+    <button class="icon-btn" :aria-label="$t('common.nextMonth')" @click="shift(1)">
+      <UIcon name="i-lucide-chevron-right" />
+    </button>
   </div>
 </template>

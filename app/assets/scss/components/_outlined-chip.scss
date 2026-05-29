@@ -1,0 +1,38 @@
+.o-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  text-transform: lowercase;
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  background: transparent;
+
+  &--paid {
+    border-style: solid;
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  &--sent {
+    border-style: dashed;
+    border-color: var(--border-strong);
+    color: var(--ink-2);
+  }
+  &--draft {
+    border-style: dotted;
+    border-color: var(--border-strong);
+    color: var(--ink-3);
+  }
+  &--overdue {
+    border-style: solid;
+    border-color: var(--ink);
+    color: var(--accent-ink);
+    background: var(--ink);
+  }
+  &--due {
+    border-style: dashed;
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+}

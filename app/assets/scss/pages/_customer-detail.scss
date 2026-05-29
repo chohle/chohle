@@ -1,0 +1,103 @@
+.page-customer-detail {
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    padding-top: 24px;
+
+    &:hover { color: var(--ink); }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 0 28px;
+  }
+
+  &__meta { flex: 1; min-width: 0; }
+  &__name {
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    margin: 0 0 4px;
+  }
+  &__meta-row {
+    font-size: 11px;
+    color: var(--ink-3);
+    display: inline-flex;
+    gap: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  &__actions {
+    display: inline-flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  &__tabs { padding: 22px 0 18px; }
+
+  &__logo {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  &__dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 32px;
+    margin: 0;
+  }
+
+  &__dl-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    dd { margin: 0; font-size: 13.5px; color: var(--ink); }
+  }
+
+  &__inv-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+  }
+
+  &__inv-table {
+    tbody tr.row { cursor: pointer; }
+  }
+
+  @media (max-width: 700px) {
+    &__dl { grid-template-columns: 1fr; }
+
+    &__head {
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    &__meta { flex-basis: calc(100% - 78px); }
+    &__actions {
+      flex-basis: 100%;
+      flex-wrap: wrap;
+
+      .ed-btn,
+      .ed-btn-primary {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+    }
+    &__name { font-size: 22px; }
+    &__tabs {
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+  }
+}

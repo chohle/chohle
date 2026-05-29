@@ -25,13 +25,8 @@ interface Expense {
 const { t } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
 
-const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
-  query: { month },
-  default: () => []
-})
-const { data: categories } = await useFetch<Category[]>('/api/categories', {
-  default: () => []
-})
+const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', { query: { month }, default: () => [] })
+const { data: categories } = await useFetch<Category[]>('/api/categories', { default: () => [] })
 
 const expenseCategories = computed(() => categories.value.filter((c) => c.type === 'expense'))
 const categoryItems = computed(() => [
@@ -53,35 +48,44 @@ const filtered = computed(() =>
 )
 const total = computed(() => filtered.value.reduce((sum, e) => sum + e.amount_rappen, 0))
 
+const byCategory = computed(() => {
+  const map = new Map<number, { id: number, name: string, color: string, icon: string, total: number, weight: 1 | 2 | 3 }>()
+  for (const e of expenses.value) {
+    if (e.category_id == null) continue
+    const ex = map.get(e.category_id)
+    if (ex) ex.total += e.amount_rappen
+    else map.set(e.category_id, {
+      id: e.category_id, name: e.category_name ?? '—',
+      color: e.category_color ?? 'var(--ink-3)', icon: e.category_icon ?? 'i-lucide-tag',
+      total: e.amount_rappen, weight: 1
+    })
+  }
+  const arr = [...map.values()].sort((a, b) => b.total - a.total)
+  arr.forEach((c, i) => { c.weight = (i < 2 ? 1 : i < 4 ? 2 : 3) })
+  return arr
+})
+
+const donutSegments = computed(() =>
+  byCategory.value.map(c => ({ label: c.name, value: c.total, weight: c.weight }))
+)
+
 const today = new Date().toISOString().slice(0, 10)
 function blank() {
   return {
-    id: null as number | null,
-    title: '',
-    amount: undefined as number | undefined,
-    date: today,
-    categoryId: null as number | null,
-    vendor: '',
-    notes: ''
+    id: null as number | null, title: '',
+    amount: undefined as number | undefined, date: today,
+    categoryId: null as number | null, vendor: '', notes: ''
   }
 }
 const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
 
-function openCreate() {
-  Object.assign(form, blank())
-  open.value = true
-}
+function openCreate() { Object.assign(form, blank()); open.value = true }
 function openEdit(e: Expense) {
   Object.assign(form, {
-    id: e.id,
-    title: e.title,
-    amount: e.amount_rappen / 100,
-    date: e.date,
-    categoryId: e.category_id,
-    vendor: e.vendor ?? '',
-    notes: e.notes ?? ''
+    id: e.id, title: e.title, amount: e.amount_rappen / 100,
+    date: e.date, categoryId: e.category_id, vendor: e.vendor ?? '', notes: e.notes ?? ''
   })
   open.value = true
 }
@@ -94,148 +98,142 @@ function validate(state: typeof form) {
   else if (state.amount <= 0) errors.push({ name: 'amount', message: t('validation.positive') })
   return errors
 }
-
 async function save() {
   saving.value = true
   try {
     const { id, ...body } = form
-    if (id) {
-      await $fetch(`/api/expenses/${id}`, { method: 'PUT', body })
-    } else {
-      await $fetch('/api/expenses', { method: 'POST', body })
-    }
+    if (id) await $fetch(`/api/expenses/${id}`, { method: 'PUT', body })
+    else await $fetch('/api/expenses', { method: 'POST', body })
     open.value = false
     await refresh()
-  } finally {
-    saving.value = false
-  }
+  } finally { saving.value = false }
 }
+async function removeExpense(id: number) { await $fetch(`/api/expenses/${id}`, { method: 'DELETE' }); await refresh() }
 
-async function removeExpense(id: number) {
-  await $fetch(`/api/expenses/${id}`, { method: 'DELETE' })
-  await refresh()
-}
-
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
+function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }
 </script>
 
 <template>
-  <div>
-    <PageHeader :title="$t('nav.expenses')" :description="$t('expenses.subtitle')">
+  <div class="page-expenses">
+    <UiPageHead crumb="Finance / Expenses" :title="$t('nav.expenses')" :subtitle="$t('expenses.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
-        <div class="inline-flex items-center gap-2 rounded-md bg-elevated px-3 h-8">
-          <span class="text-xs text-muted">{{ $t('common.total') }}</span>
-          <span class="text-sm font-semibold tabular-nums text-highlighted">CHF {{ chf(total) }}</span>
-        </div>
+        <button class="ed-btn-primary" @click="openCreate">
+          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('expenses.add') }}
+        </button>
       </template>
-    </PageHeader>
+    </UiPageHead>
 
-    <UCard>
-      <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
-        <div class="flex flex-wrap gap-2">
-          <UButton
+    <UiKpiRow>
+      <UiKpiCell label="Total this month" currency="CHF" :value="chf(total)" inverted />
+      <UiKpiCell label="Entries" :value="String(filtered.length)" />
+      <UiKpiCell label="Categories" :value="String(byCategory.length)" />
+      <UiKpiCell label="Avg per entry" currency="CHF" :value="filtered.length ? chf(Math.round(total / filtered.length)) : '0'" />
+    </UiKpiRow>
+
+    <UiSectionLabel>Breakdown</UiSectionLabel>
+
+    <div class="grid-2">
+      <UiCard>
+        <div class="card-head">
+          <div class="eyebrow">By category</div>
+        </div>
+        <div v-if="byCategory.length" class="donut-wrap">
+          <UiDonut :segments="donutSegments" label="This month" :center-value="`CHF ${chf(total)}`" />
+          <ul class="legend">
+            <li v-for="c in byCategory" :key="c.id">
+              <span class="dot" :class="`w${c.weight}`" />
+              <span class="lg-name">{{ c.name }}</span>
+              <span class="mono lg-val">CHF {{ chf(c.total) }}</span>
+            </li>
+          </ul>
+        </div>
+        <EmptyState v-else :bordered="false" icon="i-lucide-pie-chart" title="No data" description="Log expenses to see the breakdown." />
+      </UiCard>
+
+      <UiCard>
+        <div class="card-head"><div class="eyebrow">Quick filter</div></div>
+        <div class="filter-grid">
+          <button
             v-for="c in expenseCategories"
             :key="c.id"
-            size="xs"
-            color="neutral"
-            :variant="activeCategories.has(c.id) ? 'solid' : 'outline'"
+            class="chip-btn"
+            :class="{ active: activeCategories.has(c.id) }"
             @click="toggleCategory(c.id)"
           >
-            <UIcon :name="c.icon" :style="{ color: c.color }" class="size-3" />
-            {{ c.name }}
-          </UButton>
+            <UIcon :name="c.icon" class="size-3.5" />
+            <span>{{ c.name }}</span>
+          </button>
         </div>
-        <UButton icon="i-lucide-plus" @click="openCreate">{{ $t('expenses.add') }}</UButton>
-      </div>
+      </UiCard>
+    </div>
 
+    <UiSectionLabel>Recent expenses</UiSectionLabel>
+
+    <UiCard>
       <EmptyState
         v-if="!filtered.length"
+        :bordered="false"
         icon="i-lucide-receipt"
         :title="$t('expenses.emptyTitle')"
         :description="$t('expenses.emptyText')"
       >
         <template #action>
-          <UButton icon="i-lucide-plus" @click="openCreate">
-            {{ $t('expenses.add') }}
-          </UButton>
+          <button class="ed-btn-primary" @click="openCreate">
+            <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('expenses.add') }}
+          </button>
         </template>
       </EmptyState>
-      <div v-else class="overflow-x-auto">
-        <table class="w-full min-w-[680px] text-sm">
-        <thead class="text-muted text-left">
-          <tr class="border-b border-default">
-            <th class="py-2 font-medium">{{ $t('common.date') }}</th>
-            <th class="py-2 font-medium">{{ $t('common.title') }}</th>
-            <th class="py-2 font-medium">{{ $t('common.category') }}</th>
-            <th class="py-2 font-medium">{{ $t('common.vendor') }}</th>
-            <th class="py-2 font-medium">{{ $t('expenses.receipts') }}</th>
-            <th class="py-2 font-medium text-right">{{ $t('common.amount') }}</th>
-            <th class="py-2" />
+      <div v-else class="ed-scroll"><table class="ed-table">
+        <thead>
+          <tr>
+            <th>{{ $t('common.date') }}</th>
+            <th>{{ $t('common.title') }}</th>
+            <th>{{ $t('common.category') }}</th>
+            <th>{{ $t('common.vendor') }}</th>
+            <th>{{ $t('expenses.receipts') }}</th>
+            <th class="right">{{ $t('common.amount') }}</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="e in filtered"
-            :key="e.id"
-            class="border-b border-default last:border-0 hover:bg-elevated/50 transition-colors"
-          >
-            <td class="py-2 whitespace-nowrap">{{ e.date }}</td>
-            <td class="py-2">{{ e.title }}</td>
-            <td class="py-2">
-              <span v-if="e.category_name" class="inline-flex items-center gap-1.5">
-                <UIcon :name="e.category_icon!" :style="{ color: e.category_color! }" class="size-4" />
+          <tr v-for="e in filtered" :key="e.id" class="row">
+            <td class="mono">{{ dateCh(e.date) }}</td>
+            <td>{{ e.title }}</td>
+            <td>
+              <span v-if="e.category_name" class="cat">
+                <UIcon :name="e.category_icon!" class="size-3.5" />
                 {{ e.category_name }}
               </span>
-              <span v-else class="text-muted">-</span>
+              <span v-else class="muted">—</span>
             </td>
-            <td class="py-2">{{ e.vendor || '-' }}</td>
-            <td class="py-2">
-              <ExpenseReceipts :expense-id="e.id" :attachments="e.attachments" @changed="refresh" />
-            </td>
-            <td class="py-2 text-right whitespace-nowrap">{{ e.currency }} {{ chf(e.amount_rappen) }}</td>
-            <td class="py-2 text-right whitespace-nowrap">
-              <UButton
-                icon="i-lucide-pencil"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                @click="openEdit(e)"
-              />
-              <UButton
-                icon="i-lucide-trash-2"
-                color="error"
-                variant="ghost"
-                size="sm"
-                @click="removeExpense(e.id)"
-              />
+            <td>{{ e.vendor || '—' }}</td>
+            <td><ExpenseReceipts :expense-id="e.id" :attachments="e.attachments" @changed="refresh" /></td>
+            <td class="right mono">−{{ e.currency }} {{ chf(e.amount_rappen) }}</td>
+            <td class="actions">
+              <button class="icon-btn" @click="openEdit(e)"><UIcon name="i-lucide-pencil" /></button>
+              <button class="icon-btn" @click="removeExpense(e.id)"><UIcon name="i-lucide-trash-2" /></button>
             </td>
           </tr>
         </tbody>
-        </table>
-      </div>
-    </UCard>
+      </table></div>
+    </UiCard>
 
     <USlideover
       v-model:open="open"
       :title="form.id ? $t('expenses.edit') : $t('expenses.add')"
-      :ui="{ content: 'max-w-xl' }"
+      :ui="{ content: 'max-w-full sm:max-w-xl' }"
     >
       <template #body>
         <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
           <UFormField name="title" :label="$t('common.title')" class="sm:col-span-2">
-            <UInput v-model="form.title" :placeholder="$t('expenses.titlePlaceholder')" class="w-full" />
+            <UInput v-model="form.title" class="w-full" />
           </UFormField>
           <UFormField name="amount" :label="$t('expenses.amountField')">
             <UInput v-model.number="form.amount" type="number" step="0.05" class="w-full" />
           </UFormField>
           <UFormField :label="$t('common.date')">
-            <UInput v-model="form.date" type="date" class="w-full" />
+            <UiDatePicker v-model="form.date" />
           </UFormField>
           <UFormField :label="$t('common.category')">
             <USelect v-model="form.categoryId" :items="categoryItems" class="w-full" />
@@ -250,10 +248,11 @@ function chf(rappen: number) {
       </template>
       <template #footer>
         <div class="flex justify-end gap-2 w-full">
-          <UButton color="neutral" variant="ghost" @click="open = false">{{ $t('common.cancel') }}</UButton>
-          <UButton :loading="saving" @click="formRef?.submit()">{{ $t('common.save') }}</UButton>
+          <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
         </div>
       </template>
     </USlideover>
   </div>
 </template>
+

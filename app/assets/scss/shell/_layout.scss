@@ -1,0 +1,36 @@
+.app-shell {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.32);
+    backdrop-filter: blur(2px);
+    z-index: 19;
+    animation: app-shell__fade-in 0.15s ease;
+  }
+}
+
+.app-main {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.app-content {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 32px var(--content-pad) 56px;
+}
+
+@media (max-width: 900px) {
+  .app-main { margin-left: 0; }
+  .app-content { padding: 20px 16px 40px; }
+}
+
+@keyframes app-shell__fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

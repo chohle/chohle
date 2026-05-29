@@ -1,0 +1,51 @@
+.page-payments {
+  .year-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .month-row td {
+    padding: 18px 10px 6px;
+    border-bottom: 0;
+  }
+
+  .month-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+
+    .mr { color: var(--ink); }
+  }
+
+  .src {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .src-name {
+    color: var(--ink);
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  .src-sub {
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 480px) {
+    .month-bar {
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+  }
+}

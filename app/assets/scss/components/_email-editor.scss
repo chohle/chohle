@@ -1,0 +1,32 @@
+.email-editor {
+  display: flex;
+  flex-direction: column;
+  min-height: 10rem;
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+
+  &--tall {
+    height: 500px;
+    min-height: 18rem;
+    resize: vertical;
+  }
+
+  &--fallback { background: var(--surface-2); }
+
+  &__toolbar {
+    border-bottom: 1px solid var(--border);
+    padding: 6px 8px;
+    background: var(--surface-2);
+  }
+
+  // Tiptap's editable element ships with horizontal padding via the
+  // Nuxt UI theme but no vertical padding — paragraphs glue to the
+  // toolbar/footer otherwise. Give the editable surface breathing room.
+  [contenteditable="true"] {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}

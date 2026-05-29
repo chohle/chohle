@@ -1,0 +1,17 @@
+.bar-chart {
+  width: 100%;
+
+  &__labels {
+    display: grid;
+    grid-template-columns: repeat(var(--n, 6), 1fr);
+    margin-top: 8px;
+  }
+
+  &__lbl {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-align: center;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+}
