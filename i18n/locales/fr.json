@@ -1,4 +1,39 @@
 {
+  "activity": {
+    "title": "Activité",
+    "subtitle": "Tout ce qui s'est passé dans votre espace, plus récent d'abord.",
+    "emptyTitle": "Rien ici pour l'instant",
+    "emptyText": "Dès que vous saisirez des dépenses, enverrez des factures ou enregistrerez un salaire, le flux s'animera ici.",
+    "filterBy": "Filtrer par",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette semaine",
+    "earlier": "Plus tôt",
+    "todayShort": "aujourd'hui",
+    "yesterday": "hier",
+    "daysAgo": "il y a {n}j",
+    "weeksAgo": "il y a {n}sem",
+    "netChange": "Variation nette",
+    "in": "Entrées",
+    "out": "Sorties",
+    "allKinds": "Toute l'activité",
+    "kindsActive": "{n} sur 5",
+    "periodLabel": "Période",
+    "period": {
+      "week": "Cette semaine",
+      "month": "Ce mois-ci",
+      "lastMonth": "Mois dernier",
+      "custom": "Autre mois"
+    },
+    "loadMore": "Charger {n} de plus",
+    "showing": "{shown} sur {total}",
+    "kind": {
+      "paid": "Payé",
+      "sent": "Envoyé",
+      "overdue": "En retard",
+      "expense": "Dépenses",
+      "salary": "Salaire"
+    }
+  },
   "nav": {
     "dashboard": "Tableau de bord",
     "expenses": "Dépenses",
@@ -7,7 +42,8 @@
     "invoices": "Factures",
     "payments": "Paiements",
     "articles": "Articles",
-    "categories": "Catégories"
+    "categories": "Catégories",
+    "activity": "Activité"
   },
   "payments": {
     "title": "Paiements",

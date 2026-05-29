@@ -7,7 +7,43 @@
     "invoices": "Invoices",
     "payments": "Payments",
     "articles": "Articles",
-    "categories": "Categories"
+    "categories": "Categories",
+    "activity": "Activity"
+  },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Everything that happened in your workspace, newest first.",
+    "emptyTitle": "Nothing here yet",
+    "emptyText": "Once you log expenses, send invoices or record salary, the stream lights up here.",
+    "filterBy": "Filter by",
+    "today": "Today",
+    "thisWeek": "This week",
+    "earlier": "Earlier",
+    "todayShort": "today",
+    "yesterday": "yesterday",
+    "daysAgo": "{n}d ago",
+    "weeksAgo": "{n}w ago",
+    "netChange": "Net change",
+    "in": "In",
+    "out": "Out",
+    "allKinds": "All activity",
+    "kindsActive": "{n} of 5",
+    "periodLabel": "Time range",
+    "period": {
+      "week": "This week",
+      "month": "This month",
+      "lastMonth": "Last month",
+      "custom": "Custom"
+    },
+    "loadMore": "Load {n} more",
+    "showing": "Showing {shown} of {total}",
+    "kind": {
+      "paid": "Paid",
+      "sent": "Sent",
+      "overdue": "Overdue",
+      "expense": "Expenses",
+      "salary": "Salary"
+    }
   },
   "payments": {
     "title": "Payments",

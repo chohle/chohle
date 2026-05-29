@@ -1,0 +1,286 @@
+.page-activity {
+  &__head-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 22px;
+    align-items: start;
+  }
+
+  &__side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__side-title {
+    margin-bottom: 12px;
+  }
+
+  &__divider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 0 8px;
+  }
+
+  &__group-label {
+    padding: 8px 0 10px;
+  }
+
+  // Activity row — circle icon · markdown body · mono timestamp.
+  .activity-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 6px;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-xs);
+    text-align: left;
+    color: var(--ink);
+    font: inherit;
+    cursor: default;
+
+    &.is-link { cursor: pointer; }
+    &.is-link:hover { background: var(--surface-2); }
+    &.is-link:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ink);
+    }
+
+    &__icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--surface-3);
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      svg, .iconify { width: 14px; height: 14px; }
+    }
+
+    &.is-overdue .activity-row__icon {
+      background: var(--ink);
+      color: var(--accent-ink);
+    }
+
+    &__body {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--ink);
+
+      strong { font-weight: 500; color: var(--ink); }
+      em { font-family: var(--font-serif); font-style: italic; color: var(--ink-2); }
+    }
+
+    &__time {
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+  }
+
+  // --- Filter sidebar (desktop) ---
+  &__filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__filter { padding: 0; }
+
+  &__filter-row {
+    display: grid;
+    grid-template-columns: 16px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__check {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    color: var(--accent-ink);
+
+    &.on {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+  }
+
+  &__sr {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  &__filter-label { font-size: 13px; color: var(--ink); }
+  &__filter-count { font-size: 11px; color: var(--ink-3); }
+
+  // --- This week stat card (desktop) ---
+  &__net {
+    font-size: 38px;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  &__cur { font-size: 0.45em; color: var(--ink-3); }
+  &__sign { color: var(--ink-3); }
+
+  &__net-meta {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  &__week-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+
+    .tabular { font-size: 13px; color: var(--ink); }
+  }
+
+  // --- Mobile toolbar (filter dropdown trigger + week net) ---
+  &__mobile-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 0 14px;
+  }
+
+  &__mobile-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 12.5px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color .12s ease, border-color .12s ease;
+
+    &:hover { background: var(--surface-3); border-color: var(--ink); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ink); }
+  }
+
+  &__mobile-trigger-label { font-weight: 500; }
+  &__mobile-trigger-caret { color: var(--ink-3); }
+
+  &__mobile-week {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__mobile-net {
+    font-size: 14px;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  // Popover for the mobile filter dropdown — same editorial chrome as
+  // the date picker popover, with overrides for Nuxt UI tokens at scope.
+  &__pop {
+    --ui-bg: var(--surface);
+    --ui-border: var(--border);
+    --ui-border-accented: var(--border-strong);
+    --ui-text: var(--ink);
+    --ui-text-muted: var(--ink-3);
+    --ui-radius: var(--radius);
+
+    background: var(--surface) !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.22) !important;
+    padding: 14px 16px !important;
+    min-width: 220px;
+  }
+
+  // Load-more footer below the feed.
+  &__more {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 18px;
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  &__more-meta {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 900px) {
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+
+    // Drop the right-hand aside on mobile — its content moves into the
+    // top toolbar (dropdown) so the feed is the only thing below the head.
+    &__side { display: none; }
+
+    &__mobile-bar { display: flex; }
+  }
+
+  @media (max-width: 600px) {
+    .activity-row {
+      grid-template-columns: 32px 1fr;
+
+      &__time {
+        grid-column: 2;
+        margin-top: 2px;
+      }
+    }
+  }
+}

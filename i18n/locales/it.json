@@ -1,4 +1,39 @@
 {
+  "activity": {
+    "title": "Attività",
+    "subtitle": "Tutto quello che è successo nel tuo workspace, dal più recente.",
+    "emptyTitle": "Ancora nulla qui",
+    "emptyText": "Appena registri spese, invii fatture o segni uno stipendio, il flusso si popola.",
+    "filterBy": "Filtra per",
+    "today": "Oggi",
+    "thisWeek": "Questa settimana",
+    "earlier": "Prima",
+    "todayShort": "oggi",
+    "yesterday": "ieri",
+    "daysAgo": "{n}g fa",
+    "weeksAgo": "{n}sett fa",
+    "netChange": "Variazione netta",
+    "in": "Entrate",
+    "out": "Uscite",
+    "allKinds": "Tutta l'attività",
+    "kindsActive": "{n} su 5",
+    "periodLabel": "Periodo",
+    "period": {
+      "week": "Questa settimana",
+      "month": "Questo mese",
+      "lastMonth": "Mese scorso",
+      "custom": "Altro mese"
+    },
+    "loadMore": "Carica altri {n}",
+    "showing": "{shown} su {total}",
+    "kind": {
+      "paid": "Pagate",
+      "sent": "Inviate",
+      "overdue": "Scadute",
+      "expense": "Spese",
+      "salary": "Stipendio"
+    }
+  },
   "nav": {
     "dashboard": "Dashboard",
     "expenses": "Spese",
@@ -7,7 +42,8 @@
     "invoices": "Fatture",
     "payments": "Pagamenti",
     "articles": "Articoli",
-    "categories": "Categorie"
+    "categories": "Categorie",
+    "activity": "Attività"
   },
   "payments": {
     "title": "Pagamenti",

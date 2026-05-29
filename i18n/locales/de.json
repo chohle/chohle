@@ -7,7 +7,43 @@
     "invoices": "Rechnungen",
     "payments": "Zahlungen",
     "articles": "Artikel",
-    "categories": "Kategorien"
+    "categories": "Kategorien",
+    "activity": "Aktivität"
+  },
+  "activity": {
+    "title": "Aktivität",
+    "subtitle": "Alles, was in deinem Workspace passiert, Neuestes zuerst.",
+    "emptyTitle": "Noch nichts hier",
+    "emptyText": "Sobald du Ausgaben erfasst, Rechnungen verschickst oder Lohn buchst, läuft hier der Feed.",
+    "filterBy": "Filtern nach",
+    "today": "Heute",
+    "thisWeek": "Diese Woche",
+    "earlier": "Früher",
+    "todayShort": "heute",
+    "yesterday": "gestern",
+    "daysAgo": "vor {n}T",
+    "weeksAgo": "vor {n}W",
+    "netChange": "Nettoveränderung",
+    "in": "Ein",
+    "out": "Aus",
+    "allKinds": "Alle Aktivitäten",
+    "kindsActive": "{n} von 5",
+    "periodLabel": "Zeitraum",
+    "period": {
+      "week": "Diese Woche",
+      "month": "Dieser Monat",
+      "lastMonth": "Letzter Monat",
+      "custom": "Anderer Monat"
+    },
+    "loadMore": "{n} weitere laden",
+    "showing": "{shown} von {total}",
+    "kind": {
+      "paid": "Bezahlt",
+      "sent": "Versendet",
+      "overdue": "Überfällig",
+      "expense": "Ausgaben",
+      "salary": "Lohn"
+    }
   },
   "payments": {
     "title": "Zahlungen",

@@ -25,7 +25,8 @@ const sections = computed<Section[]>(() => [
       { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
       { label: t('nav.customers'), icon: 'i-lucide-users', to: '/customers' },
       { label: t('nav.invoices'), icon: 'i-lucide-file-text', to: '/invoices' },
-      { label: t('nav.articles'), icon: 'i-lucide-package', to: '/articles' }
+      { label: t('nav.articles'), icon: 'i-lucide-package', to: '/articles' },
+      { label: t('nav.activity'), icon: 'i-lucide-activity', to: '/activity' }
     ]
   },
   {
