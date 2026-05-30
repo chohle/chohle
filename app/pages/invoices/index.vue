@@ -41,7 +41,7 @@ function open(id: number) {
 
 <template>
   <div class="page-invoices">
-    <UiPageHead crumb="Workspace / Invoices" :title="$t('nav.invoices')" :subtitle="$t('invoices.allSubtitle')">
+    <UiPageHead :crumb="`${$t('nav.workspace')} / ${$t('nav.invoices')}`" :title="$t('nav.invoices')" :subtitle="$t('invoices.allSubtitle')">
       <template #actions>
         <button class="ed-btn" @click="navigateTo('/customers')">
           <UIcon name="i-lucide-users" class="size-3.5" /> {{ $t('invoices.emptyCta') }}
@@ -50,10 +50,10 @@ function open(id: number) {
     </UiPageHead>
 
     <UiKpiRow>
-      <UiKpiCell label="Paid" currency="CHF" :value="chf(paidTotal)" :delta="`${countBy('paid')} invoices`" />
-      <UiKpiCell label="Sent · awaiting" currency="CHF" :value="chf(sentTotal)" :delta="`${countBy('sent')} invoices`" />
-      <UiKpiCell label="Drafts" currency="CHF" :value="chf(draftTotal)" :delta="`${countBy('draft')} drafts`" />
-      <UiKpiCell label="Total" currency="CHF" :value="chf(paidTotal + sentTotal + draftTotal)" :delta="`${invoices.length} all`" />
+      <UiKpiCell :label="$t('invoices.kpiPaid')" currency="CHF" :value="chf(paidTotal)" :delta="$t('invoices.deltaCount', { n: countBy('paid') })" />
+      <UiKpiCell :label="$t('invoices.kpiSentAwaiting')" currency="CHF" :value="chf(sentTotal)" :delta="$t('invoices.deltaCount', { n: countBy('sent') })" />
+      <UiKpiCell :label="$t('invoices.kpiDrafts')" currency="CHF" :value="chf(draftTotal)" :delta="$t('invoices.deltaDrafts', { n: countBy('draft') })" />
+      <UiKpiCell :label="$t('invoices.kpiTotal')" currency="CHF" :value="chf(paidTotal + sentTotal + draftTotal)" :delta="$t('invoices.deltaAll', { n: invoices.length })" />
     </UiKpiRow>
 
     <div class="page-invoices__filter-row">

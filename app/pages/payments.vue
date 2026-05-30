@@ -40,7 +40,7 @@ const salaryTotal = computed(() =>
 
 <template>
   <div class="page-payments">
-    <UiPageHead crumb="Finance / Payments" :title="$t('payments.title')" :subtitle="$t('payments.subtitle')">
+    <UiPageHead :crumb="`${$t('nav.finance')} / ${$t('nav.payments')}`" :title="$t('payments.title')" :subtitle="$t('payments.subtitle')">
       <template #actions>
         <div class="year-pick">
           <button class="icon-btn" @click="year--"><UIcon name="i-lucide-chevron-left" /></button>
@@ -51,12 +51,12 @@ const salaryTotal = computed(() =>
     </UiPageHead>
 
     <UiKpiRow :cols="3">
-      <UiKpiCell label="Year total" currency="CHF" :value="chf(data?.total ?? 0)" inverted />
-      <UiKpiCell label="From invoices" currency="CHF" :value="chf(invoiceTotal)" />
-      <UiKpiCell label="From salary" currency="CHF" :value="chf(salaryTotal)" />
+      <UiKpiCell :label="$t('payments.total')" currency="CHF" :value="chf(data?.total ?? 0)" inverted />
+      <UiKpiCell :label="$t('payments.fromInvoices')" currency="CHF" :value="chf(invoiceTotal)" />
+      <UiKpiCell :label="$t('payments.fromSalary')" currency="CHF" :value="chf(salaryTotal)" />
     </UiKpiRow>
 
-    <UiSectionLabel>All receipts</UiSectionLabel>
+    <UiSectionLabel>{{ $t('payments.allReceipts') }}</UiSectionLabel>
 
     <UiCard>
       <EmptyState

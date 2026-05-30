@@ -89,7 +89,7 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
 
 <template>
   <div class="page-income">
-    <UiPageHead crumb="Finance / Income" :title="$t('nav.income')" :subtitle="$t('income.subtitle')">
+    <UiPageHead :crumb="`${$t('nav.finance')} / ${$t('nav.income')}`" :title="$t('nav.income')" :subtitle="$t('income.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
         <button class="ed-btn-primary" @click="openCreate">
@@ -99,13 +99,13 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
     </UiPageHead>
 
     <UiKpiRow>
-      <UiKpiCell label="Total this month" currency="CHF" :value="chf(totalMonth)" inverted />
-      <UiKpiCell label="Received" currency="CHF" :value="chf(totalPaid)" />
-      <UiKpiCell label="Pending" currency="CHF" :value="chf(totalPending)" />
-      <UiKpiCell label="Sources" :value="String(data.sources.length)" />
+      <UiKpiCell :label="$t('income.kpiTotalMonth')" currency="CHF" :value="chf(totalMonth)" inverted />
+      <UiKpiCell :label="$t('common.received')" currency="CHF" :value="chf(totalPaid)" />
+      <UiKpiCell :label="$t('common.pending')" currency="CHF" :value="chf(totalPending)" />
+      <UiKpiCell :label="$t('income.kpiSources')" :value="String(data.sources.length)" />
     </UiKpiRow>
 
-    <UiSectionLabel>Recurring sources</UiSectionLabel>
+    <UiSectionLabel>{{ $t('income.recurringSources') }}</UiSectionLabel>
 
     <UiCard>
       <EmptyState

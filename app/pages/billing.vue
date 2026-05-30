@@ -56,7 +56,7 @@ async function save() {
 
 <template>
   <div class="page-billing">
-    <UiPageHead crumb="System / Billing" :title="$t('user.billing')" :subtitle="$t('billing.subtitle')" />
+    <UiPageHead :crumb="`${$t('nav.system')} / ${$t('user.billing')}`" :title="$t('user.billing')" :subtitle="$t('billing.subtitle')" />
 
     <UiCard>
       <UForm :state="form" :validate="validate" :validate-on="['input', 'blur']" novalidate class="page-billing__form" @submit="save">
@@ -73,7 +73,7 @@ async function save() {
 
         <USwitch v-model="form.vatRegistered" :label="$t('billing.vatLabel')" :description="$t('billing.vatDescription')" />
 
-        <h3 class="eyebrow">Business details</h3>
+        <h3 class="eyebrow">{{ $t('billing.businessDetails') }}</h3>
 
         <div class="grid sm:grid-cols-2 gap-4">
           <UFormField name="name" :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')" class="sm:col-span-2">

@@ -47,7 +47,9 @@
     "pipeline": "Pipeline",
     "vertrieb": "Vendite",
     "einkauf": "Acquisti",
-    "workspace": "Area di lavoro"
+    "workspace": "Area di lavoro",
+    "finance": "Finanze",
+    "system": "Sistema"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -126,7 +128,10 @@
     "colSource": "Fonte",
     "colAmount": "Importo",
     "emptyTitle": "Nessun pagamento",
-    "emptyText": "Quando contrassegni le fatture come pagate o registri stipendi, compariranno qui."
+    "emptyText": "Quando contrassegni le fatture come pagate o registri stipendi, compariranno qui.",
+    "fromInvoices": "Dalle fatture",
+    "fromSalary": "Dallo stipendio",
+    "allReceipts": "Tutte le entrate"
   },
   "user": {
     "profile": "Profilo",
@@ -180,7 +185,9 @@
     "placeholderSender": "Il tuo nome",
     "emailTemplateSaved": "Modello e-mail salvato",
     "languageConfirmTitle": "Cambiare lingua?",
-    "languageConfirmText": "L'intera app passerà subito alla lingua selezionata."
+    "languageConfirmText": "L'intera app passerà subito alla lingua selezionata.",
+    "cornerRadius": "Raggio degli angoli",
+    "theme": "Tema"
   },
   "dashboard": {
     "subtitle": "Il tuo mese in sintesi.",
@@ -201,7 +208,15 @@
     "noIncomeText": "Aggiungi un lavoro nella pagina Entrate per tracciare i pagamenti ricorrenti.",
     "pays": "Paga il {date}",
     "received": "Ricevuto",
-    "pending": "In sospeso"
+    "pending": "In sospeso",
+    "kpiFromCustomers": "Dai clienti",
+    "kpiExpected": "Atteso questo mese",
+    "kpiExpensesOut": "Spese in uscita",
+    "incomeVsExpenses": "Entrate vs. spese",
+    "recurringIncome": "Entrate ricorrenti",
+    "netHeroEyebrow": "Netto questo mese · dopo spese",
+    "last6Months": "Entrate & uscite · ultimi 6 mesi",
+    "outstandingShort": "CHF {amount} in sospeso"
   },
   "expenses": {
     "subtitle": "Tieni traccia di ciò che compri, con la ricevuta.",
@@ -213,7 +228,18 @@
     "receipt": "Ricevuta",
     "noCategory": "Nessuna categoria",
     "titlePlaceholder": "es. sedia da ufficio",
-    "amountField": "Importo (CHF)"
+    "amountField": "Importo (CHF)",
+    "kpiTotalMonth": "Totale questo mese",
+    "kpiEntries": "Voci",
+    "kpiCategories": "Categorie",
+    "kpiAvg": "Media per voce",
+    "breakdown": "Suddivisione",
+    "byCategory": "Per categoria",
+    "quickFilter": "Filtro rapido",
+    "recent": "Spese recenti",
+    "noBreakdownTitle": "Nessun dato",
+    "noBreakdownText": "Registra spese per vedere la suddivisione.",
+    "thisMonth": "Questo mese"
   },
   "income": {
     "subtitle": "Stipendi e lavori con calcolo della data di pagamento svizzera.",
@@ -235,7 +261,10 @@
     "salary": "Stipendio mensile (CHF)",
     "payoutDay": "Giorno di pagamento",
     "canton": "Cantone",
-    "adjustment": "Aggiustamento"
+    "adjustment": "Aggiustamento",
+    "kpiTotalMonth": "Totale questo mese",
+    "kpiSources": "Fonti",
+    "recurringSources": "Fonti ricorrenti"
   },
   "customers": {
     "subtitle": "La tua rubrica clienti.",
@@ -279,7 +308,9 @@
     "language": "Lingua",
     "newInvoice": "Nuova fattura",
     "noInvoicesTitle": "Nessuna fattura",
-    "noInvoicesText": "Crea la prima fattura per questo cliente."
+    "noInvoicesText": "Crea la prima fattura per questo cliente.",
+    "kpiTotalBilled": "Totale fatturato",
+    "kpiPaid": "Pagato"
   },
   "articles": {
     "subtitle": "Voci riutilizzabili condivise tra tutti i clienti.",
@@ -328,7 +359,8 @@
     "vatDescription": "Attiva se sei soggetto all'IVA svizzera (obbligatorio oltre CHF 100'000 di fatturato). Se disattivato, le tue fatture non includono IVA.",
     "iban": "IBAN",
     "companyDetails": "Dettagli aziendali",
-    "toastSaved": "Dati di fatturazione salvati"
+    "toastSaved": "Dati di fatturazione salvati",
+    "businessDetails": "Dati commerciali"
   },
   "profile": {
     "subtitle": "Il tuo account e la password.",
@@ -343,7 +375,8 @@
   },
   "login": {
     "signIn": "Accedi",
-    "invalid": "Nome utente o password non validi."
+    "invalid": "Nome utente o password non validi.",
+    "welcome": "Accedi al tuo spazio di lavoro"
   },
   "logoUpload": {
     "upload": "Carica logo",
@@ -392,7 +425,14 @@
     "sendError": "Impossibile inviare la fattura",
     "sendNote": "Il cliente riceve questa e-mail con la fattura in PDF allegata.",
     "deleteConfirmTitle": "Eliminare la fattura?",
-    "deleteConfirmText": "Questo elimina definitivamente la fattura. L'azione non può essere annullata."
+    "deleteConfirmText": "Questo elimina definitivamente la fattura. L'azione non può essere annullata.",
+    "kpiPaid": "Pagato",
+    "kpiSentAwaiting": "Inviata · in attesa",
+    "kpiDrafts": "Bozze",
+    "kpiTotal": "Totale",
+    "deltaCount": "{n} fatture",
+    "deltaDrafts": "{n} bozze",
+    "deltaAll": "{n} in totale"
   },
   "editor": {
     "uploadImage": "Carica un'immagine",

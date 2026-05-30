@@ -76,7 +76,7 @@ const greeting = computed(() => {
 
 <template>
   <div v-if="data" class="page-overview">
-    <UiPageHead crumb="Workspace / Overview" :title="`${greeting}, ${username}.`">
+    <UiPageHead :crumb="`${$t('nav.workspace')} / ${$t('nav.dashboard')}`" :title="`${greeting}, ${username}.`">
       <template #title>
         {{ greeting }}, <em class="page-overview__italic">{{ username }}</em>.
       </template>
@@ -87,7 +87,7 @@ const greeting = computed(() => {
     </UiPageHead>
 
     <UiHero
-      eyebrow="Net this month · after expenses"
+      :eyebrow="$t('dashboard.netHeroEyebrow')"
       currency="CHF"
       :value="chf(data.net)"
       :delta="deltaText(netDelta)"
@@ -99,34 +99,34 @@ const greeting = computed(() => {
 
     <UiSubStrip>
       <UiSubStripItem
-        label="From customers"
+        :label="$t('dashboard.kpiFromCustomers')"
         currency="CHF"
         :value="chf(data.invoiceIncome || data.income)"
         :delta="deltaText(incomeDelta)"
       />
       <UiSubStripItem
-        label="Expected this month"
+        :label="$t('dashboard.kpiExpected')"
         currency="CHF"
         :value="chf(data.expected)"
-        :delta="data.outstanding ? `CHF ${chf(data.outstanding)} outstanding` : ''"
+        :delta="data.outstanding ? $t('dashboard.outstandingShort', { amount: chf(data.outstanding) }) : ''"
       />
       <UiSubStripItem
-        label="Expenses out"
+        :label="$t('dashboard.kpiExpensesOut')"
         currency="CHF"
         :value="chf(data.expenses)"
         :delta="deltaText(expensesDelta)"
       />
     </UiSubStrip>
 
-    <UiSectionLabel>Money in &amp; out · last 6 months</UiSectionLabel>
+    <UiSectionLabel>{{ $t('dashboard.last6Months') }}</UiSectionLabel>
 
     <div class="page-overview__grid">
       <UiCard>
         <div class="page-overview__card-head">
-          <div class="eyebrow">Income vs expenses</div>
+          <div class="eyebrow">{{ $t('dashboard.incomeVsExpenses') }}</div>
           <div class="page-overview__legend mono">
-            <span><span class="page-overview__lg-dot page-overview__lg-dot--ink" /> Income</span>
-            <span><span class="page-overview__lg-dot page-overview__lg-dot--muted" /> Expenses</span>
+            <span><span class="page-overview__lg-dot page-overview__lg-dot--ink" /> {{ $t('dashboard.income') }}</span>
+            <span><span class="page-overview__lg-dot page-overview__lg-dot--muted" /> {{ $t('dashboard.expenses') }}</span>
           </div>
         </div>
         <UiBarChart :series="trendSeries" :labels="trendLabels" :stacked="false" :height="220" />
@@ -134,7 +134,7 @@ const greeting = computed(() => {
 
       <UiCard>
         <div class="page-overview__card-head">
-          <div class="eyebrow">Recurring income</div>
+          <div class="eyebrow">{{ $t('dashboard.recurringIncome') }}</div>
           <span class="mono page-overview__count">{{ data.recurring.length }}</span>
         </div>
         <EmptyState
@@ -161,7 +161,7 @@ const greeting = computed(() => {
       </UiCard>
     </div>
 
-    <UiSectionLabel v-if="yearData">Cashflow {{ yearData.year }}</UiSectionLabel>
+    <UiSectionLabel v-if="yearData">{{ $t('dashboard.cashflow', { year: yearData.year }) }}</UiSectionLabel>
 
     <UiCard v-if="yearData">
       <div class="page-overview__card-head">
@@ -171,9 +171,9 @@ const greeting = computed(() => {
           <button class="icon-btn" @click="year++"><UIcon name="i-lucide-chevron-right" /></button>
         </div>
         <div class="page-overview__yr-totals mono">
-          <span>Income <b class="tabular">CHF {{ chf(yearData.totals.income) }}</b></span>
-          <span>Expenses <b class="tabular">CHF {{ chf(yearData.totals.expenses) }}</b></span>
-          <span>Net <b class="tabular">CHF {{ chf(yearData.totals.net) }}</b></span>
+          <span>{{ $t('dashboard.income') }} <b class="tabular">CHF {{ chf(yearData.totals.income) }}</b></span>
+          <span>{{ $t('dashboard.expenses') }} <b class="tabular">CHF {{ chf(yearData.totals.expenses) }}</b></span>
+          <span>{{ $t('dashboard.net') }} <b class="tabular">CHF {{ chf(yearData.totals.net) }}</b></span>
         </div>
       </div>
       <UiBarChart :series="yearSeries" :labels="yearLabels" :stacked="false" :height="220" />

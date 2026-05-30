@@ -35,7 +35,7 @@ async function onSubmit() {
         <span class="page-login__mark">b</span>
         <span class="page-login__name">batze</span>
       </div>
-      <p class="page-login__welcome">Sign in to your workspace<span class="page-login__serif">.</span></p>
+      <p class="page-login__welcome">{{ $t('login.welcome') }}<span class="page-login__serif">.</span></p>
 
       <UForm :state="state" :validate="validate" novalidate class="page-login__form" @submit="onSubmit">
         <UFormField name="username" :label="$t('common.username')">

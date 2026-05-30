@@ -11,7 +11,10 @@
     "activity": "Activity",
     "pipeline": "Pipeline",
     "vertrieb": "Sales",
-    "einkauf": "Procurement"
+    "einkauf": "Procurement",
+    "workspace": "Workspace",
+    "finance": "Finance",
+    "system": "System"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -125,7 +128,10 @@
     "colSource": "Source",
     "colAmount": "Amount",
     "emptyTitle": "No payments",
-    "emptyText": "Once you mark invoices as paid or record salaries, they show up here."
+    "emptyText": "Once you mark invoices as paid or record salaries, they show up here.",
+    "fromInvoices": "From invoices",
+    "fromSalary": "From salary",
+    "allReceipts": "All receipts"
   },
   "user": {
     "profile": "Profile",
@@ -179,7 +185,9 @@
     "placeholderSender": "Your name",
     "emailTemplateSaved": "Email template saved",
     "languageConfirmTitle": "Change language?",
-    "languageConfirmText": "The whole app will switch to the selected language right away."
+    "languageConfirmText": "The whole app will switch to the selected language right away.",
+    "cornerRadius": "Corner radius",
+    "theme": "Theme"
   },
   "dashboard": {
     "subtitle": "Your month at a glance.",
@@ -200,7 +208,15 @@
     "noIncomeText": "Add a job on the Income page to track recurring pay.",
     "pays": "Pays {date}",
     "received": "Received",
-    "pending": "Pending"
+    "pending": "Pending",
+    "kpiFromCustomers": "From customers",
+    "kpiExpected": "Expected this month",
+    "kpiExpensesOut": "Expenses out",
+    "incomeVsExpenses": "Income vs. expenses",
+    "recurringIncome": "Recurring income",
+    "netHeroEyebrow": "Net this month · after expenses",
+    "last6Months": "Money in & out · last 6 months",
+    "outstandingShort": "CHF {amount} outstanding"
   },
   "expenses": {
     "subtitle": "Track what you buy, with the receipt.",
@@ -212,7 +228,18 @@
     "receipt": "Receipt",
     "noCategory": "No category",
     "titlePlaceholder": "e.g. Office chair",
-    "amountField": "Amount (CHF)"
+    "amountField": "Amount (CHF)",
+    "kpiTotalMonth": "Total this month",
+    "kpiEntries": "Entries",
+    "kpiCategories": "Categories",
+    "kpiAvg": "Avg per entry",
+    "breakdown": "Breakdown",
+    "byCategory": "By category",
+    "quickFilter": "Quick filter",
+    "recent": "Recent expenses",
+    "noBreakdownTitle": "No data",
+    "noBreakdownText": "Log expenses to see the breakdown.",
+    "thisMonth": "This month"
   },
   "income": {
     "subtitle": "Salary and jobs with Swiss pay-date calculation.",
@@ -234,7 +261,10 @@
     "salary": "Monthly salary (CHF)",
     "payoutDay": "Payout day",
     "canton": "Canton",
-    "adjustment": "Adjustment"
+    "adjustment": "Adjustment",
+    "kpiTotalMonth": "Total this month",
+    "kpiSources": "Sources",
+    "recurringSources": "Recurring sources"
   },
   "customers": {
     "subtitle": "Your customer book.",
@@ -278,7 +308,9 @@
     "language": "Language",
     "newInvoice": "New invoice",
     "noInvoicesTitle": "No invoices yet",
-    "noInvoicesText": "Create the first invoice for this customer."
+    "noInvoicesText": "Create the first invoice for this customer.",
+    "kpiTotalBilled": "Total billed",
+    "kpiPaid": "Paid"
   },
   "articles": {
     "subtitle": "Reusable line items shared across all customers.",
@@ -327,7 +359,8 @@
     "vatDescription": "Turn on if you are registered for Swiss VAT (mandatory above CHF 100,000 turnover). When off, your invoices carry no VAT.",
     "iban": "IBAN",
     "companyDetails": "Company details",
-    "toastSaved": "Billing details saved"
+    "toastSaved": "Billing details saved",
+    "businessDetails": "Business details"
   },
   "profile": {
     "subtitle": "Your account and password.",
@@ -342,7 +375,8 @@
   },
   "login": {
     "signIn": "Sign in",
-    "invalid": "Invalid username or password."
+    "invalid": "Invalid username or password.",
+    "welcome": "Sign in to your workspace"
   },
   "logoUpload": {
     "upload": "Upload logo",
@@ -391,7 +425,14 @@
     "sendError": "Could not send the invoice",
     "sendNote": "The customer receives this email with the invoice PDF attached.",
     "deleteConfirmTitle": "Delete invoice?",
-    "deleteConfirmText": "This permanently deletes the invoice. This cannot be undone."
+    "deleteConfirmText": "This permanently deletes the invoice. This cannot be undone.",
+    "kpiPaid": "Paid",
+    "kpiSentAwaiting": "Sent · awaiting",
+    "kpiDrafts": "Drafts",
+    "kpiTotal": "Total",
+    "deltaCount": "{n} invoices",
+    "deltaDrafts": "{n} drafts",
+    "deltaAll": "{n} all"
   },
   "editor": {
     "uploadImage": "Upload an image",

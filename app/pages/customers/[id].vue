@@ -124,10 +124,10 @@ const details = computed(() => {
     </header>
 
     <UiKpiRow :cols="4">
-      <UiKpiCell label="Total billed" currency="CHF" :value="chf(stats.total)" />
-      <UiKpiCell label="Paid" currency="CHF" :value="chf(stats.paid)" />
-      <UiKpiCell label="Outstanding" currency="CHF" :value="chf(stats.outstanding)" />
-      <UiKpiCell label="Invoices" :value="String(stats.count)" />
+      <UiKpiCell :label="$t('customers.kpiTotalBilled')" currency="CHF" :value="chf(stats.total)" />
+      <UiKpiCell :label="$t('customers.kpiPaid')" currency="CHF" :value="chf(stats.paid)" />
+      <UiKpiCell :label="$t('customers.outstanding')" currency="CHF" :value="chf(stats.outstanding)" />
+      <UiKpiCell :label="$t('customers.invoices')" :value="String(stats.count)" />
     </UiKpiRow>
 
     <div class="page-customer-detail__tabs">
@@ -180,10 +180,10 @@ const details = computed(() => {
       <div v-else class="ed-scroll"><table class="ed-table page-customer-detail__inv-table">
         <thead>
           <tr>
-            <th>Number</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th class="right">Amount</th>
+            <th>{{ $t('invoices.number') }}</th>
+            <th>{{ $t('common.title') }}</th>
+            <th>{{ $t('invoices.statusLabel') }}</th>
+            <th class="right">{{ $t('common.amount') }}</th>
           </tr>
         </thead>
         <tbody>

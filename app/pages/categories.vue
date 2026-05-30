@@ -63,7 +63,7 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
 
 <template>
   <div class="page-categories">
-    <UiPageHead crumb="Finance / Categories" :title="$t('nav.categories')" :subtitle="$t('categories.subtitle')">
+    <UiPageHead :crumb="`${$t('nav.finance')} / ${$t('nav.categories')}`" :title="$t('nav.categories')" :subtitle="$t('categories.subtitle')">
       <template #actions>
         <button class="ed-btn-primary" @click="openCreate">
           <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('categories.add') }}

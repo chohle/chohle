@@ -153,7 +153,7 @@ async function remove(id: number) {
 
 <template>
   <div>
-    <UiPageHead crumb="Workspace / Customers" :title="$t('nav.customers')" :subtitle="$t('customers.subtitle')">
+    <UiPageHead :crumb="`${$t('nav.workspace')} / ${$t('nav.customers')}`" :title="$t('nav.customers')" :subtitle="$t('customers.subtitle')">
       <template #actions>
         <UiSegmentedControl v-model="filter" :options="filterOptions" />
         <button class="ed-btn-primary" @click="openCreate">

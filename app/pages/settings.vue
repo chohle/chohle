@@ -55,7 +55,7 @@ const themes = [
 
 <template>
   <div class="page-settings">
-    <UiPageHead crumb="System / Settings" :title="$t('user.settings')" :subtitle="$t('settings.subtitle')" />
+    <UiPageHead :crumb="`${$t('nav.system')} / ${$t('user.settings')}`" :title="$t('user.settings')" :subtitle="$t('settings.subtitle')" />
 
     <div class="settings-grid">
       <nav class="inner-nav">
@@ -70,7 +70,7 @@ const themes = [
 
       <div class="pane">
         <template v-if="tab === 'appearance'">
-          <UiSectionLabel>Theme</UiSectionLabel>
+          <UiSectionLabel>{{ $t('settings.theme') }}</UiSectionLabel>
           <div class="theme-grid">
             <button
               v-for="th in themes"
@@ -87,7 +87,7 @@ const themes = [
             </button>
           </div>
 
-          <UiSectionLabel>Corner radius</UiSectionLabel>
+          <UiSectionLabel>{{ $t('settings.cornerRadius') }}</UiSectionLabel>
           <div class="radius">
             <input
               type="range"

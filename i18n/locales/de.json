@@ -12,7 +12,9 @@
     "pipeline": "Pipeline",
     "vertrieb": "Vertrieb",
     "einkauf": "Einkauf",
-    "workspace": "Arbeitsbereich"
+    "workspace": "Arbeitsbereich",
+    "finance": "Finanzen",
+    "system": "System"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -126,7 +128,10 @@
     "colSource": "Quelle",
     "colAmount": "Betrag",
     "emptyTitle": "Keine Zahlungen",
-    "emptyText": "Sobald Rechnungen als bezahlt markiert oder Gehälter erfasst werden, erscheinen sie hier."
+    "emptyText": "Sobald Rechnungen als bezahlt markiert oder Gehälter erfasst werden, erscheinen sie hier.",
+    "fromInvoices": "Aus Rechnungen",
+    "fromSalary": "Aus Gehalt",
+    "allReceipts": "Alle Eingänge"
   },
   "user": {
     "profile": "Profil",
@@ -180,7 +185,9 @@
     "placeholderSender": "Dein Name",
     "emailTemplateSaved": "E-Mail-Vorlage gespeichert",
     "languageConfirmTitle": "Sprache ändern?",
-    "languageConfirmText": "Die gesamte App wird sofort auf die gewählte Sprache umgestellt."
+    "languageConfirmText": "Die gesamte App wird sofort auf die gewählte Sprache umgestellt.",
+    "cornerRadius": "Eckenradius",
+    "theme": "Theme"
   },
   "dashboard": {
     "subtitle": "Dein Monat auf einen Blick.",
@@ -201,7 +208,15 @@
     "noIncomeText": "Füge auf der Seite Einnahmen einen Job hinzu, um wiederkehrende Zahlungen zu erfassen.",
     "pays": "Zahlt {date}",
     "received": "Erhalten",
-    "pending": "Ausstehend"
+    "pending": "Ausstehend",
+    "kpiFromCustomers": "Von Kunden",
+    "kpiExpected": "Erwartet diesen Monat",
+    "kpiExpensesOut": "Ausgaben raus",
+    "incomeVsExpenses": "Einnahmen vs. Ausgaben",
+    "recurringIncome": "Wiederkehrende Einnahmen",
+    "netHeroEyebrow": "Netto diesen Monat · nach Ausgaben",
+    "last6Months": "Geld rein & raus · letzte 6 Monate",
+    "outstandingShort": "CHF {amount} ausstehend"
   },
   "expenses": {
     "subtitle": "Erfasse, was du kaufst, mit dem Beleg.",
@@ -213,7 +228,18 @@
     "receipt": "Beleg",
     "noCategory": "Keine Kategorie",
     "titlePlaceholder": "z. B. Bürostuhl",
-    "amountField": "Betrag (CHF)"
+    "amountField": "Betrag (CHF)",
+    "kpiTotalMonth": "Total diesen Monat",
+    "kpiEntries": "Einträge",
+    "kpiCategories": "Kategorien",
+    "kpiAvg": "Ø pro Eintrag",
+    "breakdown": "Aufschlüsselung",
+    "byCategory": "Nach Kategorie",
+    "quickFilter": "Schnellfilter",
+    "recent": "Letzte Ausgaben",
+    "noBreakdownTitle": "Keine Daten",
+    "noBreakdownText": "Erfasse Ausgaben, um die Aufschlüsselung zu sehen.",
+    "thisMonth": "Diesen Monat"
   },
   "income": {
     "subtitle": "Gehalt und Jobs mit Schweizer Auszahlungsdatum-Berechnung.",
@@ -235,7 +261,10 @@
     "salary": "Monatsgehalt (CHF)",
     "payoutDay": "Zahltag",
     "canton": "Kanton",
-    "adjustment": "Anpassung"
+    "adjustment": "Anpassung",
+    "kpiTotalMonth": "Total diesen Monat",
+    "kpiSources": "Quellen",
+    "recurringSources": "Wiederkehrende Quellen"
   },
   "customers": {
     "subtitle": "Dein Kundenverzeichnis.",
@@ -279,7 +308,9 @@
     "language": "Sprache",
     "newInvoice": "Neue Rechnung",
     "noInvoicesTitle": "Noch keine Rechnungen",
-    "noInvoicesText": "Erstelle die erste Rechnung für diesen Kunden."
+    "noInvoicesText": "Erstelle die erste Rechnung für diesen Kunden.",
+    "kpiTotalBilled": "Gesamt fakturiert",
+    "kpiPaid": "Bezahlt"
   },
   "articles": {
     "subtitle": "Wiederverwendbare Positionen für alle Kunden.",
@@ -328,7 +359,8 @@
     "vatDescription": "Aktivieren, wenn du MWST-pflichtig bist (obligatorisch ab CHF 100'000 Umsatz). Wenn aus, enthalten deine Rechnungen keine MWST.",
     "iban": "IBAN",
     "companyDetails": "Firmendetails",
-    "toastSaved": "Rechnungsdaten gespeichert"
+    "toastSaved": "Rechnungsdaten gespeichert",
+    "businessDetails": "Geschäftsangaben"
   },
   "profile": {
     "subtitle": "Dein Konto und Passwort.",
@@ -343,7 +375,8 @@
   },
   "login": {
     "signIn": "Anmelden",
-    "invalid": "Ungültiger Benutzername oder Passwort."
+    "invalid": "Ungültiger Benutzername oder Passwort.",
+    "welcome": "Melde dich in deinem Arbeitsbereich an"
   },
   "logoUpload": {
     "upload": "Logo hochladen",
@@ -392,7 +425,14 @@
     "sendError": "Rechnung konnte nicht gesendet werden",
     "sendNote": "Der Kunde erhält diese E-Mail mit der Rechnung als PDF im Anhang.",
     "deleteConfirmTitle": "Rechnung löschen?",
-    "deleteConfirmText": "Dies löscht die Rechnung dauerhaft. Dies kann nicht rückgängig gemacht werden."
+    "deleteConfirmText": "Dies löscht die Rechnung dauerhaft. Dies kann nicht rückgängig gemacht werden.",
+    "kpiPaid": "Bezahlt",
+    "kpiSentAwaiting": "Versendet · wartet",
+    "kpiDrafts": "Entwürfe",
+    "kpiTotal": "Total",
+    "deltaCount": "{n} Rechnungen",
+    "deltaDrafts": "{n} Entwürfe",
+    "deltaAll": "{n} insgesamt"
   },
   "editor": {
     "uploadImage": "Bild hochladen",

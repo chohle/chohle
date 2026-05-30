@@ -47,7 +47,9 @@
     "pipeline": "Pipeline",
     "vertrieb": "Ventes",
     "einkauf": "Achats",
-    "workspace": "Espace de travail"
+    "workspace": "Espace de travail",
+    "finance": "Finances",
+    "system": "Système"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -126,7 +128,10 @@
     "colSource": "Source",
     "colAmount": "Montant",
     "emptyTitle": "Aucun paiement",
-    "emptyText": "Dès que vous marquez une facture comme payée ou enregistrez un salaire, ils apparaissent ici."
+    "emptyText": "Dès que vous marquez une facture comme payée ou enregistrez un salaire, ils apparaissent ici.",
+    "fromInvoices": "Des factures",
+    "fromSalary": "Du salaire",
+    "allReceipts": "Toutes les recettes"
   },
   "user": {
     "profile": "Profil",
@@ -180,7 +185,9 @@
     "placeholderSender": "Votre nom",
     "emailTemplateSaved": "Modèle d'e-mail enregistré",
     "languageConfirmTitle": "Changer de langue ?",
-    "languageConfirmText": "Toute l'application passera immédiatement à la langue sélectionnée."
+    "languageConfirmText": "Toute l'application passera immédiatement à la langue sélectionnée.",
+    "cornerRadius": "Rayon des coins",
+    "theme": "Thème"
   },
   "dashboard": {
     "subtitle": "Votre mois en bref.",
@@ -201,7 +208,15 @@
     "noIncomeText": "Ajoutez un emploi sur la page Revenus pour suivre les paiements récurrents.",
     "pays": "Paye le {date}",
     "received": "Reçu",
-    "pending": "En attente"
+    "pending": "En attente",
+    "kpiFromCustomers": "Des clients",
+    "kpiExpected": "Attendu ce mois",
+    "kpiExpensesOut": "Dépenses sorties",
+    "incomeVsExpenses": "Revenus vs. dépenses",
+    "recurringIncome": "Revenus récurrents",
+    "netHeroEyebrow": "Net ce mois · après dépenses",
+    "last6Months": "Entrées & sorties · 6 derniers mois",
+    "outstandingShort": "CHF {amount} dus"
   },
   "expenses": {
     "subtitle": "Suivez vos achats, avec le reçu.",
@@ -213,7 +228,18 @@
     "receipt": "Reçu",
     "noCategory": "Aucune catégorie",
     "titlePlaceholder": "p. ex. chaise de bureau",
-    "amountField": "Montant (CHF)"
+    "amountField": "Montant (CHF)",
+    "kpiTotalMonth": "Total ce mois",
+    "kpiEntries": "Entrées",
+    "kpiCategories": "Catégories",
+    "kpiAvg": "Moy. par entrée",
+    "breakdown": "Répartition",
+    "byCategory": "Par catégorie",
+    "quickFilter": "Filtre rapide",
+    "recent": "Dépenses récentes",
+    "noBreakdownTitle": "Aucune donnée",
+    "noBreakdownText": "Saisissez des dépenses pour voir la répartition.",
+    "thisMonth": "Ce mois"
   },
   "income": {
     "subtitle": "Salaires et emplois avec calcul de la date de paie suisse.",
@@ -235,7 +261,10 @@
     "salary": "Salaire mensuel (CHF)",
     "payoutDay": "Jour de paie",
     "canton": "Canton",
-    "adjustment": "Ajustement"
+    "adjustment": "Ajustement",
+    "kpiTotalMonth": "Total ce mois",
+    "kpiSources": "Sources",
+    "recurringSources": "Sources récurrentes"
   },
   "customers": {
     "subtitle": "Votre carnet de clients.",
@@ -279,7 +308,9 @@
     "language": "Langue",
     "newInvoice": "Nouvelle facture",
     "noInvoicesTitle": "Aucune facture",
-    "noInvoicesText": "Créez la première facture pour ce client."
+    "noInvoicesText": "Créez la première facture pour ce client.",
+    "kpiTotalBilled": "Total facturé",
+    "kpiPaid": "Payé"
   },
   "articles": {
     "subtitle": "Postes réutilisables partagés entre tous les clients.",
@@ -328,7 +359,8 @@
     "vatDescription": "Activez si vous êtes assujetti à la TVA suisse (obligatoire au-delà de CHF 100 000 de chiffre d'affaires). Si désactivé, vos factures ne comportent aucune TVA.",
     "iban": "IBAN",
     "companyDetails": "Détails de l'entreprise",
-    "toastSaved": "Données de facturation enregistrées"
+    "toastSaved": "Données de facturation enregistrées",
+    "businessDetails": "Coordonnées professionnelles"
   },
   "profile": {
     "subtitle": "Votre compte et votre mot de passe.",
@@ -343,7 +375,8 @@
   },
   "login": {
     "signIn": "Se connecter",
-    "invalid": "Nom d'utilisateur ou mot de passe invalide."
+    "invalid": "Nom d'utilisateur ou mot de passe invalide.",
+    "welcome": "Connectez-vous à votre espace de travail"
   },
   "logoUpload": {
     "upload": "Téléverser le logo",
@@ -392,7 +425,14 @@
     "sendError": "Impossible d'envoyer la facture",
     "sendNote": "Le client reçoit cet e-mail avec la facture en PDF en pièce jointe.",
     "deleteConfirmTitle": "Supprimer la facture ?",
-    "deleteConfirmText": "Cela supprime définitivement la facture. Cette action est irréversible."
+    "deleteConfirmText": "Cela supprime définitivement la facture. Cette action est irréversible.",
+    "kpiPaid": "Payé",
+    "kpiSentAwaiting": "Envoyé · en attente",
+    "kpiDrafts": "Brouillons",
+    "kpiTotal": "Total",
+    "deltaCount": "{n} factures",
+    "deltaDrafts": "{n} brouillons",
+    "deltaAll": "{n} au total"
   },
   "editor": {
     "uploadImage": "Téléverser une image",

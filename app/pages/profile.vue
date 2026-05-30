@@ -35,7 +35,7 @@ async function changePassword() {
 
 <template>
   <div class="page-profile">
-    <UiPageHead crumb="System / Profile" :title="$t('user.profile')" :subtitle="$t('profile.subtitle')" />
+    <UiPageHead :crumb="`${$t('nav.system')} / ${$t('user.profile')}`" :title="$t('user.profile')" :subtitle="$t('profile.subtitle')" />
 
     <UiCard>
       <UFormField :label="$t('common.username')">

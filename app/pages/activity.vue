@@ -154,7 +154,7 @@ function go(link: string | undefined) {
 <template>
   <div v-if="data" class="page-activity">
     <UiPageHead
-      crumb="Workspace / Activity"
+      :crumb="`${$t('nav.workspace')} / ${$t('nav.activity')}`"
       :title="$t('activity.title')"
       :subtitle="$t('activity.subtitle')"
     >

@@ -115,7 +115,7 @@ function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { m
 
 <template>
   <div class="page-expenses">
-    <UiPageHead crumb="Finance / Expenses" :title="$t('nav.expenses')" :subtitle="$t('expenses.subtitle')">
+    <UiPageHead :crumb="`${$t('nav.finance')} / ${$t('nav.expenses')}`" :title="$t('nav.expenses')" :subtitle="$t('expenses.subtitle')">
       <template #actions>
         <MonthSelect v-model="month" />
         <button class="ed-btn-primary" @click="openCreate">
@@ -125,21 +125,21 @@ function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { m
     </UiPageHead>
 
     <UiKpiRow>
-      <UiKpiCell label="Total this month" currency="CHF" :value="chf(total)" inverted />
-      <UiKpiCell label="Entries" :value="String(filtered.length)" />
-      <UiKpiCell label="Categories" :value="String(byCategory.length)" />
-      <UiKpiCell label="Avg per entry" currency="CHF" :value="filtered.length ? chf(Math.round(total / filtered.length)) : '0'" />
+      <UiKpiCell :label="$t('expenses.kpiTotalMonth')" currency="CHF" :value="chf(total)" inverted />
+      <UiKpiCell :label="$t('expenses.kpiEntries')" :value="String(filtered.length)" />
+      <UiKpiCell :label="$t('expenses.kpiCategories')" :value="String(byCategory.length)" />
+      <UiKpiCell :label="$t('expenses.kpiAvg')" currency="CHF" :value="filtered.length ? chf(Math.round(total / filtered.length)) : '0'" />
     </UiKpiRow>
 
-    <UiSectionLabel>Breakdown</UiSectionLabel>
+<UiSectionLabel>{{ $t('expenses.breakdown') }}</UiSectionLabel>
 
     <div class="grid-2">
       <UiCard>
         <div class="card-head">
-          <div class="eyebrow">By category</div>
+          <div class="eyebrow">{{ $t('expenses.byCategory') }}</div>
         </div>
         <div v-if="byCategory.length" class="donut-wrap">
-          <UiDonut :segments="donutSegments" label="This month" :center-value="`CHF ${chf(total)}`" />
+          <UiDonut :segments="donutSegments" :label="$t('expenses.thisMonth')" :center-value="`CHF ${chf(total)}`" />
           <ul class="legend">
             <li v-for="c in byCategory" :key="c.id">
               <span class="dot" :class="`w${c.weight}`" />
@@ -148,11 +148,11 @@ function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { m
             </li>
           </ul>
         </div>
-        <EmptyState v-else :bordered="false" icon="i-lucide-pie-chart" title="No data" description="Log expenses to see the breakdown." />
+        <EmptyState v-else :bordered="false" icon="i-lucide-pie-chart" :title="$t('expenses.noBreakdownTitle')" :description="$t('expenses.noBreakdownText')" />
       </UiCard>
 
       <UiCard>
-        <div class="card-head"><div class="eyebrow">Quick filter</div></div>
+        <div class="card-head"><div class="eyebrow">{{ $t('expenses.quickFilter') }}</div></div>
         <div class="filter-grid">
           <button
             v-for="c in expenseCategories"
@@ -168,7 +168,7 @@ function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { m
       </UiCard>
     </div>
 
-    <UiSectionLabel>Recent expenses</UiSectionLabel>
+<UiSectionLabel>{{ $t('expenses.recent') }}</UiSectionLabel>
 
     <UiCard>
       <EmptyState
