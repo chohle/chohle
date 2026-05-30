@@ -230,7 +230,7 @@ const emailMessage = computed({
 
     <!-- Step 1: Draft -->
     <template v-if="step === 0">
-      <UForm ref="formRef" :state="lineState" :validate="validate" @submit="continueToSend">
+      <UForm ref="formRef" :state="lineState" :validate="validate" novalidate @submit="continueToSend">
         <UiCard>
           <div class="grid sm:grid-cols-2 gap-4">
             <UFormField :label="$t('common.title')" class="sm:col-span-2">

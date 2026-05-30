@@ -413,7 +413,8 @@
     "invoiceAmountChf": "Invoice amount CHF"
   },
   "validation": {
-    "required": "This field is required",
+    "required": "This field must be filled",
+    "email": "Please enter a valid email address",
     "positive": "Must be greater than 0"
   },
   "common": {

@@ -37,7 +37,7 @@ async function onSubmit() {
       </div>
       <p class="page-login__welcome">Sign in to your workspace<span class="page-login__serif">.</span></p>
 
-      <UForm :state="state" :validate="validate" class="page-login__form" @submit="onSubmit">
+      <UForm :state="state" :validate="validate" novalidate class="page-login__form" @submit="onSubmit">
         <UFormField name="username" :label="$t('common.username')">
           <UInput v-model="state.username" autocomplete="username" class="w-full" />
         </UFormField>

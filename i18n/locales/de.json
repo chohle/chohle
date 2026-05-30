@@ -414,7 +414,8 @@
     "invoiceAmountChf": "Rechnungsbetrag CHF"
   },
   "validation": {
-    "required": "Dieses Feld ist erforderlich",
+    "required": "Dieses Feld muss ausgefüllt werden",
+    "email": "Bitte eine gültige E-Mail-Adresse eingeben",
     "positive": "Muss grösser als 0 sein"
   },
   "common": {

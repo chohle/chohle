@@ -97,7 +97,7 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
       :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" class="space-y-6" @submit="save">
+        <UForm ref="formRef" :state="form" :validate="validate" novalidate class="space-y-6" @submit="save">
           <div class="category-form__preview">
             <span class="category-form__ico">
               <UIcon :name="form.icon" class="size-5" />

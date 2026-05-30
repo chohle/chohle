@@ -109,9 +109,26 @@ async function openEdit(id: number) {
 }
 
 const formRef = ref()
+// Basic RFC-ish check — good enough to catch typos like "aadsf" without
+// rejecting valid edge cases. Server is the source of truth.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 function validate(state: typeof form) {
   const errors: { name: string, message: string }[] = []
-  if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
+  const req = (key: keyof typeof state, fieldName: string) => {
+    const v = state[key]
+    if (typeof v !== 'string' || !v.trim()) errors.push({ name: fieldName, message: t('validation.required') })
+  }
+  req('name', 'name')
+  req('email', 'email')
+  if (state.email?.trim() && !EMAIL_RE.test(state.email.trim())) {
+    errors.push({ name: 'email', message: t('validation.email') })
+  }
+  req('phone', 'phone')
+  req('street', 'street')
+  req('zip', 'zip')
+  req('city', 'city')
+  req('country', 'country')
   return errors
 }
 
@@ -211,7 +228,7 @@ async function remove(id: number) {
       :ui="{ content: 'max-w-full sm:max-w-xl' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" class="space-y-6" @submit="save">
+        <UForm ref="formRef" :state="form" :validate="validate" :validate-on="['input', 'blur']" novalidate class="space-y-6" @submit="save">
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.details') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
@@ -236,8 +253,8 @@ async function remove(id: number) {
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.secContact') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField :label="$t('customers.email')"><UInput v-model="form.email" type="email" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.phone')"><UInput v-model="form.phone" class="w-full" /></UFormField>
+              <UFormField name="email" :label="$t('customers.email')"><UInput v-model="form.email" inputmode="email" autocomplete="email" class="w-full" /></UFormField>
+              <UFormField name="phone" :label="$t('customers.phone')"><UInput v-model="form.phone" class="w-full" /></UFormField>
               <UFormField :label="$t('customers.website')"><UInput v-model="form.website" class="w-full" /></UFormField>
               <UFormField :label="$t('customers.social')"><UInput v-model="form.social" class="w-full" /></UFormField>
             </div>
@@ -246,10 +263,10 @@ async function remove(id: number) {
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.secAddress') }}</h3>
             <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField :label="$t('customers.street')" class="sm:col-span-2"><UInput v-model="form.street" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.zip')"><UInput v-model="form.zip" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.city')"><UInput v-model="form.city" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.country')"><UInput v-model="form.country" class="w-full" /></UFormField>
+              <UFormField name="street" :label="$t('customers.street')" class="sm:col-span-2"><UInput v-model="form.street" class="w-full" /></UFormField>
+              <UFormField name="zip" :label="$t('customers.zip')"><UInput v-model="form.zip" class="w-full" /></UFormField>
+              <UFormField name="city" :label="$t('customers.city')"><UInput v-model="form.city" class="w-full" /></UFormField>
+              <UFormField name="country" :label="$t('customers.country')"><UInput v-model="form.country" class="w-full" /></UFormField>
             </div>
           </div>
 

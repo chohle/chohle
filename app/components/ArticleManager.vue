@@ -120,7 +120,7 @@ function chf(rappen: number) {
       :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+        <UForm ref="formRef" :state="form" :validate="validate" novalidate class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
           <UFormField name="name" :label="$t('common.name')" class="sm:col-span-2">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>

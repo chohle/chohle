@@ -31,6 +31,19 @@ const typeItems = computed(() => [
   { label: t('customers.typeCompany'), value: 'company' }
 ])
 
+// Basic RFC-ish check — good enough to catch typos like "aadsf" without
+// rejecting valid edge cases. Server is the source of truth.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function validate(state: typeof form) {
+  const errors: { name: string, message: string }[] = []
+  if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
+  if (!state.email.trim()) errors.push({ name: 'email', message: t('validation.required') })
+  else if (!EMAIL_RE.test(state.email.trim())) errors.push({ name: 'email', message: t('validation.email') })
+  if (!state.iban.trim()) errors.push({ name: 'iban', message: t('validation.required') })
+  return errors
+}
+
 const saving = ref(false)
 async function save() {
   saving.value = true
@@ -46,7 +59,7 @@ async function save() {
     <UiPageHead crumb="System / Billing" :title="$t('user.billing')" :subtitle="$t('billing.subtitle')" />
 
     <UiCard>
-      <form class="page-billing__form" @submit.prevent="save">
+      <UForm :state="form" :validate="validate" :validate-on="['input', 'blur']" novalidate class="page-billing__form" @submit="save">
         <LogoUpload
           :src="logoSrc"
           upload-url="/api/sender/logo"
@@ -63,15 +76,15 @@ async function save() {
         <h3 class="eyebrow">Business details</h3>
 
         <div class="grid sm:grid-cols-2 gap-4">
-          <UFormField :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')" class="sm:col-span-2">
+          <UFormField name="name" :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')" class="sm:col-span-2">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
           <UFormField :label="$t('customers.street')" class="sm:col-span-2"><UInput v-model="form.street" class="w-full" /></UFormField>
           <UFormField :label="$t('customers.zip')"><UInput v-model="form.zip" class="w-full" /></UFormField>
           <UFormField :label="$t('customers.city')"><UInput v-model="form.city" class="w-full" /></UFormField>
           <UFormField :label="$t('customers.country')"><UInput v-model="form.country" class="w-full" /></UFormField>
-          <UFormField :label="$t('billing.iban')"><UInput v-model="form.iban" class="w-full" /></UFormField>
-          <UFormField :label="$t('customers.email')"><UInput v-model="form.email" type="email" class="w-full" /></UFormField>
+          <UFormField name="iban" :label="$t('billing.iban')"><UInput v-model="form.iban" class="w-full" /></UFormField>
+          <UFormField name="email" :label="$t('customers.email')"><UInput v-model="form.email" inputmode="email" autocomplete="email" class="w-full" /></UFormField>
           <UFormField :label="$t('customers.phone')"><UInput v-model="form.phone" class="w-full" /></UFormField>
           <UFormField :label="$t('customers.website')" class="sm:col-span-2"><UInput v-model="form.website" class="w-full" /></UFormField>
         </div>
@@ -89,7 +102,7 @@ async function save() {
         <div class="page-billing__foot">
           <button type="submit" class="ed-btn-primary" :disabled="saving">{{ $t('common.save') }}</button>
         </div>
-      </form>
+      </UForm>
     </UiCard>
   </div>
 </template>

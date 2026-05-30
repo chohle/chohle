@@ -46,7 +46,7 @@ async function changePassword() {
     <UiSectionLabel>{{ $t('profile.changePassword') }}</UiSectionLabel>
 
     <UiCard>
-      <UForm :state="form" :validate="validate" class="page-profile__form" @submit="changePassword">
+      <UForm :state="form" :validate="validate" novalidate class="page-profile__form" @submit="changePassword">
         <UFormField name="current" :label="$t('profile.currentPassword')">
           <UInput v-model="form.current" type="password" autocomplete="current-password" class="w-full" />
         </UFormField>

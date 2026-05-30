@@ -155,9 +155,16 @@ function openEdit(d: Deal) {
 }
 
 const formRef = ref()
+// Basic RFC-ish check — good enough to catch typos like "aadsf" without
+// rejecting valid edge cases. Server is the source of truth.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 function validate(state: FormState) {
   const errors: { name: string; message: string }[] = []
   if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
+  if (!state.email.trim()) errors.push({ name: 'email', message: t('validation.required') })
+  else if (!EMAIL_RE.test(state.email.trim())) errors.push({ name: 'email', message: t('validation.email') })
+  if (!state.phone.trim()) errors.push({ name: 'phone', message: t('validation.required') })
   return errors
 }
 
@@ -363,15 +370,15 @@ function goToDetail(d: Deal) {
       :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" class="flex flex-col gap-4" @submit="save">
+        <UForm ref="formRef" :state="form" :validate="validate" :validate-on="['input', 'blur']" novalidate class="flex flex-col gap-4" @submit="save">
           <UFormField name="name" :label="direction === 'procurement' ? $t('pipeline.vendorName') : $t('pipeline.dealName')">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
           <div class="grid sm:grid-cols-2 gap-3">
-            <UFormField :label="$t('customers.email')">
-              <UInput v-model="form.email" type="email" class="w-full" />
+            <UFormField name="email" :label="$t('customers.email')">
+              <UInput v-model="form.email" inputmode="email" autocomplete="email" class="w-full" />
             </UFormField>
-            <UFormField :label="$t('customers.phone')">
+            <UFormField name="phone" :label="$t('customers.phone')">
               <UInput v-model="form.phone" class="w-full" />
             </UFormField>
           </div>

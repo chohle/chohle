@@ -414,7 +414,8 @@
     "invoiceAmountChf": "Importo fattura CHF"
   },
   "validation": {
-    "required": "Questo campo è obbligatorio",
+    "required": "Questo campo deve essere compilato",
+    "email": "Inserisci un indirizzo email valido",
     "positive": "Deve essere maggiore di 0"
   },
   "common": {

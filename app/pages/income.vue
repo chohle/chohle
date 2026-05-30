@@ -165,7 +165,7 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
       :ui="{ content: 'max-w-full sm:max-w-xl' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+        <UForm ref="formRef" :state="form" :validate="validate" novalidate class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
           <UFormField name="company" :label="$t('income.company')" class="sm:col-span-2">
             <UInput v-model="form.company" class="w-full" />
           </UFormField>
