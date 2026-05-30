@@ -145,8 +145,13 @@
   },
   "search": {
     "placeholder": "Suchen ...",
-    "hint": "Tippe, um Rechnungen, Kunden, Artikel und Ausgaben zu durchsuchen.",
-    "empty": "Keine Treffer."
+    "hint": "Tippe, um Rechnungen, Kunden, Artikel, Ausgaben und Deals zu durchsuchen.",
+    "empty": "Keine Treffer.",
+    "scopeLabel": "Suchbereich",
+    "scope": {
+      "all": "Alle",
+      "deals": "Deals"
+    }
   },
   "errors": {
     "notFoundTitle": "Hier ist nichts",

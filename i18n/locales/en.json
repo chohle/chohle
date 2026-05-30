@@ -144,8 +144,13 @@
   },
   "search": {
     "placeholder": "Search ...",
-    "hint": "Type to search invoices, customers, articles, and expenses.",
-    "empty": "No matches."
+    "hint": "Type to search invoices, customers, articles, expenses, and deals.",
+    "empty": "No matches.",
+    "scopeLabel": "Search scope",
+    "scope": {
+      "all": "All",
+      "deals": "Deals"
+    }
   },
   "errors": {
     "notFoundTitle": "Nothing here",

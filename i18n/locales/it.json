@@ -145,8 +145,13 @@
   },
   "search": {
     "placeholder": "Cerca ...",
-    "hint": "Digita per cercare fatture, clienti, articoli e spese.",
-    "empty": "Nessun risultato."
+    "hint": "Digita per cercare fatture, clienti, articoli, spese e deals.",
+    "empty": "Nessun risultato.",
+    "scopeLabel": "Ambito di ricerca",
+    "scope": {
+      "all": "Tutti",
+      "deals": "Deals"
+    }
   },
   "errors": {
     "notFoundTitle": "Qui non c'è nulla",
