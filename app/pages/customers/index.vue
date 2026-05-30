@@ -14,25 +14,28 @@ const { data: customers, refresh } = await useFetch<CustomerRow[]>('/api/custome
   default: () => []
 })
 
-const filter = ref<'all' | 'company' | 'person'>('all')
-const filterOptions = [
-  { value: 'all', label: 'All' },
-  { value: 'company', label: 'Companies' },
-  { value: 'person', label: 'People' }
-]
+type SortKey = 'nameAsc' | 'nameDesc'
 
-const grouped = computed(() => {
+const filter = ref<'all' | 'company' | 'person'>('all')
+const sortKey = ref<SortKey>('nameAsc')
+
+const filterOptions = computed(() => [
+  { value: 'all',     label: `${t('customers.filterAll')} (${customers.value.length})` },
+  { value: 'company', label: `${t('customers.filterCompany')} (${customers.value.filter(c => c.type === 'company').length})` },
+  { value: 'person',  label: `${t('customers.filterPerson')} (${customers.value.filter(c => c.type === 'person').length})` }
+])
+
+const sortItems = computed(() => [
+  { value: 'nameAsc',  label: t('customers.sortNameAsc') },
+  { value: 'nameDesc', label: t('customers.sortNameDesc') }
+])
+
+const visibleRows = computed(() => {
   const collator = new Intl.Collator(locale.value, { sensitivity: 'base' })
   const rows = customers.value.filter(c => filter.value === 'all' || c.type === filter.value)
-  const sorted = [...rows].sort((a, b) => collator.compare(a.name, b.name))
-  const groups = new Map<string, CustomerRow[]>()
-  for (const row of sorted) {
-    const first = row.name.trim().charAt(0).toLocaleUpperCase(locale.value) || '#'
-    const key = /[A-Z]/.test(first) ? first : '#'
-    if (!groups.has(key)) groups.set(key, [])
-    groups.get(key)!.push(row)
-  }
-  return [...groups.entries()].map(([letter, rows]) => ({ letter, rows }))
+  return [...rows].sort((a, b) => sortKey.value === 'nameDesc'
+    ? collator.compare(b.name, a.name)
+    : collator.compare(a.name, b.name))
 })
 
 const typeItems = computed(() => [
@@ -155,14 +158,13 @@ async function remove(id: number) {
   <div>
     <UiPageHead :crumb="`${$t('nav.workspace')} / ${$t('nav.customers')}`" :title="$t('nav.customers')" :subtitle="$t('customers.subtitle')">
       <template #actions>
-        <UiSegmentedControl v-model="filter" :options="filterOptions" />
         <button class="ed-btn-primary" @click="openCreate">
           <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('customers.add') }}
         </button>
       </template>
     </UiPageHead>
 
-    <UiCard>
+    <UiCard :flush="true">
       <EmptyState
         v-if="!customers.length"
         icon="i-lucide-users"
@@ -175,20 +177,35 @@ async function remove(id: number) {
           </button>
         </template>
       </EmptyState>
-      <div v-else class="ed-scroll"><table class="ed-table">
-        <thead>
-          <tr>
-            <th>{{ $t('customers.colCustomer') }}</th>
-            <th>{{ $t('customers.colNumber') }}</th>
-            <th>{{ $t('customers.city') }}</th>
-            <th>{{ $t('customers.paymentTerm') }}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="g in grouped" :key="g.letter">
-            <tr class="letter-row"><td colspan="5"><span class="mono">{{ g.letter }}</span></td></tr>
-            <tr v-for="c in g.rows" :key="c.id" class="row">
+      <template v-else>
+        <div class="cust-toolbar">
+          <UiSegmentedControl v-model="filter" :options="filterOptions" />
+          <div class="cust-toolbar__spacer" />
+          <USelect
+            v-model="sortKey"
+            :items="sortItems"
+            value-key="value"
+            class="cust-sort"
+            :aria-label="$t('customers.sortLabel')"
+            icon="i-lucide-arrow-up-down"
+          />
+        </div>
+
+        <div class="ed-scroll"><table class="ed-table">
+          <thead>
+            <tr>
+              <th>{{ $t('customers.colCustomer') }}</th>
+              <th>{{ $t('customers.colNumber') }}</th>
+              <th>{{ $t('customers.city') }}</th>
+              <th>{{ $t('customers.paymentTerm') }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="!visibleRows.length" class="cust-empty-row">
+              <td colspan="5">{{ $t('customers.noMatches') }}</td>
+            </tr>
+            <tr v-for="c in visibleRows" :key="c.id" class="row">
               <td>
                 <div class="cust">
                   <UAvatar :alt="c.name" size="2xs" />
@@ -217,9 +234,9 @@ async function remove(id: number) {
                 </button>
               </td>
             </tr>
-          </template>
-        </tbody>
-      </table></div>
+          </tbody>
+        </table></div>
+      </template>
     </UiCard>
 
     <USlideover

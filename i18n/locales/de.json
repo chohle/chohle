@@ -186,7 +186,6 @@
     "emailTemplateSaved": "E-Mail-Vorlage gespeichert",
     "languageConfirmTitle": "Sprache ändern?",
     "languageConfirmText": "Die gesamte App wird sofort auf die gewählte Sprache umgestellt.",
-    "cornerRadius": "Eckenradius",
     "theme": "Theme"
   },
   "dashboard": {
@@ -310,7 +309,14 @@
     "noInvoicesTitle": "Noch keine Rechnungen",
     "noInvoicesText": "Erstelle die erste Rechnung für diesen Kunden.",
     "kpiTotalBilled": "Gesamt fakturiert",
-    "kpiPaid": "Bezahlt"
+    "kpiPaid": "Bezahlt",
+    "filterAll": "Alle",
+    "filterCompany": "Firmen",
+    "filterPerson": "Personen",
+    "sortLabel": "Sortieren nach",
+    "sortNameAsc": "Name A → Z",
+    "sortNameDesc": "Name Z → A",
+    "noMatches": "Keine Kunden entsprechen deinen Filtern."
   },
   "articles": {
     "subtitle": "Wiederverwendbare Positionen für alle Kunden.",

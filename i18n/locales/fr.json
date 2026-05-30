@@ -186,7 +186,6 @@
     "emailTemplateSaved": "Modèle d'e-mail enregistré",
     "languageConfirmTitle": "Changer de langue ?",
     "languageConfirmText": "Toute l'application passera immédiatement à la langue sélectionnée.",
-    "cornerRadius": "Rayon des coins",
     "theme": "Thème"
   },
   "dashboard": {
@@ -310,7 +309,14 @@
     "noInvoicesTitle": "Aucune facture",
     "noInvoicesText": "Créez la première facture pour ce client.",
     "kpiTotalBilled": "Total facturé",
-    "kpiPaid": "Payé"
+    "kpiPaid": "Payé",
+    "filterAll": "Tous",
+    "filterCompany": "Entreprises",
+    "filterPerson": "Particuliers",
+    "sortLabel": "Trier par",
+    "sortNameAsc": "Nom A → Z",
+    "sortNameDesc": "Nom Z → A",
+    "noMatches": "Aucun client ne correspond à vos filtres."
   },
   "articles": {
     "subtitle": "Postes réutilisables partagés entre tous les clients.",

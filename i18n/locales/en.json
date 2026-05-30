@@ -186,7 +186,6 @@
     "emailTemplateSaved": "Email template saved",
     "languageConfirmTitle": "Change language?",
     "languageConfirmText": "The whole app will switch to the selected language right away.",
-    "cornerRadius": "Corner radius",
     "theme": "Theme"
   },
   "dashboard": {
@@ -310,7 +309,14 @@
     "noInvoicesTitle": "No invoices yet",
     "noInvoicesText": "Create the first invoice for this customer.",
     "kpiTotalBilled": "Total billed",
-    "kpiPaid": "Paid"
+    "kpiPaid": "Paid",
+    "filterAll": "All",
+    "filterCompany": "Companies",
+    "filterPerson": "People",
+    "sortLabel": "Sort by",
+    "sortNameAsc": "Name A → Z",
+    "sortNameDesc": "Name Z → A",
+    "noMatches": "No customers match your filters."
   },
   "articles": {
     "subtitle": "Reusable line items shared across all customers.",

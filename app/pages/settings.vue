@@ -2,7 +2,7 @@
 const { t } = useI18n()
 const toast = useToast()
 const { current, options, set } = useAppLocale()
-const { tweaks, setTheme, setRadius } = useTweaks()
+const { tweaks, setTheme } = useTweaks()
 
 const { data: sender } = await useFetch<{ email_template: string }>('/api/sender')
 const template = ref(sender.value?.email_template ?? '')
@@ -87,20 +87,6 @@ const themes = [
             </button>
           </div>
 
-          <UiSectionLabel>{{ $t('settings.cornerRadius') }}</UiSectionLabel>
-          <div class="radius">
-            <input
-              type="range"
-              min="0"
-              max="20"
-              :value="tweaks.radius"
-              @input="setRadius(Number(($event.target as HTMLInputElement).value))"
-            >
-            <div class="radius-meta mono">
-              <span>{{ tweaks.radius }} px</span>
-              <span class="muted">Live preview</span>
-            </div>
-          </div>
         </template>
 
         <template v-else-if="tab === 'general'">

@@ -1,10 +1,15 @@
 .ed-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+
+  // Cards use the stronger border so they read as distinct containers on a
+  // matching white surface (matches the design's "borders do the work" rule).
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 24px;
 
   @media (max-width: 700px) {
     padding: 16px;
   }
+
+  &--flush { padding: 0; }
 }

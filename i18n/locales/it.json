@@ -186,7 +186,6 @@
     "emailTemplateSaved": "Modello e-mail salvato",
     "languageConfirmTitle": "Cambiare lingua?",
     "languageConfirmText": "L'intera app passerà subito alla lingua selezionata.",
-    "cornerRadius": "Raggio degli angoli",
     "theme": "Tema"
   },
   "dashboard": {
@@ -310,7 +309,14 @@
     "noInvoicesTitle": "Nessuna fattura",
     "noInvoicesText": "Crea la prima fattura per questo cliente.",
     "kpiTotalBilled": "Totale fatturato",
-    "kpiPaid": "Pagato"
+    "kpiPaid": "Pagato",
+    "filterAll": "Tutti",
+    "filterCompany": "Aziende",
+    "filterPerson": "Privati",
+    "sortLabel": "Ordina per",
+    "sortNameAsc": "Nome A → Z",
+    "sortNameDesc": "Nome Z → A",
+    "noMatches": "Nessun cliente corrisponde ai tuoi filtri."
   },
   "articles": {
     "subtitle": "Voci riutilizzabili condivise tra tutti i clienti.",

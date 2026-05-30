@@ -7,9 +7,15 @@ interface Article {
   default_mwst: number
 }
 
-const props = defineProps<{ listUrl: string, createUrl: string }>()
+// `headless` hides the built-in eyebrow + Add button so the parent page can
+// own the "Add article" trigger from its own page head. Without this flag the
+// component still renders its own header (used inside the customer-detail
+// tab where there's no page-head to host it).
+const props = defineProps<{ listUrl: string, createUrl: string, headless?: boolean }>()
 const { t } = useI18n()
 const formRef = ref()
+
+defineExpose({ openCreate })
 
 const { data: articles, refresh } = await useFetch<Article[]>(props.listUrl, { default: () => [] })
 const { data: sender } = await useFetch<{ vat_registered: number }>('/api/sender')
@@ -33,7 +39,10 @@ const hasMwst = computed({
   set: (v: boolean) => { form.mwst = v ? (form.mwst > 0 ? form.mwst : 8.1) : 0 }
 })
 
-function openCreate() { Object.assign(form, blank()); open.value = true }
+function openCreate() {
+  Object.assign(form, blank())
+  open.value = true
+}
 function openEdit(a: Article) {
   Object.assign(form, { id: a.id, name: a.name, unit: a.unit, price: a.default_price_rappen / 100, mwst: a.default_mwst })
   open.value = true
@@ -70,7 +79,7 @@ function chf(rappen: number) {
 
 <template>
   <div class="article-manager">
-    <div v-if="articles.length" class="article-manager__head">
+    <div v-if="articles.length && !headless" class="article-manager__head">
       <div class="eyebrow">{{ articles.length }} {{ $t('nav.articles') }}</div>
       <button class="ed-btn-primary" @click="openCreate">
         <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('articles.add') }}

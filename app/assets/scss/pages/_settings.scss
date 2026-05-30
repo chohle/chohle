@@ -91,7 +91,7 @@
     width: 38%;
     height: 6px;
     background: #0A0A0A;
-    border-radius: 2px;
+    border-radius: 0;
   }
 
   .sw-bar {
@@ -101,7 +101,7 @@
     width: 64%;
     height: 4px;
     background: rgba(0, 0, 0, .18);
-    border-radius: 2px;
+    border-radius: 0;
   }
 
   .th-name {
@@ -111,17 +111,6 @@
     letter-spacing: 0.12em;
   }
 
-  .radius input[type="range"] { width: 100%; }
-  .radius-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-
-    .muted { color: var(--ink-3); }
-  }
 
   .email-foot {
     display: flex;

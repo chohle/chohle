@@ -4,10 +4,9 @@ export type Theme = 'light' | 'warm' | 'dark'
 
 interface Tweaks {
   theme: Theme
-  radius: number
 }
 
-const DEFAULTS: Tweaks = { theme: 'light', radius: 4 }
+const DEFAULTS: Tweaks = { theme: 'light' }
 const STORAGE_KEY = 'batze.tweaks'
 
 const state = ref<Tweaks>({ ...DEFAULTS })
@@ -15,11 +14,7 @@ let initialised = false
 
 function apply(t: Tweaks) {
   if (typeof document === 'undefined') return
-  const html = document.documentElement
-  html.setAttribute('data-theme', t.theme)
-  html.style.setProperty('--radius', `${t.radius}px`)
-  html.style.setProperty('--radius-sm', `${Math.max(0, t.radius - 1)}px`)
-  html.style.setProperty('--radius-xs', `${Math.max(0, t.radius - 2)}px`)
+  document.documentElement.setAttribute('data-theme', t.theme)
 }
 
 export function useTweaks() {
@@ -27,13 +22,16 @@ export function useTweaks() {
     initialised = true
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) Object.assign(state.value, JSON.parse(raw))
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Tweaks>
+        // Older clients persisted a `radius` field — ignore it silently
+        // so removing the setting doesn't blow up on existing installs.
+        if (parsed.theme) state.value.theme = parsed.theme
+      }
     } catch {}
     apply(state.value)
 
     // Detached scope so the watcher survives the first caller's unmount.
-    // Without this the persistence + apply() effect dies whichever component
-    // happened to call useTweaks() first.
     const scope = effectScope(true)
     scope.run(() => {
       watch(state, (v) => {
@@ -45,7 +43,6 @@ export function useTweaks() {
 
   return {
     tweaks: state,
-    setTheme(theme: Theme) { state.value.theme = theme },
-    setRadius(radius: number) { state.value.radius = Math.max(0, Math.min(20, radius)) }
+    setTheme(theme: Theme) { state.value.theme = theme }
   }
 }
