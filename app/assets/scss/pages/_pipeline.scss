@@ -1,0 +1,211 @@
+.page-pipeline {
+  &__strong { font-weight: 500; color: var(--ink); }
+
+  // Vertrieb / Einkauf sub-nav in the head actions row. Each link is a
+  // real route so direction state can't desync from the URL.
+  &__tabs {
+    display: inline-flex;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 2px;
+    background: var(--surface);
+  }
+
+  &__tab {
+    padding: 5px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: color .12s ease, background-color .12s ease;
+
+    &:hover { color: var(--ink-2); }
+    &[aria-selected="true"] { background: var(--ink); color: var(--accent-ink); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ink); }
+  }
+
+  // Kanban board — 4 fixed-width columns. On phones the whole row is
+  // horizontally scrollable so columns keep their full width.
+  &__board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+  }
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 14px 12px;
+    min-height: 200px;
+  }
+
+  &__col-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  &__col-title { display: inline-flex; align-items: center; gap: 8px; }
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  &__col-name {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  &__col-count {
+    font-size: 11px;
+    color: var(--ink-3);
+    padding: 1px 6px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+  }
+  &__col-total {
+    font-size: 11px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__col-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 60px;
+  }
+
+  // Ghost = placeholder where the dragged card will land. Drag = the
+  // floating card during the gesture.
+  &__ghost { opacity: 0.35; }
+  &__drag {
+    transform: rotate(-1deg);
+    box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.32);
+  }
+
+  // Dashed "+ Add deal" footer at the bottom of each column.
+  &__add {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px;
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--ink-3);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: color .12s ease, border-color .12s ease, background-color .12s ease;
+
+    &:hover { color: var(--ink); border-color: var(--ink); background: var(--surface); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ink); }
+  }
+
+  // --- Deal card ---
+  .deal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 12px 10px;
+    cursor: grab;
+    user-select: none;
+    transition: box-shadow .12s ease, border-color .12s ease;
+
+    &:hover {
+      border-color: var(--border-strong);
+      box-shadow: 0 4px 14px -8px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active { cursor: grabbing; }
+
+    &__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    &__title {
+      margin: 0;
+      font-size: 13.5px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    &__menu {
+      margin: -4px -4px 0 0;
+    }
+
+    &__label {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: var(--ink-2);
+      line-height: 1.45;
+    }
+
+    &__foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    &__value {
+      font-size: 12px;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    &__due {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: 0.04em;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    &__board {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 14px;
+      // Add a little vertical room so the box-shadow on drag isn't clipped.
+      padding: 4px 4px 12px;
+      margin: 0 -4px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    &__col {
+      flex: 0 0 280px;
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (max-width: 600px) {
+    &__col { flex: 0 0 86vw; }
+  }
+}

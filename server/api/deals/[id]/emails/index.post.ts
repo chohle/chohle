@@ -1,0 +1,82 @@
+interface Body {
+  subject?: string
+  to?: string
+  body_html?: string
+}
+
+interface SenderRow { email: string | null; name: string }
+interface DealRow {
+  id: number
+  customer_id: number | null
+}
+interface CustomerRow { email: string | null }
+
+function htmlToText(html: string): string {
+  // Tiny stripper for plaintext fallback. Good enough for email clients
+  // that fall back when there's no text/plain part.
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .trim()
+}
+
+export default defineEventHandler(async (event) => {
+  await requireUserSession(event)
+  const id = Number(getRouterParam(event, 'id'))
+  if (!Number.isFinite(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
+  }
+
+  const body = await readBody<Body>(event)
+  const subject = (body.subject ?? '').trim()
+  const html = (body.body_html ?? '').trim()
+  if (!subject || !html) {
+    throw createError({ statusCode: 400, statusMessage: 'subject and body required' })
+  }
+
+  const db = useDb()
+  const deal = db.prepare(`SELECT id, customer_id FROM deals WHERE id = ?`).get(id) as DealRow | undefined
+  if (!deal) throw createError({ statusCode: 404, statusMessage: 'deal not found' })
+
+  // Resolve the recipient: explicit body.to wins, otherwise pull from the
+  // linked customer record so the UI can default-fill the field.
+  let to = (body.to ?? '').trim()
+  if (!to && deal.customer_id) {
+    const c = db.prepare(`SELECT email FROM customers WHERE id = ?`).get(deal.customer_id) as CustomerRow | undefined
+    if (c?.email) to = c.email
+  }
+  if (!to) {
+    throw createError({ statusCode: 400, statusMessage: 'recipient address required' })
+  }
+
+  const sender = db.prepare(`SELECT email, name FROM sender WHERE id = 1`).get() as SenderRow | undefined
+  if (!sender?.email) {
+    throw createError({ statusCode: 400, statusMessage: 'configure a sender email in Billing first' })
+  }
+
+  // Pass the address object form so nodemailer encodes display names with
+  // special characters (quotes, commas, non-ASCII) into a valid RFC 5322 header.
+  const from = sender.name
+    ? { name: sender.name, address: sender.email }
+    : sender.email
+  const text = htmlToText(html)
+
+  try {
+    await getMailer().sendMail({ from, to, subject, html, text })
+  } catch (err) {
+    throw createError({ statusCode: 502, statusMessage: 'SMTP send failed', cause: err })
+  }
+
+  const info = db.prepare(
+    `INSERT INTO deal_emails (deal_id, direction, from_address, to_address, subject, body_html, body_text)
+     VALUES (?, 'outbound', ?, ?, ?, ?, ?)`
+  ).run(id, sender.email, to, subject, html, text)
+
+  return { id: info.lastInsertRowid }
+})

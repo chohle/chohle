@@ -113,6 +113,53 @@
   .nav-text { flex: 1; }
   .nav-count { font-size: 11px; color: var(--ink-3); }
 
+  // Parent group (collapsible) — same chrome as nav-item, plus a chevron.
+  // Buttons ship with appearance + content-box height that make them
+  // visibly taller than the sibling NuxtLink rows. Reset both so the
+  // group trigger matches the other items pixel-for-pixel.
+  .nav-group-trigger {
+    width: 100%;
+    box-sizing: border-box;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    margin: 0;
+    text-align: left;
+    cursor: pointer;
+    // Don't use the `font` shorthand — it expands to font-size:<inherited>
+    // and overrides the 13px from .nav-item (same specificity, declared later).
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: var(--ink-2);
+  }
+
+  .nav-chevron {
+    width: 12px;
+    height: 12px;
+    color: var(--ink-3);
+    transition: transform .15s ease;
+
+    &.open { transform: rotate(180deg); color: var(--ink); }
+  }
+
+  // Child list under an expanded group — kept visually quieter than peers.
+  .nav-children {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2px 11px; // align under the parent's icon centre
+    border-left: 1px solid var(--border);
+  }
+
+  .nav-child {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 12px;
+    font-size: 12px;
+
+    &.active::before { left: -1px; }
+  }
+
   .user {
     padding-top: 12px;
     border-top: 1px solid var(--border);
@@ -169,7 +216,9 @@
     }
 
     .nav-text,
-    .nav-count { display: none; }
+    .nav-count,
+    .nav-chevron,
+    .nav-children { display: none; }
 
     .nav-icon { width: 16px; height: 16px; }
 

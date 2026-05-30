@@ -261,6 +261,96 @@ const migrations: Migration[] = [
       ALTER TABLE invoices ADD COLUMN step INTEGER NOT NULL DEFAULT 0;
       UPDATE invoices SET step = 2 WHERE status IN ('sent', 'paid');
     `
+  },
+  {
+    name: '0022_deals',
+    // Sales pipeline / kanban deals. customer_id is optional so leads that
+    // aren't customers yet can live here as free-text names. position is a
+    // per-stage ordering used by the drag-and-drop UI.
+    up: `
+      CREATE TABLE deals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+        stage TEXT NOT NULL DEFAULT 'lead' CHECK (stage IN ('lead', 'contacted', 'proposal', 'won')),
+        label TEXT NOT NULL DEFAULT '',
+        value_rappen INTEGER NOT NULL DEFAULT 0,
+        due_date TEXT,
+        notes TEXT,
+        position INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX idx_deals_stage_position ON deals (stage, position);
+    `
+  },
+  {
+    name: '0023_deals_direction',
+    // Procurement pipeline alongside sales. SQLite can't alter CHECK
+    // constraints in place, so rebuild: copy rows into a new table with
+    // the expanded stage CHECK and a direction column, then swap.
+    //   sales      → stages: lead / contacted / proposal / won
+    //   procurement → stages: need / requested / received / accepted
+    // Existing rows default to direction='sales'.
+    up: `
+      DROP INDEX IF EXISTS idx_deals_stage_position;
+      CREATE TABLE deals_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+        direction TEXT NOT NULL DEFAULT 'sales' CHECK (direction IN ('sales', 'procurement')),
+        stage TEXT NOT NULL DEFAULT 'lead' CHECK (stage IN (
+          'lead', 'contacted', 'proposal', 'won',
+          'need', 'requested', 'received', 'accepted'
+        )),
+        label TEXT NOT NULL DEFAULT '',
+        value_rappen INTEGER NOT NULL DEFAULT 0,
+        due_date TEXT,
+        notes TEXT,
+        position INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      INSERT INTO deals_new (id, name, customer_id, direction, stage, label, value_rappen,
+                             due_date, notes, position, created_at, updated_at)
+        SELECT id, name, customer_id, 'sales', stage, label, value_rappen,
+               due_date, notes, position, created_at, updated_at
+        FROM deals;
+      DROP TABLE deals;
+      ALTER TABLE deals_new RENAME TO deals;
+      CREATE INDEX idx_deals_direction_stage_position ON deals (direction, stage, position);
+    `
+  },
+  {
+    name: '0024_deal_emails',
+    // Per-deal email thread. Outbound rows are emails we sent through the
+    // SMTP transport; inbound rows are replies the user pasted in manually
+    // (no IMAP polling — the user owns logging incoming messages).
+    up: `
+      CREATE TABLE deal_emails (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+        direction TEXT NOT NULL CHECK (direction IN ('outbound', 'inbound')),
+        from_address TEXT,
+        to_address TEXT,
+        subject TEXT NOT NULL DEFAULT '',
+        body_html TEXT NOT NULL DEFAULT '',
+        body_text TEXT NOT NULL DEFAULT '',
+        sent_at TEXT NOT NULL DEFAULT (datetime('now')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX idx_deal_emails_deal_sent_at ON deal_emails (deal_id, sent_at);
+    `
+  },
+  {
+    name: '0025_deals_contact',
+    // Inline contact fields so a deal can carry a lead's name + email
+    // before any customer record exists. When customer_id IS set, these
+    // fall back to the customer's own contact details on read.
+    up: `
+      ALTER TABLE deals ADD COLUMN email TEXT;
+      ALTER TABLE deals ADD COLUMN phone TEXT;
+    `
   }
 ]
 
