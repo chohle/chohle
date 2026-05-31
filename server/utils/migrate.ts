@@ -505,6 +505,38 @@ const migrations: Migration[] = [
       ALTER TABLE invoices_new RENAME TO invoices;
       CREATE INDEX idx_invoices_project_id ON invoices (project_id);
     `
+  },
+  {
+    name: '0030_email_sync_scaffolding',
+    // Capture each outbound email's RFC 5322 Message-ID so future sync
+    // workers can thread inbound replies via In-Reply-To / References headers
+    // (the "only log replies to mail we actually sent" rule). Also add a
+    // `mailboxes` table that the upcoming Microsoft Graph / Gmail / IMAP
+    // drivers will populate with one row per connected account.
+    up: `
+      ALTER TABLE project_emails ADD COLUMN message_id TEXT;
+      CREATE INDEX idx_project_emails_message_id ON project_emails (message_id);
+
+      CREATE TABLE mailboxes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider TEXT NOT NULL CHECK (provider IN ('outlook', 'gmail', 'imap')),
+        label TEXT NOT NULL DEFAULT '',
+        email_address TEXT,
+        -- Encrypted with BATZE_SECRET (see server/utils/secrets.ts).
+        access_token_enc TEXT,
+        refresh_token_enc TEXT,
+        token_expires_at TEXT,
+        -- IMAP only.
+        imap_host TEXT,
+        imap_port INTEGER,
+        imap_user TEXT,
+        imap_password_enc TEXT,
+        imap_tls INTEGER NOT NULL DEFAULT 1,
+        last_sync_at TEXT,
+        last_error TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+    `
   }
 ]
 

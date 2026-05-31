@@ -1,4 +1,18 @@
 {
+  "conversations": {
+    "title": "Conversazioni",
+    "subtitle": "Ogni email di ogni progetto, in un unico posto.",
+    "emptyTitle": "Ancora nessuna conversazione",
+    "emptyText": "Invia un'email da un progetto e il thread apparirà qui.",
+    "messages": "messaggi",
+    "sent": "inviati",
+    "received": "ricevuti",
+    "noSubject": "(senza oggetto)",
+    "noneInFilter": "Nessun messaggio corrisponde a questo filtro.",
+    "filterAll": "Tutti",
+    "filterSent": "Inviati",
+    "filterReceived": "Ricevuti"
+  },
   "activity": {
     "title": "Attività",
     "subtitle": "Tutto quello che è successo nel tuo workspace, dal più recente.",
@@ -44,6 +58,7 @@
     "articles": "Articoli",
     "categories": "Categorie",
     "activity": "Attività",
+    "conversations": "Conversazioni",
     "pipeline": "Pipeline",
     "vertrieb": "Vendite",
     "einkauf": "Acquisti",

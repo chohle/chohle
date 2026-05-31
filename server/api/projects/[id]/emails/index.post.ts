@@ -67,16 +67,21 @@ export default defineEventHandler(async (event) => {
     : sender.email
   const text = htmlToText(html)
 
+  // nodemailer returns the Message-ID it assigned (or that the SMTP server
+  // assigned). We persist it so the sync worker can thread inbound replies
+  // by matching their In-Reply-To / References headers against it.
+  let messageId: string | null = null
   try {
-    await getMailer().sendMail({ from, to, subject, html, text })
+    const sendInfo = await getMailer().sendMail({ from, to, subject, html, text })
+    messageId = (sendInfo as { messageId?: string }).messageId?.replace(/^<|>$/g, '') ?? null
   } catch (err) {
     throw createError({ statusCode: 502, statusMessage: 'SMTP send failed', cause: err })
   }
 
   const info = db.prepare(
-    `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text)
-     VALUES (?, 'outbound', ?, ?, ?, ?, ?)`
-  ).run(id, sender.email, to, subject, html, text)
+    `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text, message_id)
+     VALUES (?, 'outbound', ?, ?, ?, ?, ?, ?)`
+  ).run(id, sender.email, to, subject, html, text, messageId)
 
   return { id: info.lastInsertRowid }
 })

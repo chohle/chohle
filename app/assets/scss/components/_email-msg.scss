@@ -1,0 +1,56 @@
+// One email card in a thread. Shared by the project detail page and the
+// Conversations page.
+.email-msg {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  background: var(--surface);
+
+  &.is-inbound {
+    background: var(--surface-2);
+    border-style: dashed;
+  }
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+
+  &__dir { color: var(--ink); }
+
+  &__subject {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  &__body {
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.55;
+
+    p { margin: 0 0 0.75em; }
+    p:last-child { margin-bottom: 0; }
+    a { color: var(--ink); text-decoration: underline; }
+  }
+
+  &__body--text {
+    font-family: var(--font-sans);
+    white-space: pre-wrap;
+    margin: 0;
+  }
+
+  &__foot {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+}

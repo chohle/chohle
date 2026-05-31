@@ -38,6 +38,7 @@
 @use "components/email-editor";
 @use "components/command-palette";
 @use "components/project-picker";
+@use "components/email-msg";
 
 // Pages
 @use "pages/overview";
@@ -52,6 +53,7 @@
 @use "pages/activity";
 @use "pages/pipeline";
 @use "pages/deal-detail";
+@use "pages/conversations";
 @use "pages/categories";
 @use "pages/billing";
 @use "pages/profile";

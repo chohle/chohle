@@ -9,6 +9,7 @@
     "articles": "Articles",
     "categories": "Categories",
     "activity": "Activity",
+    "conversations": "Conversations",
     "pipeline": "Pipeline",
     "vertrieb": "Sales",
     "einkauf": "Procurement",
@@ -110,6 +111,20 @@
       "archive": "Archive",
       "archived": "Project archived"
     }
+  },
+  "conversations": {
+    "title": "Conversations",
+    "subtitle": "Every email exchanged on every project, in one place.",
+    "emptyTitle": "No conversations yet",
+    "emptyText": "Send an email from a project and the thread will show up here.",
+    "messages": "messages",
+    "sent": "sent",
+    "received": "received",
+    "noSubject": "(no subject)",
+    "noneInFilter": "No messages match this filter.",
+    "filterAll": "All",
+    "filterSent": "Sent",
+    "filterReceived": "Received"
   },
   "activity": {
     "title": "Activity",
