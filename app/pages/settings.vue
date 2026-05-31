@@ -32,10 +32,16 @@ interface MailboxRow {
 const { data: mailboxes, refresh: refreshMailboxes } = await useFetch<MailboxRow[]>('/api/mailboxes', { default: () => [] })
 
 const connectOpen = ref(false)
+const connectGmailOpen = ref(false)
 const connecting = ref(false)
 const outlookForm = reactive({
   clientId: '',
   tenantId: 'common',
+  label: ''
+})
+const gmailForm = reactive({
+  clientId: '',
+  clientSecret: '',
   label: ''
 })
 
@@ -46,12 +52,33 @@ function openConnectOutlook() {
   connectOpen.value = true
 }
 
+function openConnectGmail() {
+  gmailForm.clientId = ''
+  gmailForm.clientSecret = ''
+  gmailForm.label = ''
+  connectGmailOpen.value = true
+}
+
 async function startOutlookConnect() {
   connecting.value = true
   try {
     const { url } = await $fetch<{ url: string }>('/api/auth/outlook/start', {
       method: 'POST',
       body: { clientId: outlookForm.clientId.trim(), tenantId: outlookForm.tenantId.trim(), label: outlookForm.label.trim() }
+    })
+    window.location.href = url
+  } catch (err) {
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('settings.mailSync.connectFailed')
+    toast.add({ title: msg, color: 'error' })
+  } finally { connecting.value = false }
+}
+
+async function startGmailConnect() {
+  connecting.value = true
+  try {
+    const { url } = await $fetch<{ url: string }>('/api/auth/gmail/start', {
+      method: 'POST',
+      body: { clientId: gmailForm.clientId.trim(), clientSecret: gmailForm.clientSecret.trim(), label: gmailForm.label.trim() }
     })
     window.location.href = url
   } catch (err) {
@@ -249,13 +276,13 @@ const themes = [
                   <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.outlookDesc') }}</div>
                 </div>
               </button>
-              <div class="mail-sync__provider mail-sync__provider--soon">
+              <button class="mail-sync__provider" type="button" @click="openConnectGmail">
                 <UIcon name="i-lucide-mail" class="size-5" />
                 <div>
-                  <div class="mail-sync__provider-name">Gmail</div>
-                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.comingSoon') }}</div>
+                  <div class="mail-sync__provider-name">Google / Gmail</div>
+                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.gmailDesc') }}</div>
                 </div>
-              </div>
+              </button>
               <div class="mail-sync__provider mail-sync__provider--soon">
                 <UIcon name="i-lucide-mail" class="size-5" />
                 <div>
@@ -312,6 +339,32 @@ const themes = [
         <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="cancelChange">{{ t('common.cancel') }}</button>
           <button class="ed-btn-primary" :disabled="saving" @click="confirmChange">{{ t('common.confirm') }}</button>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="connectGmailOpen" :title="$t('settings.mailSync.gmailConnectTitle')">
+      <template #body>
+        <p class="note">{{ $t('settings.mailSync.gmailConnectHint') }}</p>
+        <form class="flex flex-col gap-3 mt-3" novalidate @submit.prevent="startGmailConnect">
+          <UFormField :label="$t('settings.mailSync.clientId')" :help="$t('settings.mailSync.gmailClientIdHelp')">
+            <UInput v-model="gmailForm.clientId" placeholder="123456789012-abc.apps.googleusercontent.com" class="w-full mono" />
+          </UFormField>
+          <UFormField :label="$t('settings.mailSync.clientSecret')" :help="$t('settings.mailSync.clientSecretHelp')">
+            <UInput v-model="gmailForm.clientSecret" type="password" class="w-full mono" />
+          </UFormField>
+          <UFormField :label="$t('settings.mailSync.connectionLabel')" :help="$t('settings.mailSync.connectionLabelHelp')">
+            <UInput v-model="gmailForm.label" placeholder="Work inbox" class="w-full" />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" @click="connectGmailOpen = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" :disabled="connecting || !gmailForm.clientId.trim() || !gmailForm.clientSecret.trim()" @click="startGmailConnect">
+            <UIcon name="i-lucide-external-link" class="size-3.5" />
+            {{ $t('settings.mailSync.signInWith', { provider: 'Google' }) }}
+          </button>
         </div>
       </template>
     </UModal>

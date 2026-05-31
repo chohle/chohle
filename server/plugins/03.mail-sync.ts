@@ -2,12 +2,13 @@
 //
 // Every BATZE_MAIL_SYNC_INTERVAL_MS (default 5 minutes) we walk every
 // connected mailbox and pull inbound replies via its provider driver
-// (currently only Outlook; Gmail and IMAP land in later PRs). The first
-// run fires 30s after boot so the app finishes hydrating before we
-// start hammering external APIs.
+// (Outlook + Gmail; IMAP lands in a later PR). The first run fires 30s
+// after boot so the app finishes hydrating before we start hammering
+// external APIs.
 
 import { secretIsAvailable } from '~~/server/utils/secrets'
 import { listOutlookMailboxes, recordSyncError, syncOutlookMailbox } from '~~/server/utils/outlookSync'
+import { listGmailMailboxes, syncGmailMailbox } from '~~/server/utils/gmailSync'
 
 const DEFAULT_INTERVAL_MS = 5 * 60 * 1000
 const FIRST_RUN_DELAY_MS = 30 * 1000
@@ -31,12 +32,24 @@ async function runOnce(): Promise<void> {
         try {
           const r = await syncOutlookMailbox(db, mailbox)
           if (r.inserted > 0) {
-            console.log(`[mail-sync] mailbox ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`)
+            console.log(`[mail-sync] outlook ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`)
           }
         } catch (err) {
           const msg = (err as { message?: string }).message ?? String(err)
           recordSyncError(db, mailbox.id, msg)
-          console.warn(`[mail-sync] mailbox ${mailbox.id} failed:`, msg)
+          console.warn(`[mail-sync] outlook ${mailbox.id} failed:`, msg)
+        }
+      }
+      for (const mailbox of listGmailMailboxes(db)) {
+        try {
+          const r = await syncGmailMailbox(db, mailbox)
+          if (r.inserted > 0) {
+            console.log(`[mail-sync] gmail ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`)
+          }
+        } catch (err) {
+          const msg = (err as { message?: string }).message ?? String(err)
+          recordSyncError(db, mailbox.id, msg)
+          console.warn(`[mail-sync] gmail ${mailbox.id} failed:`, msg)
         }
       }
     } catch (err) {

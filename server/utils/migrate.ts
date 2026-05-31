@@ -547,6 +547,16 @@ const migrations: Migration[] = [
       ALTER TABLE mailboxes ADD COLUMN provider_client_id TEXT;
       ALTER TABLE mailboxes ADD COLUMN provider_tenant_id TEXT;
     `
+  },
+  {
+    name: '0032_mailboxes_provider_client_secret',
+    // Google's Web OAuth client requires a client_secret on the token
+    // exchange even when PKCE is in use (only Desktop/Installed client
+    // types skip it, and those need loopback redirects which don't fit
+    // hosted batze). Stored encrypted at rest like the tokens.
+    up: `
+      ALTER TABLE mailboxes ADD COLUMN provider_client_secret_enc TEXT;
+    `
   }
 ]
 

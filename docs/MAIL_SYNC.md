@@ -10,7 +10,7 @@ setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
 | Provider                                    | Status      | Setup guide                          |
 | ------------------------------------------- | ----------- | ------------------------------------ |
 | Microsoft 365 / Outlook                     | Available   | [OUTLOOK_SYNC](OUTLOOK_SYNC.md)      |
-| Gmail / Google Workspace                    | Coming soon | (planned)                            |
+| Gmail / Google Workspace                    | Available   | [GMAIL_SYNC](GMAIL_SYNC.md)          |
 | IMAP (Proton Bridge, Fastmail, iCloud, …)   | Coming soon | (planned)                            |
 
 ## Requirements
@@ -26,10 +26,11 @@ setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
   with a key derived from this secret. Rotating it invalidates every
   stored mailbox connection; you'll have to reconnect.
 
-* For OAuth providers (Outlook, Gmail), batze runs the PKCE flow so no
-  client secret is needed. The user is the only one with the
-  credentials; batze stores only the tokens that result from a
-  consented sign in.
+* For OAuth providers (Outlook, Gmail), batze runs the PKCE flow.
+  Outlook works secret free; Google's Web OAuth client also requires
+  a client secret on token exchange, which batze stores encrypted at
+  rest. The user is the only one with the credentials; batze keeps
+  only the tokens that result from a consented sign in.
 
 ## Where to find it
 

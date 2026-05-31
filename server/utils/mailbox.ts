@@ -63,3 +63,35 @@ export function insertOutlookMailbox(db: import('better-sqlite3').Database, inpu
   )
   return Number(info.lastInsertRowid)
 }
+
+export interface InsertGmailMailboxInput {
+  label: string
+  emailAddress: string | null
+  accessToken: string
+  refreshToken: string
+  expiresInSeconds: number
+  clientId: string
+  clientSecret: string
+}
+
+// Same idea as insertOutlookMailbox but for Gmail. Google's Web OAuth
+// client requires a client_secret on the token exchange even with PKCE,
+// so we encrypt and store it alongside the tokens for the refresh flow.
+export function insertGmailMailbox(db: import('better-sqlite3').Database, input: InsertGmailMailboxInput): number {
+  const expiresAt = new Date(Date.now() + Math.max(0, input.expiresInSeconds) * 1000).toISOString()
+  const info = db.prepare(
+    `INSERT INTO mailboxes (provider, label, email_address, access_token_enc,
+                             refresh_token_enc, token_expires_at,
+                             provider_client_id, provider_client_secret_enc)
+     VALUES ('gmail', ?, ?, ?, ?, ?, ?, ?)`
+  ).run(
+    input.label.trim() || 'Gmail',
+    input.emailAddress,
+    encryptSecret(input.accessToken),
+    encryptSecret(input.refreshToken),
+    expiresAt,
+    input.clientId,
+    encryptSecret(input.clientSecret)
+  )
+  return Number(info.lastInsertRowid)
+}
