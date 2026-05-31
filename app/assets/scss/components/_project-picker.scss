@@ -12,7 +12,9 @@
     border: 1px solid var(--border-strong);
     background: var(--surface);
 
-    &:focus-within { border-color: var(--ink); }
+    &:focus-within {
+      border-color: var(--ink);
+    }
 
     input {
       flex: 1;
@@ -22,7 +24,9 @@
       font-size: 14px;
       color: var(--ink);
 
-      &::placeholder { color: var(--ink-3); }
+      &::placeholder {
+        color: var(--ink-3);
+      }
     }
   }
 
@@ -44,7 +48,9 @@
     overflow-y: auto;
   }
 
-  &__list li + li { border-top: 1px solid var(--border); }
+  &__list li + li {
+    border-top: 1px solid var(--border);
+  }
 
   &__item {
     width: 100%;
@@ -59,8 +65,13 @@
     color: var(--ink);
     font-size: 13.5px;
 
-    &:hover { background: var(--surface-2); }
-    &:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+    &:hover {
+      background: var(--surface-2);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: -2px;
+    }
 
     &--create {
       color: var(--ink);
@@ -68,11 +79,21 @@
     }
   }
 
-  &__item-icon { color: var(--ink-3); flex-shrink: 0; }
-  &__item-name { flex: 1; }
-  &__item-meta { font-size: 11px; color: var(--ink-3); }
+  &__item-icon {
+    color: var(--ink-3);
+    flex-shrink: 0;
+  }
+  &__item-name {
+    flex: 1;
+  }
+  &__item-meta {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
 
-  &__create-row { background: var(--surface-2); }
+  &__create-row {
+    background: var(--surface-2);
+  }
 
   &__form {
     display: flex;
@@ -91,7 +112,9 @@
     font-size: 12.5px;
     cursor: pointer;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
   }
 
   &__actions {

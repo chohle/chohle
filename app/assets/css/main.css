@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 /* Editorial mono styles live in app/assets/scss/main.scss
    loaded as a separate entry from nuxt.config.ts so Tailwind v4

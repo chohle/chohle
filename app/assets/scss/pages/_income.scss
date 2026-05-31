@@ -21,8 +21,14 @@
     gap: 8px;
   }
 
-  .src-meta { min-width: 0; }
-  .src-name { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .src-meta {
+    min-width: 0;
+  }
+  .src-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+  }
   .src-sub {
     font-size: 11px;
     color: var(--ink-3);
@@ -30,7 +36,10 @@
     letter-spacing: 0.1em;
   }
 
-  .src-actions { display: flex; gap: 4px; }
+  .src-actions {
+    display: flex;
+    gap: 4px;
+  }
   .src-amt {
     font-size: 24px;
     letter-spacing: -0.02em;
@@ -57,13 +66,19 @@
     border-top: 1px solid var(--border);
   }
 
-  .pay-date { font-size: 12px; color: var(--ink); margin-top: 2px; }
+  .pay-date {
+    font-size: 12px;
+    color: var(--ink);
+    margin-top: 2px;
+  }
   .reason {
     font-size: 10.5px;
     margin-top: 2px;
     color: var(--ink-2);
 
-    &.muted { color: var(--ink-3); }
+    &.muted {
+      color: var(--ink-3);
+    }
   }
 
   .src-pay {
@@ -84,11 +99,15 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
   }
 
   @media (max-width: 700px) {
-    .src-grid { grid-template-columns: 1fr; }
+    .src-grid {
+      grid-template-columns: 1fr;
+    }
 
     .src-foot {
       flex-direction: column;

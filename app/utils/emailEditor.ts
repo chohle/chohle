@@ -58,7 +58,5 @@ export const emailEditorItems = [
     { kind: 'imageUpload', icon: 'i-lucide-image' },
     { kind: 'horizontalRule', icon: 'i-lucide-minus' }
   ],
-  [
-    { kind: 'clearFormatting', icon: 'i-lucide-remove-formatting' }
-  ]
+  [{ kind: 'clearFormatting', icon: 'i-lucide-remove-formatting' }]
 ]

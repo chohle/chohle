@@ -12,7 +12,9 @@
     min-width: 0;
   }
 
-  &__crumb { color: var(--ink-3); }
+  &__crumb {
+    color: var(--ink-3);
+  }
 
   &__title {
     font-size: 36px;
@@ -42,12 +44,16 @@
     align-items: stretch;
     padding: 22px 0 18px;
 
-    &__title { font-size: 26px; }
+    &__title {
+      font-size: 26px;
+    }
     &__actions {
       flex-wrap: wrap;
       gap: 8px;
 
-      > * { flex: 1 1 auto; }
+      > * {
+        flex: 1 1 auto;
+      }
     }
   }
 }

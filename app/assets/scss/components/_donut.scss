@@ -18,5 +18,9 @@
     text-transform: uppercase;
   }
 
-  &__val { font-size: 22px; color: var(--ink); margin-top: 2px; }
+  &__val {
+    font-size: 22px;
+    color: var(--ink);
+    margin-top: 2px;
+  }
 }

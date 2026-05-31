@@ -3,7 +3,10 @@ export default defineEventHandler(async (event) => {
 
   const { currentPassword, newPassword } = await readBody(event)
   if (!currentPassword || !newPassword || String(newPassword).length < 8) {
-    throw createError({ statusCode: 400, statusMessage: 'New password must be at least 8 characters' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'New password must be at least 8 characters'
+    })
   }
 
   const db = useDb()

@@ -22,7 +22,9 @@
     margin-bottom: 6px;
   }
 
-  &__dir { color: var(--ink); }
+  &__dir {
+    color: var(--ink);
+  }
 
   &__subject {
     margin: 0 0 8px;
@@ -36,9 +38,16 @@
     color: var(--ink);
     line-height: 1.55;
 
-    p { margin: 0 0 0.75em; }
-    p:last-child { margin-bottom: 0; }
-    a { color: var(--ink); text-decoration: underline; }
+    p {
+      margin: 0 0 0.75em;
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
+    a {
+      color: var(--ink);
+      text-decoration: underline;
+    }
   }
 
   &__body--text {

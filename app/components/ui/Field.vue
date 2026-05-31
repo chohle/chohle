@@ -11,7 +11,7 @@ defineEmits<{ (e: 'update:modelValue', v: string): void }>()
         :value="modelValue"
         :placeholder="placeholder"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-      >
+      />
     </slot>
   </label>
 </template>

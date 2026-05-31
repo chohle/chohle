@@ -24,13 +24,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'project not found' })
   }
 
-  const rows = db.prepare(
-    `SELECT id, project_id, direction, from_address, to_address, subject,
+  const rows = db
+    .prepare(
+      `SELECT id, project_id, direction, from_address, to_address, subject,
             body_html, body_text, sent_at, created_at
      FROM project_emails
      WHERE project_id = ?
      ORDER BY sent_at ASC, id ASC`
-  ).all(id) as ProjectEmailRow[]
+    )
+    .all(id) as ProjectEmailRow[]
 
   return { rows }
 })

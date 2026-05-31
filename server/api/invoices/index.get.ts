@@ -37,9 +37,11 @@ export default defineEventHandler(async (event) => {
       else itemsByInvoice.set(r.invoice_id, [r])
     }
   }
-  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined)?.vat_registered
+  const vat = !!(
+    db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
+      | { vat_registered: number }
+      | undefined
+  )?.vat_registered
 
   return invoices.map((inv) => {
     const items = itemsByInvoice.get(inv.id) ?? []

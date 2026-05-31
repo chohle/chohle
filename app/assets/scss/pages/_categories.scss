@@ -55,7 +55,10 @@
     color: var(--ink-2);
     cursor: pointer;
 
-    &:hover { border-color: var(--border-strong); color: var(--ink); }
+    &:hover {
+      border-color: var(--border-strong);
+      color: var(--ink);
+    }
     &.is-active {
       background: var(--ink);
       color: var(--accent-ink);

@@ -20,10 +20,22 @@ async function onSignOut() {
 // A `Group` is a parent that holds children but isn't itself a route; it
 // renders as a collapsible header in the sidebar. A regular `Item` is a
 // link (with no children). `to` is required on items, omitted on groups.
-interface Item { label: string; icon: string; to: string; count?: number | string }
-interface Group { label: string; icon: string; children: Item[] }
+interface Item {
+  label: string
+  icon: string
+  to: string
+  count?: number | string
+}
+interface Group {
+  label: string
+  icon: string
+  children: Item[]
+}
 type Entry = Item | Group
-interface Section { label: string; items: Entry[] }
+interface Section {
+  label: string
+  items: Entry[]
+}
 
 function isGroup(e: Entry): e is Group {
   return 'children' in e
@@ -66,7 +78,7 @@ function isActive(to: string) {
 }
 
 function groupContainsRoute(g: Group) {
-  return g.children.some(c => isActive(c.to))
+  return g.children.some((c) => isActive(c.to))
 }
 
 // Per-group expanded state. Defaults to expanded if the current route lives
@@ -83,11 +95,15 @@ function toggleGroup(g: Group) {
 // dropdown menu so they remain reachable by click / keyboard instead of
 // being orphaned behind a label-only tooltip.
 function groupMenu(g: Group): DropdownMenuItem[][] {
-  return [g.children.map(c => ({
-    label: c.label,
-    icon: c.icon,
-    onSelect: () => { router.push(c.to) }
-  }))]
+  return [
+    g.children.map((c) => ({
+      label: c.label,
+      icon: c.icon,
+      onSelect: () => {
+        router.push(c.to)
+      }
+    }))
+  ]
 }
 
 const userMenu = computed<DropdownMenuItem[][]>(() => [
@@ -104,7 +120,7 @@ const userMenu = computed<DropdownMenuItem[][]>(() => [
   <aside class="app-sidebar" :class="{ 'is-open': mobileOpen, 'is-collapsed': isCollapsed }">
     <div class="brand">
       <NuxtLink to="/" class="brand-link" aria-label="batze">
-        <img v-if="!isCollapsed" src="/logo.svg" alt="batze" class="brand-logo">
+        <img v-if="!isCollapsed" src="/logo.svg" alt="batze" class="brand-logo" />
         <span v-else class="brand-mark" aria-hidden="true">b</span>
       </NuxtLink>
       <button
@@ -163,7 +179,11 @@ const userMenu = computed<DropdownMenuItem[][]>(() => [
               </button>
               <ul v-if="isExpanded(i)" class="nav-children">
                 <li v-for="c in i.children" :key="c.to">
-                  <NuxtLink :to="c.to" class="nav-item nav-child" :class="{ active: isActive(c.to) }">
+                  <NuxtLink
+                    :to="c.to"
+                    class="nav-item nav-child"
+                    :class="{ active: isActive(c.to) }"
+                  >
                     <UIcon :name="c.icon" class="nav-icon" />
                     <span class="nav-text">{{ c.label }}</span>
                   </NuxtLink>
@@ -192,7 +212,12 @@ const userMenu = computed<DropdownMenuItem[][]>(() => [
 
     <div class="user">
       <UDropdownMenu :items="userMenu" :ui="{ content: 'w-56' }">
-        <UTooltip :text="username" :delay-duration="0" :disabled="!isCollapsed" :content="{ side: 'right', sideOffset: 12 }">
+        <UTooltip
+          :text="username"
+          :delay-duration="0"
+          :disabled="!isCollapsed"
+          :content="{ side: 'right', sideOffset: 12 }"
+        >
           <button class="user-btn" :aria-label="username">
             <UAvatar :alt="username" size="2xs" />
             <span class="user-meta">

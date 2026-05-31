@@ -8,30 +8,36 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
 
   const expensesByMonth = Object.fromEntries(
-    (db
-      .prepare(
-        `SELECT substr(date, 1, 7) AS ym, SUM(amount_rappen) AS total
+    (
+      db
+        .prepare(
+          `SELECT substr(date, 1, 7) AS ym, SUM(amount_rappen) AS total
          FROM expenses WHERE substr(date, 1, 4) = ? GROUP BY ym`
-      )
-      .all(year) as Array<{ ym: string, total: number }>).map((r) => [r.ym, r.total])
+        )
+        .all(year) as Array<{ ym: string; total: number }>
+    ).map((r) => [r.ym, r.total])
   )
 
   const salaryByMonth = Object.fromEntries(
-    (db
-      .prepare(
-        `SELECT month AS ym, SUM(amount_rappen) AS total
+    (
+      db
+        .prepare(
+          `SELECT month AS ym, SUM(amount_rappen) AS total
          FROM income_payments WHERE substr(month, 1, 4) = ? GROUP BY ym`
-      )
-      .all(year) as Array<{ ym: string, total: number }>).map((r) => [r.ym, r.total])
+        )
+        .all(year) as Array<{ ym: string; total: number }>
+    ).map((r) => [r.ym, r.total])
   )
 
   const invoiceByMonth = Object.fromEntries(
-    (db
-      .prepare(
-        `SELECT substr(paid_at, 1, 7) AS ym, COALESCE(SUM(total_rappen), 0) AS total
+    (
+      db
+        .prepare(
+          `SELECT substr(paid_at, 1, 7) AS ym, COALESCE(SUM(total_rappen), 0) AS total
          FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 4) = ? GROUP BY ym`
-      )
-      .all(year) as Array<{ ym: string, total: number }>).map((r) => [r.ym, r.total])
+        )
+        .all(year) as Array<{ ym: string; total: number }>
+    ).map((r) => [r.ym, r.total])
   )
 
   const months = Array.from({ length: 12 }, (_, i) => {

@@ -7,9 +7,11 @@ export default defineNitroPlugin(() => {
     .all() as { id: number }[]
   if (!pending.length) return
 
-  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined)?.vat_registered
+  const vat = !!(
+    db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
+      | { vat_registered: number }
+      | undefined
+  )?.vat_registered
   const itemsStmt = db.prepare(
     'SELECT quantity, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?'
   )
@@ -18,7 +20,12 @@ export default defineNitroPlugin(() => {
   let filled = 0
   for (const { id } of pending) {
     try {
-      const items = itemsStmt.all(id) as Array<{ quantity: number, unit_price_rappen: number, discount_percent: number, mwst_percent: number }>
+      const items = itemsStmt.all(id) as Array<{
+        quantity: number
+        unit_price_rappen: number
+        discount_percent: number
+        mwst_percent: number
+      }>
       const { totalRappen } = computeInvoiceTotals(
         items.map((i) => ({
           quantity: i.quantity,

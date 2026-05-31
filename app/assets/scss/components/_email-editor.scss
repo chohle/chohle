@@ -14,7 +14,9 @@
     resize: vertical;
   }
 
-  &--fallback { background: var(--surface-2); }
+  &--fallback {
+    background: var(--surface-2);
+  }
 
   &__toolbar {
     border-bottom: 1px solid var(--border);

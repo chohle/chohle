@@ -50,5 +50,10 @@ export function decryptSecret(stored: string): string {
 // `secretIsAvailable` lets the UI surface a helpful "set BATZE_SECRET" hint
 // instead of failing the first encrypt() call deep in an OAuth callback.
 export function secretIsAvailable(): boolean {
-  try { getKey(); return true } catch { return false }
+  try {
+    getKey()
+    return true
+  } catch {
+    return false
+  }
 }

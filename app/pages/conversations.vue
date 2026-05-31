@@ -50,14 +50,14 @@ function pick(id: number) {
 // Right pane filter
 const filter = ref<'all' | 'inbound' | 'outbound'>('all')
 const filterOptions = computed(() => [
-  { value: 'all',      label: t('conversations.filterAll') },
-  { value: 'inbound',  label: t('conversations.filterReceived') },
+  { value: 'all', label: t('conversations.filterAll') },
+  { value: 'inbound', label: t('conversations.filterReceived') },
   { value: 'outbound', label: t('conversations.filterSent') }
 ])
 
-const messagesUrl = computed(() => selectedId.value
-  ? `/api/projects/${selectedId.value}/emails`
-  : null)
+const messagesUrl = computed(() =>
+  selectedId.value ? `/api/projects/${selectedId.value}/emails` : null
+)
 const { data: thread, refresh: refreshThread } = await useFetch<{ rows: ProjectEmail[] }>(
   messagesUrl,
   { default: () => ({ rows: [] }), watch: [messagesUrl] }
@@ -66,12 +66,17 @@ const { data: thread, refresh: refreshThread } = await useFetch<{ rows: ProjectE
 const filteredRows = computed(() => {
   const rows = thread.value?.rows ?? []
   if (filter.value === 'all') return rows
-  return rows.filter(r => r.direction === filter.value)
+  return rows.filter((r) => r.direction === filter.value)
 })
 
-const selectedThread = computed(() => threads.value.find(t => t.project_id === selectedId.value) ?? null)
+const selectedThread = computed(
+  () => threads.value.find((t) => t.project_id === selectedId.value) ?? null
+)
 
-const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = { sales: 'vertrieb', procurement: 'einkauf' }
+const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
+  sales: 'vertrieb',
+  procurement: 'einkauf'
+}
 
 function fmtTimestamp(s: string) {
   const ymd = s.slice(0, 10)
@@ -88,7 +93,9 @@ function sanitizeHtml(html: string) {
 const listRef = ref<HTMLElement>()
 watch(selectedId, async () => {
   await nextTick()
-  listRef.value?.querySelector<HTMLElement>('.conv-list__row.is-active')?.scrollIntoView({ block: 'nearest' })
+  listRef.value
+    ?.querySelector<HTMLElement>('.conv-list__row.is-active')
+    ?.scrollIntoView({ block: 'nearest' })
 })
 </script>
 
@@ -126,7 +133,9 @@ watch(selectedId, async () => {
             <span class="conv-list__count mono">{{ t.total }}</span>
           </div>
           <div class="conv-list__row-snippet">
-            <span class="conv-list__dir mono">{{ t.last_direction === 'inbound' ? '←' : '→' }}</span>
+            <span class="conv-list__dir mono">{{
+              t.last_direction === 'inbound' ? '←' : '→'
+            }}</span>
             {{ t.last_subject || $t('conversations.noSubject') }}
           </div>
         </button>
@@ -135,8 +144,13 @@ watch(selectedId, async () => {
       <section class="conv-thread">
         <header v-if="selectedThread" class="conv-thread__head">
           <div class="conv-thread__title-row">
-            <h2 class="conv-thread__title">{{ selectedThread.customer_name || selectedThread.project_name }}</h2>
-            <NuxtLink :to="`/${DIR_TO_SLUG[selectedThread.project_direction]}/${selectedThread.project_id}`" class="conv-thread__project-link mono">
+            <h2 class="conv-thread__title">
+              {{ selectedThread.customer_name || selectedThread.project_name }}
+            </h2>
+            <NuxtLink
+              :to="`/${DIR_TO_SLUG[selectedThread.project_direction]}/${selectedThread.project_id}`"
+              class="conv-thread__project-link mono"
+            >
               <UIcon name="i-lucide-kanban" class="size-3.5" />
               {{ selectedThread.project_name }}
             </NuxtLink>
@@ -159,15 +173,23 @@ watch(selectedId, async () => {
             :class="`is-${ev.direction}`"
           >
             <header class="email-msg__head">
-              <span class="mono email-msg__dir">{{ ev.direction === 'outbound' ? $t('pipeline.detail.sent') : $t('pipeline.detail.received') }}</span>
+              <span class="mono email-msg__dir">{{
+                ev.direction === 'outbound'
+                  ? $t('pipeline.detail.sent')
+                  : $t('pipeline.detail.received')
+              }}</span>
               <span class="mono email-msg__time">{{ fmtTimestamp(ev.sent_at) }}</span>
             </header>
             <h4 class="email-msg__subject">{{ ev.subject || $t('conversations.noSubject') }}</h4>
             <div v-if="ev.body_html" class="email-msg__body" v-html="sanitizeHtml(ev.body_html)" />
-            <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{ ev.body_text }}</pre>
+            <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{
+              ev.body_text
+            }}</pre>
             <footer v-if="ev.from_address || ev.to_address" class="email-msg__foot mono">
               <span v-if="ev.direction === 'outbound' && ev.to_address">→ {{ ev.to_address }}</span>
-              <span v-else-if="ev.direction === 'inbound' && ev.from_address">← {{ ev.from_address }}</span>
+              <span v-else-if="ev.direction === 'inbound' && ev.from_address"
+                >← {{ ev.from_address }}</span
+              >
             </footer>
           </li>
         </ul>

@@ -20,19 +20,19 @@ later.
 
 ## Types
 
-| Type | Use for |
-| --- | --- |
-| `feat` | A new feature |
-| `fix` | A bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, with no change to code meaning |
+| Type       | Use for                                                   |
+| ---------- | --------------------------------------------------------- |
+| `feat`     | A new feature                                             |
+| `fix`      | A bug fix                                                 |
+| `docs`     | Documentation only                                        |
+| `style`    | Formatting, with no change to code meaning                |
 | `refactor` | A code change that neither fixes a bug nor adds a feature |
-| `perf` | A performance improvement |
-| `test` | Adding or fixing tests |
-| `build` | Build system or dependencies |
-| `ci` | CI configuration |
-| `chore` | Maintenance that does not touch app or test code |
-| `revert` | Reverts a previous commit |
+| `perf`     | A performance improvement                                 |
+| `test`     | Adding or fixing tests                                    |
+| `build`    | Build system or dependencies                              |
+| `ci`       | CI configuration                                          |
+| `chore`    | Maintenance that does not touch app or test code          |
+| `revert`   | Reverts a previous commit                                 |
 
 ## Scopes
 

@@ -30,11 +30,7 @@ export function parseCh(text: string): string {
   const mo = Number(month)
   const d = Number(day)
   const probe = new Date(y, mo - 1, d)
-  if (
-    probe.getFullYear() !== y ||
-    probe.getMonth() !== mo - 1 ||
-    probe.getDate() !== d
-  ) return ''
+  if (probe.getFullYear() !== y || probe.getMonth() !== mo - 1 || probe.getDate() !== d) return ''
 
   return `${year}-${month}-${day}`
 }

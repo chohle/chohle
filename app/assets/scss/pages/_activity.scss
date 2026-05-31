@@ -49,8 +49,12 @@
     font: inherit;
     cursor: default;
 
-    &.is-link { cursor: pointer; }
-    &.is-link:hover { background: var(--surface-2); }
+    &.is-link {
+      cursor: pointer;
+    }
+    &.is-link:hover {
+      background: var(--surface-2);
+    }
     &.is-link:focus-visible {
       outline: none;
       box-shadow: 0 0 0 2px var(--ink);
@@ -66,7 +70,11 @@
       align-items: center;
       justify-content: center;
 
-      svg, .iconify { width: 14px; height: 14px; }
+      svg,
+      .iconify {
+        width: 14px;
+        height: 14px;
+      }
     }
 
     &.is-overdue .activity-row__icon {
@@ -79,8 +87,15 @@
       line-height: 1.45;
       color: var(--ink);
 
-      strong { font-weight: 500; color: var(--ink); }
-      em { font-family: var(--font-serif); font-style: italic; color: var(--ink-2); }
+      strong {
+        font-weight: 500;
+        color: var(--ink);
+      }
+      em {
+        font-family: var(--font-serif);
+        font-style: italic;
+        color: var(--ink-2);
+      }
     }
 
     &__time {
@@ -102,7 +117,9 @@
     gap: 4px;
   }
 
-  &__filter { padding: 0; }
+  &__filter {
+    padding: 0;
+  }
 
   &__filter-row {
     display: grid;
@@ -133,15 +150,23 @@
 
   &__sr {
     position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
   }
 
-  &__filter-label { font-size: 13px; color: var(--ink); }
-  &__filter-count { font-size: 11px; color: var(--ink-3); }
+  &__filter-label {
+    font-size: 13px;
+    color: var(--ink);
+  }
+  &__filter-count {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
 
   // --- This week stat card (desktop) ---
   &__net {
@@ -154,8 +179,13 @@
     gap: 4px;
   }
 
-  &__cur { font-size: 0.45em; color: var(--ink-3); }
-  &__sign { color: var(--ink-3); }
+  &__cur {
+    font-size: 0.45em;
+    color: var(--ink-3);
+  }
+  &__sign {
+    color: var(--ink-3);
+  }
 
   &__net-meta {
     font-size: 10.5px;
@@ -174,7 +204,10 @@
     border-top: 1px solid var(--border);
     font-size: 12px;
 
-    .tabular { font-size: 13px; color: var(--ink); }
+    .tabular {
+      font-size: 13px;
+      color: var(--ink);
+    }
   }
 
   // --- Mobile toolbar (filter dropdown trigger + week net) ---
@@ -197,14 +230,26 @@
     font-size: 12.5px;
     color: var(--ink);
     cursor: pointer;
-    transition: background-color .12s ease, border-color .12s ease;
+    transition:
+      background-color 0.12s ease,
+      border-color 0.12s ease;
 
-    &:hover { background: var(--surface-3); border-color: var(--ink); }
-    &:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ink); }
+    &:hover {
+      background: var(--surface-3);
+      border-color: var(--ink);
+    }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ink);
+    }
   }
 
-  &__mobile-trigger-label { font-weight: 500; }
-  &__mobile-trigger-caret { color: var(--ink-3); }
+  &__mobile-trigger-label {
+    font-weight: 500;
+  }
+  &__mobile-trigger-caret {
+    color: var(--ink-3);
+  }
 
   &__mobile-week {
     display: inline-flex;
@@ -268,9 +313,13 @@
 
     // Drop the right-hand aside on mobile — its content moves into the
     // top toolbar (dropdown) so the feed is the only thing below the head.
-    &__side { display: none; }
+    &__side {
+      display: none;
+    }
 
-    &__mobile-bar { display: flex; }
+    &__mobile-bar {
+      display: flex;
+    }
   }
 
   @media (max-width: 600px) {

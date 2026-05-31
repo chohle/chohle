@@ -24,8 +24,10 @@
     color: var(--ink);
     font-family: inherit;
     outline: none;
-    transition: border-color .15s ease;
+    transition: border-color 0.15s ease;
 
-    &:focus { border-color: var(--ink); }
+    &:focus {
+      border-color: var(--ink);
+    }
   }
 }

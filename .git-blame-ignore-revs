@@ -1,0 +1,7 @@
+# Revisions to skip with `git blame --ignore-revs-file .git-blame-ignore-revs`.
+# Enable for the whole repo with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub honours this file automatically in its blame UI.
+
+# Prettier one time format pass across 188 files
+e3c4001

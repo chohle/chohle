@@ -47,7 +47,10 @@ const catalogs: Record<string, { invoiceDoc: typeof enLocale.invoiceDoc }> = {
 const qrLang: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = { de: 'DE', fr: 'FR', it: 'IT', en: 'EN' }
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 }
 function dateFmt(iso: string) {
   const [y, m, d] = iso.split('-')
@@ -57,13 +60,19 @@ function dateFmt(iso: string) {
 // Builds the invoice PDF (in the customer's language) with the Swiss QR-bill.
 export async function generateInvoicePdf(id: number): Promise<Buffer> {
   const db = useDb()
-  const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRow | undefined
+  const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as
+    | InvoiceRow
+    | undefined
   if (!invoice) throw createError({ statusCode: 404, statusMessage: 'Invoice not found' })
 
   const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party & { iban: string }
-  const customer = db.prepare('SELECT * FROM customers WHERE id = ?').get(invoice.customer_id) as Party
+  const customer = db
+    .prepare('SELECT * FROM customers WHERE id = ?')
+    .get(invoice.customer_id) as Party
   const items = db
-    .prepare('SELECT description, quantity, unit, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?')
+    .prepare(
+      'SELECT description, quantity, unit, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?'
+    )
     .all(id) as ItemRow[]
 
   const lang = customer?.language ?? 'en'
@@ -116,17 +125,34 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
   const done = new Promise<Buffer>((resolve) => pdf.on('end', () => resolve(Buffer.concat(chunks))))
 
   // Sender
-  pdf.fillColor('#000').font('Helvetica-Bold').fontSize(16).text(sender.name || 'batze', 50, 50)
-  pdf.font('Helvetica').fontSize(9).fillColor('#555')
-    .text([sender.street, [sender.zip, sender.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), 50)
+  pdf
+    .fillColor('#000')
+    .font('Helvetica-Bold')
+    .fontSize(16)
+    .text(sender.name || 'batze', 50, 50)
+  pdf
+    .font('Helvetica')
+    .fontSize(9)
+    .fillColor('#555')
+    .text(
+      [sender.street, [sender.zip, sender.city].filter(Boolean).join(' ')]
+        .filter(Boolean)
+        .join(', '),
+      50
+    )
 
   // Customer address (right)
-  pdf.fillColor('#000').fontSize(10).font('Helvetica-Bold').text(customer.name, 330, 120, { width: 215 })
+  pdf
+    .fillColor('#000')
+    .fontSize(10)
+    .font('Helvetica-Bold')
+    .text(customer.name, 330, 120, { width: 215 })
   pdf.font('Helvetica')
   if (customer.contact_person) pdf.text(customer.contact_person, 330, undefined, { width: 215 })
   pdf.text(customer.street ?? '', 330, undefined, { width: 215 })
   pdf.text([customer.zip, customer.city].filter(Boolean).join(' '), 330, undefined, { width: 215 })
-  if (customer.country && customer.country !== 'CH') pdf.text(customer.country, 330, undefined, { width: 215 })
+  if (customer.country && customer.country !== 'CH')
+    pdf.text(customer.country, 330, undefined, { width: 215 })
 
   // Invoice meta (left)
   pdf.font('Helvetica-Bold').fontSize(13).text(L.invoice, 50, 120)

@@ -1,4 +1,6 @@
-interface SqliteError { code?: string }
+interface SqliteError {
+  code?: string
+}
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)

@@ -24,10 +24,16 @@ interface MeResponse {
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const session = await getUserSession(event) as { outlookPending?: {
-    clientId: string; tenantId: string; verifier: string; state: string;
-    label: string; redirectUri: string
-  } }
+  const session = (await getUserSession(event)) as {
+    outlookPending?: {
+      clientId: string
+      tenantId: string
+      verifier: string
+      state: string
+      label: string
+      redirectUri: string
+    }
+  }
 
   const pending = session.outlookPending
   if (!pending) {
@@ -44,7 +50,10 @@ export default defineEventHandler(async (event) => {
   await setUserSession(event, { outlookPending: undefined })
 
   if (error) {
-    return sendRedirect(event, `/settings?mailbox=error&reason=${encodeURIComponent(error)}#mail-sync`)
+    return sendRedirect(
+      event,
+      `/settings?mailbox=error&reason=${encodeURIComponent(error)}#mail-sync`
+    )
   }
   if (!code || returnedState !== pending.state) {
     throw createError({ statusCode: 400, statusMessage: 'invalid callback parameters' })
@@ -65,7 +74,9 @@ export default defineEventHandler(async (event) => {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString()
   }).catch((err) => {
-    const msg = (err as { data?: { error_description?: string } }).data?.error_description ?? 'token exchange failed'
+    const msg =
+      (err as { data?: { error_description?: string } }).data?.error_description ??
+      'token exchange failed'
     throw createError({ statusCode: 502, statusMessage: msg, cause: err })
   })
 
@@ -74,7 +85,7 @@ export default defineEventHandler(async (event) => {
   // and `userPrincipalName` as a fallback.
   const me = await $fetch<MeResponse>('https://graph.microsoft.com/v1.0/me', {
     headers: { Authorization: `Bearer ${tokenRes.access_token}` }
-  }).catch(() => ({} as MeResponse))
+  }).catch(() => ({}) as MeResponse)
 
   const emailAddress = (me.mail || me.userPrincipalName || '').trim() || null
   const label = pending.label || me.displayName || 'Outlook'
@@ -95,7 +106,10 @@ export default defineEventHandler(async (event) => {
   } catch (err) {
     const msg = (err as { message?: string }).message ?? 'insert failed'
     console.error('[outlook-oauth] insert mailbox failed:', msg)
-    return sendRedirect(event, `/settings?mailbox=error&reason=${encodeURIComponent(msg)}#mail-sync`)
+    return sendRedirect(
+      event,
+      `/settings?mailbox=error&reason=${encodeURIComponent(msg)}#mail-sync`
+    )
   }
 
   return sendRedirect(event, '/settings?mailbox=connected#mail-sync')

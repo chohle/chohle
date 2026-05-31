@@ -14,8 +14,9 @@ describe('computeInvoiceTotals', () => {
 
   it('applies a line discount', () => {
     // 2 x 100.00 with 10% off = 180.00 net
-    expect(lineNetRappen({ quantity: 2, unitPriceRappen: 10000, discountPercent: 10, mwstPercent: 8.1 }))
-      .toBe(18000)
+    expect(
+      lineNetRappen({ quantity: 2, unitPriceRappen: 10000, discountPercent: 10, mwstPercent: 8.1 })
+    ).toBe(18000)
   })
 
   it('groups MWST by rate, sorted', () => {

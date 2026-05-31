@@ -7,7 +7,10 @@
 
 const props = defineProps<{ text: string }>()
 
-interface Token { kind: 'text' | 'bold' | 'italic'; value: string }
+interface Token {
+  kind: 'text' | 'bold' | 'italic'
+  value: string
+}
 
 function tokenise(input: string): Token[] {
   const tokens: Token[] = []
@@ -15,7 +18,10 @@ function tokenise(input: string): Token[] {
   let buf = ''
 
   function flushText() {
-    if (buf) { tokens.push({ kind: 'text', value: buf }); buf = '' }
+    if (buf) {
+      tokens.push({ kind: 'text', value: buf })
+      buf = ''
+    }
   }
 
   while (i < input.length) {

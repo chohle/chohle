@@ -1,6 +1,30 @@
 export const CANTONS = [
-  'ZH', 'BE', 'LU', 'UR', 'SZ', 'OW', 'NW', 'GL', 'ZG', 'FR', 'SO', 'BS', 'BL',
-  'SH', 'AR', 'AI', 'SG', 'GR', 'AG', 'TG', 'TI', 'VD', 'VS', 'NE', 'GE', 'JU'
+  'ZH',
+  'BE',
+  'LU',
+  'UR',
+  'SZ',
+  'OW',
+  'NW',
+  'GL',
+  'ZG',
+  'FR',
+  'SO',
+  'BS',
+  'BL',
+  'SH',
+  'AR',
+  'AI',
+  'SG',
+  'GR',
+  'AG',
+  'TG',
+  'TI',
+  'VD',
+  'VS',
+  'NE',
+  'GE',
+  'JU'
 ]
 
 const RULES = ['earlier', 'later', 'none']
@@ -21,7 +45,9 @@ export function parseIncomeSource(body: Record<string, unknown>): IncomeSourceIn
   const salary = Number(body?.salary)
   const currency = String(body?.currency ?? 'CHF').trim() || 'CHF'
   const payoutDay = Number(body?.payoutDay)
-  const canton = String(body?.canton ?? '').trim().toUpperCase()
+  const canton = String(body?.canton ?? '')
+    .trim()
+    .toUpperCase()
   const payoutRule = String(body?.payoutRule ?? 'earlier')
 
   if (

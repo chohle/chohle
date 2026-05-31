@@ -46,9 +46,16 @@ export default defineEventHandler(async (event) => {
   if (!/^[0-9a-f-]{36}$/i.test(clientId)) {
     throw createError({ statusCode: 400, statusMessage: 'Client ID must be a UUID' })
   }
-  if (tenantId !== 'common' && tenantId !== 'organizations' && tenantId !== 'consumers'
-      && !/^[0-9a-f-]{36}$/i.test(tenantId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Tenant ID must be common, organizations, consumers, or a UUID' })
+  if (
+    tenantId !== 'common' &&
+    tenantId !== 'organizations' &&
+    tenantId !== 'consumers' &&
+    !/^[0-9a-f-]{36}$/i.test(tenantId)
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Tenant ID must be common, organizations, consumers, or a UUID'
+    })
   }
 
   // PKCE: random 32 bytes → base64url verifier, SHA-256 → base64url challenge.

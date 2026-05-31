@@ -9,9 +9,9 @@ gets synced, where to find it in the UI) see
 
 ## Prerequisites
 
-* `BATZE_SECRET` set on the running batze instance (see
+- `BATZE_SECRET` set on the running batze instance (see
   [MAIL_SYNC](MAIL_SYNC.md#requirements)).
-* A Google account with access to https://console.cloud.google.com so
+- A Google account with access to https://console.cloud.google.com so
   you can create a Google Cloud project and an OAuth client. Any
   Google account works, including personal `@gmail.com`.
 
@@ -33,19 +33,19 @@ gets synced, where to find it in the UI) see
 
 1. **APIs & Services** → **OAuth consent screen**.
 2. **User type**:
-   * **Internal** if your account is a Google Workspace admin and you
+   - **Internal** if your account is a Google Workspace admin and you
      only want users in your own workspace to connect.
-   * **External** for personal `@gmail.com` accounts or anyone outside
+   - **External** for personal `@gmail.com` accounts or anyone outside
      your workspace.
 3. Fill in **App name** (`batze`), **User support email**, and
    **Developer contact** with your own email.
 4. **Scopes**: add the three batze needs:
 
-   | Scope                                          | Why                                                       |
-   | ---------------------------------------------- | --------------------------------------------------------- |
+   | Scope                                            | Why                                                            |
+   | ------------------------------------------------ | -------------------------------------------------------------- |
    | `https://www.googleapis.com/auth/gmail.readonly` | Read your mailbox so the sync worker can find inbound replies. |
-   | `openid`                                       | Standard OpenID Connect identifier.                       |
-   | `email`, `profile`                             | Capture the connected email address for the Settings list. |
+   | `openid`                                         | Standard OpenID Connect identifier.                            |
+   | `email`, `profile`                               | Capture the connected email address for the Settings list.     |
 
 5. **Test users** (External + Testing only): add your own email. While
    the consent screen is in **Testing** state, only listed test users
@@ -67,6 +67,7 @@ gets synced, where to find it in the UI) see
    ```
 
    For a hosted batze, swap in your domain.
+
 5. Click **Create**. A dialog shows your **Client ID** and **Client
    secret**. Copy both into batze. The secret is also visible later
    from the same Credentials page.
@@ -91,20 +92,20 @@ locally. To revoke at Google's side too, remove batze from
 
 ## Gmail specific troubleshooting
 
-* **"Error 400: redirect_uri_mismatch"**: the redirect URI in your
+- **"Error 400: redirect_uri_mismatch"**: the redirect URI in your
   Google OAuth client must exactly match the one batze posts.
   Including the scheme, host, port, and path. Add the exact URL under
   **Credentials** → your client → **Authorized redirect URIs**.
-* **"Access blocked: This app's request is invalid"** or
+- **"Access blocked: This app's request is invalid"** or
   **"Error 403: access_denied"**: your account is not on the
   **Test users** list while the consent screen is in Testing state.
   Add your email under **OAuth consent screen** → **Test users**, or
   publish the consent screen to Production.
-* **"Error 401: invalid_client" on token exchange**: the Client
+- **"Error 401: invalid_client" on token exchange**: the Client
   Secret you pasted is wrong. Copy it again from **Credentials** →
   your client. Note that secrets are displayed only once at creation;
   if you lost it you can rotate it from the same page.
-* **"Google did not return a refresh_token"**: batze always requests
+- **"Google did not return a refresh_token"**: batze always requests
   `access_type=offline` with `prompt=consent`, so this should not
   happen on a fresh consent. If it does, disconnect the mailbox and
   reconnect; Google will reissue a refresh token.

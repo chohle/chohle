@@ -18,7 +18,12 @@ watch(file, (newFile) => {
       return
     }
     // Replace this upload placeholder node with the actual image.
-    props.editor.chain().focus().deleteRange({ from: pos, to: pos + 1 }).setImage({ src: dataUrl }).run()
+    props.editor
+      .chain()
+      .focus()
+      .deleteRange({ from: pos, to: pos + 1 })
+      .setImage({ src: dataUrl })
+      .run()
     loading.value = false
   }
   reader.readAsDataURL(newFile)

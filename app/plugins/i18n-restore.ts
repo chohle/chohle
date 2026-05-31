@@ -8,7 +8,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   }
 
   const apply = async (code?: string) => {
-    if (code && i18n.locales.value.some(l => l.code === code)) await i18n.setLocale(code)
+    if (code && i18n.locales.value.some((l) => l.code === code)) await i18n.setLocale(code)
   }
 
   await apply((user.value as { locale?: string } | null)?.locale)

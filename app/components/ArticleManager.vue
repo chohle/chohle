@@ -11,7 +11,7 @@ interface Article {
 // own the "Add article" trigger from its own page head. Without this flag the
 // component still renders its own header (used inside the customer-detail
 // tab where there's no page-head to host it).
-const props = defineProps<{ listUrl: string, createUrl: string, headless?: boolean }>()
+const props = defineProps<{ listUrl: string; createUrl: string; headless?: boolean }>()
 const { t } = useI18n()
 const formRef = ref()
 
@@ -36,7 +36,9 @@ const saving = ref(false)
 
 const hasMwst = computed({
   get: () => (form.mwst ?? 0) > 0,
-  set: (v: boolean) => { form.mwst = v ? (form.mwst > 0 ? form.mwst : 8.1) : 0 }
+  set: (v: boolean) => {
+    form.mwst = v ? (form.mwst > 0 ? form.mwst : 8.1) : 0
+  }
 })
 
 function openCreate() {
@@ -44,12 +46,18 @@ function openCreate() {
   open.value = true
 }
 function openEdit(a: Article) {
-  Object.assign(form, { id: a.id, name: a.name, unit: a.unit, price: a.default_price_rappen / 100, mwst: a.default_mwst })
+  Object.assign(form, {
+    id: a.id,
+    name: a.name,
+    unit: a.unit,
+    price: a.default_price_rappen / 100,
+    mwst: a.default_mwst
+  })
   open.value = true
 }
 
 function validate(state: typeof form) {
-  const errors: { name: string, message: string }[] = []
+  const errors: { name: string; message: string }[] = []
   if (!state.name?.trim()) errors.push({ name: 'name', message: t('validation.required') })
   if (state.price == null) errors.push({ name: 'price', message: t('validation.required') })
   else if (state.price <= 0) errors.push({ name: 'price', message: t('validation.positive') })
@@ -64,7 +72,9 @@ async function save() {
     else await $fetch(props.createUrl, { method: 'POST', body })
     open.value = false
     await refresh()
-  } finally { saving.value = false }
+  } finally {
+    saving.value = false
+  }
 }
 
 async function remove(id: number) {
@@ -73,7 +83,10 @@ async function remove(id: number) {
 }
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
 }
 </script>
 
@@ -99,29 +112,35 @@ function chf(rappen: number) {
         </button>
       </template>
     </EmptyState>
-    <div v-else class="ed-scroll"><table class="ed-table">
-      <thead>
-        <tr>
-          <th>{{ $t('common.name') }}</th>
-          <th>{{ $t('articles.colUnit') }}</th>
-          <th class="right">{{ $t('articles.colPrice') }}</th>
-          <th class="right">{{ $t('common.vat') }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="a in articles" :key="a.id" class="row">
-          <td>{{ a.name }}</td>
-          <td class="mono">{{ a.unit || '—' }}</td>
-          <td class="right mono">CHF {{ chf(a.default_price_rappen) }}</td>
-          <td class="right mono">{{ a.default_mwst ? `${a.default_mwst}%` : '—' }}</td>
-          <td class="actions">
-            <button class="icon-btn" @click="openEdit(a)"><UIcon name="i-lucide-pencil" /></button>
-            <button class="icon-btn" @click="remove(a.id)"><UIcon name="i-lucide-trash-2" /></button>
-          </td>
-        </tr>
-      </tbody>
-    </table></div>
+    <div v-else class="ed-scroll">
+      <table class="ed-table">
+        <thead>
+          <tr>
+            <th>{{ $t('common.name') }}</th>
+            <th>{{ $t('articles.colUnit') }}</th>
+            <th class="right">{{ $t('articles.colPrice') }}</th>
+            <th class="right">{{ $t('common.vat') }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="a in articles" :key="a.id" class="row">
+            <td>{{ a.name }}</td>
+            <td class="mono">{{ a.unit || '—' }}</td>
+            <td class="right mono">CHF {{ chf(a.default_price_rappen) }}</td>
+            <td class="right mono">{{ a.default_mwst ? `${a.default_mwst}%` : '—' }}</td>
+            <td class="actions">
+              <button class="icon-btn" @click="openEdit(a)">
+                <UIcon name="i-lucide-pencil" />
+              </button>
+              <button class="icon-btn" @click="remove(a.id)">
+                <UIcon name="i-lucide-trash-2" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <USlideover
       v-model:open="open"
@@ -129,7 +148,14 @@ function chf(rappen: number) {
       :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" novalidate class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+        <UForm
+          ref="formRef"
+          :state="form"
+          :validate="validate"
+          novalidate
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2"
+          @submit="save"
+        >
           <UFormField name="name" :label="$t('common.name')" class="sm:col-span-2">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
@@ -142,15 +168,22 @@ function chf(rappen: number) {
           <div class="sm:col-span-2">
             <USwitch v-model="hasMwst" :label="$t('articles.chargeMwst')" />
           </div>
-          <UFormField v-if="hasMwst" name="mwst" :label="$t('articles.mwstPercent')" class="sm:col-span-2">
+          <UFormField
+            v-if="hasMwst"
+            name="mwst"
+            :label="$t('articles.mwstPercent')"
+            class="sm:col-span-2"
+          >
             <UInput v-model.number="form.mwst" type="number" min="0" step="0.1" class="w-full" />
           </UFormField>
         </UForm>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2 w-full">
+        <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
-          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">
+            {{ $t('common.save') }}
+          </button>
         </div>
       </template>
     </USlideover>

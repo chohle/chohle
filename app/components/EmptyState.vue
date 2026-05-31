@@ -1,6 +1,6 @@
 <script setup lang="ts">
 withDefaults(
-  defineProps<{ icon?: string, title: string, description?: string, bordered?: boolean }>(),
+  defineProps<{ icon?: string; title: string; description?: string; bordered?: boolean }>(),
   { bordered: true }
 )
 </script>

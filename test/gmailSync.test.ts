@@ -54,11 +54,13 @@ function makeMailbox(db: Database.Database, opts: { tokenExpiresAt?: string } = 
     '123456789012-abc.apps.googleusercontent.com',
     encryptSecret('fake-client-secret')
   )
-  return db.prepare(
-    `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
+  return db
+    .prepare(
+      `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
             token_expires_at, provider_client_id, provider_client_secret_enc, last_sync_at
      FROM mailboxes ORDER BY id DESC LIMIT 1`
-  ).get() as Parameters<typeof syncGmailMailbox>[1]
+    )
+    .get() as Parameters<typeof syncGmailMailbox>[1]
 }
 
 interface GmailMessageStub {
@@ -84,7 +86,8 @@ function stubGmail(opts: {
   const fetch = vi.fn(async (url: string) => {
     calls.push(url)
     if (url.includes('oauth2.googleapis.com/token')) {
-      if (!opts.tokenResponse) throw new Error('stubGmail: token call but no tokenResponse provided')
+      if (!opts.tokenResponse)
+        throw new Error('stubGmail: token call but no tokenResponse provided')
       return opts.tokenResponse
     }
     if (url.includes('/messages/')) {
@@ -93,8 +96,10 @@ function stubGmail(opts: {
       if (!m) throw new Error(`stubGmail: get ${id} but no fixture provided`)
       const b64 = (s: string) => Buffer.from(s, 'utf8').toString('base64url')
       const parts = []
-      if (m.htmlBody !== undefined) parts.push({ mimeType: 'text/html', body: { data: b64(m.htmlBody) } })
-      if (m.textBody !== undefined) parts.push({ mimeType: 'text/plain', body: { data: b64(m.textBody) } })
+      if (m.htmlBody !== undefined)
+        parts.push({ mimeType: 'text/html', body: { data: b64(m.htmlBody) } })
+      if (m.textBody !== undefined)
+        parts.push({ mimeType: 'text/plain', body: { data: b64(m.textBody) } })
       return {
         id: m.id,
         internalDate: m.internalDate ?? String(Date.now()),
@@ -103,10 +108,13 @@ function stubGmail(opts: {
     }
     if (url.includes('/messages')) {
       const page = listPages[listIdx]
-      if (!page) throw new Error(`stubGmail: list page ${listIdx + 1} requested but only ${listPages.length} provided`)
+      if (!page)
+        throw new Error(
+          `stubGmail: list page ${listIdx + 1} requested but only ${listPages.length} provided`
+        )
       listIdx += 1
       return {
-        messages: page.ids.map(id => ({ id, threadId: id })),
+        messages: page.ids.map((id) => ({ id, threadId: id })),
         ...(page.nextPageToken ? { nextPageToken: page.nextPageToken } : {})
       }
     }
@@ -122,17 +130,19 @@ const matchingReply: GmailMessageStub = {
   headers: [
     { name: 'Message-Id', value: '<reply-1@gmail.com>' },
     { name: 'In-Reply-To', value: '<original-1@batze.ch>' },
-    { name: 'References',  value: '<original-1@batze.ch>' },
-    { name: 'Subject',     value: 'Re: Proposal' },
-    { name: 'From',        value: 'Thomas <thomas@acme.ch>' },
-    { name: 'To',          value: 'us@batze.ch' }
+    { name: 'References', value: '<original-1@batze.ch>' },
+    { name: 'Subject', value: 'Re: Proposal' },
+    { name: 'From', value: 'Thomas <thomas@acme.ch>' },
+    { name: 'To', value: 'us@batze.ch' }
   ],
   htmlBody: '<p>Sounds great</p>',
   textBody: 'Sounds great'
 }
 
 describe('syncGmailMailbox', () => {
-  beforeEach(() => { vi.unstubAllGlobals() })
+  beforeEach(() => {
+    vi.unstubAllGlobals()
+  })
 
   it('inserts an inbound row when In-Reply-To matches a captured outbound message_id', async () => {
     const { db, projectId } = makeDb()
@@ -147,9 +157,15 @@ describe('syncGmailMailbox', () => {
     expect(result.inserted).toBe(1)
     expect(result.duplicates).toBe(0)
 
-    const inbound = db.prepare(
-      `SELECT * FROM project_emails WHERE direction = 'inbound'`
-    ).all() as Array<{ project_id: number; subject: string; message_id: string; from_address: string; body_html: string }>
+    const inbound = db
+      .prepare(`SELECT * FROM project_emails WHERE direction = 'inbound'`)
+      .all() as Array<{
+      project_id: number
+      subject: string
+      message_id: string
+      from_address: string
+      body_html: string
+    }>
     expect(inbound).toHaveLength(1)
     expect(inbound[0]!.project_id).toBe(projectId)
     expect(inbound[0]!.subject).toBe('Re: Proposal')
@@ -168,7 +184,7 @@ describe('syncGmailMailbox', () => {
           id: 'unrelated',
           headers: [
             { name: 'Message-Id', value: '<random@spam.com>' },
-            { name: 'Subject',    value: 'Buy more synergy' }
+            { name: 'Subject', value: 'Buy more synergy' }
           ],
           textBody: 'Limited time offer'
         }
@@ -179,7 +195,11 @@ describe('syncGmailMailbox', () => {
     expect(result.scanned).toBe(1)
     expect(result.inserted).toBe(0)
     expect(
-      (db.prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`).get() as { n: number }).n
+      (
+        db
+          .prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`)
+          .get() as { n: number }
+      ).n
     ).toBe(0)
   })
 
@@ -196,17 +216,23 @@ describe('syncGmailMailbox', () => {
       listPages: [{ ids: ['gmsg1'] }],
       messages: { gmsg1: matchingReply }
     })
-    const reload = db.prepare(
-      `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
+    const reload = db
+      .prepare(
+        `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
               token_expires_at, provider_client_id, provider_client_secret_enc, last_sync_at
        FROM mailboxes WHERE id = ?`
-    ).get(mailbox.id) as typeof mailbox
+      )
+      .get(mailbox.id) as typeof mailbox
 
     const result = await syncGmailMailbox(db, reload)
     expect(result.inserted).toBe(0)
     expect(result.duplicates).toBe(1)
     expect(
-      (db.prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`).get() as { n: number }).n
+      (
+        db
+          .prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`)
+          .get() as { n: number }
+      ).n
     ).toBe(1)
   })
 
@@ -225,8 +251,8 @@ describe('syncGmailMailbox', () => {
           headers: [
             { name: 'Message-Id', value: '<reply-2@gmail.com>' },
             { name: 'References', value: '<some-other@x.com> <original-2@batze.ch>' },
-            { name: 'Subject',    value: 'Re: Follow up' },
-            { name: 'From',       value: 'thomas@acme.ch' }
+            { name: 'Subject', value: 'Re: Follow up' },
+            { name: 'From', value: 'thomas@acme.ch' }
           ],
           textBody: 'ok'
         }
@@ -243,7 +269,11 @@ describe('syncGmailMailbox', () => {
 
     const { calls } = stubGmail({
       listPages: [{ ids: [] }],
-      tokenResponse: { access_token: 'fresh-access', refresh_token: 'fresh-refresh', expires_in: 3600 }
+      tokenResponse: {
+        access_token: 'fresh-access',
+        refresh_token: 'fresh-refresh',
+        expires_in: 3600
+      }
     })
 
     await syncGmailMailbox(db, mailbox)
@@ -255,10 +285,7 @@ describe('syncGmailMailbox', () => {
     const { db } = makeDb()
     const mailbox = makeMailbox(db)
     stubGmail({
-      listPages: [
-        { ids: [], nextPageToken: 'tok1' },
-        { ids: ['gmsg1'] }
-      ],
+      listPages: [{ ids: [], nextPageToken: 'tok1' }, { ids: ['gmsg1'] }],
       messages: { gmsg1: matchingReply }
     })
     const result = await syncGmailMailbox(db, mailbox)

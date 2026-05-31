@@ -10,9 +10,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const files = db
-    .prepare('SELECT stored_name FROM attachments WHERE expense_id = ?')
-    .all(id) as { stored_name: string }[]
+  const files = db.prepare('SELECT stored_name FROM attachments WHERE expense_id = ?').all(id) as {
+    stored_name: string
+  }[]
   for (const f of files) {
     await rm(join(uploadsDir(), f.stored_name), { force: true })
   }

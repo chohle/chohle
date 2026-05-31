@@ -16,8 +16,13 @@
     cursor: pointer;
     border-radius: var(--radius-sm);
 
-    &:hover { color: var(--ink-2); }
-    &.is-active { background: var(--ink); color: var(--accent-ink); }
+    &:hover {
+      color: var(--ink-2);
+    }
+    &.is-active {
+      background: var(--ink);
+      color: var(--accent-ink);
+    }
 
     &:focus-visible {
       outline: none;
@@ -25,7 +30,9 @@
       color: var(--ink);
     }
     &.is-active:focus-visible {
-      box-shadow: 0 0 0 2px var(--ink), inset 0 0 0 1px var(--accent-ink);
+      box-shadow:
+        0 0 0 2px var(--ink),
+        inset 0 0 0 1px var(--accent-ink);
     }
   }
 }

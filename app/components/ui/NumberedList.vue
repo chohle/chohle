@@ -1,3 +1,5 @@
 <template>
-  <ol class="num-list"><slot /></ol>
+  <ol class="num-list">
+    <slot />
+  </ol>
 </template>

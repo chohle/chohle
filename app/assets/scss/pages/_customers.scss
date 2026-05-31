@@ -7,7 +7,9 @@
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 
-  &__spacer { flex: 1; }
+  &__spacer {
+    flex: 1;
+  }
 }
 
 .cust-sort {
@@ -21,7 +23,15 @@
 }
 
 @media (max-width: 640px) {
-  .cust-toolbar { padding: 12px 14px; gap: 8px; }
-  .cust-toolbar__spacer { display: none; }
-  .cust-sort { min-width: 0; flex: 1; }
+  .cust-toolbar {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .cust-toolbar__spacer {
+    display: none;
+  }
+  .cust-sort {
+    min-width: 0;
+    flex: 1;
+  }
 }

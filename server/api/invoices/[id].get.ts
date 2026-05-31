@@ -14,7 +14,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as { project_id: number | null } | undefined
+  const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as
+    | { project_id: number | null }
+    | undefined
   if (!invoice) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
@@ -23,18 +25,22 @@ export default defineEventHandler(async (event) => {
   // and let the user jump back to the project hub. Coalesce a missing row
   // (broken link) to null so the response shape stays predictable.
   const project = invoice.project_id
-    ? (db.prepare(
-        `SELECT id, name, direction FROM projects WHERE id = ?`
-      ).get(invoice.project_id) as { id: number, name: string, direction: 'sales' | 'procurement' } | undefined) ?? null
+    ? ((db
+        .prepare(`SELECT id, name, direction FROM projects WHERE id = ?`)
+        .get(invoice.project_id) as
+        | { id: number; name: string; direction: 'sales' | 'procurement' }
+        | undefined) ?? null)
     : null
 
   const items = db
     .prepare('SELECT * FROM invoice_items WHERE invoice_id = ? ORDER BY position, id')
     .all(id) as ItemRow[]
 
-  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined)?.vat_registered
+  const vat = !!(
+    db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
+      | { vat_registered: number }
+      | undefined
+  )?.vat_registered
 
   const totals = computeInvoiceTotals(
     items.map((i) => ({

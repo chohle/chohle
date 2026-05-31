@@ -6,7 +6,9 @@
   gap: 10px;
   min-width: 0;
 
-  &:last-child { border-right: 0; }
+  &:last-child {
+    border-right: 0;
+  }
 
   &__row {
     display: flex;
@@ -36,7 +38,11 @@
     line-height: 1;
     color: var(--ink);
   }
-  &__cur { font-size: 0.5em; color: var(--ink-3); margin-right: 2px; }
+  &__cur {
+    font-size: 0.5em;
+    color: var(--ink-3);
+    margin-right: 2px;
+  }
   &__delta {
     font-size: 10.5px;
     color: var(--ink-3);
@@ -48,18 +54,28 @@
     background: var(--ink);
     color: var(--accent-ink);
 
-    .kpi-cell__dot { background: var(--accent-ink); }
+    .kpi-cell__dot {
+      background: var(--accent-ink);
+    }
     .kpi-cell__label,
-    .kpi-cell__delta { color: color-mix(in srgb, var(--accent-ink) 70%, transparent); }
+    .kpi-cell__delta {
+      color: color-mix(in srgb, var(--accent-ink) 70%, transparent);
+    }
     .kpi-cell__value,
-    .kpi-cell__cur { color: var(--accent-ink); }
+    .kpi-cell__cur {
+      color: var(--accent-ink);
+    }
   }
 
   @media (max-width: 800px) {
     padding: 14px 16px;
 
-    &__value { font-size: 30px; }
-    &__label { letter-spacing: 0.08em; }
+    &__value {
+      font-size: 30px;
+    }
+    &__label {
+      letter-spacing: 0.08em;
+    }
   }
 
   @media (max-width: 480px) {
@@ -67,6 +83,8 @@
 
     // Last cell sits on its own row in single-column mode; restore the
     // bottom border that the row no longer separates.
-    &:last-child { border-right: 0; }
+    &:last-child {
+      border-right: 0;
+    }
   }
 }

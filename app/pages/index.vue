@@ -7,15 +7,21 @@ interface Summary {
   net: number
   expected: number
   outstanding: number
-  byCategory: { name: string, color: string, icon: string, total: number }[]
-  trend: { month: string, income: number, expenses: number }[]
-  recurring: { company: string, salary_rappen: number, paid: boolean, pay_date: string, reason: string | null }[]
+  byCategory: { name: string; color: string; icon: string; total: number }[]
+  trend: { month: string; income: number; expenses: number }[]
+  recurring: {
+    company: string
+    salary_rappen: number
+    paid: boolean
+    pay_date: string
+    reason: string | null
+  }[]
 }
 
 interface YearSummary {
   year: number
-  months: { ym: string, income: number, expenses: number, net: number }[]
-  totals: { income: number, expenses: number, net: number }
+  months: { ym: string; income: number; expenses: number; net: number }[]
+  totals: { income: number; expenses: number; net: number }
 }
 
 const { t, locale } = useI18n()
@@ -27,7 +33,10 @@ const { data } = await useFetch<Summary>('/api/summary', { query: { month } })
 const { data: yearData } = await useFetch<YearSummary>('/api/summary/year', { query: { year } })
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
 }
 
 const prevMonth = computed(() => {
@@ -53,18 +62,20 @@ function monthLabel(ym: string) {
   return new Date(`${ym}-01`).toLocaleDateString(locale.value, { month: 'short' })
 }
 
-const sparkValues = computed(() => (data.value?.trend ?? []).map(t => Math.max(0, t.income - t.expenses)))
+const sparkValues = computed(() =>
+  (data.value?.trend ?? []).map((t) => Math.max(0, t.income - t.expenses))
+)
 const trendSeries = computed(() => [
-  { values: (data.value?.trend ?? []).map(t => t.income), weight: 1 as const },
-  { values: (data.value?.trend ?? []).map(t => t.expenses), weight: 3 as const }
+  { values: (data.value?.trend ?? []).map((t) => t.income), weight: 1 as const },
+  { values: (data.value?.trend ?? []).map((t) => t.expenses), weight: 3 as const }
 ])
-const trendLabels = computed(() => (data.value?.trend ?? []).map(t => monthLabel(t.month)))
+const trendLabels = computed(() => (data.value?.trend ?? []).map((t) => monthLabel(t.month)))
 
 const yearSeries = computed(() => [
-  { values: (yearData.value?.months ?? []).map(m => m.income), weight: 1 as const },
-  { values: (yearData.value?.months ?? []).map(m => m.expenses), weight: 3 as const }
+  { values: (yearData.value?.months ?? []).map((m) => m.income), weight: 1 as const },
+  { values: (yearData.value?.months ?? []).map((m) => m.expenses), weight: 3 as const }
 ])
-const yearLabels = computed(() => (yearData.value?.months ?? []).map(m => monthLabel(m.ym)))
+const yearLabels = computed(() => (yearData.value?.months ?? []).map((m) => monthLabel(m.ym)))
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -76,9 +87,13 @@ const greeting = computed(() => {
 
 <template>
   <div v-if="data" class="page-overview">
-    <UiPageHead :crumb="`${$t('nav.workspace')} / ${$t('nav.dashboard')}`" :title="`${greeting}, ${username}.`">
+    <UiPageHead
+      :crumb="`${$t('nav.workspace')} / ${$t('nav.dashboard')}`"
+      :title="`${greeting}, ${username}.`"
+    >
       <template #title>
-        {{ greeting }}, <em class="page-overview__italic">{{ username }}</em>.
+        {{ greeting }}, <em class="page-overview__italic">{{ username }}</em
+        >.
       </template>
       <template #subtitle>{{ $t('dashboard.subtitle') }}</template>
       <template #actions>
@@ -108,7 +123,11 @@ const greeting = computed(() => {
         :label="$t('dashboard.kpiExpected')"
         currency="CHF"
         :value="chf(data.expected)"
-        :delta="data.outstanding ? $t('dashboard.outstandingShort', { amount: chf(data.outstanding) }) : ''"
+        :delta="
+          data.outstanding
+            ? $t('dashboard.outstandingShort', { amount: chf(data.outstanding) })
+            : ''
+        "
       />
       <UiSubStripItem
         :label="$t('dashboard.kpiExpensesOut')"
@@ -125,8 +144,14 @@ const greeting = computed(() => {
         <div class="page-overview__card-head">
           <div class="eyebrow">{{ $t('dashboard.incomeVsExpenses') }}</div>
           <div class="page-overview__legend mono">
-            <span><span class="page-overview__lg-dot page-overview__lg-dot--ink" /> {{ $t('dashboard.income') }}</span>
-            <span><span class="page-overview__lg-dot page-overview__lg-dot--muted" /> {{ $t('dashboard.expenses') }}</span>
+            <span
+              ><span class="page-overview__lg-dot page-overview__lg-dot--ink" />
+              {{ $t('dashboard.income') }}</span
+            >
+            <span
+              ><span class="page-overview__lg-dot page-overview__lg-dot--muted" />
+              {{ $t('dashboard.expenses') }}</span
+            >
           </div>
         </div>
         <UiBarChart :series="trendSeries" :labels="trendLabels" :stacked="false" :height="220" />
@@ -145,11 +170,7 @@ const greeting = computed(() => {
           :description="$t('dashboard.noIncomeText')"
         />
         <UiNumberedList v-else>
-          <li
-            v-for="(r, i) in data.recurring"
-            :key="r.company"
-            class="item"
-          >
+          <li v-for="(r, i) in data.recurring" :key="r.company" class="item">
             <span class="num">{{ String(i + 1).padStart(2, '0') }}</span>
             <span class="main">
               <span class="title">{{ r.company }}</span>
@@ -161,7 +182,9 @@ const greeting = computed(() => {
       </UiCard>
     </div>
 
-    <UiSectionLabel v-if="yearData">{{ $t('dashboard.cashflow', { year: yearData.year }) }}</UiSectionLabel>
+    <UiSectionLabel v-if="yearData">{{
+      $t('dashboard.cashflow', { year: yearData.year })
+    }}</UiSectionLabel>
 
     <UiCard v-if="yearData">
       <div class="page-overview__card-head">
@@ -171,9 +194,18 @@ const greeting = computed(() => {
           <button class="icon-btn" @click="year++"><UIcon name="i-lucide-chevron-right" /></button>
         </div>
         <div class="page-overview__yr-totals mono">
-          <span>{{ $t('dashboard.income') }} <b class="tabular">CHF {{ chf(yearData.totals.income) }}</b></span>
-          <span>{{ $t('dashboard.expenses') }} <b class="tabular">CHF {{ chf(yearData.totals.expenses) }}</b></span>
-          <span>{{ $t('dashboard.net') }} <b class="tabular">CHF {{ chf(yearData.totals.net) }}</b></span>
+          <span
+            >{{ $t('dashboard.income') }}
+            <b class="tabular">CHF {{ chf(yearData.totals.income) }}</b></span
+          >
+          <span
+            >{{ $t('dashboard.expenses') }}
+            <b class="tabular">CHF {{ chf(yearData.totals.expenses) }}</b></span
+          >
+          <span
+            >{{ $t('dashboard.net') }}
+            <b class="tabular">CHF {{ chf(yearData.totals.net) }}</b></span
+          >
         </div>
       </div>
       <UiBarChart :series="yearSeries" :labels="yearLabels" :stacked="false" :height="220" />

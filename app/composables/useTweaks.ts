@@ -34,15 +34,23 @@ export function useTweaks() {
     // Detached scope so the watcher survives the first caller's unmount.
     const scope = effectScope(true)
     scope.run(() => {
-      watch(state, (v) => {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)) } catch {}
-        apply(v)
-      }, { deep: true })
+      watch(
+        state,
+        (v) => {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(v))
+          } catch {}
+          apply(v)
+        },
+        { deep: true }
+      )
     })
   }
 
   return {
     tweaks: state,
-    setTheme(theme: Theme) { state.value.theme = theme }
+    setTheme(theme: Theme) {
+      state.value.theme = theme
+    }
   }
 }

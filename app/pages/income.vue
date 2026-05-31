@@ -1,7 +1,31 @@
 <script setup lang="ts">
 const cantons = [
-  'ZH', 'BE', 'LU', 'UR', 'SZ', 'OW', 'NW', 'GL', 'ZG', 'FR', 'SO', 'BS', 'BL',
-  'SH', 'AR', 'AI', 'SG', 'GR', 'AG', 'TG', 'TI', 'VD', 'VS', 'NE', 'GE', 'JU'
+  'ZH',
+  'BE',
+  'LU',
+  'UR',
+  'SZ',
+  'OW',
+  'NW',
+  'GL',
+  'ZG',
+  'FR',
+  'SO',
+  'BS',
+  'BL',
+  'SH',
+  'AR',
+  'AI',
+  'SG',
+  'GR',
+  'AG',
+  'TG',
+  'TI',
+  'VD',
+  'VS',
+  'NE',
+  'GE',
+  'JU'
 ]
 
 interface IncomeSource {
@@ -20,7 +44,7 @@ interface IncomeSource {
 
 const { t, locale } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
-const { data, refresh } = await useFetch<{ month: string, sources: IncomeSource[] }>(
+const { data, refresh } = await useFetch<{ month: string; sources: IncomeSource[] }>(
   '/api/income/overview',
   { query: { month }, default: () => ({ month: '', sources: [] }) }
 )
@@ -35,9 +59,12 @@ const ruleLabel = (r: string) => ruleItems.value.find((i) => i.value === r)?.lab
 function blank() {
   return {
     id: null as number | null,
-    company: '', jobTitle: '',
+    company: '',
+    jobTitle: '',
     salary: undefined as number | undefined,
-    currency: 'CHF', payoutDay: 25, canton: 'LU',
+    currency: 'CHF',
+    payoutDay: 25,
+    canton: 'LU',
     payoutRule: 'earlier' as IncomeSource['payout_rule']
   }
 }
@@ -45,19 +72,27 @@ const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
 
-function openCreate() { Object.assign(form, blank()); open.value = true }
+function openCreate() {
+  Object.assign(form, blank())
+  open.value = true
+}
 function openEdit(s: IncomeSource) {
   Object.assign(form, {
-    id: s.id, company: s.company, jobTitle: s.job_title ?? '',
-    salary: s.salary_rappen / 100, currency: s.currency,
-    payoutDay: s.payout_day, canton: s.canton, payoutRule: s.payout_rule
+    id: s.id,
+    company: s.company,
+    jobTitle: s.job_title ?? '',
+    salary: s.salary_rappen / 100,
+    currency: s.currency,
+    payoutDay: s.payout_day,
+    canton: s.canton,
+    payoutRule: s.payout_rule
   })
   open.value = true
 }
 
 const formRef = ref()
 function validate(state: typeof form) {
-  const errors: { name: string, message: string }[] = []
+  const errors: { name: string; message: string }[] = []
   if (!state.company.trim()) errors.push({ name: 'company', message: t('validation.required') })
   if (state.salary == null) errors.push({ name: 'salary', message: t('validation.required') })
   else if (state.salary <= 0) errors.push({ name: 'salary', message: t('validation.positive') })
@@ -66,30 +101,56 @@ function validate(state: typeof form) {
 async function save() {
   saving.value = true
   try {
-    const body = { company: form.company, jobTitle: form.jobTitle, salary: form.salary,
-      currency: form.currency, payoutDay: form.payoutDay, canton: form.canton, payoutRule: form.payoutRule }
+    const body = {
+      company: form.company,
+      jobTitle: form.jobTitle,
+      salary: form.salary,
+      currency: form.currency,
+      payoutDay: form.payoutDay,
+      canton: form.canton,
+      payoutRule: form.payoutRule
+    }
     if (form.id) await $fetch(`/api/income/sources/${form.id}`, { method: 'PUT', body })
     else await $fetch('/api/income/sources', { method: 'POST', body })
     open.value = false
     await refresh()
-  } finally { saving.value = false }
+  } finally {
+    saving.value = false
+  }
 }
-async function remove(id: number) { await $fetch(`/api/income/sources/${id}`, { method: 'DELETE' }); await refresh() }
+async function remove(id: number) {
+  await $fetch(`/api/income/sources/${id}`, { method: 'DELETE' })
+  await refresh()
+}
 async function togglePaid(id: number) {
-  await $fetch(`/api/income/sources/${id}/toggle-paid`, { method: 'POST', body: { month: month.value } })
+  await $fetch(`/api/income/sources/${id}/toggle-paid`, {
+    method: 'POST',
+    body: { month: month.value }
+  })
   await refresh()
 }
 
-function chf(rappen: number) { return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }
+function chf(rappen: number) {
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
+}
 
 const totalMonth = computed(() => data.value.sources.reduce((s, x) => s + x.salary_rappen, 0))
-const totalPaid = computed(() => data.value.sources.filter(s => s.paid).reduce((s, x) => s + x.salary_rappen, 0))
+const totalPaid = computed(() =>
+  data.value.sources.filter((s) => s.paid).reduce((s, x) => s + x.salary_rappen, 0)
+)
 const totalPending = computed(() => totalMonth.value - totalPaid.value)
 </script>
 
 <template>
   <div class="page-income">
-    <UiPageHead :crumb="`${$t('nav.finance')} / ${$t('nav.income')}`" :title="$t('nav.income')" :subtitle="$t('income.subtitle')">
+    <UiPageHead
+      :crumb="`${$t('nav.finance')} / ${$t('nav.income')}`"
+      :title="$t('nav.income')"
+      :subtitle="$t('income.subtitle')"
+    >
       <template #actions>
         <MonthSelect v-model="month" />
         <button class="ed-btn-primary" @click="openCreate">
@@ -99,7 +160,12 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
     </UiPageHead>
 
     <UiKpiRow>
-      <UiKpiCell :label="$t('income.kpiTotalMonth')" currency="CHF" :value="chf(totalMonth)" inverted />
+      <UiKpiCell
+        :label="$t('income.kpiTotalMonth')"
+        currency="CHF"
+        :value="chf(totalMonth)"
+        inverted
+      />
       <UiKpiCell :label="$t('common.received')" currency="CHF" :value="chf(totalPaid)" />
       <UiKpiCell :label="$t('common.pending')" currency="CHF" :value="chf(totalPending)" />
       <UiKpiCell :label="$t('income.kpiSources')" :value="String(data.sources.length)" />
@@ -129,8 +195,12 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
               <div v-if="s.job_title" class="src-sub mono">{{ s.job_title }}</div>
             </div>
             <div class="src-actions">
-              <button class="icon-btn" @click="openEdit(s)"><UIcon name="i-lucide-pencil" /></button>
-              <button class="icon-btn" @click="remove(s.id)"><UIcon name="i-lucide-trash-2" /></button>
+              <button class="icon-btn" @click="openEdit(s)">
+                <UIcon name="i-lucide-pencil" />
+              </button>
+              <button class="icon-btn" @click="remove(s.id)">
+                <UIcon name="i-lucide-trash-2" />
+              </button>
             </div>
           </header>
           <div class="src-amt tabular">{{ s.currency }} {{ chf(s.salary_rappen) }}</div>
@@ -143,7 +213,9 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
             <div>
               <div class="eyebrow">{{ $t('income.paysThisMonth') }}</div>
               <div class="mono pay-date">{{ dateCh(s.pay_date) }}</div>
-              <div v-if="s.reason" class="reason mono">{{ $t('income.moved') }} · {{ s.reason }}</div>
+              <div v-if="s.reason" class="reason mono">
+                {{ $t('income.moved') }} · {{ s.reason }}
+              </div>
               <div v-else class="reason mono muted">{{ $t('income.onSchedule') }}</div>
             </div>
             <div class="src-pay">
@@ -165,7 +237,14 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
       :ui="{ content: 'max-w-full sm:max-w-xl' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" novalidate class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit="save">
+        <UForm
+          ref="formRef"
+          :state="form"
+          :validate="validate"
+          novalidate
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2"
+          @submit="save"
+        >
           <UFormField name="company" :label="$t('income.company')" class="sm:col-span-2">
             <UInput v-model="form.company" class="w-full" />
           </UFormField>
@@ -187,12 +266,13 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
         </UForm>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2 w-full">
+        <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
-          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">
+            {{ $t('common.save') }}
+          </button>
         </div>
       </template>
     </USlideover>
   </div>
 </template>
-

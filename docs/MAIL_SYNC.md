@@ -7,15 +7,15 @@ thread. No copy paste, no forwarding rules, no manual logging.
 This page covers the shared concepts. **For the per provider one time
 setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
 
-| Provider                                    | Status      | Setup guide                          |
-| ------------------------------------------- | ----------- | ------------------------------------ |
-| Microsoft 365 / Outlook                     | Available   | [OUTLOOK_SYNC](OUTLOOK_SYNC.md)      |
-| Gmail / Google Workspace                    | Available   | [GMAIL_SYNC](GMAIL_SYNC.md)          |
-| IMAP (Proton Bridge, Fastmail, iCloud, …)   | Available   | [IMAP_SYNC](IMAP_SYNC.md)            |
+| Provider                                  | Status    | Setup guide                     |
+| ----------------------------------------- | --------- | ------------------------------- |
+| Microsoft 365 / Outlook                   | Available | [OUTLOOK_SYNC](OUTLOOK_SYNC.md) |
+| Gmail / Google Workspace                  | Available | [GMAIL_SYNC](GMAIL_SYNC.md)     |
+| IMAP (Proton Bridge, Fastmail, iCloud, …) | Available | [IMAP_SYNC](IMAP_SYNC.md)       |
 
 ## Requirements
 
-* `BATZE_SECRET` environment variable (16+ random characters) set on
+- `BATZE_SECRET` environment variable (16+ random characters) set on
   the running batze instance.
 
   ```env
@@ -26,7 +26,7 @@ setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
   with a key derived from this secret. Rotating it invalidates every
   stored mailbox connection; you'll have to reconnect.
 
-* For OAuth providers (Outlook, Gmail), batze runs the PKCE flow.
+- For OAuth providers (Outlook, Gmail), batze runs the PKCE flow.
   Outlook works secret free; Google's Web OAuth client also requires
   a client secret on token exchange, which batze stores encrypted at
   rest. The user is the only one with the credentials; batze keeps
@@ -34,11 +34,11 @@ setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
 
 ## Where to find it
 
-* **Settings → Mail sync** lists all your connected mailboxes and
+- **Settings → Mail sync** lists all your connected mailboxes and
   lets you connect a new one.
-* **Settings → Mail sync → row → Sync now** runs a sync immediately
+- **Settings → Mail sync → row → Sync now** runs a sync immediately
   for that mailbox and shows how many new replies it imported.
-* **Settings → Mail sync → row → Disconnect** forgets the local
+- **Settings → Mail sync → row → Disconnect** forgets the local
   tokens. To revoke at the provider side, do that from the provider's
   own apps dashboard.
 
@@ -80,15 +80,15 @@ You can always force a sync from the Settings list with **Sync now**.
 
 ## Troubleshooting
 
-* **`BATZE_SECRET environment variable must be set`**
+- **`BATZE_SECRET environment variable must be set`**
   Add a 16+ char random string to your environment (or `.env` /
   `docker-compose.yml`) and restart batze.
-* **The sync ran but nothing appeared in the thread**
+- **The sync ran but nothing appeared in the thread**
   The reply's headers didn't reference a Message-ID batze captured.
   Confirm the email was originally sent from batze (not from your
   normal mail client) and that the recipient's reply is a true reply
   (not a forwarded new message that strips the headers).
-* **Mailbox row shows a red error message**
+- **Mailbox row shows a red error message**
   The last sync attempt failed with that message. Common causes:
   the access token couldn't be refreshed (reconnect the mailbox),
   the provider's API is rate limiting (it'll retry on the next

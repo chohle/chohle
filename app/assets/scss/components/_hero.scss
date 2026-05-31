@@ -25,15 +25,25 @@
     gap: 6px;
   }
 
-  .hero-cur { font-size: 0.36em; color: var(--ink-3); font-weight: 400; }
-  .hero-num { font-feature-settings: "tnum"; }
+  .hero-cur {
+    font-size: 0.36em;
+    color: var(--ink-3);
+    font-weight: 400;
+  }
+  .hero-num {
+    font-feature-settings: "tnum";
+  }
   .hero-period {
     font-family: var(--font-serif);
     font-style: italic;
     color: var(--ink);
   }
 
-  .hero-aside { display: flex; align-items: flex-end; gap: 18px; }
+  .hero-aside {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+  }
   .hero-delta {
     font-size: 11px;
     letter-spacing: 0.12em;
@@ -47,6 +57,8 @@
     gap: 14px;
     padding: 22px 0;
 
-    .hero-aside { justify-content: space-between; }
+    .hero-aside {
+      justify-content: space-between;
+    }
   }
 }

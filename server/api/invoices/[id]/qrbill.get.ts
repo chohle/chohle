@@ -41,18 +41,26 @@ export default defineEventHandler(async (event) => {
   const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party | undefined
   const iban = (sender?.iban ?? '').replace(/\s/g, '')
   if (!sender || !isIBANValid(iban)) {
-    throw createError({ statusCode: 422, statusMessage: 'Set a valid IBAN in Billing to generate the QR-bill.' })
+    throw createError({
+      statusCode: 422,
+      statusMessage: 'Set a valid IBAN in Billing to generate the QR-bill.'
+    })
   }
   if (!sender.name || !sender.street || !sender.zip || !sender.city) {
-    throw createError({ statusCode: 422, statusMessage: 'Complete your sender address in Billing.' })
+    throw createError({
+      statusCode: 422,
+      statusMessage: 'Complete your sender address in Billing.'
+    })
   }
 
-  const customer = db
-    .prepare('SELECT * FROM customers WHERE id = ?')
-    .get(invoice.customer_id) as Party | undefined
+  const customer = db.prepare('SELECT * FROM customers WHERE id = ?').get(invoice.customer_id) as
+    | Party
+    | undefined
 
   const items = db
-    .prepare('SELECT quantity, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?')
+    .prepare(
+      'SELECT quantity, unit_price_rappen, discount_percent, mwst_percent FROM invoice_items WHERE invoice_id = ?'
+    )
     .all(id) as ItemRow[]
   const vat = !!(sender as { vat_registered?: number }).vat_registered
   const { totalRappen } = computeInvoiceTotals(
@@ -97,7 +105,12 @@ export default defineEventHandler(async (event) => {
   }
 
   // Render the QR-bill in the customer's language so it matches the invoice.
-  const langMap: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = { de: 'DE', fr: 'FR', it: 'IT', en: 'EN' }
+  const langMap: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = {
+    de: 'DE',
+    fr: 'FR',
+    it: 'IT',
+    en: 'EN'
+  }
   const language = langMap[customer?.language ?? ''] ?? 'DE'
 
   let svg: string

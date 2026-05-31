@@ -571,7 +571,10 @@ export function runMigrations(db: Database): { applied: string[] } {
   `)
 
   const done = new Set(
-    db.prepare('SELECT name FROM schema_migrations').all().map((r) => (r as { name: string }).name)
+    db
+      .prepare('SELECT name FROM schema_migrations')
+      .all()
+      .map((r) => (r as { name: string }).name)
   )
 
   const applied: string[] = []
@@ -594,7 +597,9 @@ export function runMigrations(db: Database): { applied: string[] } {
       }
       const violations = db.pragma('foreign_key_check') as unknown[]
       if (violations.length > 0) {
-        throw new Error(`Migration ${migration.name} left foreign key violations: ${JSON.stringify(violations)}`)
+        throw new Error(
+          `Migration ${migration.name} left foreign key violations: ${JSON.stringify(violations)}`
+        )
       }
     } else {
       db.transaction(() => {

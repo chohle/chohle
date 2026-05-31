@@ -35,8 +35,9 @@ export default defineEventHandler(async (event) => {
   const stageList: Stage[] = direction === 'procurement' ? PROC_STAGES : SALES_STAGES
 
   const db = useDb()
-  const rows = db.prepare(
-    `SELECT p.id, p.name, p.customer_id, c.name AS customer_name,
+  const rows = db
+    .prepare(
+      `SELECT p.id, p.name, p.customer_id, c.name AS customer_name,
             COALESCE(c.email, p.email) AS customer_email,
             p.email, p.phone,
             p.direction, p.stage, p.label, p.budget_rappen, p.budget_type,
@@ -45,10 +46,14 @@ export default defineEventHandler(async (event) => {
      LEFT JOIN customers c ON c.id = p.customer_id
      WHERE p.direction = ?
      ORDER BY p.stage, p.position, p.id`
-  ).all(direction) as ProjectRow[]
+    )
+    .all(direction) as ProjectRow[]
 
-  const stages = Object.fromEntries(stageList.map(s => [s, [] as ProjectRow[]])) as Record<Stage, ProjectRow[]>
-  const totals = Object.fromEntries(stageList.map(s => [s, 0])) as Record<Stage, number>
+  const stages = Object.fromEntries(stageList.map((s) => [s, [] as ProjectRow[]])) as Record<
+    Stage,
+    ProjectRow[]
+  >
+  const totals = Object.fromEntries(stageList.map((s) => [s, 0])) as Record<Stage, number>
 
   for (const r of rows) {
     if (!(r.stage in stages)) continue

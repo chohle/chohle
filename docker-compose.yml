@@ -5,7 +5,7 @@ services:
       context: .
       target: dev
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       # Bind-mount source for hot reload, but keep the container's own
       # node_modules (native modules are built for Linux, not the host).
@@ -29,8 +29,8 @@ services:
     # 8025/1025. The app reaches Mailpit at mailpit:1025 over the compose
     # network regardless, so only these host-facing URLs change.
     ports:
-      - "8125:8025" # web UI  -> http://localhost:8125
-      - "1125:1025" # SMTP
+      - '8125:8025' # web UI  -> http://localhost:8125
+      - '1125:1025' # SMTP
     environment:
       - MP_MAX_MESSAGES=500
 

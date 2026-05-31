@@ -1,4 +1,14 @@
-type Stage = 'lead' | 'contacted' | 'proposal' | 'won' | 'active' | 'completed' | 'need' | 'requested' | 'received' | 'accepted'
+type Stage =
+  | 'lead'
+  | 'contacted'
+  | 'proposal'
+  | 'won'
+  | 'active'
+  | 'completed'
+  | 'need'
+  | 'requested'
+  | 'received'
+  | 'accepted'
 type BudgetType = 'fixed' | 'hourly' | 'estimate'
 
 interface Body {
@@ -14,8 +24,20 @@ interface Body {
   phone?: string | null
 }
 
-const SALES_STAGES: ReadonlySet<Stage> = new Set<Stage>(['lead', 'contacted', 'proposal', 'won', 'active', 'completed'])
-const PROC_STAGES: ReadonlySet<Stage> = new Set<Stage>(['need', 'requested', 'received', 'accepted'])
+const SALES_STAGES: ReadonlySet<Stage> = new Set<Stage>([
+  'lead',
+  'contacted',
+  'proposal',
+  'won',
+  'active',
+  'completed'
+])
+const PROC_STAGES: ReadonlySet<Stage> = new Set<Stage>([
+  'need',
+  'requested',
+  'received',
+  'accepted'
+])
 const BUDGET_TYPES: ReadonlySet<BudgetType> = new Set<BudgetType>(['fixed', 'hourly', 'estimate'])
 
 function stagesFor(direction: 'sales' | 'procurement') {
@@ -32,9 +54,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<Body>(event)
   const db = useDb()
 
-  const existing = db.prepare(
-    `SELECT id, direction, stage FROM projects WHERE id = ?`
-  ).get(id) as { id: number; direction: 'sales' | 'procurement'; stage: Stage } | undefined
+  const existing = db.prepare(`SELECT id, direction, stage FROM projects WHERE id = ?`).get(id) as
+    | { id: number; direction: 'sales' | 'procurement'; stage: Stage }
+    | undefined
   if (!existing) {
     throw createError({ statusCode: 404, statusMessage: 'not found' })
   }
@@ -45,25 +67,34 @@ export default defineEventHandler(async (event) => {
   const allowed = stagesFor(existing.direction)
   const stage: Stage | undefined = body.stage && allowed.has(body.stage) ? body.stage : undefined
   if (body.stage && !stage) {
-    throw createError({ statusCode: 400, statusMessage: 'stage is not valid for this project direction' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'stage is not valid for this project direction'
+    })
   }
   const label = body.label?.trim()
   const budgetRappen = body.budget != null ? Math.round(body.budget * 100) : undefined
-  const budgetType: BudgetType | undefined = body.budget_type && BUDGET_TYPES.has(body.budget_type) ? body.budget_type : undefined
-  const dueDate = body.due_date === null
-    ? null
-    : (body.due_date && /^\d{4}-\d{2}-\d{2}$/.test(body.due_date) ? body.due_date : undefined)
+  const budgetType: BudgetType | undefined =
+    body.budget_type && BUDGET_TYPES.has(body.budget_type) ? body.budget_type : undefined
+  const dueDate =
+    body.due_date === null
+      ? null
+      : body.due_date && /^\d{4}-\d{2}-\d{2}$/.test(body.due_date)
+        ? body.due_date
+        : undefined
   const notes = body.notes
   const customerId = body.customer_id
   // Treat empty string as 'clear' so the user can wipe a field.
-  const email = body.email === undefined ? undefined : (body.email?.trim() || null)
-  const phone = body.phone === undefined ? undefined : (body.phone?.trim() || null)
+  const email = body.email === undefined ? undefined : body.email?.trim() || null
+  const phone = body.phone === undefined ? undefined : body.phone?.trim() || null
 
   let position: number | undefined
   if (stage && stage !== existing.stage) {
-    const next = db.prepare(
-      `SELECT COALESCE(MAX(position), -1) + 1 AS p FROM projects WHERE direction = ? AND stage = ?`
-    ).get(existing.direction, stage) as { p: number }
+    const next = db
+      .prepare(
+        `SELECT COALESCE(MAX(position), -1) + 1 AS p FROM projects WHERE direction = ? AND stage = ?`
+      )
+      .get(existing.direction, stage) as { p: number }
     position = next.p
   }
 

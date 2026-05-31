@@ -43,7 +43,13 @@ const shown = ref(PAGE_SIZE)
 
 // Reset pagination when filters, period or custom month change so we
 // don't strand the user in the middle of a now-shorter list.
-watch([filters, period, customMonth], () => { shown.value = PAGE_SIZE }, { deep: true })
+watch(
+  [filters, period, customMonth],
+  () => {
+    shown.value = PAGE_SIZE
+  },
+  { deep: true }
+)
 
 const todayDate = new Date()
 const todayIso = todayDate.toISOString().slice(0, 10)
@@ -81,9 +87,9 @@ const window_ = computed<{ start: string; end: string | null }>(() => {
 })
 
 const filtered = computed(() => {
-  const events = (data.value?.events ?? []).filter(e => filters[e.kind])
+  const events = (data.value?.events ?? []).filter((e) => filters[e.kind])
   const w = window_.value
-  return events.filter(e => e.at >= w.start && (w.end === null || e.at < w.end))
+  return events.filter((e) => e.at >= w.start && (w.end === null || e.at < w.end))
 })
 
 const visible = computed(() => filtered.value.slice(0, shown.value))
@@ -106,11 +112,14 @@ const groups = computed(() => {
     { label: t('activity.today'), items: today },
     { label: t('activity.thisWeek'), items: week },
     { label: t('activity.earlier'), items: earlier }
-  ].filter(g => g.items.length)
+  ].filter((g) => g.items.length)
 })
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
 }
 
 function relTime(iso: string): string {
@@ -139,7 +148,7 @@ const periodOptions = computed(() => [
   { value: 'custom', label: t('activity.period.custom') }
 ])
 
-const activeCount = computed(() => orderedKinds.filter(k => filters[k]).length)
+const activeCount = computed(() => orderedKinds.filter((k) => filters[k]).length)
 const allActive = computed(() => activeCount.value === orderedKinds.length)
 const filterTriggerLabel = computed(() =>
   allActive.value ? t('activity.allKinds') : t('activity.kindsActive', { n: activeCount.value })
@@ -160,7 +169,11 @@ function go(link: string | undefined) {
     >
       <template #actions>
         <div class="page-activity__head-actions">
-          <UiSegmentedControl v-model="period" :options="periodOptions" :aria-label="$t('activity.periodLabel')" />
+          <UiSegmentedControl
+            v-model="period"
+            :options="periodOptions"
+            :aria-label="$t('activity.periodLabel')"
+          />
           <MonthSelect v-if="period === 'custom'" v-model="customMonth" />
         </div>
       </template>
@@ -171,7 +184,10 @@ function go(link: string | undefined) {
         <button class="page-activity__mobile-trigger" type="button">
           <UIcon name="i-lucide-sliders-horizontal" class="size-4" />
           <span class="page-activity__mobile-trigger-label">{{ filterTriggerLabel }}</span>
-          <UIcon name="i-lucide-chevron-down" class="size-3.5 page-activity__mobile-trigger-caret" />
+          <UIcon
+            name="i-lucide-chevron-down"
+            class="page-activity__mobile-trigger-caret size-3.5"
+          />
         </button>
         <template #content>
           <div class="eyebrow page-activity__side-title">{{ $t('activity.filterBy') }}</div>
@@ -181,7 +197,7 @@ function go(link: string | undefined) {
                 <span class="page-activity__check" :class="{ on: filters[k] }">
                   <UIcon v-if="filters[k]" name="i-lucide-check" class="size-3" />
                 </span>
-                <input v-model="filters[k]" type="checkbox" class="page-activity__sr">
+                <input v-model="filters[k]" type="checkbox" class="page-activity__sr" />
                 <span class="page-activity__filter-label">{{ KIND_LABEL[k] }}</span>
                 <span class="mono page-activity__filter-count">{{ data.counts[k] }}</span>
               </label>
@@ -253,7 +269,7 @@ function go(link: string | undefined) {
                 <span class="page-activity__check" :class="{ on: filters[k] }">
                   <UIcon v-if="filters[k]" name="i-lucide-check" class="size-3" />
                 </span>
-                <input v-model="filters[k]" type="checkbox" class="page-activity__sr">
+                <input v-model="filters[k]" type="checkbox" class="page-activity__sr" />
                 <span class="page-activity__filter-label">{{ KIND_LABEL[k] }}</span>
                 <span class="mono page-activity__filter-count">{{ data.counts[k] }}</span>
               </label>

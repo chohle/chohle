@@ -1,6 +1,14 @@
 type Direction = 'sales' | 'procurement'
 // Only kanban stages can be reordered (active/completed are not kanban columns).
-type Stage = 'lead' | 'contacted' | 'proposal' | 'won' | 'need' | 'requested' | 'received' | 'accepted'
+type Stage =
+  | 'lead'
+  | 'contacted'
+  | 'proposal'
+  | 'won'
+  | 'need'
+  | 'requested'
+  | 'received'
+  | 'accepted'
 
 interface Body {
   direction: Direction
@@ -9,7 +17,12 @@ interface Body {
 }
 
 const SALES_STAGES: ReadonlySet<Stage> = new Set<Stage>(['lead', 'contacted', 'proposal', 'won'])
-const PROC_STAGES: ReadonlySet<Stage> = new Set<Stage>(['need', 'requested', 'received', 'accepted'])
+const PROC_STAGES: ReadonlySet<Stage> = new Set<Stage>([
+  'need',
+  'requested',
+  'received',
+  'accepted'
+])
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)

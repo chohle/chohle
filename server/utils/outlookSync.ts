@@ -10,6 +10,7 @@
 
 import type { Database } from 'better-sqlite3'
 import { decryptSecret, encryptSecret } from './secrets'
+import type { SyncResult } from './mailbox'
 
 // Server side mailbox row. Includes the encrypted token columns and the
 // OAuth app credentials needed to refresh the access token; distinct on
@@ -71,8 +72,8 @@ function extractAnchors(msg: GraphMessage): string[] {
   const ids: string[] = []
   const inReply = headerValue(msg, 'In-Reply-To')
   const refs = headerValue(msg, 'References')
-  if (inReply) ids.push(...inReply.match(/<[^>]+>/g) ?? [inReply])
-  if (refs)    ids.push(...refs.match(/<[^>]+>/g) ?? refs.split(/\s+/))
+  if (inReply) ids.push(...(inReply.match(/<[^>]+>/g) ?? [inReply]))
+  if (refs) ids.push(...(refs.match(/<[^>]+>/g) ?? refs.split(/\s+/)))
   return Array.from(new Set(ids.map(stripAngles).filter(Boolean)))
 }
 
@@ -120,8 +121,15 @@ async function fetchInboxSince(token: string, sinceIso: string): Promise<GraphMe
   // page at 50 by default; follow @odata.nextLink to paginate but cap at
   // 200 messages per sync run to keep things bounded.
   const select = [
-    'id', 'internetMessageId', 'subject', 'bodyPreview', 'body',
-    'from', 'toRecipients', 'receivedDateTime', 'internetMessageHeaders'
+    'id',
+    'internetMessageId',
+    'subject',
+    'bodyPreview',
+    'body',
+    'from',
+    'toRecipients',
+    'receivedDateTime',
+    'internetMessageHeaders'
   ].join(',')
   const filter = `receivedDateTime gt ${sinceIso}`
   let url: string | undefined =
@@ -138,13 +146,10 @@ async function fetchInboxSince(token: string, sinceIso: string): Promise<GraphMe
   return out
 }
 
-export interface SyncResult {
-  scanned: number
-  inserted: number
-  duplicates: number
-}
-
-export async function syncOutlookMailbox(db: Database, mailbox: OutlookSyncMailbox): Promise<SyncResult> {
+export async function syncOutlookMailbox(
+  db: Database,
+  mailbox: OutlookSyncMailbox
+): Promise<SyncResult> {
   const token = await ensureFreshToken(db, mailbox)
   // On first sync, look back 7 days. Subsequent syncs resume from
   // last_sync_at minus a small overlap so a slow-clock reply doesn't slip
@@ -160,15 +165,22 @@ export async function syncOutlookMailbox(db: Database, mailbox: OutlookSyncMailb
   // any realistic batze install and replaces a second sentIds Set whose
   // `.has` was always redundant with `projectByMsgId.has`.
   const projectByMsgId = new Map<string, number>()
-  const outboundRows = db.prepare(
-    `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
-  ).all() as Array<{ project_id: number, message_id: string }>
+  const outboundRows = db
+    .prepare(
+      `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
+    )
+    .all() as Array<{ project_id: number; message_id: string }>
   for (const r of outboundRows) projectByMsgId.set(r.message_id, r.project_id)
 
   // Dedup: skip messages we've already imported (by Graph internetMessageId).
   const existingInbound = new Set<string>(
-    (db.prepare(`SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`).all() as Array<{ message_id: string }>)
-      .map(r => r.message_id)
+    (
+      db
+        .prepare(
+          `SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`
+        )
+        .all() as Array<{ message_id: string }>
+    ).map((r) => r.message_id)
   )
 
   const insert = db.prepare(
@@ -181,20 +193,31 @@ export async function syncOutlookMailbox(db: Database, mailbox: OutlookSyncMailb
   let duplicates = 0
   for (const msg of messages) {
     const incomingId = msg.internetMessageId ? stripAngles(msg.internetMessageId) : null
-    if (incomingId && existingInbound.has(incomingId)) { duplicates += 1; continue }
+    if (incomingId && existingInbound.has(incomingId)) {
+      duplicates += 1
+      continue
+    }
 
     const anchors = extractAnchors(msg)
     let projectId: number | undefined
     for (const a of anchors) {
       const match = projectByMsgId.get(a)
-      if (match !== undefined) { projectId = match; break }
+      if (match !== undefined) {
+        projectId = match
+        break
+      }
     }
     if (!projectId) continue
 
     const html = msg.body?.contentType === 'html' ? (msg.body.content ?? '') : ''
-    const text = msg.body?.contentType === 'text' ? (msg.body.content ?? '') : (msg.bodyPreview ?? '')
+    const text =
+      msg.body?.contentType === 'text' ? (msg.body.content ?? '') : (msg.bodyPreview ?? '')
     const from = msg.from?.emailAddress?.address ?? null
-    const to = (msg.toRecipients ?? []).map(r => r.emailAddress?.address).filter(Boolean).join(', ') || null
+    const to =
+      (msg.toRecipients ?? [])
+        .map((r) => r.emailAddress?.address)
+        .filter(Boolean)
+        .join(', ') || null
     const sentAt = (msg.receivedDateTime ?? new Date().toISOString()).replace('T', ' ').slice(0, 19)
 
     insert.run(projectId, from, to, msg.subject ?? '', html, text, sentAt, incomingId)
@@ -202,20 +225,27 @@ export async function syncOutlookMailbox(db: Database, mailbox: OutlookSyncMailb
     if (incomingId) existingInbound.add(incomingId)
   }
 
-  db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`)
-    .run(new Date().toISOString(), mailbox.id)
+  db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`).run(
+    new Date().toISOString(),
+    mailbox.id
+  )
 
   return { scanned: messages.length, inserted, duplicates }
 }
 
 export function listOutlookMailboxes(db: Database): OutlookSyncMailbox[] {
-  return db.prepare(
-    `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
+  return db
+    .prepare(
+      `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
             token_expires_at, provider_client_id, provider_tenant_id, last_sync_at
      FROM mailboxes WHERE provider = 'outlook'`
-  ).all() as OutlookSyncMailbox[]
+    )
+    .all() as OutlookSyncMailbox[]
 }
 
 export function recordSyncError(db: Database, mailboxId: number, message: string) {
-  db.prepare(`UPDATE mailboxes SET last_error = ? WHERE id = ?`).run(message.slice(0, 500), mailboxId)
+  db.prepare(`UPDATE mailboxes SET last_error = ? WHERE id = ?`).run(
+    message.slice(0, 500),
+    mailboxId
+  )
 }

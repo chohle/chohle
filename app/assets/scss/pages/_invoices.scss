@@ -1,6 +1,10 @@
 .page-invoices {
-  &__filter-row { padding: 22px 0 18px; }
-  &__muted { color: var(--ink-3); }
+  &__filter-row {
+    padding: 22px 0 18px;
+  }
+  &__muted {
+    color: var(--ink-3);
+  }
 
   &__project {
     display: inline-flex;
@@ -12,5 +16,7 @@
     background: var(--surface-2);
   }
 
-  .ed-table tr.row { cursor: pointer; }
+  .ed-table tr.row {
+    cursor: pointer;
+  }
 }

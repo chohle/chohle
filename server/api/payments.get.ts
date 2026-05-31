@@ -25,13 +25,13 @@ export default defineEventHandler(async (event) => {
        WHERE i.status = 'paid' AND substr(i.paid_at, 1, 4) = ?`
     )
     .all(year) as Array<{
-      id: number
-      number: string | null
-      title: string | null
-      date: string
-      total_rappen: number
-      customer_name: string
-    }>
+    id: number
+    number: string | null
+    title: string | null
+    date: string
+    total_rappen: number
+    customer_name: string
+  }>
 
   const salaryRows = db
     .prepare(
@@ -41,12 +41,12 @@ export default defineEventHandler(async (event) => {
        WHERE substr(p.date, 1, 4) = ?`
     )
     .all(year) as Array<{
-      id: number
-      date: string
-      amount_rappen: number
-      month: string
-      company: string
-    }>
+    id: number
+    date: string
+    amount_rappen: number
+    month: string
+    company: string
+  }>
 
   const rows: PaymentRow[] = [
     ...invoiceRows.map<PaymentRow>((r) => ({

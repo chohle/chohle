@@ -57,11 +57,13 @@ function makeMailbox(db: Database.Database, opts: { tokenExpiresAt?: string } = 
     '00000000-0000-0000-0000-000000000001',
     'common'
   )
-  return db.prepare(
-    `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
+  return db
+    .prepare(
+      `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
             token_expires_at, provider_client_id, provider_tenant_id, last_sync_at
      FROM mailboxes ORDER BY id DESC LIMIT 1`
-  ).get() as Parameters<typeof syncOutlookMailbox>[1]
+    )
+    .get() as Parameters<typeof syncOutlookMailbox>[1]
 }
 
 function stubGraphResponses(pages: { value: GraphMessage[]; '@odata.nextLink'?: string }[]) {
@@ -72,7 +74,9 @@ function stubGraphResponses(pages: { value: GraphMessage[]; '@odata.nextLink'?: 
   const fetch = vi.fn(async () => {
     const page = pages[idx]
     if (!page) {
-      throw new Error(`stubGraphResponses: $fetch called ${idx + 1} times but only ${pages.length} page(s) provided`)
+      throw new Error(
+        `stubGraphResponses: $fetch called ${idx + 1} times but only ${pages.length} page(s) provided`
+      )
     }
     idx += 1
     return page
@@ -85,14 +89,14 @@ const replyMatching: GraphMessage = {
   id: 'AAMkAGI1',
   internetMessageId: '<reply-1@outlook.com>',
   subject: 'Re: Proposal',
-  bodyPreview: 'Sounds great, let\'s do it.',
+  bodyPreview: "Sounds great, let's do it.",
   body: { contentType: 'html', content: '<p>Sounds great, let&apos;s do it.</p>' },
   from: { emailAddress: { address: 'thomas@acme.ch', name: 'Thomas' } },
   toRecipients: [{ emailAddress: { address: 'us@batze.ch' } }],
   receivedDateTime: '2026-05-31T10:00:00Z',
   internetMessageHeaders: [
     { name: 'In-Reply-To', value: '<original-1@batze.ch>' },
-    { name: 'References',  value: '<original-1@batze.ch>' }
+    { name: 'References', value: '<original-1@batze.ch>' }
   ]
 }
 
@@ -108,7 +112,9 @@ const replyUnrelated: GraphMessage = {
 }
 
 describe('syncOutlookMailbox', () => {
-  beforeEach(() => { vi.unstubAllGlobals() })
+  beforeEach(() => {
+    vi.unstubAllGlobals()
+  })
 
   it('inserts an inbound row when In-Reply-To matches a captured outbound message_id', async () => {
     const { db, projectId } = makeDb()
@@ -120,9 +126,14 @@ describe('syncOutlookMailbox', () => {
     expect(result.inserted).toBe(1)
     expect(result.duplicates).toBe(0)
 
-    const inbound = db.prepare(
-      `SELECT * FROM project_emails WHERE direction = 'inbound'`
-    ).all() as Array<{ project_id: number; subject: string; message_id: string; from_address: string }>
+    const inbound = db
+      .prepare(`SELECT * FROM project_emails WHERE direction = 'inbound'`)
+      .all() as Array<{
+      project_id: number
+      subject: string
+      message_id: string
+      from_address: string
+    }>
     expect(inbound).toHaveLength(1)
     expect(inbound[0]!.project_id).toBe(projectId)
     expect(inbound[0]!.subject).toBe('Re: Proposal')
@@ -139,7 +150,11 @@ describe('syncOutlookMailbox', () => {
     expect(result.scanned).toBe(1)
     expect(result.inserted).toBe(0)
     expect(
-      (db.prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`).get() as { n: number }).n
+      (
+        db
+          .prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`)
+          .get() as { n: number }
+      ).n
     ).toBe(0)
   })
 
@@ -151,17 +166,23 @@ describe('syncOutlookMailbox', () => {
 
     // Reset stub and feed the same message again on a second run.
     stubGraphResponses([{ value: [replyMatching] }])
-    const reload = db.prepare(
-      `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
+    const reload = db
+      .prepare(
+        `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
               token_expires_at, provider_client_id, provider_tenant_id, last_sync_at
        FROM mailboxes WHERE id = ?`
-    ).get(mailbox.id) as typeof mailbox
+      )
+      .get(mailbox.id) as typeof mailbox
 
     const result = await syncOutlookMailbox(db, reload)
     expect(result.inserted).toBe(0)
     expect(result.duplicates).toBe(1)
     expect(
-      (db.prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`).get() as { n: number }).n
+      (
+        db
+          .prepare(`SELECT COUNT(*) AS n FROM project_emails WHERE direction = 'inbound'`)
+          .get() as { n: number }
+      ).n
     ).toBe(1)
   })
 
@@ -173,15 +194,19 @@ describe('syncOutlookMailbox', () => {
        VALUES (?, 'outbound', 'original-2@batze.ch', 'Follow up', '', '')`
     ).run(projectId)
     const mailbox = makeMailbox(db)
-    stubGraphResponses([{
-      value: [{
-        ...replyMatching,
-        internetMessageId: '<reply-2@outlook.com>',
-        internetMessageHeaders: [
-          { name: 'References', value: '<some-other@x.com> <original-2@batze.ch>' }
+    stubGraphResponses([
+      {
+        value: [
+          {
+            ...replyMatching,
+            internetMessageId: '<reply-2@outlook.com>',
+            internetMessageHeaders: [
+              { name: 'References', value: '<some-other@x.com> <original-2@batze.ch>' }
+            ]
+          }
         ]
-      }]
-    }])
+      }
+    ])
 
     const result = await syncOutlookMailbox(db, mailbox)
     expect(result.inserted).toBe(1)
@@ -214,7 +239,10 @@ describe('syncOutlookMailbox', () => {
     const { db } = makeDb()
     const mailbox = makeMailbox(db)
     stubGraphResponses([
-      { value: [], '@odata.nextLink': 'https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages?next' },
+      {
+        value: [],
+        '@odata.nextLink': 'https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages?next'
+      },
       { value: [replyMatching] }
     ])
     const result = await syncOutlookMailbox(db, mailbox)

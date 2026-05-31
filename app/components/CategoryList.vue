@@ -7,8 +7,8 @@ interface Category {
   icon: string
 }
 
-defineProps<{ title: string, categories: Category[] }>()
-defineEmits<{ edit: [Category], remove: [number] }>()
+defineProps<{ title: string; categories: Category[] }>()
+defineEmits<{ edit: [Category]; remove: [number] }>()
 </script>
 
 <template>
@@ -23,8 +23,12 @@ defineEmits<{ edit: [Category], remove: [number] }>()
         </span>
         <span class="cat-list__name">{{ c.name }}</span>
         <div class="cat-list__actions">
-          <button class="icon-btn" @click="$emit('edit', c)"><UIcon name="i-lucide-pencil" /></button>
-          <button class="icon-btn" @click="$emit('remove', c.id)"><UIcon name="i-lucide-trash-2" /></button>
+          <button class="icon-btn" @click="$emit('edit', c)">
+            <UIcon name="i-lucide-pencil" />
+          </button>
+          <button class="icon-btn" @click="$emit('remove', c.id)">
+            <UIcon name="i-lucide-trash-2" />
+          </button>
         </div>
       </li>
     </ul>

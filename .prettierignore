@@ -1,0 +1,22 @@
+# Build output + caches
+.nuxt
+.output
+dist
+node_modules
+
+# Runtime data + uploaded assets
+data
+public/uploads
+
+# Generated screenshots
+ai-images
+
+# Lockfiles
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Coverage + minified
+coverage
+*.min.js
+*.min.css

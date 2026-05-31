@@ -40,6 +40,8 @@ function onKey(e: KeyboardEvent, index: number) {
       :tabindex="o.value === modelValue ? 0 : -1"
       @click="select(o.value, i)"
       @keydown="onKey($event, i)"
-    >{{ o.label }}</button>
+    >
+      {{ o.label }}
+    </button>
   </div>
 </template>

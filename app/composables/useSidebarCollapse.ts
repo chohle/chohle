@@ -22,13 +22,17 @@ export function useSidebarCollapse() {
     } catch {}
     applyWidth(isCollapsed.value)
     watch(isCollapsed, (v) => {
-      try { localStorage.setItem(STORAGE_KEY, v ? '1' : '0') } catch {}
+      try {
+        localStorage.setItem(STORAGE_KEY, v ? '1' : '0')
+      } catch {}
       applyWidth(v)
     })
   }
 
   return {
     isCollapsed,
-    toggle() { isCollapsed.value = !isCollapsed.value }
+    toggle() {
+      isCollapsed.value = !isCollapsed.value
+    }
   }
 }

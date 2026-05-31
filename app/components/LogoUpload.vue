@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ src: string | null, uploadUrl: string, removeUrl: string }>()
+const props = defineProps<{ src: string | null; uploadUrl: string; removeUrl: string }>()
 const emit = defineEmits<{ changed: [] }>()
 
 const input = ref<HTMLInputElement>()
@@ -25,14 +25,16 @@ async function remove() {
   try {
     await $fetch(props.removeUrl, { method: 'DELETE' })
     emit('changed')
-  } finally { busy.value = false }
+  } finally {
+    busy.value = false
+  }
 }
 </script>
 
 <template>
   <div class="logo-upload">
     <div class="logo-upload__frame">
-      <img v-if="src" :src="src" alt="Logo" class="logo-upload__img">
+      <img v-if="src" :src="src" alt="Logo" class="logo-upload__img" />
       <UIcon v-else name="i-lucide-image" class="logo-upload__empty" />
     </div>
     <div class="logo-upload__actions">
@@ -44,7 +46,7 @@ async function remove() {
         <UIcon name="i-lucide-trash-2" class="size-3" />
         {{ $t('logoUpload.remove') }}
       </button>
-      <input ref="input" type="file" accept="image/*" class="logo-upload__file" @change="onFile">
+      <input ref="input" type="file" accept="image/*" class="logo-upload__file" @change="onFile" />
     </div>
   </div>
 </template>

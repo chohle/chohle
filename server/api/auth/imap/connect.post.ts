@@ -33,11 +33,14 @@ export default defineEventHandler(async (event) => {
   const user = (body.user ?? '').trim()
   const password = body.password ?? ''
   const label = (body.label ?? '').trim()
-  const emailAddress = ((body.emailAddress ?? user) || null)
+  const emailAddress = (body.emailAddress ?? user) || null
 
   if (!host) throw createError({ statusCode: 400, statusMessage: 'host is required' })
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw createError({ statusCode: 400, statusMessage: 'port must be an integer between 1 and 65535' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'port must be an integer between 1 and 65535'
+    })
   }
   if (!user) throw createError({ statusCode: 400, statusMessage: 'user is required' })
   if (!password) throw createError({ statusCode: 400, statusMessage: 'password is required' })
@@ -47,7 +50,9 @@ export default defineEventHandler(async (event) => {
   // advertises it; rejected if the server is plain text only.
   const secure = port === 993
   const client = new ImapFlow({
-    host, port, secure,
+    host,
+    port,
+    secure,
     auth: { user, pass: password },
     logger: false
   })
@@ -60,16 +65,26 @@ export default defineEventHandler(async (event) => {
     const lock = await client.getMailboxLock('INBOX', { readonly: true })
     lock.release()
   } catch (err) {
-    const msg = (err as { responseText?: string; message?: string }).responseText
-      ?? (err as { message?: string }).message
-      ?? 'IMAP login failed'
+    const msg =
+      (err as { responseText?: string; message?: string }).responseText ??
+      (err as { message?: string }).message ??
+      'IMAP login failed'
     throw createError({ statusCode: 401, statusMessage: msg, cause: err })
   } finally {
-    try { await client.logout() } catch { /* ignore */ }
+    try {
+      await client.logout()
+    } catch {
+      /* ignore */
+    }
   }
 
   const id = insertImapMailbox(useDb(), {
-    label, emailAddress, host, port, user, password
+    label,
+    emailAddress,
+    host,
+    port,
+    user,
+    password
   })
 
   return { ok: true, id }

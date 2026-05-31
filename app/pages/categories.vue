@@ -9,14 +9,29 @@ interface Category {
 
 const { t } = useI18n()
 const formRef = ref()
-const { data: categories, refresh } = await useFetch<Category[]>('/api/categories', { default: () => [] })
+const { data: categories, refresh } = await useFetch<Category[]>('/api/categories', {
+  default: () => []
+})
 
 const iconOptions = [
-  'i-lucide-shopping-cart', 'i-lucide-utensils', 'i-lucide-car', 'i-lucide-home',
-  'i-lucide-plug', 'i-lucide-briefcase', 'i-lucide-plane', 'i-lucide-heart-pulse',
-  'i-lucide-banknote', 'i-lucide-landmark', 'i-lucide-gift', 'i-lucide-wrench',
-  'i-lucide-smartphone', 'i-lucide-coffee', 'i-lucide-fuel', 'i-lucide-book',
-  'i-lucide-dumbbell', 'i-lucide-graduation-cap'
+  'i-lucide-shopping-cart',
+  'i-lucide-utensils',
+  'i-lucide-car',
+  'i-lucide-home',
+  'i-lucide-plug',
+  'i-lucide-briefcase',
+  'i-lucide-plane',
+  'i-lucide-heart-pulse',
+  'i-lucide-banknote',
+  'i-lucide-landmark',
+  'i-lucide-gift',
+  'i-lucide-wrench',
+  'i-lucide-smartphone',
+  'i-lucide-coffee',
+  'i-lucide-fuel',
+  'i-lucide-book',
+  'i-lucide-dumbbell',
+  'i-lucide-graduation-cap'
 ]
 // Color is no longer user-selectable: every category renders in ink.
 // The DB column still exists; we keep writing a constant so existing rows stay valid.
@@ -35,13 +50,16 @@ const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
 
-function openCreate() { Object.assign(form, blank()); open.value = true }
+function openCreate() {
+  Object.assign(form, blank())
+  open.value = true
+}
 function openEdit(c: Category) {
   Object.assign(form, { id: c.id, name: c.name, type: c.type, color: INK, icon: c.icon })
   open.value = true
 }
 function validate(state: typeof form) {
-  const errors: { name: string, message: string }[] = []
+  const errors: { name: string; message: string }[] = []
   if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
   return errors
 }
@@ -53,9 +71,14 @@ async function save() {
     else await $fetch('/api/categories', { method: 'POST', body })
     open.value = false
     await refresh()
-  } finally { saving.value = false }
+  } finally {
+    saving.value = false
+  }
 }
-async function removeCategory(id: number) { await $fetch(`/api/categories/${id}`, { method: 'DELETE' }); await refresh() }
+async function removeCategory(id: number) {
+  await $fetch(`/api/categories/${id}`, { method: 'DELETE' })
+  await refresh()
+}
 
 const expense = computed(() => categories.value.filter((c) => c.type === 'expense'))
 const income = computed(() => categories.value.filter((c) => c.type === 'income'))
@@ -63,7 +86,11 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
 
 <template>
   <div class="page-categories">
-    <UiPageHead :crumb="`${$t('nav.finance')} / ${$t('nav.categories')}`" :title="$t('nav.categories')" :subtitle="$t('categories.subtitle')">
+    <UiPageHead
+      :crumb="`${$t('nav.finance')} / ${$t('nav.categories')}`"
+      :title="$t('nav.categories')"
+      :subtitle="$t('categories.subtitle')"
+    >
       <template #actions>
         <button class="ed-btn-primary" @click="openCreate">
           <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('categories.add') }}
@@ -85,9 +112,19 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
           </button>
         </template>
       </EmptyState>
-      <div v-else class="grid sm:grid-cols-2 gap-6">
-        <CategoryList :title="$t('nav.expenses')" :categories="expense" @edit="openEdit" @remove="removeCategory" />
-        <CategoryList :title="$t('nav.income')" :categories="income" @edit="openEdit" @remove="removeCategory" />
+      <div v-else class="grid gap-6 sm:grid-cols-2">
+        <CategoryList
+          :title="$t('nav.expenses')"
+          :categories="expense"
+          @edit="openEdit"
+          @remove="removeCategory"
+        />
+        <CategoryList
+          :title="$t('nav.income')"
+          :categories="income"
+          @edit="openEdit"
+          @remove="removeCategory"
+        />
       </div>
     </UiCard>
 
@@ -97,7 +134,14 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
       :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" novalidate class="space-y-6" @submit="save">
+        <UForm
+          ref="formRef"
+          :state="form"
+          :validate="validate"
+          novalidate
+          class="space-y-6"
+          @submit="save"
+        >
           <div class="category-form__preview">
             <span class="category-form__ico">
               <UIcon :name="form.icon" class="size-5" />
@@ -109,12 +153,30 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
           </UFormField>
           <UFormField :label="$t('common.type')">
             <div class="category-form__type-row">
-              <button type="button" class="ed-btn" :class="{ 'is-active': form.type === 'expense' }" @click="form.type = 'expense'">{{ $t('categories.typeExpense') }}</button>
-              <button type="button" class="ed-btn" :class="{ 'is-active': form.type === 'income' }" @click="form.type = 'income'">{{ $t('categories.typeIncome') }}</button>
+              <button
+                type="button"
+                class="ed-btn"
+                :class="{ 'is-active': form.type === 'expense' }"
+                @click="form.type = 'expense'"
+              >
+                {{ $t('categories.typeExpense') }}
+              </button>
+              <button
+                type="button"
+                class="ed-btn"
+                :class="{ 'is-active': form.type === 'income' }"
+                @click="form.type = 'income'"
+              >
+                {{ $t('categories.typeIncome') }}
+              </button>
             </div>
           </UFormField>
           <UFormField :label="$t('categories.icon')">
-            <div class="category-form__icon-grid" role="radiogroup" :aria-label="$t('categories.icon')">
+            <div
+              class="category-form__icon-grid"
+              role="radiogroup"
+              :aria-label="$t('categories.icon')"
+            >
               <button
                 v-for="ic in iconOptions"
                 :key="ic"
@@ -133,12 +195,13 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
         </UForm>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2 w-full">
+        <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
-          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">
+            {{ $t('common.save') }}
+          </button>
         </div>
       </template>
     </USlideover>
   </div>
 </template>
-

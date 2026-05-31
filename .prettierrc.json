@@ -1,0 +1,19 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "none",
+  "printWidth": 100,
+  "arrowParens": "always",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": "*.scss",
+      "options": { "singleQuote": false }
+    },
+    {
+      "files": "*.md",
+      "options": { "proseWrap": "preserve" }
+    }
+  ]
+}

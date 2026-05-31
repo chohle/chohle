@@ -20,22 +20,30 @@ const filter = ref<'all' | 'company' | 'person'>('all')
 const sortKey = ref<SortKey>('nameAsc')
 
 const filterOptions = computed(() => [
-  { value: 'all',     label: `${t('customers.filterAll')} (${customers.value.length})` },
-  { value: 'company', label: `${t('customers.filterCompany')} (${customers.value.filter(c => c.type === 'company').length})` },
-  { value: 'person',  label: `${t('customers.filterPerson')} (${customers.value.filter(c => c.type === 'person').length})` }
+  { value: 'all', label: `${t('customers.filterAll')} (${customers.value.length})` },
+  {
+    value: 'company',
+    label: `${t('customers.filterCompany')} (${customers.value.filter((c) => c.type === 'company').length})`
+  },
+  {
+    value: 'person',
+    label: `${t('customers.filterPerson')} (${customers.value.filter((c) => c.type === 'person').length})`
+  }
 ])
 
 const sortItems = computed(() => [
-  { value: 'nameAsc',  label: t('customers.sortNameAsc') },
+  { value: 'nameAsc', label: t('customers.sortNameAsc') },
   { value: 'nameDesc', label: t('customers.sortNameDesc') }
 ])
 
 const visibleRows = computed(() => {
   const collator = new Intl.Collator(locale.value, { sensitivity: 'base' })
-  const rows = customers.value.filter(c => filter.value === 'all' || c.type === filter.value)
-  return [...rows].sort((a, b) => sortKey.value === 'nameDesc'
-    ? collator.compare(b.name, a.name)
-    : collator.compare(a.name, b.name))
+  const rows = customers.value.filter((c) => filter.value === 'all' || c.type === filter.value)
+  return [...rows].sort((a, b) =>
+    sortKey.value === 'nameDesc'
+      ? collator.compare(b.name, a.name)
+      : collator.compare(a.name, b.name)
+  )
 })
 
 const typeItems = computed(() => [
@@ -117,10 +125,11 @@ const formRef = ref()
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function validate(state: typeof form) {
-  const errors: { name: string, message: string }[] = []
+  const errors: { name: string; message: string }[] = []
   const req = (key: keyof typeof state, fieldName: string) => {
     const v = state[key]
-    if (typeof v !== 'string' || !v.trim()) errors.push({ name: fieldName, message: t('validation.required') })
+    if (typeof v !== 'string' || !v.trim())
+      errors.push({ name: fieldName, message: t('validation.required') })
   }
   req('name', 'name')
   req('email', 'email')
@@ -156,7 +165,11 @@ async function remove(id: number) {
 
 <template>
   <div>
-    <UiPageHead :crumb="`${$t('nav.workspace')} / ${$t('nav.customers')}`" :title="$t('nav.customers')" :subtitle="$t('customers.subtitle')">
+    <UiPageHead
+      :crumb="`${$t('nav.workspace')} / ${$t('nav.customers')}`"
+      :title="$t('nav.customers')"
+      :subtitle="$t('customers.subtitle')"
+    >
       <template #actions>
         <button class="ed-btn-primary" @click="openCreate">
           <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('customers.add') }}
@@ -191,51 +204,53 @@ async function remove(id: number) {
           />
         </div>
 
-        <div class="ed-scroll"><table class="ed-table">
-          <thead>
-            <tr>
-              <th>{{ $t('customers.colCustomer') }}</th>
-              <th>{{ $t('customers.colNumber') }}</th>
-              <th>{{ $t('customers.city') }}</th>
-              <th>{{ $t('customers.paymentTerm') }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="!visibleRows.length" class="cust-empty-row">
-              <td colspan="5">{{ $t('customers.noMatches') }}</td>
-            </tr>
-            <tr v-for="c in visibleRows" :key="c.id" class="row">
-              <td>
-                <div class="cust">
-                  <UAvatar :alt="c.name" size="2xs" />
-                  <NuxtLink :to="`/customers/${c.id}`" class="cust-name">{{ c.name }}</NuxtLink>
-                </div>
-              </td>
-              <td class="mono">{{ c.customer_number || '—' }}</td>
-              <td>{{ c.city || '—' }}</td>
-              <td class="mono">{{ $t('customers.days', { n: c.payment_term_days }) }}</td>
-              <td class="actions">
-                <button
-                  class="icon-btn"
-                  type="button"
-                  :aria-label="`${$t('customers.edit')} — ${c.name}`"
-                  @click="openEdit(c.id)"
-                >
-                  <UIcon name="i-lucide-pencil" />
-                </button>
-                <button
-                  class="icon-btn danger"
-                  type="button"
-                  :aria-label="`${$t('common.delete')} — ${c.name}`"
-                  @click="remove(c.id)"
-                >
-                  <UIcon name="i-lucide-trash-2" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table></div>
+        <div class="ed-scroll">
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>{{ $t('customers.colCustomer') }}</th>
+                <th>{{ $t('customers.colNumber') }}</th>
+                <th>{{ $t('customers.city') }}</th>
+                <th>{{ $t('customers.paymentTerm') }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!visibleRows.length" class="cust-empty-row">
+                <td colspan="5">{{ $t('customers.noMatches') }}</td>
+              </tr>
+              <tr v-for="c in visibleRows" :key="c.id" class="row">
+                <td>
+                  <div class="cust">
+                    <UAvatar :alt="c.name" size="2xs" />
+                    <NuxtLink :to="`/customers/${c.id}`" class="cust-name">{{ c.name }}</NuxtLink>
+                  </div>
+                </td>
+                <td class="mono">{{ c.customer_number || '—' }}</td>
+                <td>{{ c.city || '—' }}</td>
+                <td class="mono">{{ $t('customers.days', { n: c.payment_term_days }) }}</td>
+                <td class="actions">
+                  <button
+                    class="icon-btn"
+                    type="button"
+                    :aria-label="`${$t('customers.edit')} — ${c.name}`"
+                    @click="openEdit(c.id)"
+                  >
+                    <UIcon name="i-lucide-pencil" />
+                  </button>
+                  <button
+                    class="icon-btn danger"
+                    type="button"
+                    :aria-label="`${$t('common.delete')} — ${c.name}`"
+                    @click="remove(c.id)"
+                  >
+                    <UIcon name="i-lucide-trash-2" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </template>
     </UiCard>
 
@@ -245,17 +260,29 @@ async function remove(id: number) {
       :ui="{ content: 'max-w-full sm:max-w-xl' }"
     >
       <template #body>
-        <UForm ref="formRef" :state="form" :validate="validate" :validate-on="['input', 'blur']" novalidate class="space-y-6" @submit="save">
+        <UForm
+          ref="formRef"
+          :state="form"
+          :validate="validate"
+          :validate-on="['input', 'blur']"
+          novalidate
+          class="space-y-6"
+          @submit="save"
+        >
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.details') }}</h3>
-            <div class="grid sm:grid-cols-2 gap-4">
+            <div class="grid gap-4 sm:grid-cols-2">
               <UFormField :label="$t('common.type')">
                 <USelect v-model="form.type" :items="typeItems" class="w-full" />
               </UFormField>
               <UFormField :label="$t('customers.language')">
                 <USelect v-model="form.language" :items="languageItems" class="w-full" />
               </UFormField>
-              <UFormField name="name" :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')" class="sm:col-span-2">
+              <UFormField
+                name="name"
+                :label="form.type === 'company' ? $t('customers.companyName') : $t('common.name')"
+                class="sm:col-span-2"
+              >
                 <UInput v-model="form.name" class="w-full" />
               </UFormField>
               <UFormField :label="$t('customers.contactPerson')">
@@ -269,48 +296,85 @@ async function remove(id: number) {
 
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.secContact') }}</h3>
-            <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField name="email" :label="$t('customers.email')"><UInput v-model="form.email" inputmode="email" autocomplete="email" class="w-full" /></UFormField>
-              <UFormField name="phone" :label="$t('customers.phone')"><UInput v-model="form.phone" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.website')"><UInput v-model="form.website" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.social')"><UInput v-model="form.social" class="w-full" /></UFormField>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField name="email" :label="$t('customers.email')"
+                ><UInput v-model="form.email" inputmode="email" autocomplete="email" class="w-full"
+              /></UFormField>
+              <UFormField name="phone" :label="$t('customers.phone')"
+                ><UInput v-model="form.phone" class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.website')"
+                ><UInput v-model="form.website" class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.social')"
+                ><UInput v-model="form.social" class="w-full"
+              /></UFormField>
             </div>
           </div>
 
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.secAddress') }}</h3>
-            <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField name="street" :label="$t('customers.street')" class="sm:col-span-2"><UInput v-model="form.street" class="w-full" /></UFormField>
-              <UFormField name="zip" :label="$t('customers.zip')"><UInput v-model="form.zip" class="w-full" /></UFormField>
-              <UFormField name="city" :label="$t('customers.city')"><UInput v-model="form.city" class="w-full" /></UFormField>
-              <UFormField name="country" :label="$t('customers.country')"><UInput v-model="form.country" class="w-full" /></UFormField>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField name="street" :label="$t('customers.street')" class="sm:col-span-2"
+                ><UInput v-model="form.street" class="w-full"
+              /></UFormField>
+              <UFormField name="zip" :label="$t('customers.zip')"
+                ><UInput v-model="form.zip" class="w-full"
+              /></UFormField>
+              <UFormField name="city" :label="$t('customers.city')"
+                ><UInput v-model="form.city" class="w-full"
+              /></UFormField>
+              <UFormField name="country" :label="$t('customers.country')"
+                ><UInput v-model="form.country" class="w-full"
+              /></UFormField>
             </div>
           </div>
 
           <div class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.secBilling') }}</h3>
-            <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField :label="$t('customers.priceCategory')"><UInput v-model="form.priceCategory" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.discountPercent')"><UInput v-model.number="form.discountPercent" type="number" min="0" step="0.1" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.paymentTermDays')"><UInput v-model.number="form.paymentTermDays" type="number" min="0" class="w-full" /></UFormField>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField :label="$t('customers.priceCategory')"
+                ><UInput v-model="form.priceCategory" class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.discountPercent')"
+                ><UInput
+                  v-model.number="form.discountPercent"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.paymentTermDays')"
+                ><UInput v-model.number="form.paymentTermDays" type="number" min="0" class="w-full"
+              /></UFormField>
             </div>
           </div>
 
           <div v-if="form.type === 'company'" class="space-y-3">
             <h3 class="eyebrow">{{ $t('customers.secBusiness') }}</h3>
-            <div class="grid sm:grid-cols-2 gap-4">
-              <UFormField :label="$t('customers.uid')"><UInput v-model="form.uid" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.mwstNumber')"><UInput v-model="form.mwst" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.hrNumber')"><UInput v-model="form.hrNumber" class="w-full" /></UFormField>
-              <UFormField :label="$t('customers.foundingYear')"><UInput v-model.number="form.foundingYear" type="number" class="w-full" /></UFormField>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField :label="$t('customers.uid')"
+                ><UInput v-model="form.uid" class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.mwstNumber')"
+                ><UInput v-model="form.mwst" class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.hrNumber')"
+                ><UInput v-model="form.hrNumber" class="w-full"
+              /></UFormField>
+              <UFormField :label="$t('customers.foundingYear')"
+                ><UInput v-model.number="form.foundingYear" type="number" class="w-full"
+              /></UFormField>
             </div>
           </div>
         </UForm>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2 w-full">
+        <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="open = false">{{ $t('common.cancel') }}</button>
-          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">{{ $t('common.save') }}</button>
+          <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">
+            {{ $t('common.save') }}
+          </button>
         </div>
       </template>
     </USlideover>

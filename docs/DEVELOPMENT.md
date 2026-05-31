@@ -26,12 +26,12 @@ The app hot-reloads on file changes. Source is bind-mounted into the container, 
 
 Copy `.env.example` to `.env` and adjust. `.env` is gitignored.
 
-| Variable | Purpose |
-| --- | --- |
-| `NUXT_ADMIN_USERNAME` | Owner account, seeded on first launch |
-| `NUXT_ADMIN_PASSWORD` | Owner password, seeded on first launch |
-| `NUXT_SESSION_PASSWORD` | Secret that seals the session cookie (32+ characters) |
-| `NUXT_SMTP_HOST`, `NUXT_SMTP_PORT` | SMTP target (Mailpit in development) |
+| Variable                           | Purpose                                               |
+| ---------------------------------- | ----------------------------------------------------- |
+| `NUXT_ADMIN_USERNAME`              | Owner account, seeded on first launch                 |
+| `NUXT_ADMIN_PASSWORD`              | Owner password, seeded on first launch                |
+| `NUXT_SESSION_PASSWORD`            | Secret that seals the session cookie (32+ characters) |
+| `NUXT_SMTP_HOST`, `NUXT_SMTP_PORT` | SMTP target (Mailpit in development)                  |
 
 ## Adding a dependency
 

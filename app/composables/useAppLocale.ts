@@ -7,7 +7,7 @@ export function useAppLocale() {
   const { fetch: refreshSession } = useUserSession()
 
   const options = computed(() =>
-    (locales.value as LocaleObject[]).map(l => ({ value: l.code, label: l.name ?? l.code }))
+    (locales.value as LocaleObject[]).map((l) => ({ value: l.code, label: l.name ?? l.code }))
   )
 
   async function set(code: string) {
@@ -19,7 +19,7 @@ export function useAppLocale() {
   // Narrow a free-form string (e.g. a customer's stored language) to a
   // configured locale, falling back to 'en' when it isn't one we ship.
   function toLocale(value: string | null | undefined): typeof locale.value {
-    const codes = (locales.value as LocaleObject[]).map(l => String(l.code))
+    const codes = (locales.value as LocaleObject[]).map((l) => String(l.code))
     return value && codes.includes(value) ? (value as typeof locale.value) : 'en'
   }
 

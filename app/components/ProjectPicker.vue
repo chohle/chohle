@@ -37,9 +37,7 @@ const newProject = reactive({
 const filtered = computed(() => {
   const term = query.value.trim().toLocaleLowerCase()
   if (!term) return props.projects.slice(0, 8)
-  return props.projects
-    .filter(p => p.name.toLocaleLowerCase().includes(term))
-    .slice(0, 8)
+  return props.projects.filter((p) => p.name.toLocaleLowerCase().includes(term)).slice(0, 8)
 })
 
 const createLabel = computed(() => {
@@ -50,8 +48,8 @@ const createLabel = computed(() => {
 })
 
 const budgetTypeItems = computed(() => [
-  { value: 'fixed',    label: t('pipeline.budgetTypeFixed') },
-  { value: 'hourly',   label: t('pipeline.budgetTypeHourly') },
+  { value: 'fixed', label: t('pipeline.budgetTypeFixed') },
+  { value: 'hourly', label: t('pipeline.budgetTypeHourly') },
   { value: 'estimate', label: t('pipeline.budgetTypeEstimate') }
 ])
 
@@ -71,7 +69,10 @@ function pickExisting(p: ProjectLite) {
 }
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
 }
 
 async function submitCreate() {
@@ -89,7 +90,8 @@ async function submitCreate() {
     const { id } = await $fetch<{ id: number }>('/api/projects', { method: 'POST', body })
     emit('resolved', id)
   } catch (err) {
-    const msg = (err as { statusMessage?: string }).statusMessage ?? t('pipeline.picker.createFailed')
+    const msg =
+      (err as { statusMessage?: string }).statusMessage ?? t('pipeline.picker.createFailed')
     toast.add({ title: msg, color: 'error' })
   } finally {
     submitting.value = false
@@ -101,23 +103,19 @@ async function submitCreate() {
   <div class="project-picker">
     <template v-if="mode === 'pick'">
       <label class="project-picker__search">
-        <UIcon name="i-lucide-search" class="size-4 project-picker__search-icon" />
+        <UIcon name="i-lucide-search" class="project-picker__search-icon size-4" />
         <input
           v-model="query"
           type="text"
           :placeholder="$t('pipeline.picker.searchProjectPlaceholder')"
           autocomplete="off"
-        >
+        />
       </label>
 
       <ul class="project-picker__list">
         <li v-for="p in filtered" :key="p.id">
-          <button
-            type="button"
-            class="project-picker__item"
-            @click="pickExisting(p)"
-          >
-            <UIcon name="i-lucide-kanban" class="size-4 project-picker__item-icon" />
+          <button type="button" class="project-picker__item" @click="pickExisting(p)">
+            <UIcon name="i-lucide-kanban" class="project-picker__item-icon size-4" />
             <span class="project-picker__item-name">{{ p.name }}</span>
             <span class="project-picker__item-meta mono">
               {{ $t(`pipeline.stage.${p.stage}`) }} · CHF {{ chf(p.budget_rappen) }}
@@ -138,11 +136,7 @@ async function submitCreate() {
     </template>
 
     <form v-else class="project-picker__form" @submit.prevent="submitCreate">
-      <button
-        type="button"
-        class="project-picker__back"
-        @click="backToPick"
-      >
+      <button type="button" class="project-picker__back" @click="backToPick">
         <UIcon name="i-lucide-arrow-left" class="size-3.5" />
         {{ $t('common.back') }}
       </button>
@@ -151,7 +145,7 @@ async function submitCreate() {
         <UInput v-model="newProject.name" autofocus required class="w-full" />
       </UFormField>
 
-      <div class="grid sm:grid-cols-2 gap-3">
+      <div class="grid gap-3 sm:grid-cols-2">
         <UFormField :label="$t('pipeline.budget')">
           <UInput v-model.number="newProject.budget" type="number" step="50" class="w-full" />
         </UFormField>
@@ -161,8 +155,14 @@ async function submitCreate() {
       </div>
 
       <div class="project-picker__actions">
-        <button type="button" class="ed-btn-ghost" @click="emit('cancel')">{{ $t('common.cancel') }}</button>
-        <button type="submit" class="ed-btn-primary" :disabled="submitting || !newProject.name.trim()">
+        <button type="button" class="ed-btn-ghost" @click="emit('cancel')">
+          {{ $t('common.cancel') }}
+        </button>
+        <button
+          type="submit"
+          class="ed-btn-primary"
+          :disabled="submitting || !newProject.name.trim()"
+        >
           <UIcon name="i-lucide-plus" class="size-3.5" />
           {{ $t('pipeline.picker.createProjectAndInvoice') }}
         </button>

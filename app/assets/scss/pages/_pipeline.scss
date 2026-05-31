@@ -1,5 +1,8 @@
 .page-pipeline {
-  &__strong { font-weight: 500; color: var(--ink); }
+  &__strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
 
   // Vertrieb / Einkauf sub-nav in the head actions row. Each link is a
   // real route so direction state can't desync from the URL.
@@ -19,11 +22,21 @@
     color: var(--ink-3);
     text-decoration: none;
     border-radius: var(--radius-sm);
-    transition: color .12s ease, background-color .12s ease;
+    transition:
+      color 0.12s ease,
+      background-color 0.12s ease;
 
-    &:hover { color: var(--ink-2); }
-    &[aria-selected="true"] { background: var(--ink); color: var(--accent-ink); }
-    &:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ink); }
+    &:hover {
+      color: var(--ink-2);
+    }
+    &[aria-selected="true"] {
+      background: var(--ink);
+      color: var(--accent-ink);
+    }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ink);
+    }
   }
 
   // Kanban board — 4 fixed-width columns. On phones the whole row is
@@ -55,7 +68,11 @@
     border-bottom: 1px solid var(--border);
   }
 
-  &__col-title { display: inline-flex; align-items: center; gap: 8px; }
+  &__col-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
   &__dot {
     width: 8px;
     height: 8px;
@@ -90,7 +107,9 @@
 
   // Ghost = placeholder where the dragged card will land. Drag = the
   // floating card during the gesture.
-  &__ghost { opacity: 0.35; }
+  &__ghost {
+    opacity: 0.35;
+  }
   &__drag {
     transform: rotate(-1deg);
     box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.32);
@@ -111,10 +130,20 @@
     font-size: 11.5px;
     letter-spacing: 0.04em;
     cursor: pointer;
-    transition: color .12s ease, border-color .12s ease, background-color .12s ease;
+    transition:
+      color 0.12s ease,
+      border-color 0.12s ease,
+      background-color 0.12s ease;
 
-    &:hover { color: var(--ink); border-color: var(--ink); background: var(--surface); }
-    &:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ink); }
+    &:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+      background: var(--surface);
+    }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ink);
+    }
   }
 
   // --- Deal card ---
@@ -125,14 +154,18 @@
     padding: 12px 12px 10px;
     cursor: grab;
     user-select: none;
-    transition: box-shadow .12s ease, border-color .12s ease;
+    transition:
+      box-shadow 0.12s ease,
+      border-color 0.12s ease;
 
     &:hover {
       border-color: var(--border-strong);
       box-shadow: 0 4px 14px -8px rgba(0, 0, 0, 0.15);
     }
 
-    &:active { cursor: grabbing; }
+    &:active {
+      cursor: grabbing;
+    }
 
     &__head {
       display: flex;
@@ -206,6 +239,8 @@
   }
 
   @media (max-width: 600px) {
-    &__col { flex: 0 0 86vw; }
+    &__col {
+      flex: 0 0 86vw;
+    }
   }
 }

@@ -2,7 +2,17 @@
 import DOMPurify from 'isomorphic-dompurify'
 
 type Direction = 'sales' | 'procurement'
-type Stage = 'lead' | 'contacted' | 'proposal' | 'won' | 'active' | 'completed' | 'need' | 'requested' | 'received' | 'accepted'
+type Stage =
+  | 'lead'
+  | 'contacted'
+  | 'proposal'
+  | 'won'
+  | 'active'
+  | 'completed'
+  | 'need'
+  | 'requested'
+  | 'received'
+  | 'accepted'
 
 interface ProjectDetail {
   id: number
@@ -48,10 +58,15 @@ const PROC_STAGES: Stage[] = ['need', 'requested', 'received', 'accepted']
 const { t } = useI18n()
 const toast = useToast()
 
-const { data: project, refresh: refreshProject } = await useFetch<ProjectDetail>(`/api/projects/${props.id}`)
-const { data: emails, refresh: refreshEmails } = await useFetch<{ rows: ProjectEmail[] }>(`/api/projects/${props.id}/emails`, {
-  default: () => ({ rows: [] })
-})
+const { data: project, refresh: refreshProject } = await useFetch<ProjectDetail>(
+  `/api/projects/${props.id}`
+)
+const { data: emails, refresh: refreshEmails } = await useFetch<{ rows: ProjectEmail[] }>(
+  `/api/projects/${props.id}/emails`,
+  {
+    default: () => ({ rows: [] })
+  }
+)
 
 interface ProjectInvoiceRow {
   id: number
@@ -62,18 +77,21 @@ interface ProjectInvoiceRow {
   due_date: string
   total_rappen: number
 }
-const { data: invoices } = await useFetch<ProjectInvoiceRow[]>(`/api/projects/${props.id}/invoices`, {
-  default: () => []
-})
+const { data: invoices } = await useFetch<ProjectInvoiceRow[]>(
+  `/api/projects/${props.id}/invoices`,
+  {
+    default: () => []
+  }
+)
 
 // Budget burn: paid is locked in, sent is committed (awaiting payment), draft
 // hasn't been issued yet. Show them separately so the user can read both
 // "what we've billed" and "what's actually landed".
 const burn = computed(() => {
   const list = invoices.value ?? []
-  const paid = list.filter(i => i.status === 'paid').reduce((s, i) => s + i.total_rappen, 0)
-  const sent = list.filter(i => i.status === 'sent').reduce((s, i) => s + i.total_rappen, 0)
-  const draft = list.filter(i => i.status === 'draft').reduce((s, i) => s + i.total_rappen, 0)
+  const paid = list.filter((i) => i.status === 'paid').reduce((s, i) => s + i.total_rappen, 0)
+  const sent = list.filter((i) => i.status === 'sent').reduce((s, i) => s + i.total_rappen, 0)
+  const draft = list.filter((i) => i.status === 'draft').reduce((s, i) => s + i.total_rappen, 0)
   const invoiced = paid + sent + draft
   const budget = project.value?.budget_rappen ?? 0
   const remaining = Math.max(budget - invoiced, 0)
@@ -89,7 +107,9 @@ async function archive() {
     await $fetch(`/api/projects/${props.id}`, { method: 'PUT', body: { stage: 'completed' } })
     await refreshProject()
     toast.add({ title: t('pipeline.detail.archived'), color: 'success' })
-  } finally { archiving.value = false }
+  } finally {
+    archiving.value = false
+  }
 }
 
 const creatingInvoice = ref(false)
@@ -102,18 +122,26 @@ async function newInvoice() {
     })
     await navigateTo(`/invoices/${invoiceId}`)
   } catch (err) {
-    const msg = (err as { statusMessage?: string }).statusMessage ?? t('pipeline.detail.invoiceFailed')
+    const msg =
+      (err as { statusMessage?: string }).statusMessage ?? t('pipeline.detail.invoiceFailed')
     toast.add({ title: msg, color: 'error' })
-  } finally { creatingInvoice.value = false }
+  } finally {
+    creatingInvoice.value = false
+  }
 }
 
 // Bounce to the correct slug if the URL direction doesn't match the project's.
 if (project.value && project.value.direction !== props.direction) {
-  await navigateTo(`/${DIR_TO_SLUG[project.value.direction]}/${project.value.id}`, { replace: true })
+  await navigateTo(`/${DIR_TO_SLUG[project.value.direction]}/${project.value.id}`, {
+    replace: true
+  })
 }
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
 }
 
 function fmtTimestamp(s: string) {
@@ -138,7 +166,7 @@ const STAGE_LABEL = computed<Record<Stage, string>>(() => ({
 const stageOptions = computed(() => {
   if (!project.value) return []
   const stages = project.value.direction === 'procurement' ? PROC_STAGES : SALES_STAGES
-  return stages.map(s => ({ value: s, label: STAGE_LABEL.value[s] }))
+  return stages.map((s) => ({ value: s, label: STAGE_LABEL.value[s] }))
 })
 
 async function changeStage(newStage: Stage) {
@@ -166,12 +194,23 @@ const sending = ref(false)
 
 function validateComposerTo(): boolean {
   const v = composer.to.trim()
-  if (!v) { composerError.value = t('validation.required'); return false }
-  if (!EMAIL_RE.test(v)) { composerError.value = t('validation.email'); return false }
+  if (!v) {
+    composerError.value = t('validation.required')
+    return false
+  }
+  if (!EMAIL_RE.test(v)) {
+    composerError.value = t('validation.email')
+    return false
+  }
   composerError.value = ''
   return true
 }
-watch(() => composer.to, () => { if (composerError.value) validateComposerTo() })
+watch(
+  () => composer.to,
+  () => {
+    if (composerError.value) validateComposerTo()
+  }
+)
 
 // Resolve contact via the API's COALESCEd value first, then the raw project
 // fields. Belt and braces: handles edge cases where the linked customer has
@@ -204,9 +243,12 @@ async function send() {
     await refreshEmails()
     toast.add({ title: t('pipeline.detail.emailSent'), color: 'success' })
   } catch (err) {
-    const msg = (err as { statusMessage?: string }).statusMessage ?? t('pipeline.detail.emailFailed')
+    const msg =
+      (err as { statusMessage?: string }).statusMessage ?? t('pipeline.detail.emailFailed')
     toast.add({ title: msg, color: 'error' })
-  } finally { sending.value = false }
+  } finally {
+    sending.value = false
+  }
 }
 
 // --- Paste a reply ---
@@ -223,11 +265,19 @@ const logging = ref(false)
 // log), but if provided, it has to look like an email.
 function validateReplyFrom(): boolean {
   const v = reply.from.trim()
-  if (v && !EMAIL_RE.test(v)) { replyError.value = t('validation.email'); return false }
+  if (v && !EMAIL_RE.test(v)) {
+    replyError.value = t('validation.email')
+    return false
+  }
   replyError.value = ''
   return true
 }
-watch(() => reply.from, () => { if (replyError.value) validateReplyFrom() })
+watch(
+  () => reply.from,
+  () => {
+    if (replyError.value) validateReplyFrom()
+  }
+)
 
 function openLogReply() {
   reply.open = true
@@ -259,30 +309,46 @@ async function logReply() {
     })
     reply.open = false
     await refreshEmails()
-  } finally { logging.value = false }
+  } finally {
+    logging.value = false
+  }
 }
 
 const initials = computed(() => {
   const n = project.value?.customer_name || project.value?.name || ''
-  return n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]!.toUpperCase()).join('')
+  return n
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('')
 })
 
-const subscribeWord = computed(() => project.value?.direction === 'procurement' ? t('pipeline.detail.supplier') : t('pipeline.detail.contact'))
+const subscribeWord = computed(() =>
+  project.value?.direction === 'procurement'
+    ? t('pipeline.detail.supplier')
+    : t('pipeline.detail.contact')
+)
 
 // Back goes to the customer when there is one (project belongs to a
 // customer record), otherwise falls back to the pipeline column the user
 // most likely came from.
 const back = computed(() => {
   if (project.value?.customer_id) {
-    return { href: `/customers/${project.value.customer_id}`, label: project.value.customer_name || t('customers.colCustomer') }
+    return {
+      href: `/customers/${project.value.customer_id}`,
+      label: project.value.customer_name || t('customers.colCustomer')
+    }
   }
   const dir = project.value?.direction ?? props.direction
-  const dirLabel = dir === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
+  const dirLabel =
+    dir === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
   return { href: `/${DIR_TO_SLUG[dir]}`, label: dirLabel }
 })
 const headerCrumb = computed(() => {
   const d = project.value?.direction ?? props.direction
-  const dirLabel = d === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
+  const dirLabel =
+    d === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
   return `${t('nav.workspace')} / ${dirLabel}`
 })
 </script>
@@ -338,17 +404,31 @@ const headerCrumb = computed(() => {
       </div>
     </header>
 
-    <section v-if="project.direction === 'sales' && project.budget_rappen > 0" class="page-deal-detail__burn">
+    <section
+      v-if="project.direction === 'sales' && project.budget_rappen > 0"
+      class="page-deal-detail__burn"
+    >
       <UiCard>
         <h3 class="eyebrow">{{ $t('pipeline.detail.budgetBurn') }}</h3>
         <div class="page-deal-detail__burn-bar" :aria-label="`${burn.pct}%`">
           <div class="page-deal-detail__burn-fill" :style="{ width: `${burn.pct}%` }" />
         </div>
         <div class="page-deal-detail__burn-stats mono">
-          <span>{{ $t('pipeline.detail.invoiced') }}: <b class="tabular">CHF {{ chf(burn.invoiced) }}</b></span>
-          <span>{{ $t('pipeline.detail.paid') }}: <b class="tabular">CHF {{ chf(burn.paid) }}</b></span>
-          <span>{{ $t('pipeline.detail.remaining') }}: <b class="tabular">CHF {{ chf(burn.remaining) }}</b></span>
-          <span>{{ $t('pipeline.detail.budgetTotal') }}: <b class="tabular">CHF {{ chf(burn.budget) }}</b></span>
+          <span
+            >{{ $t('pipeline.detail.invoiced') }}:
+            <b class="tabular">CHF {{ chf(burn.invoiced) }}</b></span
+          >
+          <span
+            >{{ $t('pipeline.detail.paid') }}: <b class="tabular">CHF {{ chf(burn.paid) }}</b></span
+          >
+          <span
+            >{{ $t('pipeline.detail.remaining') }}:
+            <b class="tabular">CHF {{ chf(burn.remaining) }}</b></span
+          >
+          <span
+            >{{ $t('pipeline.detail.budgetTotal') }}:
+            <b class="tabular">CHF {{ chf(burn.budget) }}</b></span
+          >
         </div>
       </UiCard>
     </section>
@@ -379,14 +459,19 @@ const headerCrumb = computed(() => {
           </div>
         </dl>
 
-        <hr class="page-deal-detail__sep">
+        <hr class="page-deal-detail__sep" />
 
         <h3 class="eyebrow">{{ $t('pipeline.stage.label') }}</h3>
         <div class="page-deal-detail__stage-row">
-          <USelect :model-value="project.stage" :items="stageOptions" class="w-full" @update:model-value="changeStage" />
+          <USelect
+            :model-value="project.stage"
+            :items="stageOptions"
+            class="w-full"
+            @update:model-value="changeStage"
+          />
         </div>
 
-        <hr class="page-deal-detail__sep">
+        <hr class="page-deal-detail__sep" />
 
         <h3 class="eyebrow">{{ $t('common.notes') }}</h3>
         <p v-if="project.notes" class="page-deal-detail__notes">{{ project.notes }}</p>
@@ -417,15 +502,23 @@ const headerCrumb = computed(() => {
             :class="`is-${ev.direction}`"
           >
             <header class="email-msg__head">
-              <span class="mono email-msg__dir">{{ ev.direction === 'outbound' ? $t('pipeline.detail.sent') : $t('pipeline.detail.received') }}</span>
+              <span class="mono email-msg__dir">{{
+                ev.direction === 'outbound'
+                  ? $t('pipeline.detail.sent')
+                  : $t('pipeline.detail.received')
+              }}</span>
               <span class="mono email-msg__time">{{ fmtTimestamp(ev.sent_at) }}</span>
             </header>
             <h4 class="email-msg__subject">{{ ev.subject || '(no subject)' }}</h4>
             <div v-if="ev.body_html" class="email-msg__body" v-html="sanitizeHtml(ev.body_html)" />
-            <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{ ev.body_text }}</pre>
+            <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{
+              ev.body_text
+            }}</pre>
             <footer v-if="ev.from_address || ev.to_address" class="email-msg__foot mono">
               <span v-if="ev.direction === 'outbound' && ev.to_address">→ {{ ev.to_address }}</span>
-              <span v-else-if="ev.direction === 'inbound' && ev.from_address">← {{ ev.from_address }}</span>
+              <span v-else-if="ev.direction === 'inbound' && ev.from_address"
+                >← {{ ev.from_address }}</span
+              >
             </footer>
           </li>
         </ul>
@@ -454,36 +547,38 @@ const headerCrumb = computed(() => {
           :title="$t('pipeline.detail.noInvoicesTitle')"
           :description="$t('pipeline.detail.noInvoicesText')"
         />
-        <div v-else class="ed-scroll"><table class="ed-table">
-          <thead>
-            <tr>
-              <th>{{ $t('invoices.number') }}</th>
-              <th>{{ $t('common.title') }}</th>
-              <th>{{ $t('invoices.statusLabel') }}</th>
-              <th>{{ $t('invoices.issueDate') }}</th>
-              <th class="right">{{ $t('common.amount') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="inv in invoices"
-              :key="inv.id"
-              class="row"
-              tabindex="0"
-              role="button"
-              :aria-label="`${inv.number || $t('common.untitled')} ${inv.title || ''}`.trim()"
-              @click="navigateTo(`/invoices/${inv.id}`)"
-              @keyup.enter="navigateTo(`/invoices/${inv.id}`)"
-              @keyup.space.prevent="navigateTo(`/invoices/${inv.id}`)"
-            >
-              <td class="mono">{{ inv.number || '—' }}</td>
-              <td>{{ inv.title || '—' }}</td>
-              <td class="mono">{{ $t(`status.${inv.status}`) }}</td>
-              <td class="mono">{{ dateCh(inv.issue_date) }}</td>
-              <td class="right mono">CHF {{ chf(inv.total_rappen) }}</td>
-            </tr>
-          </tbody>
-        </table></div>
+        <div v-else class="ed-scroll">
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>{{ $t('invoices.number') }}</th>
+                <th>{{ $t('common.title') }}</th>
+                <th>{{ $t('invoices.statusLabel') }}</th>
+                <th>{{ $t('invoices.issueDate') }}</th>
+                <th class="right">{{ $t('common.amount') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="inv in invoices"
+                :key="inv.id"
+                class="row"
+                tabindex="0"
+                role="button"
+                :aria-label="`${inv.number || $t('common.untitled')} ${inv.title || ''}`.trim()"
+                @click="navigateTo(`/invoices/${inv.id}`)"
+                @keyup.enter="navigateTo(`/invoices/${inv.id}`)"
+                @keyup.space.prevent="navigateTo(`/invoices/${inv.id}`)"
+              >
+                <td class="mono">{{ inv.number || '—' }}</td>
+                <td>{{ inv.title || '—' }}</td>
+                <td class="mono">{{ $t(`status.${inv.status}`) }}</td>
+                <td class="mono">{{ dateCh(inv.issue_date) }}</td>
+                <td class="right mono">CHF {{ chf(inv.total_rappen) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </UiCard>
     </section>
 
@@ -510,7 +605,11 @@ const headerCrumb = computed(() => {
                 class="email-editor email-editor--tall"
               >
                 <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap email-editor__toolbar">
+                  <UEditorToolbar
+                    :editor="editor"
+                    :items="emailEditorItems"
+                    class="email-editor__toolbar flex-wrap"
+                  >
                     <template #link><EditorLinkPopover :editor="editor" /></template>
                   </UEditorToolbar>
                 </template>
@@ -523,8 +622,10 @@ const headerCrumb = computed(() => {
         </form>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2 w-full">
-          <button class="ed-btn-ghost" type="button" @click="composer.open = false">{{ $t('common.cancel') }}</button>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" type="button" @click="composer.open = false">
+            {{ $t('common.cancel') }}
+          </button>
           <button class="ed-btn-primary" type="button" :disabled="sending" @click="send">
             <UIcon name="i-lucide-send" class="size-3.5" />
             {{ $t('pipeline.detail.send') }}
@@ -548,9 +649,13 @@ const headerCrumb = computed(() => {
         </div>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2 w-full">
-          <button class="ed-btn-ghost" type="button" @click="reply.open = false">{{ $t('common.cancel') }}</button>
-          <button class="ed-btn-primary" type="button" :disabled="logging" @click="logReply">{{ $t('pipeline.detail.logSave') }}</button>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" type="button" @click="reply.open = false">
+            {{ $t('common.cancel') }}
+          </button>
+          <button class="ed-btn-primary" type="button" :disabled="logging" @click="logReply">
+            {{ $t('pipeline.detail.logSave') }}
+          </button>
         </div>
       </template>
     </UModal>

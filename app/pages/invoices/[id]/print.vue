@@ -18,7 +18,7 @@ interface Item {
 }
 interface Totals {
   nettoRappen: number
-  mwstByRate: { rate: number, mwstRappen: number }[]
+  mwstByRate: { rate: number; mwstRappen: number }[]
   totalRappen: number
 }
 interface Party {
@@ -41,7 +41,7 @@ interface Party {
 const route = useRoute()
 const id = route.params.id as string
 
-const { data } = await useFetch<{ invoice: Invoice, items: Item[], totals: Totals }>(
+const { data } = await useFetch<{ invoice: Invoice; items: Item[]; totals: Totals }>(
   `/api/invoices/${id}`
 )
 const invoice = data.value!.invoice
@@ -101,7 +101,7 @@ function printPage() {
 
 <template>
   <div class="min-h-screen bg-gray-100 text-black">
-    <div class="print:hidden print-toolbar">
+    <div class="print-toolbar print:hidden">
       <NuxtLink :to="`/invoices/${id}`" class="ed-btn-ghost">
         <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('invoices.backToEditor') }}
       </NuxtLink>
@@ -116,7 +116,7 @@ function printPage() {
       <div class="flex flex-1 flex-col px-[20mm] pt-[18mm] pb-6">
         <!-- Logo -->
         <div class="mb-16 h-12">
-          <img v-if="senderLogo" :src="senderLogo" alt="Logo" class="h-12 object-contain">
+          <img v-if="senderLogo" :src="senderLogo" alt="Logo" class="h-12 object-contain" />
           <div v-else class="text-2xl font-bold tracking-tight">{{ sender?.name || 'batze' }}</div>
         </div>
 
@@ -150,7 +150,9 @@ function printPage() {
           </div>
 
           <div v-if="customer" class="w-[80mm]">
-            <div v-if="senderReturnLine" class="mb-6 text-[9px] underline">{{ senderReturnLine }}</div>
+            <div v-if="senderReturnLine" class="mb-6 text-[9px] underline">
+              {{ senderReturnLine }}
+            </div>
             <div class="font-semibold">{{ customer.name }}</div>
             <div v-if="customer.contact_person">{{ customer.contact_person }}</div>
             <div>{{ customer.street }}</div>
@@ -167,18 +169,18 @@ function printPage() {
           <thead>
             <tr class="border-y border-black">
               <th class="py-2 pr-3 text-left font-semibold">{{ td('invoiceDoc.description') }}</th>
-              <th class="py-2 px-3 text-right font-semibold">{{ td('invoiceDoc.quantity') }}</th>
-              <th class="py-2 px-3 text-left font-semibold">{{ td('invoiceDoc.unit') }}</th>
-              <th class="py-2 px-3 text-right font-semibold">{{ td('invoiceDoc.price') }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ td('invoiceDoc.quantity') }}</th>
+              <th class="px-3 py-2 text-left font-semibold">{{ td('invoiceDoc.unit') }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ td('invoiceDoc.price') }}</th>
               <th class="py-2 pl-3 text-right font-semibold">{{ td('invoiceDoc.amount') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(i, idx) in items" :key="idx" class="align-top">
               <td class="py-2 pr-3">{{ i.description }}</td>
-              <td class="py-2 px-3 text-right tabular-nums">{{ i.quantity }}</td>
-              <td class="py-2 px-3">{{ i.unit }}</td>
-              <td class="py-2 px-3 text-right tabular-nums">{{ chf(i.unit_price_rappen) }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ i.quantity }}</td>
+              <td class="px-3 py-2">{{ i.unit }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ chf(i.unit_price_rappen) }}</td>
               <td class="py-2 pl-3 text-right tabular-nums">{{ chf(lineAmount(i)) }}</td>
             </tr>
           </tbody>
@@ -193,7 +195,9 @@ function printPage() {
                 <td class="py-0.5 text-right tabular-nums">{{ chf(totals.nettoRappen) }}</td>
               </tr>
               <tr v-for="r in totals.mwstByRate" :key="r.rate">
-                <td class="py-0.5 pr-12 text-gray-600">{{ td('invoiceDoc.vatLine', { rate: r.rate }) }}</td>
+                <td class="py-0.5 pr-12 text-gray-600">
+                  {{ td('invoiceDoc.vatLine', { rate: r.rate }) }}
+                </td>
                 <td class="py-0.5 text-right tabular-nums">{{ chf(r.mwstRappen) }}</td>
               </tr>
               <tr class="border-t border-black font-bold">

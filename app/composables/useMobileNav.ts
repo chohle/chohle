@@ -8,14 +8,23 @@ export function useMobileNav() {
   const route = useRoute()
 
   // Auto-close when navigating, so tapping a nav link slides the drawer away.
-  watch(() => route.fullPath, () => {
-    if (isOpen.value) isOpen.value = false
-  })
+  watch(
+    () => route.fullPath,
+    () => {
+      if (isOpen.value) isOpen.value = false
+    }
+  )
 
   return {
     isOpen,
-    open() { isOpen.value = true },
-    close() { isOpen.value = false },
-    toggle() { isOpen.value = !isOpen.value }
+    open() {
+      isOpen.value = true
+    },
+    close() {
+      isOpen.value = false
+    },
+    toggle() {
+      isOpen.value = !isOpen.value
+    }
   }
 }

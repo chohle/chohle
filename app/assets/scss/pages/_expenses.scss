@@ -42,9 +42,15 @@
     height: 8px;
     border-radius: 50%;
 
-    &.w1 { background: var(--ink); }
-    &.w2 { background: var(--ink-3); }
-    &.w3 { background: var(--ink-4); }
+    &.w1 {
+      background: var(--ink);
+    }
+    &.w2 {
+      background: var(--ink-3);
+    }
+    &.w3 {
+      background: var(--ink-4);
+    }
   }
 
   .lg-val {
@@ -87,15 +93,25 @@
     }
   }
 
-  .cat { display: inline-flex; align-items: center; gap: 6px; }
-  .muted { color: var(--ink-3); }
+  .cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .muted {
+    color: var(--ink-3);
+  }
 
   @media (max-width: 900px) {
-    .grid-2 { grid-template-columns: 1fr; }
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 700px) {
-    .filter-grid { grid-template-columns: repeat(2, 1fr); }
+    .filter-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
     // Donut + legend stack vertically and the chart shrinks slightly.
     .donut-wrap {

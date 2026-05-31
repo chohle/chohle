@@ -9,7 +9,11 @@ const display = computed(() => dateCh(modelValue.value ?? ''))
 
 const calendarValue = computed<CalendarDate | null>(() => {
   if (!modelValue.value) return null
-  try { return parseDate(modelValue.value) } catch { return null }
+  try {
+    return parseDate(modelValue.value)
+  } catch {
+    return null
+  }
 })
 
 const open = ref(false)

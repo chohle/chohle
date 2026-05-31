@@ -64,6 +64,10 @@ export function serveUpload(event: H3Event, storedName: string | null | undefine
   if (!existsSync(path)) {
     throw createError({ statusCode: 404, statusMessage: 'File missing' })
   }
-  setHeader(event, 'Content-Type', CONTENT_TYPES[extname(storedName).toLowerCase()] ?? 'application/octet-stream')
+  setHeader(
+    event,
+    'Content-Type',
+    CONTENT_TYPES[extname(storedName).toLowerCase()] ?? 'application/octet-stream'
+  )
   return sendStream(event, createReadStream(path))
 }

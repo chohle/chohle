@@ -13,12 +13,17 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
   const project = db
     .prepare('SELECT id, customer_id, name, label FROM projects WHERE id = ?')
-    .get(projectId) as { id: number; customer_id: number | null; name: string; label: string } | undefined
+    .get(projectId) as
+    | { id: number; customer_id: number | null; name: string; label: string }
+    | undefined
   if (!project) {
     throw createError({ statusCode: 404, statusMessage: 'Project not found' })
   }
   if (!project.customer_id) {
-    throw createError({ statusCode: 400, statusMessage: 'Project has no linked customer; link one before invoicing' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Project has no linked customer; link one before invoicing'
+    })
   }
 
   const customer = db

@@ -9,7 +9,9 @@
     height: 1px;
     background: var(--border);
 
-    &:first-child { max-width: 24px; }
+    &:first-child {
+      max-width: 24px;
+    }
   }
 
   &__text {

@@ -29,14 +29,17 @@ export default defineEventHandler(async (event) => {
   const exists = db.prepare(`SELECT id FROM projects WHERE id = ?`).get(id)
   if (!exists) throw createError({ statusCode: 404, statusMessage: 'project not found' })
 
-  const sentAt = body.sent_at && /^\d{4}-\d{2}-\d{2}/.test(body.sent_at)
-    ? body.sent_at
-    : new Date().toISOString().replace('T', ' ').slice(0, 19)
+  const sentAt =
+    body.sent_at && /^\d{4}-\d{2}-\d{2}/.test(body.sent_at)
+      ? body.sent_at
+      : new Date().toISOString().replace('T', ' ').slice(0, 19)
 
-  const info = db.prepare(
-    `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text, sent_at)
+  const info = db
+    .prepare(
+      `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text, sent_at)
      VALUES (?, 'inbound', ?, NULL, ?, ?, ?, ?)`
-  ).run(id, from, subject, html, text, sentAt)
+    )
+    .run(id, from, subject, html, text, sentAt)
 
   return { id: info.lastInsertRowid }
 })

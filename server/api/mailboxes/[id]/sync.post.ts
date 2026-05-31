@@ -2,7 +2,11 @@
 // background plugin (server/plugins/03.mail-sync.ts), so the user can
 // see the result immediately instead of waiting for the next tick.
 
-import { syncOutlookMailbox, listOutlookMailboxes, recordSyncError } from '~~/server/utils/outlookSync'
+import {
+  syncOutlookMailbox,
+  listOutlookMailboxes,
+  recordSyncError
+} from '~~/server/utils/outlookSync'
 import { syncGmailMailbox, listGmailMailboxes } from '~~/server/utils/gmailSync'
 import { syncImapMailbox, listImapMailboxes } from '~~/server/utils/imapSync'
 
@@ -14,13 +18,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const provider = (db.prepare('SELECT provider FROM mailboxes WHERE id = ?').get(id) as { provider?: string } | undefined)?.provider
+  const provider = (
+    db.prepare('SELECT provider FROM mailboxes WHERE id = ?').get(id) as
+      | { provider?: string }
+      | undefined
+  )?.provider
   if (!provider) {
     throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })
   }
 
   if (provider === 'outlook') {
-    const mailbox = listOutlookMailboxes(db).find(m => m.id === id)
+    const mailbox = listOutlookMailboxes(db).find((m) => m.id === id)
     if (!mailbox) throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })
     try {
       return { ok: true, ...(await syncOutlookMailbox(db, mailbox)) }
@@ -31,7 +39,7 @@ export default defineEventHandler(async (event) => {
     }
   }
   if (provider === 'gmail') {
-    const mailbox = listGmailMailboxes(db).find(m => m.id === id)
+    const mailbox = listGmailMailboxes(db).find((m) => m.id === id)
     if (!mailbox) throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })
     try {
       return { ok: true, ...(await syncGmailMailbox(db, mailbox)) }
@@ -42,7 +50,7 @@ export default defineEventHandler(async (event) => {
     }
   }
   if (provider === 'imap') {
-    const mailbox = listImapMailboxes(db).find(m => m.id === id)
+    const mailbox = listImapMailboxes(db).find((m) => m.id === id)
     if (!mailbox) throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })
     try {
       return { ok: true, ...(await syncImapMailbox(db, mailbox)) }

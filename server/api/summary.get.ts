@@ -25,7 +25,9 @@ export default defineEventHandler(async (event) => {
 
   const salaryIncome = (
     db
-      .prepare('SELECT COALESCE(SUM(amount_rappen), 0) AS total FROM income_payments WHERE month = ?')
+      .prepare(
+        'SELECT COALESCE(SUM(amount_rappen), 0) AS total FROM income_payments WHERE month = ?'
+      )
       .get(month) as { total: number }
   ).total
 
@@ -34,7 +36,9 @@ export default defineEventHandler(async (event) => {
   // not shift when items or VAT registration change later.
   const invoiceIncome = (
     db
-      .prepare("SELECT COALESCE(SUM(total_rappen), 0) AS total FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) = ?")
+      .prepare(
+        "SELECT COALESCE(SUM(total_rappen), 0) AS total FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) = ?"
+      )
       .get(month) as { total: number }
   ).total
 
@@ -50,7 +54,12 @@ export default defineEventHandler(async (event) => {
          GROUP BY e.category_id
          ORDER BY total DESC`
       )
-      .all(`${month}%`) as Array<{ name: string | null, color: string | null, icon: string | null, total: number }>
+      .all(`${month}%`) as Array<{
+      name: string | null
+      color: string | null
+      icon: string | null
+      total: number
+    }>
   ).map((r) => ({
     name: r.name ?? 'Uncategorized',
     color: r.color ?? '#9ca3af',
@@ -64,7 +73,7 @@ export default defineEventHandler(async (event) => {
       `SELECT substr(date, 1, 7) AS ym, SUM(amount_rappen) AS total
        FROM expenses WHERE substr(date, 1, 7) >= ? GROUP BY ym`
     )
-    .all(months[0]) as Array<{ ym: string, total: number }>
+    .all(months[0]) as Array<{ ym: string; total: number }>
   const expensesByMonth = Object.fromEntries(grouped.map((r) => [r.ym, r.total]))
 
   const incomeGrouped = db
@@ -72,16 +81,18 @@ export default defineEventHandler(async (event) => {
       `SELECT month AS ym, SUM(amount_rappen) AS total
        FROM income_payments WHERE month >= ? GROUP BY month`
     )
-    .all(months[0]) as Array<{ ym: string, total: number }>
+    .all(months[0]) as Array<{ ym: string; total: number }>
   const incomeByMonth = Object.fromEntries(incomeGrouped.map((r) => [r.ym, r.total]))
 
   const invoiceByMonth = Object.fromEntries(
-    (db
-      .prepare(
-        `SELECT substr(paid_at, 1, 7) AS ym, COALESCE(SUM(total_rappen), 0) AS total
+    (
+      db
+        .prepare(
+          `SELECT substr(paid_at, 1, 7) AS ym, COALESCE(SUM(total_rappen), 0) AS total
          FROM invoices WHERE status = 'paid' AND substr(paid_at, 1, 7) >= ? GROUP BY ym`
-      )
-      .all(months[0]) as Array<{ ym: string, total: number }>).map((r) => [r.ym, r.total])
+        )
+        .all(months[0]) as Array<{ ym: string; total: number }>
+    ).map((r) => [r.ym, r.total])
   )
 
   const trend = months.map((m) => ({
@@ -103,9 +114,11 @@ export default defineEventHandler(async (event) => {
     payout_rule: 'earlier' | 'later' | 'none'
   }>
   const paidIds = new Set(
-    (db.prepare('SELECT source_id FROM income_payments WHERE month = ?').all(month) as {
-      source_id: number
-    }[]).map((r) => r.source_id)
+    (
+      db.prepare('SELECT source_id FROM income_payments WHERE month = ?').all(month) as {
+        source_id: number
+      }[]
+    ).map((r) => r.source_id)
   )
 
   const [year, mo] = month.split('-').map(Number) as [number, number]

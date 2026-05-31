@@ -27,10 +27,19 @@ const months = [5, 4, 3, 2, 1, 0].map(ym)
 
 const wipe = db.transaction(() => {
   for (const t of [
-    'project_emails', 'invoice_items', 'invoices', 'projects',
-    'articles', 'customers',
-    'income_payments', 'income_sources', 'attachments', 'expenses', 'categories'
-  ]) db.prepare(`DELETE FROM ${t}`).run()
+    'project_emails',
+    'invoice_items',
+    'invoices',
+    'projects',
+    'articles',
+    'customers',
+    'income_payments',
+    'income_sources',
+    'attachments',
+    'expenses',
+    'categories'
+  ])
+    db.prepare(`DELETE FROM ${t}`).run()
   db.prepare(`DELETE FROM sqlite_sequence WHERE name NOT IN ('owner')`).run()
 })
 wipe()
@@ -102,8 +111,22 @@ const insertSource = db.prepare(
   `INSERT INTO income_sources (company, job_title, salary_rappen, currency, payout_day, canton, payout_rule)
    VALUES (?, ?, ?, 'CHF', ?, ?, ?)`
 )
-const helvetia = insertSource.run('Helvetia Versicherungen', 'Software Engineer', chf(6800), 25, 'LU', 'earlier').lastInsertRowid
-const studio = insertSource.run('Studio Nord (freelance)', 'UX consulting', chf(2400), 30, 'ZH', 'later').lastInsertRowid
+const helvetia = insertSource.run(
+  'Helvetia Versicherungen',
+  'Software Engineer',
+  chf(6800),
+  25,
+  'LU',
+  'earlier'
+).lastInsertRowid
+const studio = insertSource.run(
+  'Studio Nord (freelance)',
+  'UX consulting',
+  chf(2400),
+  30,
+  'ZH',
+  'later'
+).lastInsertRowid
 
 const insertPayment = db.prepare(
   'INSERT INTO income_payments (source_id, month, date, amount_rappen) VALUES (?, ?, ?, ?)'
@@ -134,12 +157,120 @@ const insertCustomer = db.prepare(
      @price, @discount, @term, @website, @founded, @uid, @mwst)`
 )
 const customers = [
-  { type: 'company', name: 'Müller Bau AG',        contact: 'Thomas Müller', email: 'info@muellerbau.ch',   phone: '+41 41 210 44 55', street: 'Industriestrasse 8',  zip: '6010', city: 'Kriens', lang: 'de', num: 'K-1001', price: 'Standard', discount: 0,  term: 30, website: 'muellerbau.ch',  founded: 1998, uid: 'CHE-201.345.678', mwst: 'CHE-201.345.678 MWST' },
-  { type: 'company', name: 'Café Zentral GmbH',    contact: 'Sandra Bucher', email: 'sandra@cafezentral.ch', phone: '+41 41 410 22 33', street: 'Hirschmattstrasse 3', zip: '6003', city: 'Luzern', lang: 'de', num: 'K-1002', price: 'Standard', discount: 5,  term: 14, website: 'cafezentral.ch', founded: 2015, uid: 'CHE-310.222.444', mwst: '' },
-  { type: 'person',  name: 'Anna Keller',          contact: '',              email: 'anna.keller@bluewin.ch', phone: '+41 79 333 21 10', street: 'Weinbergstrasse 41', zip: '8006', city: 'Zürich', lang: 'de', num: 'K-1003', price: '',         discount: 0,  term: 30, website: '',               founded: null, uid: '', mwst: '' },
-  { type: 'company', name: 'Studio Nord GmbH',     contact: 'Luca Rossi',    email: 'luca@studionord.ch',   phone: '+41 44 500 90 00', street: 'Limmatstrasse 264',   zip: '8005', city: 'Zürich', lang: 'de', num: 'K-1004', price: 'Premium',  discount: 10, term: 30, website: 'studionord.ch',  founded: 2012, uid: 'CHE-444.555.666', mwst: 'CHE-444.555.666 MWST' },
-  { type: 'company', name: 'Tech Hub AG',          contact: 'Mira Holzer',   email: 'mira@techhub.ch',      phone: '+41 44 333 12 12', street: 'Europaallee 21',      zip: '8004', city: 'Zürich', lang: 'de', num: 'K-1005', price: 'Standard', discount: 0,  term: 30, website: 'techhub.ch',     founded: 2019, uid: 'CHE-555.666.777', mwst: 'CHE-555.666.777 MWST' },
-  { type: 'person',  name: 'Marina Sturm',         contact: '',              email: 'marina.sturm@gmx.ch',  phone: '+41 78 444 55 66', street: 'Bahnhofplatz 4',      zip: '6300', city: 'Zug',    lang: 'de', num: 'K-1006', price: '',         discount: 0,  term: 30, website: '',               founded: null, uid: '', mwst: '' }
+  {
+    type: 'company',
+    name: 'Müller Bau AG',
+    contact: 'Thomas Müller',
+    email: 'info@muellerbau.ch',
+    phone: '+41 41 210 44 55',
+    street: 'Industriestrasse 8',
+    zip: '6010',
+    city: 'Kriens',
+    lang: 'de',
+    num: 'K-1001',
+    price: 'Standard',
+    discount: 0,
+    term: 30,
+    website: 'muellerbau.ch',
+    founded: 1998,
+    uid: 'CHE-201.345.678',
+    mwst: 'CHE-201.345.678 MWST'
+  },
+  {
+    type: 'company',
+    name: 'Café Zentral GmbH',
+    contact: 'Sandra Bucher',
+    email: 'sandra@cafezentral.ch',
+    phone: '+41 41 410 22 33',
+    street: 'Hirschmattstrasse 3',
+    zip: '6003',
+    city: 'Luzern',
+    lang: 'de',
+    num: 'K-1002',
+    price: 'Standard',
+    discount: 5,
+    term: 14,
+    website: 'cafezentral.ch',
+    founded: 2015,
+    uid: 'CHE-310.222.444',
+    mwst: ''
+  },
+  {
+    type: 'person',
+    name: 'Anna Keller',
+    contact: '',
+    email: 'anna.keller@bluewin.ch',
+    phone: '+41 79 333 21 10',
+    street: 'Weinbergstrasse 41',
+    zip: '8006',
+    city: 'Zürich',
+    lang: 'de',
+    num: 'K-1003',
+    price: '',
+    discount: 0,
+    term: 30,
+    website: '',
+    founded: null,
+    uid: '',
+    mwst: ''
+  },
+  {
+    type: 'company',
+    name: 'Studio Nord GmbH',
+    contact: 'Luca Rossi',
+    email: 'luca@studionord.ch',
+    phone: '+41 44 500 90 00',
+    street: 'Limmatstrasse 264',
+    zip: '8005',
+    city: 'Zürich',
+    lang: 'de',
+    num: 'K-1004',
+    price: 'Premium',
+    discount: 10,
+    term: 30,
+    website: 'studionord.ch',
+    founded: 2012,
+    uid: 'CHE-444.555.666',
+    mwst: 'CHE-444.555.666 MWST'
+  },
+  {
+    type: 'company',
+    name: 'Tech Hub AG',
+    contact: 'Mira Holzer',
+    email: 'mira@techhub.ch',
+    phone: '+41 44 333 12 12',
+    street: 'Europaallee 21',
+    zip: '8004',
+    city: 'Zürich',
+    lang: 'de',
+    num: 'K-1005',
+    price: 'Standard',
+    discount: 0,
+    term: 30,
+    website: 'techhub.ch',
+    founded: 2019,
+    uid: 'CHE-555.666.777',
+    mwst: 'CHE-555.666.777 MWST'
+  },
+  {
+    type: 'person',
+    name: 'Marina Sturm',
+    contact: '',
+    email: 'marina.sturm@gmx.ch',
+    phone: '+41 78 444 55 66',
+    street: 'Bahnhofplatz 4',
+    zip: '6300',
+    city: 'Zug',
+    lang: 'de',
+    num: 'K-1006',
+    price: '',
+    discount: 0,
+    term: 30,
+    website: '',
+    founded: null,
+    uid: '',
+    mwst: ''
+  }
 ]
 const customerIds = customers.map((c) => insertCustomer.run(c).lastInsertRowid)
 const [muellerId, cafeId, annaId, studioId, techhubId, marinaId] = customerIds
@@ -151,19 +282,19 @@ const insertArticle = db.prepare(
 )
 const art = {}
 const articles = [
-  ['Beratung',         'Stunden',  150, 8.1],
-  ['Wartungsarbeiten', 'Stunden',  120, 8.1],
-  ['Webdesign',        'Pauschal', 2500, 8.1],
-  ['Hosting',          'Monat',    25,  8.1],
-  ['Spesen',           'Pauschal', 0,   8.1]
+  ['Beratung', 'Stunden', 150, 8.1],
+  ['Wartungsarbeiten', 'Stunden', 120, 8.1],
+  ['Webdesign', 'Pauschal', 2500, 8.1],
+  ['Hosting', 'Monat', 25, 8.1],
+  ['Spesen', 'Pauschal', 0, 8.1]
 ]
 for (const [name, unit, price, mwst] of articles) {
   art[name] = insertArticle.run(name, unit, chf(price), mwst, null).lastInsertRowid
 }
 // Customer specific articles so customer detail pages have bespoke items.
-insertArticle.run('Retainer Betreuung', 'Monat',    chf(800), 8.1, studioId)
-insertArticle.run('Express-Zuschlag',   'Pauschal', chf(200), 8.1, studioId)
-insertArticle.run('Reinigung Baustelle','Pauschal', chf(450), 8.1, muellerId)
+insertArticle.run('Retainer Betreuung', 'Monat', chf(800), 8.1, studioId)
+insertArticle.run('Express-Zuschlag', 'Pauschal', chf(200), 8.1, studioId)
+insertArticle.run('Reinigung Baustelle', 'Pauschal', chf(450), 8.1, muellerId)
 
 // --- Projects (Sales + Procurement) -------------------------------------
 const insertProject = db.prepare(
@@ -178,36 +309,216 @@ const projectAt = (offset, dd) => day(offset, dd) + ' 09:00:00'
 
 const projects = [
   // SALES: lead stage (x2)
-  { name: 'Webshop Redesign', customer_id: techhubId, direction: 'sales', stage: 'lead', label: 'New storefront with checkout', budget_rappen: chf(8500), budget_type: 'fixed', due_date: day(0, 28), notes: 'First call promising. Wants mockups by end of month.', position: 0, email: 'mira@techhub.ch', phone: '+41 44 333 12 12', created_at: projectAt(0, 5), updated_at: projectAt(0, 12) },
-  { name: 'Logo & CI', customer_id: marinaId, direction: 'sales', stage: 'lead', label: 'Personal brand identity', budget_rappen: chf(1500), budget_type: 'fixed', due_date: null, notes: '', position: 1, email: 'marina.sturm@gmx.ch', phone: '+41 78 444 55 66', created_at: projectAt(0, 8), updated_at: projectAt(0, 9) },
+  {
+    name: 'Webshop Redesign',
+    customer_id: techhubId,
+    direction: 'sales',
+    stage: 'lead',
+    label: 'New storefront with checkout',
+    budget_rappen: chf(8500),
+    budget_type: 'fixed',
+    due_date: day(0, 28),
+    notes: 'First call promising. Wants mockups by end of month.',
+    position: 0,
+    email: 'mira@techhub.ch',
+    phone: '+41 44 333 12 12',
+    created_at: projectAt(0, 5),
+    updated_at: projectAt(0, 12)
+  },
+  {
+    name: 'Logo & CI',
+    customer_id: marinaId,
+    direction: 'sales',
+    stage: 'lead',
+    label: 'Personal brand identity',
+    budget_rappen: chf(1500),
+    budget_type: 'fixed',
+    due_date: null,
+    notes: '',
+    position: 1,
+    email: 'marina.sturm@gmx.ch',
+    phone: '+41 78 444 55 66',
+    created_at: projectAt(0, 8),
+    updated_at: projectAt(0, 9)
+  },
   // SALES: contacted (x1)
-  { name: 'Restaurant booking system', customer_id: cafeId, direction: 'sales', stage: 'contacted', label: 'OpenTable integration', budget_rappen: chf(4500), budget_type: 'fixed', due_date: day(1, 15), notes: 'Sent reference projects.', position: 0, email: 'sandra@cafezentral.ch', phone: '+41 41 410 22 33', created_at: projectAt(1, 22), updated_at: projectAt(0, 3) },
+  {
+    name: 'Restaurant booking system',
+    customer_id: cafeId,
+    direction: 'sales',
+    stage: 'contacted',
+    label: 'OpenTable integration',
+    budget_rappen: chf(4500),
+    budget_type: 'fixed',
+    due_date: day(1, 15),
+    notes: 'Sent reference projects.',
+    position: 0,
+    email: 'sandra@cafezentral.ch',
+    phone: '+41 41 410 22 33',
+    created_at: projectAt(1, 22),
+    updated_at: projectAt(0, 3)
+  },
   // SALES: proposal (x1) with email thread
-  { name: 'Marketing site', customer_id: muellerId, direction: 'sales', stage: 'proposal', label: 'Static landing + CMS', budget_rappen: chf(6000), budget_type: 'fixed', due_date: day(1, 10), notes: 'Proposal sent, awaiting answer.', position: 0, email: 'info@muellerbau.ch', phone: '+41 41 210 44 55', created_at: projectAt(1, 18), updated_at: projectAt(0, 6) },
+  {
+    name: 'Marketing site',
+    customer_id: muellerId,
+    direction: 'sales',
+    stage: 'proposal',
+    label: 'Static landing + CMS',
+    budget_rappen: chf(6000),
+    budget_type: 'fixed',
+    due_date: day(1, 10),
+    notes: 'Proposal sent, awaiting answer.',
+    position: 0,
+    email: 'info@muellerbau.ch',
+    phone: '+41 41 210 44 55',
+    created_at: projectAt(1, 18),
+    updated_at: projectAt(0, 6)
+  },
   // SALES: won (x1) -> has a paid invoice
-  { name: 'Wartungsvertrag 2026', customer_id: muellerId, direction: 'sales', stage: 'won', label: 'Yearly maintenance contract', budget_rappen: chf(12000), budget_type: 'hourly', due_date: day(0, 6), notes: 'Won! Annual maintenance.', position: 0, email: 'info@muellerbau.ch', phone: '+41 41 210 44 55', created_at: projectAt(3, 14), updated_at: projectAt(2, 6) },
+  {
+    name: 'Wartungsvertrag 2026',
+    customer_id: muellerId,
+    direction: 'sales',
+    stage: 'won',
+    label: 'Yearly maintenance contract',
+    budget_rappen: chf(12000),
+    budget_type: 'hourly',
+    due_date: day(0, 6),
+    notes: 'Won! Annual maintenance.',
+    position: 0,
+    email: 'info@muellerbau.ch',
+    phone: '+41 41 210 44 55',
+    created_at: projectAt(3, 14),
+    updated_at: projectAt(2, 6)
+  },
   // SALES: active (x2) -> currently being worked on
-  { name: 'Website relaunch', customer_id: studioId, direction: 'sales', stage: 'active', label: 'Full redesign + migration', budget_rappen: chf(18000), budget_type: 'fixed', due_date: day(-1, 30), notes: 'In production. Phase 1 invoiced.', position: 0, email: 'luca@studionord.ch', phone: '+41 44 500 90 00', created_at: projectAt(2, 1), updated_at: projectAt(0, 10) },
-  { name: 'Beratung Q1', customer_id: cafeId, direction: 'sales', stage: 'active', label: 'Retainer 20h/month', budget_rappen: chf(5000), budget_type: 'hourly', due_date: day(-2, 31), notes: 'Active retainer.', position: 1, email: 'sandra@cafezentral.ch', phone: '+41 41 410 22 33', created_at: projectAt(2, 8), updated_at: projectAt(0, 4) },
+  {
+    name: 'Website relaunch',
+    customer_id: studioId,
+    direction: 'sales',
+    stage: 'active',
+    label: 'Full redesign + migration',
+    budget_rappen: chf(18000),
+    budget_type: 'fixed',
+    due_date: day(-1, 30),
+    notes: 'In production. Phase 1 invoiced.',
+    position: 0,
+    email: 'luca@studionord.ch',
+    phone: '+41 44 500 90 00',
+    created_at: projectAt(2, 1),
+    updated_at: projectAt(0, 10)
+  },
+  {
+    name: 'Beratung Q1',
+    customer_id: cafeId,
+    direction: 'sales',
+    stage: 'active',
+    label: 'Retainer 20h/month',
+    budget_rappen: chf(5000),
+    budget_type: 'hourly',
+    due_date: day(-2, 31),
+    notes: 'Active retainer.',
+    position: 1,
+    email: 'sandra@cafezentral.ch',
+    phone: '+41 41 410 22 33',
+    created_at: projectAt(2, 8),
+    updated_at: projectAt(0, 4)
+  },
   // SALES: completed (x1) -> archived
-  { name: 'Website audit', customer_id: annaId, direction: 'sales', stage: 'completed', label: 'One off audit + report', budget_rappen: chf(800), budget_type: 'fixed', due_date: day(3, 20), notes: 'Done. Invoiced and paid.', position: 0, email: 'anna.keller@bluewin.ch', phone: '+41 79 333 21 10', created_at: projectAt(4, 1), updated_at: projectAt(3, 22) },
+  {
+    name: 'Website audit',
+    customer_id: annaId,
+    direction: 'sales',
+    stage: 'completed',
+    label: 'One off audit + report',
+    budget_rappen: chf(800),
+    budget_type: 'fixed',
+    due_date: day(3, 20),
+    notes: 'Done. Invoiced and paid.',
+    position: 0,
+    email: 'anna.keller@bluewin.ch',
+    phone: '+41 79 333 21 10',
+    created_at: projectAt(4, 1),
+    updated_at: projectAt(3, 22)
+  },
 
   // PROCUREMENT: need
-  { name: 'Team laptops', customer_id: null, direction: 'procurement', stage: 'need', label: 'Need 3 new MacBooks', budget_rappen: chf(9000), budget_type: 'estimate', due_date: day(0, 30), notes: 'Working laptops getting old.', position: 0, email: '', phone: '', created_at: projectAt(0, 2), updated_at: projectAt(0, 2) },
+  {
+    name: 'Team laptops',
+    customer_id: null,
+    direction: 'procurement',
+    stage: 'need',
+    label: 'Need 3 new MacBooks',
+    budget_rappen: chf(9000),
+    budget_type: 'estimate',
+    due_date: day(0, 30),
+    notes: 'Working laptops getting old.',
+    position: 0,
+    email: '',
+    phone: '',
+    created_at: projectAt(0, 2),
+    updated_at: projectAt(0, 2)
+  },
   // PROCUREMENT: requested
-  { name: 'Cleaning service quotes', customer_id: null, direction: 'procurement', stage: 'requested', label: 'Weekly office cleaning', budget_rappen: chf(2400), budget_type: 'estimate', due_date: day(0, 25), notes: 'Sent RFQ to 3 suppliers.', position: 0, email: '', phone: '', created_at: projectAt(0, 4), updated_at: projectAt(0, 7) },
+  {
+    name: 'Cleaning service quotes',
+    customer_id: null,
+    direction: 'procurement',
+    stage: 'requested',
+    label: 'Weekly office cleaning',
+    budget_rappen: chf(2400),
+    budget_type: 'estimate',
+    due_date: day(0, 25),
+    notes: 'Sent RFQ to 3 suppliers.',
+    position: 0,
+    email: '',
+    phone: '',
+    created_at: projectAt(0, 4),
+    updated_at: projectAt(0, 7)
+  },
   // PROCUREMENT: received
-  { name: 'Server hosting comparison', customer_id: null, direction: 'procurement', stage: 'received', label: 'EU based VPS', budget_rappen: chf(600), budget_type: 'estimate', due_date: null, notes: 'Got 3 offers. Evaluating.', position: 0, email: '', phone: '', created_at: projectAt(1, 12), updated_at: projectAt(0, 9) },
+  {
+    name: 'Server hosting comparison',
+    customer_id: null,
+    direction: 'procurement',
+    stage: 'received',
+    label: 'EU based VPS',
+    budget_rappen: chf(600),
+    budget_type: 'estimate',
+    due_date: null,
+    notes: 'Got 3 offers. Evaluating.',
+    position: 0,
+    email: '',
+    phone: '',
+    created_at: projectAt(1, 12),
+    updated_at: projectAt(0, 9)
+  },
   // PROCUREMENT: accepted
-  { name: 'Office furniture', customer_id: null, direction: 'procurement', stage: 'accepted', label: 'Standing desks + chairs', budget_rappen: chf(3200), budget_type: 'fixed', due_date: day(0, 22), notes: 'Order placed at Pfister.', position: 0, email: 'kontakt@pfister.ch', phone: '+41 44 500 11 22', created_at: projectAt(1, 28), updated_at: projectAt(0, 15) }
+  {
+    name: 'Office furniture',
+    customer_id: null,
+    direction: 'procurement',
+    stage: 'accepted',
+    label: 'Standing desks + chairs',
+    budget_rappen: chf(3200),
+    budget_type: 'fixed',
+    due_date: day(0, 22),
+    notes: 'Order placed at Pfister.',
+    position: 0,
+    email: 'kontakt@pfister.ch',
+    phone: '+41 44 500 11 22',
+    created_at: projectAt(1, 28),
+    updated_at: projectAt(0, 15)
+  }
 ]
-const projectIds = projects.map(p => insertProject.run(p).lastInsertRowid)
+const projectIds = projects.map((p) => insertProject.run(p).lastInsertRowid)
 
 // Pick a few project ids out by name for the email thread + invoice linking.
-const proposalProjectId = projectIds[projects.findIndex(p => p.name === 'Marketing site')]
-const wonProjectId = projectIds[projects.findIndex(p => p.name === 'Wartungsvertrag 2026')]
-const activeProjectId = projectIds[projects.findIndex(p => p.name === 'Website relaunch')]
-const completedProjectId = projectIds[projects.findIndex(p => p.name === 'Website audit')]
+const proposalProjectId = projectIds[projects.findIndex((p) => p.name === 'Marketing site')]
+const wonProjectId = projectIds[projects.findIndex((p) => p.name === 'Wartungsvertrag 2026')]
+const activeProjectId = projectIds[projects.findIndex((p) => p.name === 'Website relaunch')]
+const completedProjectId = projectIds[projects.findIndex((p) => p.name === 'Website audit')]
 
 // --- Project email thread (on the proposal stage project) ---------------
 const insertEmail = db.prepare(
@@ -216,18 +527,26 @@ const insertEmail = db.prepare(
    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 )
 insertEmail.run(
-  proposalProjectId, 'outbound', 'hello@batze.ch', 'info@muellerbau.ch',
+  proposalProjectId,
+  'outbound',
+  'hello@batze.ch',
+  'info@muellerbau.ch',
   'Proposal: Marketing site',
   '<p>Hi Thomas,</p><p>Following up on our call, please find attached the proposal for the new Müller Bau marketing site.</p><p>Budget: CHF 6,000 fixed price, two milestones.</p><p>Looking forward to your feedback.</p><p>Best,<br>batze</p>',
   'Hi Thomas,\n\nFollowing up on our call, please find attached the proposal for the new Müller Bau marketing site.\n\nBudget: CHF 6,000 fixed price, two milestones.\n\nLooking forward to your feedback.\n\nBest,\nbatze',
-  day(0, 6) + ' 10:32:00', day(0, 6) + ' 10:32:00'
+  day(0, 6) + ' 10:32:00',
+  day(0, 6) + ' 10:32:00'
 )
 insertEmail.run(
-  proposalProjectId, 'inbound', 'info@muellerbau.ch', null,
+  proposalProjectId,
+  'inbound',
+  'info@muellerbau.ch',
+  null,
   'Re: Proposal: Marketing site',
   '',
   'Hi, thanks. We discussed internally and want to go ahead. Can we schedule a kickoff call next week?\n\nThomas',
-  day(0, 8) + ' 14:18:00', day(0, 8) + ' 14:18:00'
+  day(0, 8) + ' 14:18:00',
+  day(0, 8) + ' 14:18:00'
 )
 
 // --- Invoices (some linked to projects) ---------------------------------
@@ -244,58 +563,124 @@ const addInvoice = (customerId, projectId, number, title, status, issueOffset, i
   const issue = day(issueOffset, 6)
   const dueD = new Date(now.getFullYear(), now.getMonth() - issueOffset, 6 + 30)
   const due = `${dueD.getFullYear()}-${String(dueD.getMonth() + 1).padStart(2, '0')}-${String(dueD.getDate()).padStart(2, '0')}`
-  const id = insertInvoice.run(customerId, projectId, number, title, status, issue, due).lastInsertRowid
+  const id = insertInvoice.run(
+    customerId,
+    projectId,
+    number,
+    title,
+    status,
+    issue,
+    due
+  ).lastInsertRowid
   items.forEach((it, i) => {
-    insertItem.run(id, it.article ?? null, it.desc, it.qty, it.unit ?? '', chf(it.price), it.discount ?? 0, it.mwst ?? 8.1, i)
+    insertItem.run(
+      id,
+      it.article ?? null,
+      it.desc,
+      it.qty,
+      it.unit ?? '',
+      chf(it.price),
+      it.discount ?? 0,
+      it.mwst ?? 8.1,
+      i
+    )
   })
 }
 
 // Each invoice belongs to a project. Older invoices get small completed
 // projects so the customer history is preserved without orphans.
 const legacyHeatingId = insertProject.run({
-  name: 'Heizungssteuerung (Wartung)', customer_id: muellerId, direction: 'sales',
-  stage: 'completed', label: 'One off maintenance visit', budget_rappen: chf(1000),
-  budget_type: 'fixed', due_date: day(5, 6), notes: 'Old job. Closed.',
-  position: 1, email: 'info@muellerbau.ch', phone: '+41 41 210 44 55',
-  created_at: projectAt(5, 1), updated_at: projectAt(5, 8)
+  name: 'Heizungssteuerung (Wartung)',
+  customer_id: muellerId,
+  direction: 'sales',
+  stage: 'completed',
+  label: 'One off maintenance visit',
+  budget_rappen: chf(1000),
+  budget_type: 'fixed',
+  due_date: day(5, 6),
+  notes: 'Old job. Closed.',
+  position: 1,
+  email: 'info@muellerbau.ch',
+  phone: '+41 41 210 44 55',
+  created_at: projectAt(5, 1),
+  updated_at: projectAt(5, 8)
 }).lastInsertRowid
 addInvoice(muellerId, legacyHeatingId, '2025-101', 'Wartung Heizungssteuerung', 'paid', 5, [
-  { article: art['Wartungsarbeiten'], desc: 'Wartungsarbeiten', qty: 8, unit: 'Stunden', price: 120 },
-  { article: art['Spesen'],           desc: 'Anfahrt',           qty: 1, unit: 'Pauschal', price: 45 }
+  {
+    article: art['Wartungsarbeiten'],
+    desc: 'Wartungsarbeiten',
+    qty: 8,
+    unit: 'Stunden',
+    price: 120
+  },
+  { article: art['Spesen'], desc: 'Anfahrt', qty: 1, unit: 'Pauschal', price: 45 }
 ])
 
 // Won project: 1 paid invoice
 addInvoice(muellerId, wonProjectId, '2026-001', 'Wartungsvertrag 2026 (Q1)', 'paid', 2, [
-  { article: art['Wartungsarbeiten'], desc: 'Wartung Januar bis März', qty: 24, unit: 'Stunden', price: 120 },
-  { article: art['Spesen'],           desc: 'Anfahrten',                qty: 1,  unit: 'Pauschal', price: 145 }
+  {
+    article: art['Wartungsarbeiten'],
+    desc: 'Wartung Januar bis März',
+    qty: 24,
+    unit: 'Stunden',
+    price: 120
+  },
+  { article: art['Spesen'], desc: 'Anfahrten', qty: 1, unit: 'Pauschal', price: 145 }
 ])
 
 // Active project: 1 paid invoice + 1 sent (awaiting payment) + 1 draft
 addInvoice(studioId, activeProjectId, '2026-002', 'Website relaunch (phase 1)', 'paid', 1, [
-  { article: art['Webdesign'], desc: 'Konzept und Design',     qty: 1, unit: 'Pauschal', price: 6000 },
-  { article: art['Beratung'],  desc: 'Stakeholder Workshops',  qty: 8, unit: 'Stunden',  price: 150 }
+  { article: art['Webdesign'], desc: 'Konzept und Design', qty: 1, unit: 'Pauschal', price: 6000 },
+  { article: art['Beratung'], desc: 'Stakeholder Workshops', qty: 8, unit: 'Stunden', price: 150 }
 ])
 addInvoice(studioId, activeProjectId, '2026-003', 'Website relaunch (phase 2)', 'sent', 0, [
-  { article: art['Webdesign'], desc: 'Implementation Sprint 1', qty: 1, unit: 'Pauschal', price: 4500 },
-  { article: art['Beratung'],  desc: 'Reviews und Iterationen', qty: 6, unit: 'Stunden',  price: 150 }
+  {
+    article: art['Webdesign'],
+    desc: 'Implementation Sprint 1',
+    qty: 1,
+    unit: 'Pauschal',
+    price: 4500
+  },
+  { article: art['Beratung'], desc: 'Reviews und Iterationen', qty: 6, unit: 'Stunden', price: 150 }
 ])
 addInvoice(studioId, activeProjectId, '2026-004', 'Website relaunch (phase 3)', 'draft', 0, [
-  { article: art['Webdesign'], desc: 'Implementation Sprint 2', qty: 1, unit: 'Pauschal', price: 4500 }
+  {
+    article: art['Webdesign'],
+    desc: 'Implementation Sprint 2',
+    qty: 1,
+    unit: 'Pauschal',
+    price: 4500
+  }
 ])
 
 // Completed project: paid invoice, archived
 addInvoice(annaId, completedProjectId, '2025-099', 'Website audit + report', 'paid', 3, [
-  { article: art['Beratung'], desc: 'Audit, Bericht und Empfehlungen', qty: 4, unit: 'Stunden', price: 150 },
-  { article: art['Spesen'],   desc: 'Tool-Lizenzen',                    qty: 1, unit: 'Pauschal', price: 200 }
+  {
+    article: art['Beratung'],
+    desc: 'Audit, Bericht und Empfehlungen',
+    qty: 4,
+    unit: 'Stunden',
+    price: 150
+  },
+  { article: art['Spesen'], desc: 'Tool-Lizenzen', qty: 1, unit: 'Pauschal', price: 200 }
 ])
 
 // Quick draft invoice tied to a tiny "consulting" project for Café Zentral.
 const quickConsultingId = insertProject.run({
-  name: 'Digitalisierung Coaching', customer_id: cafeId, direction: 'sales',
-  stage: 'active', label: 'One off coaching session', budget_rappen: chf(600),
-  budget_type: 'hourly', due_date: day(0, 28), notes: 'Just bill the hours.',
-  position: 2, email: 'sandra@cafezentral.ch', phone: '+41 41 410 22 33',
-  created_at: projectAt(0, 4), updated_at: projectAt(0, 5)
+  name: 'Digitalisierung Coaching',
+  customer_id: cafeId,
+  direction: 'sales',
+  stage: 'active',
+  label: 'One off coaching session',
+  budget_rappen: chf(600),
+  budget_type: 'hourly',
+  due_date: day(0, 28),
+  notes: 'Just bill the hours.',
+  position: 2,
+  email: 'sandra@cafezentral.ch',
+  phone: '+41 41 410 22 33',
+  created_at: projectAt(0, 4),
+  updated_at: projectAt(0, 5)
 }).lastInsertRowid
 addInvoice(cafeId, quickConsultingId, '2026-005', 'Beratung Digitalisierung', 'draft', 0, [
   { article: art['Beratung'], desc: 'Beratung', qty: 4, unit: 'Stunden', price: 150, discount: 5 }
@@ -303,8 +688,10 @@ addInvoice(cafeId, quickConsultingId, '2026-005', 'Beratung Digitalisierung', 'd
 
 // 2 extra projects are inserted later (legacyHeating + quickConsulting), so
 // add them to the count for an accurate summary.
-console.log('Seeded:',
+console.log(
+  'Seeded:',
   `${categories.length} categories, ${expenses.length} expenses, 2 income sources,`,
   `${customers.length} customers, ${articles.length + 3} articles,`,
-  `${projects.length + 2} projects (8 sales + 4 procurement + 2 legacy wrappers), 2 project emails, 7 invoices.`)
+  `${projects.length + 2} projects (8 sales + 4 procurement + 2 legacy wrappers), 2 project emails, 7 invoices.`
+)
 db.close()

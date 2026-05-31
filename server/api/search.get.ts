@@ -1,5 +1,12 @@
 type Scope = 'all' | 'invoices' | 'customers' | 'articles' | 'expenses' | 'projects'
-const SCOPES: ReadonlySet<Scope> = new Set(['all', 'invoices', 'customers', 'articles', 'expenses', 'projects'])
+const SCOPES: ReadonlySet<Scope> = new Set([
+  'all',
+  'invoices',
+  'customers',
+  'articles',
+  'expenses',
+  'projects'
+])
 
 interface SearchPayload {
   invoices: unknown[]
@@ -14,7 +21,13 @@ export default defineEventHandler(async (event): Promise<SearchPayload> => {
 
   const { q, scope } = getQuery(event)
   const term = String(q ?? '').trim()
-  const empty: SearchPayload = { invoices: [], customers: [], articles: [], expenses: [], projects: [] }
+  const empty: SearchPayload = {
+    invoices: [],
+    customers: [],
+    articles: [],
+    expenses: [],
+    projects: []
+  }
   if (term.length < 1) return empty
 
   const requested = String(scope ?? 'all') as Scope
@@ -24,7 +37,7 @@ export default defineEventHandler(async (event): Promise<SearchPayload> => {
   // Escape the ESCAPE char itself first, then the wildcards. Without the
   // backslash pass, a search term containing "\" would let following chars
   // act as escape sequences and break the LIKE pattern.
-  const like = `%${term.replace(/\\/g, '\\\\').replace(/[%_]/g, c => '\\' + c)}%`
+  const like = `%${term.replace(/\\/g, '\\\\').replace(/[%_]/g, (c) => '\\' + c)}%`
   const db = useDb()
   const limit = 8
   const out: SearchPayload = { ...empty }

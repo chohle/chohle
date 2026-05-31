@@ -21,7 +21,9 @@
     padding-top: 6px;
     border-top: 1px solid var(--border);
 
-    .mr { color: var(--ink); }
+    .mr {
+      color: var(--ink);
+    }
   }
 
   .src {
@@ -34,7 +36,9 @@
     color: var(--ink);
     text-decoration: none;
 
-    &:hover { text-decoration: underline; }
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   .src-sub {

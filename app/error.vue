@@ -11,8 +11,12 @@ useTweaks()
 const isNotFound = computed(() => error.statusCode === 404)
 const statusCode = computed(() => error.statusCode || 500)
 
-function handleReturn() { clearError({ redirect: '/' }) }
-function handleReload() { clearError({ redirect: window.location.pathname }) }
+function handleReturn() {
+  clearError({ redirect: '/' })
+}
+function handleReload() {
+  clearError({ redirect: window.location.pathname })
+}
 </script>
 
 <template>
@@ -25,7 +29,8 @@ function handleReload() { clearError({ redirect: window.location.pathname }) }
 
       <div class="err-code mono">{{ statusCode }}</div>
       <h1 class="err-title">
-        {{ isNotFound ? t('errors.notFoundTitle') : t('errors.genericTitle') }}<span class="err-serif">.</span>
+        {{ isNotFound ? t('errors.notFoundTitle') : t('errors.genericTitle')
+        }}<span class="err-serif">.</span>
       </h1>
       <p class="err-desc">
         {{ isNotFound ? t('errors.notFoundText') : t('errors.genericText') }}

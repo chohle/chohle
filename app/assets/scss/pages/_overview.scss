@@ -1,5 +1,9 @@
 .page-overview {
-  &__italic { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
+  &__italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
 
   &__grid {
     display: grid;
@@ -32,11 +36,18 @@
     margin-right: 4px;
     vertical-align: middle;
 
-    &--ink { background: var(--ink); }
-    &--muted { background: var(--ink-3); }
+    &--ink {
+      background: var(--ink);
+    }
+    &--muted {
+      background: var(--ink-3);
+    }
   }
 
-  &__count { font-size: 11px; color: var(--ink-3); }
+  &__count {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
 
   &__year-pick {
     display: inline-flex;
@@ -52,11 +63,17 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
 
-    b { color: var(--ink); font-weight: 500; margin-left: 4px; }
+    b {
+      color: var(--ink);
+      font-weight: 500;
+      margin-left: 4px;
+    }
   }
 
   @media (max-width: 900px) {
-    &__grid { grid-template-columns: 1fr; }
+    &__grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 700px) {

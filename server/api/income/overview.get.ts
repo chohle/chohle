@@ -26,9 +26,11 @@ export default defineEventHandler(async (event) => {
     .all() as SourceRow[]
 
   const paidIds = new Set(
-    (db.prepare('SELECT source_id FROM income_payments WHERE month = ?').all(month) as {
-      source_id: number
-    }[]).map((r) => r.source_id)
+    (
+      db.prepare('SELECT source_id FROM income_payments WHERE month = ?').all(month) as {
+        source_id: number
+      }[]
+    ).map((r) => r.source_id)
   )
 
   const holidaysByCanton = new Map<string, Map<string, string>>()

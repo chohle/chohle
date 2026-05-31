@@ -1,6 +1,6 @@
 interface OpenHoliday {
   startDate: string
-  name: { language: string, text: string }[]
+  name: { language: string; text: string }[]
 }
 
 function holidayName(h: OpenHoliday): string {
@@ -27,7 +27,7 @@ export async function getHolidays(canton: string, year: number): Promise<Map<str
 
   const cached = db
     .prepare('SELECT date, name FROM holidays WHERE canton = ? AND year = ?')
-    .all(canton, year) as { date: string, name: string }[]
+    .all(canton, year) as { date: string; name: string }[]
   if (cached.length) {
     return new Map(cached.map((r) => [r.date, r.name]))
   }

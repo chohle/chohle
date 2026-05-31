@@ -20,7 +20,9 @@
     color: var(--ink-3);
     cursor: pointer;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
 
     &:focus-visible {
       outline: 2px solid var(--ink);
@@ -47,9 +49,11 @@
     border: 1px solid var(--border);
     border-radius: 0;
     background: var(--surface);
-    transition: border-color .12s ease;
+    transition: border-color 0.12s ease;
 
-    &:focus-within { border-color: var(--ink); }
+    &:focus-within {
+      border-color: var(--ink);
+    }
 
     input {
       flex: 1;
@@ -59,7 +63,9 @@
       font-size: 18px;
       color: var(--ink);
 
-      &::placeholder { color: var(--ink-3); }
+      &::placeholder {
+        color: var(--ink-3);
+      }
     }
   }
 
@@ -86,9 +92,11 @@
     font-size: 13px;
     color: var(--ink-3);
     cursor: pointer;
-    transition: color .12s ease;
+    transition: color 0.12s ease;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
 
     &:focus-visible {
       outline: 2px solid var(--ink);
@@ -102,7 +110,9 @@
     }
   }
 
-  &__results { min-height: 80px; }
+  &__results {
+    min-height: 80px;
+  }
 
   &__hint {
     display: flex;
@@ -113,8 +123,12 @@
     font-size: 13px;
   }
 
-  &__group + &__group { margin-top: 16px; }
-  &__group-label { padding: 0 4px 8px; }
+  &__group + &__group {
+    margin-top: 16px;
+  }
+  &__group-label {
+    padding: 0 4px 8px;
+  }
 
   &__list {
     list-style: none;
@@ -136,7 +150,9 @@
     color: var(--ink);
 
     &:hover,
-    &.is-active { background: var(--surface-2); }
+    &.is-active {
+      background: var(--surface-2);
+    }
 
     &:focus-visible {
       outline: 2px solid var(--ink);
@@ -144,14 +160,32 @@
     }
   }
 
-  &__item-icon { color: var(--ink-3); flex-shrink: 0; }
-  &__item-label { flex: 1; font-size: 13px; }
-  &__item-suffix { font-size: 11px; color: var(--ink-3); }
+  &__item-icon {
+    color: var(--ink-3);
+    flex-shrink: 0;
+  }
+  &__item-label {
+    flex: 1;
+    font-size: 13px;
+  }
+  &__item-suffix {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
 }
 
 @media (max-width: 600px) {
-  .command-palette { padding: 44px 18px 20px; }
-  .command-palette__input { height: 52px; padding: 0 14px; }
-  .command-palette__input input { font-size: 16px; }
-  .command-palette__scopes { gap: 14px; }
+  .command-palette {
+    padding: 44px 18px 20px;
+  }
+  .command-palette__input {
+    height: 52px;
+    padding: 0 14px;
+  }
+  .command-palette__input input {
+    font-size: 16px;
+  }
+  .command-palette__scopes {
+    gap: 14px;
+  }
 }

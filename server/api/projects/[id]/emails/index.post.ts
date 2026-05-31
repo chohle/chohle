@@ -4,12 +4,17 @@ interface Body {
   body_html?: string
 }
 
-interface SenderRow { email: string | null; name: string }
+interface SenderRow {
+  email: string | null
+  name: string
+}
 interface ProjectRow {
   id: number
   customer_id: number | null
 }
-interface CustomerRow { email: string | null }
+interface CustomerRow {
+  email: string | null
+}
 
 function htmlToText(html: string): string {
   // Tiny stripper for plaintext fallback. Good enough for email clients
@@ -41,30 +46,37 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const project = db.prepare(`SELECT id, customer_id FROM projects WHERE id = ?`).get(id) as ProjectRow | undefined
+  const project = db.prepare(`SELECT id, customer_id FROM projects WHERE id = ?`).get(id) as
+    | ProjectRow
+    | undefined
   if (!project) throw createError({ statusCode: 404, statusMessage: 'project not found' })
 
   // Resolve the recipient: explicit body.to wins, otherwise pull from the
   // linked customer record so the UI can default-fill the field.
   let to = (body.to ?? '').trim()
   if (!to && project.customer_id) {
-    const c = db.prepare(`SELECT email FROM customers WHERE id = ?`).get(project.customer_id) as CustomerRow | undefined
+    const c = db.prepare(`SELECT email FROM customers WHERE id = ?`).get(project.customer_id) as
+      | CustomerRow
+      | undefined
     if (c?.email) to = c.email
   }
   if (!to) {
     throw createError({ statusCode: 400, statusMessage: 'recipient address required' })
   }
 
-  const sender = db.prepare(`SELECT email, name FROM sender WHERE id = 1`).get() as SenderRow | undefined
+  const sender = db.prepare(`SELECT email, name FROM sender WHERE id = 1`).get() as
+    | SenderRow
+    | undefined
   if (!sender?.email) {
-    throw createError({ statusCode: 400, statusMessage: 'configure a sender email in Billing first' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'configure a sender email in Billing first'
+    })
   }
 
   // Pass the address object form so nodemailer encodes display names with
   // special characters (quotes, commas, non-ASCII) into a valid RFC 5322 header.
-  const from = sender.name
-    ? { name: sender.name, address: sender.email }
-    : sender.email
+  const from = sender.name ? { name: sender.name, address: sender.email } : sender.email
   const text = htmlToText(html)
 
   // nodemailer returns the Message-ID it assigned (or that the SMTP server
@@ -78,10 +90,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 502, statusMessage: 'SMTP send failed', cause: err })
   }
 
-  const info = db.prepare(
-    `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text, message_id)
+  const info = db
+    .prepare(
+      `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text, message_id)
      VALUES (?, 'outbound', ?, ?, ?, ?, ?, ?)`
-  ).run(id, sender.email, to, subject, html, text, messageId)
+    )
+    .run(id, sender.email, to, subject, html, text, messageId)
 
   return { id: info.lastInsertRowid }
 })

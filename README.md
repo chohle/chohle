@@ -66,11 +66,11 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 
 ## Documentation
 
-| Doc | What's inside |
-| --- | --- |
-| [Development](docs/DEVELOPMENT.md) | Local setup, environment, database, project structure |
-| [Contributing](CONTRIBUTING.md) | How to contribute |
-| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format |
+| Doc                                            | What's inside                                         |
+| ---------------------------------------------- | ----------------------------------------------------- |
+| [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure |
+| [Contributing](CONTRIBUTING.md)                | How to contribute                                     |
+| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                 |
 
 ## Contributing
 

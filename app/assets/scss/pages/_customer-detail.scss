@@ -10,7 +10,9 @@
     text-decoration: none;
     padding-top: 24px;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
   }
 
   &__head {
@@ -20,7 +22,10 @@
     padding: 22px 0 28px;
   }
 
-  &__meta { flex: 1; min-width: 0; }
+  &__meta {
+    flex: 1;
+    min-width: 0;
+  }
   &__name {
     font-size: 28px;
     font-weight: 400;
@@ -41,7 +46,9 @@
     flex-shrink: 0;
   }
 
-  &__tabs { padding: 22px 0 18px; }
+  &__tabs {
+    padding: 22px 0 18px;
+  }
 
   &__logo {
     margin-bottom: 24px;
@@ -61,7 +68,11 @@
     flex-direction: column;
     gap: 4px;
 
-    dd { margin: 0; font-size: 13.5px; color: var(--ink); }
+    dd {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--ink);
+    }
   }
 
   &__inv-head {
@@ -72,18 +83,24 @@
   }
 
   &__inv-table {
-    tbody tr.row { cursor: pointer; }
+    tbody tr.row {
+      cursor: pointer;
+    }
   }
 
   @media (max-width: 700px) {
-    &__dl { grid-template-columns: 1fr; }
+    &__dl {
+      grid-template-columns: 1fr;
+    }
 
     &__head {
       flex-wrap: wrap;
       gap: 14px;
     }
 
-    &__meta { flex-basis: calc(100% - 78px); }
+    &__meta {
+      flex-basis: calc(100% - 78px);
+    }
     &__actions {
       flex-basis: 100%;
       flex-wrap: wrap;
@@ -94,7 +111,9 @@
         justify-content: center;
       }
     }
-    &__name { font-size: 22px; }
+    &__name {
+      font-size: 22px;
+    }
     &__tabs {
       overflow-x: auto;
       padding-bottom: 4px;

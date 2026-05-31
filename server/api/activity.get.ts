@@ -16,7 +16,10 @@ interface ActivityEvent {
 const MAX_EVENTS = 200
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })
 }
 
 function escapeMd(s: string) {
@@ -34,8 +37,9 @@ export default defineEventHandler(async (event) => {
   // workspace ages. Custom-month picks before this window will fall outside
   // the response — acceptable for now, can become a query param later.
   // --- Invoices (sent + paid + overdue) ---
-  const invoices = db.prepare(
-    `SELECT i.id, i.number, i.status, i.issue_date, i.due_date, i.paid_at,
+  const invoices = db
+    .prepare(
+      `SELECT i.id, i.number, i.status, i.issue_date, i.due_date, i.paid_at,
             i.total_rappen, c.name AS customer_name
      FROM invoices i
      JOIN customers c ON c.id = i.customer_id
@@ -45,7 +49,8 @@ export default defineEventHandler(async (event) => {
          OR i.paid_at >= date('now', '-1 year')
          OR i.due_date >= date('now', '-1 year')
        )`
-  ).all() as Array<{
+    )
+    .all() as Array<{
     id: number
     number: string | null
     status: 'sent' | 'paid'
@@ -57,13 +62,15 @@ export default defineEventHandler(async (event) => {
   }>
 
   // --- Expenses ---
-  const expenses = db.prepare(
-    `SELECT e.id, e.title, e.amount_rappen, e.date, e.vendor,
+  const expenses = db
+    .prepare(
+      `SELECT e.id, e.title, e.amount_rappen, e.date, e.vendor,
             c.name AS category_name
      FROM expenses e
      LEFT JOIN categories c ON c.id = e.category_id
      WHERE e.date >= date('now', '-1 year')`
-  ).all() as Array<{
+    )
+    .all() as Array<{
     id: number
     title: string
     amount_rappen: number
@@ -73,12 +80,14 @@ export default defineEventHandler(async (event) => {
   }>
 
   // --- Salaries ---
-  const salaries = db.prepare(
-    `SELECT p.id, p.date, p.amount_rappen, s.company
+  const salaries = db
+    .prepare(
+      `SELECT p.id, p.date, p.amount_rappen, s.company
      FROM income_payments p
      JOIN income_sources s ON s.id = p.source_id
      WHERE p.date >= date('now', '-1 year')`
-  ).all() as Array<{
+    )
+    .all() as Array<{
     id: number
     date: string
     amount_rappen: number

@@ -28,8 +28,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'invalid id' })
   }
 
-  const row = useDb().prepare(
-    `SELECT p.id, p.name, p.customer_id, c.name AS customer_name,
+  const row = useDb()
+    .prepare(
+      `SELECT p.id, p.name, p.customer_id, c.name AS customer_name,
             COALESCE(c.email, p.email) AS customer_email,
             COALESCE(c.phone, p.phone) AS customer_phone,
             p.email, p.phone,
@@ -38,7 +39,8 @@ export default defineEventHandler(async (event) => {
      FROM projects p
      LEFT JOIN customers c ON c.id = p.customer_id
      WHERE p.id = ?`
-  ).get(id) as ProjectDetail | undefined
+    )
+    .get(id) as ProjectDetail | undefined
 
   if (!row) throw createError({ statusCode: 404, statusMessage: 'not found' })
   return row

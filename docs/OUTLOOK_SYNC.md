@@ -8,9 +8,9 @@ synced, where to find it in the UI) see [MAIL_SYNC](MAIL_SYNC.md).
 
 ## Prerequisites
 
-* `BATZE_SECRET` set on the running batze instance (see
+- `BATZE_SECRET` set on the running batze instance (see
   [MAIL_SYNC](MAIL_SYNC.md#requirements)).
-* An Azure tenant where you can register an app. Your own personal
+- An Azure tenant where you can register an app. Your own personal
   Microsoft account works for personal Outlook addresses.
 
 ## Step 1: register an Azure app
@@ -18,14 +18,14 @@ synced, where to find it in the UI) see [MAIL_SYNC](MAIL_SYNC.md).
 1. Sign in to https://entra.microsoft.com (Azure Portal) and go to
    **App registrations** → **New registration**.
 2. Fill in:
-   * **Name**: `batze` (any name works, this is just for your reference).
-   * **Supported account types**: pick the one matching where your
+   - **Name**: `batze` (any name works, this is just for your reference).
+   - **Supported account types**: pick the one matching where your
      mailbox lives.
-     * *Accounts in this organizational directory only* if you only
+     - _Accounts in this organizational directory only_ if you only
        want your own tenant.
-     * *Accounts in any organizational directory and personal Microsoft
-       accounts* if you want it to work for any account.
-   * **Redirect URI**: pick **Web** as the platform, and set the URI to
+     - _Accounts in any organizational directory and personal Microsoft
+       accounts_ if you want it to work for any account.
+   - **Redirect URI**: pick **Web** as the platform, and set the URI to
      your batze callback. For local dev that is:
 
      ```text
@@ -33,6 +33,7 @@ synced, where to find it in the UI) see [MAIL_SYNC](MAIL_SYNC.md).
      ```
 
      For a hosted batze, swap in your domain.
+
 3. Click **Register**.
 4. From the app's **Overview** page, copy the **Application (client) ID**
    and the **Directory (tenant) ID**. You'll paste these into batze.
@@ -43,11 +44,11 @@ On the app registration page, go to **API permissions** →
 **Add a permission** → **Microsoft Graph** → **Delegated permissions**
 and add:
 
-| Permission       | Why we need it                                                  |
-| ---------------- | --------------------------------------------------------------- |
-| `User.Read`      | Read your basic profile to capture the email address.           |
-| `Mail.Read`      | Read your mailbox so the sync worker can find inbound replies.  |
-| `offline_access` | Issue a refresh token so the sync keeps working past one hour.  |
+| Permission       | Why we need it                                                 |
+| ---------------- | -------------------------------------------------------------- |
+| `User.Read`      | Read your basic profile to capture the email address.          |
+| `Mail.Read`      | Read your mailbox so the sync worker can find inbound replies. |
+| `offline_access` | Issue a refresh token so the sync keeps working past one hour. |
 
 Click **Grant admin consent** if your tenant requires it. PKCE means
 no client secret is needed.
@@ -67,11 +68,11 @@ no client secret is needed.
 
 You can paste one of these special values instead of your tenant UUID:
 
-| Value           | Use case                                                  |
-| --------------- | --------------------------------------------------------- |
-| `common`        | Personal Microsoft accounts and work / school accounts.   |
-| `organizations` | Work or school accounts only.                             |
-| `consumers`     | Personal Microsoft accounts only.                         |
+| Value           | Use case                                                |
+| --------------- | ------------------------------------------------------- |
+| `common`        | Personal Microsoft accounts and work / school accounts. |
+| `organizations` | Work or school accounts only.                           |
+| `consumers`     | Personal Microsoft accounts only.                       |
 
 ## Disconnecting
 
@@ -81,16 +82,16 @@ locally. To revoke at Microsoft's side too, remove batze from
 
 ## Outlook specific troubleshooting
 
-* **"AADSTS50011: redirect URI mismatch"**: the redirect URI in your
+- **"AADSTS50011: redirect URI mismatch"**: the redirect URI in your
   Azure app must exactly match the one batze posts. Including the
   scheme, host, port, and path. Update the Azure app under
   **Authentication** → **Web** → **Redirect URIs**.
-* **"AADSTS7000218: client_assertion or client_secret required"**:
+- **"AADSTS7000218: client_assertion or client_secret required"**:
   your Azure app is registered as a confidential client. PKCE only
   works with public clients. Either register the app as **Mobile and
   desktop applications**, or under **Authentication** enable
-  *Allow public client flows*.
-* **"Sign in failed"** generic: double check that Client ID is a UUID
+  _Allow public client flows_.
+- **"Sign in failed"** generic: double check that Client ID is a UUID
   and that the Tenant ID matches the account type your app accepts.
   Personal Microsoft accounts need `common` or `consumers`; tenant
   bound apps need the actual tenant UUID or `organizations`.

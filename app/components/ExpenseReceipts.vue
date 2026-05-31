@@ -1,7 +1,10 @@
 <script setup lang="ts">
-interface Attachment { id: number; filename: string }
+interface Attachment {
+  id: number
+  filename: string
+}
 
-const props = defineProps<{ expenseId: number, attachments: Attachment[] }>()
+const props = defineProps<{ expenseId: number; attachments: Attachment[] }>()
 const emit = defineEmits<{ changed: [] }>()
 
 const input = ref<HTMLInputElement>()
@@ -44,6 +47,13 @@ async function remove(id: number) {
       <UIcon name="i-lucide-upload" class="size-3" />
       <span>{{ $t('expenses.receipt') }}</span>
     </button>
-    <input ref="input" type="file" multiple accept="application/pdf,image/*" class="rec__file" @change="onFiles">
+    <input
+      ref="input"
+      type="file"
+      multiple
+      accept="application/pdf,image/*"
+      class="rec__file"
+      @change="onFiles"
+    />
   </div>
 </template>

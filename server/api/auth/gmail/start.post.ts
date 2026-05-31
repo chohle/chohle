@@ -44,7 +44,10 @@ export default defineEventHandler(async (event) => {
 
   // Google client IDs look like 123456789012-abcdef.apps.googleusercontent.com.
   if (!/\.apps\.googleusercontent\.com$/.test(clientId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Client ID must end with .apps.googleusercontent.com' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Client ID must end with .apps.googleusercontent.com'
+    })
   }
   if (clientSecret.length < 8) {
     throw createError({ statusCode: 400, statusMessage: 'Client secret is required' })

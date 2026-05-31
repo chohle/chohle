@@ -11,8 +11,13 @@
     font-size: 12px;
     text-decoration: none;
 
-    b { color: var(--ink); font-weight: 500; }
-    &:hover { color: var(--ink); }
+    b {
+      color: var(--ink);
+      font-weight: 500;
+    }
+    &:hover {
+      color: var(--ink);
+    }
   }
 
   .back {
@@ -26,7 +31,9 @@
     text-decoration: none;
     padding-top: 24px;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
   }
 
   .progress {
@@ -50,22 +57,34 @@
     cursor: pointer;
     border-radius: var(--radius-sm);
 
-    &:hover { background: var(--surface-2); }
-    &.done { color: var(--ink); }
+    &:hover {
+      background: var(--surface-2);
+    }
+    &.done {
+      color: var(--ink);
+    }
     &.done.active {
       background: var(--ink);
       color: var(--accent-ink);
 
-      .seg-num { color: var(--accent-ink); }
+      .seg-num {
+        color: var(--accent-ink);
+      }
     }
   }
 
-  .seg-num { letter-spacing: 0.1em; color: var(--ink-3); }
-  .seg-label { text-transform: uppercase; letter-spacing: 0.12em; }
+  .seg-num {
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .seg-label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
 
   .lines-head {
     display: grid;
-    grid-template-columns: 1.4fr 2.5fr .8fr .7fr 1fr .9fr 1.2fr;
+    grid-template-columns: 1.4fr 2.5fr 0.8fr 0.7fr 1fr 0.9fr 1.2fr;
     gap: 8px;
     padding-bottom: 8px;
     font-size: 10px;
@@ -77,13 +96,15 @@
 
   .line-row {
     display: grid;
-    grid-template-columns: 1.4fr 2.5fr .8fr .7fr 1fr .9fr 1.2fr;
+    grid-template-columns: 1.4fr 2.5fr 0.8fr 0.7fr 1fr 0.9fr 1.2fr;
     gap: 8px;
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid var(--border);
 
-    &:last-of-type { border-bottom: 0; }
+    &:last-of-type {
+      border-bottom: 0;
+    }
   }
 
   .amt {
@@ -95,8 +116,12 @@
     font-size: 13px;
   }
 
-  .right { text-align: right; }
-  .add-row { padding-top: 12px; }
+  .right {
+    text-align: right;
+  }
+  .add-row {
+    padding-top: 12px;
+  }
 
   .totals {
     display: flex;
@@ -117,7 +142,10 @@
       font-weight: 500;
     }
 
-    dd { margin: 0; font-variant-numeric: tabular-nums; }
+    dd {
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
   }
 
   .foot {
@@ -136,9 +164,18 @@
     border-radius: var(--radius);
   }
 
-  .preview-amt { font-size: 22px; font-variant-numeric: tabular-nums; }
-  .warn { color: var(--ink); font-size: 12px; }
-  .muted-note { font-size: 11px; color: var(--ink-3); }
+  .preview-amt {
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+  }
+  .warn {
+    color: var(--ink);
+    font-size: 12px;
+  }
+  .muted-note {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
 
   .paid-card {
     display: flex;
@@ -149,7 +186,9 @@
     text-align: center;
   }
 
-  .paid-label { color: var(--ink-3); }
+  .paid-label {
+    color: var(--ink-3);
+  }
   .paid-amt {
     font-size: 38px;
     letter-spacing: -0.035em;
@@ -165,17 +204,26 @@
 
   @media (max-width: 700px) {
     // 3-step progress strip stays one row but tightens copy.
-    .progress { grid-template-columns: repeat(3, 1fr); }
+    .progress {
+      grid-template-columns: repeat(3, 1fr);
+    }
     .seg {
       flex-direction: column;
       gap: 2px;
       padding: 8px 6px;
     }
-    .seg-num { font-size: 10px; }
-    .seg-label { font-size: 10px; letter-spacing: 0.08em; }
+    .seg-num {
+      font-size: 10px;
+    }
+    .seg-label {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
 
     // Each line item becomes a vertical card with inline labels.
-    .lines-head { display: none; }
+    .lines-head {
+      display: none;
+    }
 
     .line-row {
       grid-template-columns: 1fr 1fr;
@@ -183,19 +231,29 @@
       padding: 14px 0;
 
       // Two-column grid: first column full width for description.
-      :nth-child(2) { grid-column: 1 / -1; }
+      :nth-child(2) {
+        grid-column: 1 / -1;
+      }
     }
 
-    .totals { max-width: none; }
+    .totals {
+      max-width: none;
+    }
 
     .foot {
       flex-direction: column-reverse;
       gap: 8px;
 
       .ed-btn-ghost,
-      .ed-btn-primary { justify-content: center; }
+      .ed-btn-primary {
+        justify-content: center;
+      }
     }
 
-    .preview-row { flex-direction: column; align-items: stretch; gap: 10px; }
+    .preview-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
   }
 }

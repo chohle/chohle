@@ -15,13 +15,13 @@ OAuth integrations and should use [OUTLOOK_SYNC](OUTLOOK_SYNC.md) or
 
 ## Prerequisites
 
-* `BATZE_SECRET` set on the running batze instance (see
+- `BATZE_SECRET` set on the running batze instance (see
   [MAIL_SYNC](MAIL_SYNC.md#requirements)). The mailbox password is
   encrypted at rest with the key derived from this secret.
-* IMAP access enabled on your mailbox. For some providers this is
+- IMAP access enabled on your mailbox. For some providers this is
   off by default; the per provider sections below say how to turn it
   on.
-* An app password if your provider supports them. Use one instead of
+- An app password if your provider supports them. Use one instead of
   your login password whenever possible; revoking just the app
   password is cleaner than rotating your real one.
 
@@ -38,12 +38,12 @@ machine; Bridge proxies your encrypted mailbox over a plain IMAP
 endpoint on `localhost`. Open Bridge → your account → **Mailbox
 configuration**:
 
-| Setting  | Value                                                       |
-| -------- | ----------------------------------------------------------- |
-| Host     | `127.0.0.1`                                                 |
-| Port     | The IMAP port Bridge shows (usually `1143`, not `993`).     |
-| Username | Your Proton email.                                          |
-| Password | The Bridge **app password** Bridge generated for you.       |
+| Setting  | Value                                                   |
+| -------- | ------------------------------------------------------- |
+| Host     | `127.0.0.1`                                             |
+| Port     | The IMAP port Bridge shows (usually `1143`, not `993`). |
+| Username | Your Proton email.                                      |
+| Password | The Bridge **app password** Bridge generated for you.   |
 
 Bridge has to be running on the same machine as batze for the sync
 worker to reach it.
@@ -59,12 +59,12 @@ rejected.
    access.
 3. Copy the generated password.
 
-| Setting  | Value                            |
-| -------- | -------------------------------- |
-| Host     | `imap.fastmail.com`              |
-| Port     | `993`                            |
-| Username | Your full Fastmail email.        |
-| Password | The app password you just made.  |
+| Setting  | Value                           |
+| -------- | ------------------------------- |
+| Host     | `imap.fastmail.com`             |
+| Port     | `993`                           |
+| Username | Your full Fastmail email.       |
+| Password | The app password you just made. |
 
 ### iCloud Mail
 
@@ -76,23 +76,23 @@ Apple ID password is rejected.
    app specific password**. Label it `batze`.
 3. Copy the generated password.
 
-| Setting  | Value                                                |
-| -------- | ---------------------------------------------------- |
-| Host     | `imap.mail.me.com`                                   |
-| Port     | `993`                                                |
-| Username | Just the part before `@icloud.com` (Apple's rule).   |
-| Password | The app specific password you just made.             |
+| Setting  | Value                                              |
+| -------- | -------------------------------------------------- |
+| Host     | `imap.mail.me.com`                                 |
+| Port     | `993`                                              |
+| Username | Just the part before `@icloud.com` (Apple's rule). |
+| Password | The app specific password you just made.           |
 
 ### Custom / self hosted IMAP
 
 Anything that speaks IMAP4rev1 works. Common defaults:
 
-| Setting  | Value                                                       |
-| -------- | ----------------------------------------------------------- |
-| Host     | Your server's IMAP hostname.                                |
+| Setting  | Value                                                                                        |
+| -------- | -------------------------------------------------------------------------------------------- |
+| Host     | Your server's IMAP hostname.                                                                 |
 | Port     | `993` (implicit TLS) is preferred. `143` works with STARTTLS where the server advertises it. |
-| Username | Whatever your server expects (usually the email address).   |
-| Password | The mailbox password.                                       |
+| Username | Whatever your server expects (usually the email address).                                    |
+| Password | The mailbox password.                                                                        |
 
 Plain text IMAP without TLS is intentionally rejected.
 
@@ -118,20 +118,20 @@ the relevant app password from the provider's own dashboard.
 
 ## IMAP specific troubleshooting
 
-* **"Invalid credentials" / "AUTHENTICATIONFAILED"**: double check
+- **"Invalid credentials" / "AUTHENTICATIONFAILED"**: double check
   Username and Password. For Fastmail, iCloud, and Google Workspace
   it must be an app password, not your login password. For Proton it
   must be the Bridge app password, not your Proton account password.
-* **"ENOTFOUND" or "ECONNREFUSED"**: the Host is wrong, the Port is
+- **"ENOTFOUND" or "ECONNREFUSED"**: the Host is wrong, the Port is
   wrong, or the server isn't reachable from where batze runs. For
   Proton Bridge, confirm Bridge is running and listening on
   `localhost` from inside the batze container too if you're using
   Docker (you may need `host.docker.internal`).
-* **"Certificate has expired" / TLS handshake errors**: your server
+- **"Certificate has expired" / TLS handshake errors**: your server
   is using a self signed or expired certificate. batze does not
   accept those by default; either fix the certificate, or contact
   the provider.
-* **Sync ran but nothing appeared in the thread**: the reply's
+- **Sync ran but nothing appeared in the thread**: the reply's
   headers didn't reference a Message-ID batze captured. Confirm the
   email was originally sent from batze (not from your normal mail
   client) and that the reply is a true reply (not a forwarded new

@@ -12,6 +12,7 @@ import type { Database } from 'better-sqlite3'
 import { ImapFlow, type FetchMessageObject } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import { decryptSecret } from './secrets'
+import type { SyncResult } from './mailbox'
 
 interface ImapSyncMailbox {
   id: number
@@ -36,14 +37,13 @@ function asArray(refs: string | string[] | undefined): string[] {
   return refs.split(/\s+/)
 }
 
-export interface SyncResult {
-  scanned: number
-  inserted: number
-  duplicates: number
-}
-
 export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): Promise<SyncResult> {
-  if (!mailbox.imap_host || !mailbox.imap_port || !mailbox.imap_user || !mailbox.imap_password_enc) {
+  if (
+    !mailbox.imap_host ||
+    !mailbox.imap_port ||
+    !mailbox.imap_user ||
+    !mailbox.imap_password_enc
+  ) {
     throw new Error('mailbox missing IMAP credentials; reconnect required')
   }
 
@@ -67,14 +67,21 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
   // Pre-load every Message-ID batze has captured on outbound so we can
   // match without hitting the DB per message.
   const projectByMsgId = new Map<string, number>()
-  const outboundRows = db.prepare(
-    `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
-  ).all() as Array<{ project_id: number; message_id: string }>
+  const outboundRows = db
+    .prepare(
+      `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
+    )
+    .all() as Array<{ project_id: number; message_id: string }>
   for (const r of outboundRows) projectByMsgId.set(r.message_id, r.project_id)
 
   const existingInbound = new Set<string>(
-    (db.prepare(`SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`).all() as Array<{ message_id: string }>)
-      .map(r => r.message_id)
+    (
+      db
+        .prepare(
+          `SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`
+        )
+        .all() as Array<{ message_id: string }>
+    ).map((r) => r.message_id)
   )
 
   const insert = db.prepare(
@@ -100,54 +107,83 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
       // through to the last_sync_at UPDATE so a quiet inbox doesn't keep
       // re-searching the same lookback window forever.
       const limited = (uids ?? []).slice(-200)
-      if (limited.length > 0) for await (const msg of client.fetch(limited, { source: true, internalDate: true }, { uid: true }) as AsyncIterable<FetchMessageObject>) {
-        scanned += 1
-        if (!msg.source) continue
-        const parsed = await simpleParser(msg.source)
-        const incomingId = parsed.messageId ? stripAngles(parsed.messageId) : null
-        if (incomingId && existingInbound.has(incomingId)) { duplicates += 1; continue }
+      if (limited.length > 0)
+        for await (const msg of client.fetch(
+          limited,
+          { source: true, internalDate: true },
+          { uid: true }
+        ) as AsyncIterable<FetchMessageObject>) {
+          scanned += 1
+          if (!msg.source) continue
+          const parsed = await simpleParser(msg.source)
+          const incomingId = parsed.messageId ? stripAngles(parsed.messageId) : null
+          if (incomingId && existingInbound.has(incomingId)) {
+            duplicates += 1
+            continue
+          }
 
-        const anchors = Array.from(new Set([
-          ...(parsed.inReplyTo ? [parsed.inReplyTo] : []).flatMap(s => s.match(/<[^>]+>/g) ?? [s]),
-          ...asArray(parsed.references).flatMap(s => s.match(/<[^>]+>/g) ?? [s])
-        ].map(stripAngles).filter(Boolean)))
+          const anchors = Array.from(
+            new Set(
+              [
+                ...(parsed.inReplyTo ? [parsed.inReplyTo] : []).flatMap(
+                  (s) => s.match(/<[^>]+>/g) ?? [s]
+                ),
+                ...asArray(parsed.references).flatMap((s) => s.match(/<[^>]+>/g) ?? [s])
+              ]
+                .map(stripAngles)
+                .filter(Boolean)
+            )
+          )
 
-        let projectId: number | undefined
-        for (const a of anchors) {
-          const match = projectByMsgId.get(a)
-          if (match !== undefined) { projectId = match; break }
+          let projectId: number | undefined
+          for (const a of anchors) {
+            const match = projectByMsgId.get(a)
+            if (match !== undefined) {
+              projectId = match
+              break
+            }
+          }
+          if (!projectId) continue
+
+          const html = typeof parsed.html === 'string' ? parsed.html : ''
+          const text = parsed.text ?? ''
+          const from = parsed.from?.text ?? null
+          const to = Array.isArray(parsed.to)
+            ? parsed.to.map((t) => t.text).join(', ')
+            : (parsed.to?.text ?? null)
+          const subject = parsed.subject ?? ''
+          const dateMs = (parsed.date ?? msg.internalDate ?? new Date()).valueOf()
+          const sentAt = new Date(dateMs).toISOString().replace('T', ' ').slice(0, 19)
+
+          insert.run(projectId, from, to, subject, html, text, sentAt, incomingId)
+          inserted += 1
+          if (incomingId) existingInbound.add(incomingId)
         }
-        if (!projectId) continue
-
-        const html = typeof parsed.html === 'string' ? parsed.html : ''
-        const text = parsed.text ?? ''
-        const from = parsed.from?.text ?? null
-        const to = Array.isArray(parsed.to) ? parsed.to.map(t => t.text).join(', ') : (parsed.to?.text ?? null)
-        const subject = parsed.subject ?? ''
-        const dateMs = (parsed.date ?? msg.internalDate ?? new Date()).valueOf()
-        const sentAt = new Date(dateMs).toISOString().replace('T', ' ').slice(0, 19)
-
-        insert.run(projectId, from, to, subject, html, text, sentAt, incomingId)
-        inserted += 1
-        if (incomingId) existingInbound.add(incomingId)
-      }
     } finally {
       lock.release()
     }
   } finally {
-    try { await client.logout() } catch { /* ignore */ }
+    try {
+      await client.logout()
+    } catch {
+      /* ignore */
+    }
   }
 
-  db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`)
-    .run(new Date().toISOString(), mailbox.id)
+  db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`).run(
+    new Date().toISOString(),
+    mailbox.id
+  )
 
   return { scanned, inserted, duplicates }
 }
 
 export function listImapMailboxes(db: Database): ImapSyncMailbox[] {
-  return db.prepare(
-    `SELECT id, provider, email_address, imap_host, imap_port, imap_user,
+  return db
+    .prepare(
+      `SELECT id, provider, email_address, imap_host, imap_port, imap_user,
             imap_password_enc, last_sync_at
      FROM mailboxes WHERE provider = 'imap'`
-  ).all() as ImapSyncMailbox[]
+    )
+    .all() as ImapSyncMailbox[]
 }

@@ -11,13 +11,30 @@
     padding: 14px 0;
     border-bottom: 1px solid var(--border);
 
-    &:last-child { border-bottom: 0; }
+    &:last-child {
+      border-bottom: 0;
+    }
   }
 
-  .num { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
-  .main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .title { font-size: 13px; color: var(--ink); }
-  .sub { font-size: 11px; color: var(--ink-3); }
+  .num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .title {
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .sub {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
   .value {
     font-family: var(--font-mono);
     font-size: 13px;

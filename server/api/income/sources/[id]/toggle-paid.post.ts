@@ -16,7 +16,9 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const source = db
-    .prepare('SELECT salary_rappen, payout_day, canton, payout_rule FROM income_sources WHERE id = ?')
+    .prepare(
+      'SELECT salary_rappen, payout_day, canton, payout_rule FROM income_sources WHERE id = ?'
+    )
     .get(id) as SourceRow | undefined
   if (!source) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })

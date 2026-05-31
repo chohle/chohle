@@ -31,13 +31,18 @@ export default defineEventHandler(async (event) => {
   )
 
   // Stamp paid_at when entering 'paid' (keep the original date if already set); clear otherwise.
-  const current = db.prepare('SELECT paid_at FROM invoices WHERE id = ?').get(id) as { paid_at: string | null } | undefined
-  const paidAt = status === 'paid' ? (current?.paid_at || new Date().toISOString().slice(0, 10)) : null
+  const current = db.prepare('SELECT paid_at FROM invoices WHERE id = ?').get(id) as
+    | { paid_at: string | null }
+    | undefined
+  const paidAt =
+    status === 'paid' ? current?.paid_at || new Date().toISOString().slice(0, 10) : null
 
   // Freeze the total when paid so realized revenue is stable; null while unpaid.
-  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined)?.vat_registered
+  const vat = !!(
+    db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
+      | { vat_registered: number }
+      | undefined
+  )?.vat_registered
   const { totalRappen } = computeInvoiceTotals(
     items.map((it: Record<string, unknown>) => ({
       quantity: Number(it?.quantity) || 0,

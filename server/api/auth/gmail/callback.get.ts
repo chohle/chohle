@@ -24,10 +24,16 @@ interface UserinfoResponse {
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const session = await getUserSession(event) as { gmailPending?: {
-    clientId: string; clientSecret: string; verifier: string; state: string;
-    label: string; redirectUri: string
-  } }
+  const session = (await getUserSession(event)) as {
+    gmailPending?: {
+      clientId: string
+      clientSecret: string
+      verifier: string
+      state: string
+      label: string
+      redirectUri: string
+    }
+  }
 
   const pending = session.gmailPending
   if (!pending) {
@@ -44,7 +50,10 @@ export default defineEventHandler(async (event) => {
   await setUserSession(event, { gmailPending: undefined })
 
   if (error) {
-    return sendRedirect(event, `/settings?mailbox=error&reason=${encodeURIComponent(error)}#mail-sync`)
+    return sendRedirect(
+      event,
+      `/settings?mailbox=error&reason=${encodeURIComponent(error)}#mail-sync`
+    )
   }
   if (!code || returnedState !== pending.state) {
     throw createError({ statusCode: 400, statusMessage: 'invalid callback parameters' })
@@ -75,13 +84,16 @@ export default defineEventHandler(async (event) => {
     // Should not happen with access_type=offline + prompt=consent, but
     // surface clearly if Google omits it (would brick the sync worker
     // as soon as the access token expires in an hour).
-    return sendRedirect(event, `/settings?mailbox=error&reason=${encodeURIComponent('Google did not return a refresh_token; reconnect required')}#mail-sync`)
+    return sendRedirect(
+      event,
+      `/settings?mailbox=error&reason=${encodeURIComponent('Google did not return a refresh_token; reconnect required')}#mail-sync`
+    )
   }
 
   // Resolve the user's email so the Settings list can show it.
   const me = await $fetch<UserinfoResponse>('https://www.googleapis.com/oauth2/v3/userinfo', {
     headers: { Authorization: `Bearer ${tokenRes.access_token}` }
-  }).catch(() => ({} as UserinfoResponse))
+  }).catch(() => ({}) as UserinfoResponse)
 
   const emailAddress = (me.email ?? '').trim() || null
   const label = pending.label || me.name || 'Gmail'
@@ -102,7 +114,10 @@ export default defineEventHandler(async (event) => {
   } catch (err) {
     const msg = (err as { message?: string }).message ?? 'insert failed'
     console.error('[gmail-oauth] insert mailbox failed:', msg)
-    return sendRedirect(event, `/settings?mailbox=error&reason=${encodeURIComponent(msg)}#mail-sync`)
+    return sendRedirect(
+      event,
+      `/settings?mailbox=error&reason=${encodeURIComponent(msg)}#mail-sync`
+    )
   }
 
   return sendRedirect(event, '/settings?mailbox=connected#mail-sync')

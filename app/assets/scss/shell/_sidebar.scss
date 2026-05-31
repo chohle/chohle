@@ -8,7 +8,9 @@
   flex-direction: column;
   padding: 22px 14px 14px;
   z-index: 20;
-  transition: transform 0.2s ease, width 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    width 0.2s ease;
 
   .brand {
     padding: 0 4px 18px;
@@ -66,7 +68,10 @@
     color: var(--ink-2);
     cursor: pointer;
 
-    &:hover { background: var(--surface-2); color: var(--ink); }
+    &:hover {
+      background: var(--surface-2);
+      color: var(--ink);
+    }
   }
 
   .nav {
@@ -75,8 +80,12 @@
     padding-top: 6px;
   }
 
-  .nav-section + .nav-section { margin-top: 18px; }
-  .nav-label { padding: 0 4px 8px; }
+  .nav-section + .nav-section {
+    margin-top: 18px;
+  }
+  .nav-label {
+    padding: 0 4px 8px;
+  }
 
   .nav-item {
     position: relative;
@@ -88,9 +97,13 @@
     color: var(--ink-2);
     text-decoration: none;
     border-radius: var(--radius-xs);
-    transition: color .12s ease, background-color .12s ease;
+    transition:
+      color 0.12s ease,
+      background-color 0.12s ease;
 
-    &:hover { color: var(--ink); }
+    &:hover {
+      color: var(--ink);
+    }
 
     &.active {
       color: var(--ink);
@@ -109,9 +122,18 @@
     }
   }
 
-  .nav-icon { width: 14px; height: 14px; flex-shrink: 0; }
-  .nav-text { flex: 1; }
-  .nav-count { font-size: 11px; color: var(--ink-3); }
+  .nav-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .nav-text {
+    flex: 1;
+  }
+  .nav-count {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
 
   // Parent group (collapsible) — same chrome as nav-item, plus a chevron.
   // Buttons ship with appearance + content-box height that make them
@@ -138,9 +160,12 @@
     width: 12px;
     height: 12px;
     color: var(--ink-3);
-    transition: transform .15s ease;
+    transition: transform 0.15s ease;
 
-    &.open { transform: rotate(180deg); color: var(--ink); }
+    &.open {
+      transform: rotate(180deg);
+      color: var(--ink);
+    }
   }
 
   // Child list under an expanded group — kept visually quieter than peers.
@@ -157,7 +182,9 @@
     padding-left: 12px;
     font-size: 12px;
 
-    &.active::before { left: -1px; }
+    &.active::before {
+      left: -1px;
+    }
   }
 
   .user {
@@ -179,7 +206,9 @@
     color: var(--ink);
     border-radius: var(--radius-xs);
 
-    &:hover { background: var(--surface-2); }
+    &:hover {
+      background: var(--surface-2);
+    }
   }
 
   .user-meta {
@@ -189,7 +218,10 @@
     flex-direction: column;
   }
 
-  .user-name { font-size: 13px; font-weight: 500; }
+  .user-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
   .user-email {
     font-size: 10px;
     color: var(--ink-3);
@@ -197,35 +229,58 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .user-icon { width: 14px; height: 14px; color: var(--ink-3); }
+  .user-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--ink-3);
+  }
 
   // Collapsed (desktop icon-only) — width comes from --sidebar-w (64px),
   // labels hide, content centers in the narrow column.
   &.is-collapsed {
     padding: 22px 8px 14px;
 
-    .brand { justify-content: center; padding: 0 0 18px; }
+    .brand {
+      justify-content: center;
+      padding: 0 0 18px;
+    }
 
-    .nav-label { display: none; }
+    .nav-label {
+      display: none;
+    }
 
     .nav-item {
       justify-content: center;
       padding: 9px 4px;
 
-      &.active::before { left: -8px; }
+      &.active::before {
+        left: -8px;
+      }
     }
 
     .nav-text,
     .nav-count,
     .nav-chevron,
-    .nav-children { display: none; }
+    .nav-children {
+      display: none;
+    }
 
-    .nav-icon { width: 16px; height: 16px; }
+    .nav-icon {
+      width: 16px;
+      height: 16px;
+    }
 
-    .user { padding: 12px 0 0; }
-    .user-btn { justify-content: center; padding: 6px 0; }
+    .user {
+      padding: 12px 0 0;
+    }
+    .user-btn {
+      justify-content: center;
+      padding: 6px 0;
+    }
     .user-meta,
-    .user-icon { display: none; }
+    .user-icon {
+      display: none;
+    }
   }
 }
 
@@ -245,21 +300,49 @@
       // so labels show in the full-screen drawer.
       padding: 22px 14px 14px;
 
-      .brand { justify-content: space-between; padding: 0 4px 18px; }
-      .nav-label { display: block; }
-      .nav-item { justify-content: flex-start; padding: 7px 4px; }
-      .nav-text { display: block; }
-      .nav-icon { width: 14px; height: 14px; }
+      .brand {
+        justify-content: space-between;
+        padding: 0 4px 18px;
+      }
+      .nav-label {
+        display: block;
+      }
+      .nav-item {
+        justify-content: flex-start;
+        padding: 7px 4px;
+      }
+      .nav-text {
+        display: block;
+      }
+      .nav-icon {
+        width: 14px;
+        height: 14px;
+      }
 
-      .user { padding: 12px 0 0; border-top: 1px solid var(--border); }
-      .user-btn { justify-content: flex-start; padding: 6px 4px; }
+      .user {
+        padding: 12px 0 0;
+        border-top: 1px solid var(--border);
+      }
+      .user-btn {
+        justify-content: flex-start;
+        padding: 6px 4px;
+      }
       .user-meta,
-      .user-icon { display: flex; }
-      .user-meta { display: flex; flex-direction: column; }
+      .user-icon {
+        display: flex;
+      }
+      .user-meta {
+        display: flex;
+        flex-direction: column;
+      }
     }
 
-    &__close { display: inline-flex; }
+    &__close {
+      display: inline-flex;
+    }
 
-    .brand-logo { height: 28px; }
+    .brand-logo {
+      height: 28px;
+    }
   }
 }

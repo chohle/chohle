@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const row = useDb()
     .prepare('SELECT filename, stored_name, mime_type FROM attachments WHERE id = ?')
-    .get(id) as { filename: string, stored_name: string, mime_type: string } | undefined
+    .get(id) as { filename: string; stored_name: string; mime_type: string } | undefined
   if (!row) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }

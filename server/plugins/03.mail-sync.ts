@@ -7,7 +7,11 @@
 // APIs.
 
 import { secretIsAvailable } from '~~/server/utils/secrets'
-import { listOutlookMailboxes, recordSyncError, syncOutlookMailbox } from '~~/server/utils/outlookSync'
+import {
+  listOutlookMailboxes,
+  recordSyncError,
+  syncOutlookMailbox
+} from '~~/server/utils/outlookSync'
 import { listGmailMailboxes, syncGmailMailbox } from '~~/server/utils/gmailSync'
 import { listImapMailboxes, syncImapMailbox } from '~~/server/utils/imapSync'
 
@@ -33,7 +37,9 @@ async function runOnce(): Promise<void> {
         try {
           const r = await syncOutlookMailbox(db, mailbox)
           if (r.inserted > 0) {
-            console.log(`[mail-sync] outlook ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`)
+            console.log(
+              `[mail-sync] outlook ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`
+            )
           }
         } catch (err) {
           const msg = (err as { message?: string }).message ?? String(err)
@@ -45,7 +51,9 @@ async function runOnce(): Promise<void> {
         try {
           const r = await syncGmailMailbox(db, mailbox)
           if (r.inserted > 0) {
-            console.log(`[mail-sync] gmail ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`)
+            console.log(
+              `[mail-sync] gmail ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`
+            )
           }
         } catch (err) {
           const msg = (err as { message?: string }).message ?? String(err)
@@ -84,8 +92,12 @@ export default defineNitroPlugin(() => {
   // setInterval keeps the event loop alive across the process lifetime.
   // `.unref()` so the timer doesn't block a graceful shutdown if the
   // host is stopping (Docker SIGTERM, dev HMR reload, etc.).
-  const timer = setInterval(() => { void runOnce() }, interval)
+  const timer = setInterval(() => {
+    void runOnce()
+  }, interval)
   ;(timer as { unref?: () => void }).unref?.()
 
-  setTimeout(() => { void runOnce() }, FIRST_RUN_DELAY_MS)
+  setTimeout(() => {
+    void runOnce()
+  }, FIRST_RUN_DELAY_MS)
 })

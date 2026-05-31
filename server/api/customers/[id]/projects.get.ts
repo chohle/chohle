@@ -53,11 +53,13 @@ export default defineEventHandler(async (event) => {
 
   // One pass over every line item across all this customer's project invoices.
   // Avoids N invoice queries when the customer has many projects.
-  const vat = !!(db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined)?.vat_registered
+  const vat = !!(
+    db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
+      | { vat_registered: number }
+      | undefined
+  )?.vat_registered
 
-  const ids = projects.map(p => p.id)
+  const ids = projects.map((p) => p.id)
   // Drive from `invoices` (LEFT JOIN items) so invoices with zero line
   // items still count toward invoice_count, even though they contribute
   // 0 to the totals.
@@ -70,12 +72,16 @@ export default defineEventHandler(async (event) => {
     .all(...ids) as Array<{ id: number; status: 'draft' | 'sent' | 'paid'; project_id: number }>
 
   const items = invoiceRows.length
-    ? db.prepare(
-        `SELECT ii.invoice_id, ii.quantity, ii.unit_price_rappen,
+    ? (db
+        .prepare(
+          `SELECT ii.invoice_id, ii.quantity, ii.unit_price_rappen,
                 ii.discount_percent, ii.mwst_percent
          FROM invoice_items ii
          WHERE ii.invoice_id IN (${invoiceRows.map(() => '?').join(',')})`
-      ).all(...invoiceRows.map(r => r.id)) as Array<Omit<ItemRow, 'invoice_id' | 'status' | 'project_id'> & { invoice_id: number }>
+        )
+        .all(...invoiceRows.map((r) => r.id)) as Array<
+        Omit<ItemRow, 'invoice_id' | 'status' | 'project_id'> & { invoice_id: number }
+      >)
     : []
 
   const itemsByInvoice = new Map<number, typeof items>()
@@ -89,7 +95,7 @@ export default defineEventHandler(async (event) => {
   for (const inv of invoiceRows) {
     const rows = itemsByInvoice.get(inv.id) ?? []
     const { totalRappen } = computeInvoiceTotals(
-      rows.map(r => ({
+      rows.map((r) => ({
         quantity: r.quantity,
         unitPriceRappen: r.unit_price_rappen,
         discountPercent: r.discount_percent,
@@ -104,7 +110,7 @@ export default defineEventHandler(async (event) => {
     stats.set(inv.project_id, s)
   }
 
-  return projects.map(p => ({
+  return projects.map((p) => ({
     ...p,
     invoice_count: stats.get(p.id)?.count ?? 0,
     invoiced_rappen: stats.get(p.id)?.invoiced ?? 0,

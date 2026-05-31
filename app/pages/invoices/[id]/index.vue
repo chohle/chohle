@@ -36,18 +36,36 @@ const route = useRoute()
 const id = route.params.id as string
 const toast = useToast()
 
-const { data } = await useFetch<{ invoice: InvoiceRow, items: ItemRow[], project: ProjectMini | null }>(`/api/invoices/${id}`)
+const { data } = await useFetch<{
+  invoice: InvoiceRow
+  items: ItemRow[]
+  project: ProjectMini | null
+}>(`/api/invoices/${id}`)
 const inv = data.value!.invoice
 const linkedProject = data.value!.project
 const customerId = inv.customer_id
 
-const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = { sales: 'vertrieb', procurement: 'einkauf' }
-const projectHref = computed(() => linkedProject ? `/${DIR_TO_SLUG[linkedProject.direction]}/${linkedProject.id}` : null)
+const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
+  sales: 'vertrieb',
+  procurement: 'einkauf'
+}
+const projectHref = computed(() =>
+  linkedProject ? `/${DIR_TO_SLUG[linkedProject.direction]}/${linkedProject.id}` : null
+)
 
 const { data: globalArticles } = await useFetch<Article[]>('/api/articles', { default: () => [] })
-const { data: customerArticles } = await useFetch<Article[]>(`/api/customers/${customerId}/articles`, { default: () => [] })
-const { data: sender } = await useFetch<{ vat_registered: number, name: string, email_template: string }>('/api/sender')
-const { data: customer } = await useFetch<{ name: string, email: string | null, language: string }>(`/api/customers/${customerId}`)
+const { data: customerArticles } = await useFetch<Article[]>(
+  `/api/customers/${customerId}/articles`,
+  { default: () => [] }
+)
+const { data: sender } = await useFetch<{
+  vat_registered: number
+  name: string
+  email_template: string
+}>('/api/sender')
+const { data: customer } = await useFetch<{ name: string; email: string | null; language: string }>(
+  `/api/customers/${customerId}`
+)
 const vat = computed(() => !!sender.value?.vat_registered)
 const articles = computed(() => [...globalArticles.value, ...customerArticles.value])
 
@@ -96,10 +114,24 @@ function onArticle(row: EditRow) {
   row.unitPrice = a.default_price_rappen / 100
   row.mwstPercent = a.default_mwst
 }
-function addRow() {
-  items.value.push({ articleId: null, description: '', quantity: 1, unit: '', unitPrice: 0, discountPercent: 0, mwstPercent: 8.1 })
+function onArticleSelect(row: EditRow, articleId: number | null) {
+  row.articleId = articleId
+  onArticle(row)
 }
-function removeRow(i: number) { items.value.splice(i, 1) }
+function addRow() {
+  items.value.push({
+    articleId: null,
+    description: '',
+    quantity: 1,
+    unit: '',
+    unitPrice: 0,
+    discountPercent: 0,
+    mwstPercent: 8.1
+  })
+}
+function removeRow(i: number) {
+  items.value.splice(i, 1)
+}
 
 function toLine(r: EditRow) {
   return {
@@ -110,14 +142,18 @@ function toLine(r: EditRow) {
   }
 }
 const totals = computed(() => computeInvoiceTotals(items.value.map(toLine), vat.value))
-function lineAmount(r: EditRow) { return lineNetRappen(toLine(r)) }
+function lineAmount(r: EditRow) {
+  return lineNetRappen(toLine(r))
+}
 
 const saving = ref(false)
 const confirmDelete = ref(false)
 const formRef = ref()
 const lineState = reactive({ items })
 
-function snapshot() { return JSON.stringify({ ...header, items: items.value }) }
+function snapshot() {
+  return JSON.stringify({ ...header, items: items.value })
+}
 const baseline = ref(snapshot())
 const dirty = computed(() => snapshot() !== baseline.value)
 
@@ -125,22 +161,31 @@ const showLeaveDialog = ref(false)
 let resolveLeave: ((v: boolean) => void) | null = null
 function confirmLeave(): Promise<boolean> {
   resolveLeave?.(false)
-  return new Promise((res) => { resolveLeave = res; showLeaveDialog.value = true })
+  return new Promise((res) => {
+    resolveLeave = res
+    showLeaveDialog.value = true
+  })
 }
 function answerLeave(v: boolean) {
   showLeaveDialog.value = false
-  resolveLeave?.(v); resolveLeave = null
+  resolveLeave?.(v)
+  resolveLeave = null
 }
 useDirtyGuard(() => dirty.value, confirmLeave)
 
 function validate() {
-  const errors: { name: string, message: string }[] = []
+  const errors: { name: string; message: string }[] = []
   items.value.forEach((row, i) => {
-    if (!row.description.trim()) errors.push({ name: `items.${i}.description`, message: t('validation.required') })
-    if (row.quantity == null) errors.push({ name: `items.${i}.quantity`, message: t('validation.required') })
-    else if (row.quantity <= 0) errors.push({ name: `items.${i}.quantity`, message: t('validation.positive') })
-    if (row.unitPrice == null) errors.push({ name: `items.${i}.unitPrice`, message: t('validation.required') })
-    else if (row.unitPrice <= 0) errors.push({ name: `items.${i}.unitPrice`, message: t('validation.positive') })
+    if (!row.description.trim())
+      errors.push({ name: `items.${i}.description`, message: t('validation.required') })
+    if (row.quantity == null)
+      errors.push({ name: `items.${i}.quantity`, message: t('validation.required') })
+    else if (row.quantity <= 0)
+      errors.push({ name: `items.${i}.quantity`, message: t('validation.positive') })
+    if (row.unitPrice == null)
+      errors.push({ name: `items.${i}.unitPrice`, message: t('validation.required') })
+    else if (row.unitPrice <= 0)
+      errors.push({ name: `items.${i}.unitPrice`, message: t('validation.positive') })
   })
   return errors
 }
@@ -150,53 +195,82 @@ async function save() {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
     baseline.value = snapshot()
     toast.add({ title: t('invoices.toastSaved'), color: 'success' })
-  } finally { saving.value = false }
+  } finally {
+    saving.value = false
+  }
 }
 async function removeInvoice() {
   await $fetch(`/api/invoices/${id}`, { method: 'DELETE' })
   baseline.value = snapshot()
   await navigateTo(`/customers/${customerId}`)
 }
-async function previewPdf() { await save(); await navigateTo(`/invoices/${id}/print`) }
-async function continueToSend() { await save(); step.value = 1 }
+async function previewPdf() {
+  await save()
+  await navigateTo(`/invoices/${id}/print`)
+}
+async function continueToSend() {
+  await save()
+  step.value = 1
+}
 async function sendInvoice() {
   saving.value = true
   try {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
-    await $fetch(`/api/invoices/${id}/send`, { method: 'POST', body: { subject: emailSubject.value, message: emailMessage.value } })
+    await $fetch(`/api/invoices/${id}/send`, {
+      method: 'POST',
+      body: { subject: emailSubject.value, message: emailMessage.value }
+    })
     header.status = 'sent'
     baseline.value = snapshot()
     toast.add({ title: t('invoices.toastSent'), color: 'success' })
     step.value = 2
   } catch (e) {
-    toast.add({ title: t('invoices.sendError'), description: (e as { statusMessage?: string }).statusMessage, color: 'error' })
-  } finally { saving.value = false }
+    toast.add({
+      title: t('invoices.sendError'),
+      description: (e as { statusMessage?: string }).statusMessage,
+      color: 'error'
+    })
+  } finally {
+    saving.value = false
+  }
 }
-async function setStatus(status: InvoiceRow['status']) { header.status = status; await save() }
+async function setStatus(status: InvoiceRow['status']) {
+  header.status = status
+  await save()
+}
 
 function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return (rappen / 100).toLocaleString('de-CH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 }
 
 const custLocale = (customer.value?.language ?? 'en') as Parameters<typeof loadLocaleMessages>[0]
 await loadLocaleMessages(custLocale)
-const td = (key: string, named?: Record<string, unknown>) => t(key, named ?? {}, { locale: custLocale })
+const td = (key: string, named?: Record<string, unknown>) =>
+  t(key, named ?? {}, { locale: custLocale })
 
 const subjectOverride = ref<string | null>(null)
 const messageOverride = ref<string | null>(null)
 const emailSubject = computed({
   get: () => subjectOverride.value ?? td('email.subject', { number: header.number }),
-  set: (v: string) => { subjectOverride.value = v }
+  set: (v: string) => {
+    subjectOverride.value = v
+  }
 })
 function fillTemplate(html: string) {
-  return html.replaceAll('{customer}', customer.value?.name ?? '')
+  return html
+    .replaceAll('{customer}', customer.value?.name ?? '')
     .replaceAll('{number}', header.number ?? '')
     .replaceAll('{due}', dateCh(header.dueDate))
     .replaceAll('{sender}', sender.value?.name ?? '')
 }
 const emailMessage = computed({
   get: () => messageOverride.value ?? fillTemplate(sender.value?.email_template ?? ''),
-  set: (v: string) => { messageOverride.value = v }
+  set: (v: string) => {
+    messageOverride.value = v
+  }
 })
 </script>
 
@@ -204,14 +278,22 @@ const emailMessage = computed({
   <div class="page-invoice-detail">
     <NuxtLink :to="projectHref ?? `/customers/${customerId}`" class="back">
       <UIcon name="i-lucide-arrow-left" class="size-3.5" />
-      <span class="mono">{{ linkedProject?.name || customer?.name || $t('customers.colCustomer') }}</span>
+      <span class="mono">{{
+        linkedProject?.name || customer?.name || $t('customers.colCustomer')
+      }}</span>
     </NuxtLink>
 
     <UiPageHead :title="$t('invoices.titleNumber', { number: header.number })">
       <template #subtitle>
-        <NuxtLink v-if="linkedProject && projectHref" :to="projectHref" class="page-invoice-detail__project-link">
+        <NuxtLink
+          v-if="linkedProject && projectHref"
+          :to="projectHref"
+          class="page-invoice-detail__project-link"
+        >
           <UIcon name="i-lucide-kanban" class="size-3.5" />
-          <span>{{ $t('invoices.fromProject') }}: <b>{{ linkedProject.name }}</b></span>
+          <span
+            >{{ $t('invoices.fromProject') }}: <b>{{ linkedProject.name }}</b></span
+          >
         </NuxtLink>
       </template>
       <template #actions>
@@ -235,10 +317,14 @@ const emailMessage = computed({
     </div>
 
     <UModal v-model:open="confirmDelete" :title="$t('invoices.deleteConfirmTitle')">
-      <template #body><p>{{ $t('invoices.deleteConfirmText') }}</p></template>
+      <template #body
+        ><p>{{ $t('invoices.deleteConfirmText') }}</p></template
+      >
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <button class="ed-btn-ghost" @click="confirmDelete = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-ghost" @click="confirmDelete = false">
+            {{ $t('common.cancel') }}
+          </button>
           <button class="ed-btn-primary" @click="removeInvoice">{{ $t('common.delete') }}</button>
         </div>
       </template>
@@ -246,9 +332,15 @@ const emailMessage = computed({
 
     <!-- Step 1: Draft -->
     <template v-if="step === 0">
-      <UForm ref="formRef" :state="lineState" :validate="validate" novalidate @submit="continueToSend">
+      <UForm
+        ref="formRef"
+        :state="lineState"
+        :validate="validate"
+        novalidate
+        @submit="continueToSend"
+      >
         <UiCard>
-          <div class="grid sm:grid-cols-2 gap-4">
+          <div class="grid gap-4 sm:grid-cols-2">
             <UFormField :label="$t('common.title')" class="sm:col-span-2">
               <UInput v-model="header.title" class="w-full" />
             </UFormField>
@@ -293,7 +385,7 @@ const emailMessage = computed({
                 :model-value="row.articleId ?? undefined"
                 :items="articleItems"
                 class="w-full"
-                @update:model-value="row.articleId = $event; onArticle(row)"
+                @update:model-value="onArticleSelect(row, $event)"
               />
               <UFormField :name="`items.${i}.description`">
                 <UInput v-model="row.description" class="w-full" />
@@ -308,14 +400,21 @@ const emailMessage = computed({
                 <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
               </UFormField>
               <UFormField :name="`items.${i}.discountPercent`">
-                <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
+                <UInput
+                  v-model.number="row.discountPercent"
+                  type="number"
+                  step="0.1"
+                  class="w-full"
+                />
               </UFormField>
               <UFormField v-if="vat" :name="`items.${i}.mwstPercent`">
                 <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
               </UFormField>
               <div class="amt mono">
                 <span>CHF {{ chf(lineAmount(row)) }}</span>
-                <button type="button" class="icon-btn" @click="removeRow(i)"><UIcon name="i-lucide-x" /></button>
+                <button type="button" class="icon-btn" @click="removeRow(i)">
+                  <UIcon name="i-lucide-x" />
+                </button>
               </div>
             </div>
             <div class="add-row">
@@ -345,7 +444,9 @@ const emailMessage = computed({
       </UForm>
 
       <div class="foot">
-        <button class="ed-btn-ghost" :disabled="saving" @click="save">{{ $t('common.save') }}</button>
+        <button class="ed-btn-ghost" :disabled="saving" @click="save">
+          {{ $t('common.save') }}
+        </button>
         <button class="ed-btn-primary" :disabled="saving" @click="formRef?.submit()">
           {{ $t('invoices.continue') }} <UIcon name="i-lucide-arrow-right" class="size-3.5" />
         </button>
@@ -379,9 +480,19 @@ const emailMessage = computed({
           </UFormField>
           <UFormField :label="$t('invoices.emailMessage')">
             <ClientOnly>
-              <UEditor v-model="emailMessage" content-type="html" :extensions="emailEditorExtensions" :handlers="emailEditorHandlers" class="email-editor email-editor--tall">
+              <UEditor
+                v-model="emailMessage"
+                content-type="html"
+                :extensions="emailEditorExtensions"
+                :handlers="emailEditorHandlers"
+                class="email-editor email-editor--tall"
+              >
                 <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="emailEditorItems" class="flex-wrap email-editor__toolbar">
+                  <UEditorToolbar
+                    :editor="editor"
+                    :items="emailEditorItems"
+                    class="email-editor__toolbar flex-wrap"
+                  >
                     <template #link><EditorLinkPopover :editor="editor" /></template>
                   </UEditorToolbar>
                 </template>
@@ -410,7 +521,11 @@ const emailMessage = computed({
     <template v-else>
       <UiCard>
         <div class="paid-card">
-          <div class="paid-label eyebrow">{{ header.status === 'paid' ? $t('invoices.paidDone') : $t('invoices.awaitingPayment') }}</div>
+          <div class="paid-label eyebrow">
+            {{
+              header.status === 'paid' ? $t('invoices.paidDone') : $t('invoices.awaitingPayment')
+            }}
+          </div>
           <div class="paid-amt tabular">CHF {{ chf(totals.totalRappen) }}</div>
           <div class="paid-actions">
             <button class="ed-btn-ghost" @click="step = 1">
@@ -419,7 +534,12 @@ const emailMessage = computed({
             <button class="ed-btn" @click="previewPdf">
               <UIcon name="i-lucide-file-text" class="size-3.5" /> {{ $t('invoices.pdfPreview') }}
             </button>
-            <button v-if="header.status !== 'paid'" class="ed-btn-primary" :disabled="saving" @click="setStatus('paid')">
+            <button
+              v-if="header.status !== 'paid'"
+              class="ed-btn-primary"
+              :disabled="saving"
+              @click="setStatus('paid')"
+            >
               <UIcon name="i-lucide-circle-check" class="size-3.5" /> {{ $t('invoices.markPaid') }}
             </button>
             <button v-else class="ed-btn" :disabled="saving" @click="setStatus('sent')">
@@ -430,12 +550,18 @@ const emailMessage = computed({
       </UiCard>
     </template>
 
-    <UModal v-model:open="showLeaveDialog" :title="$t('common.leaveDirtyTitle')" :description="$t('common.leaveDirty')" :dismissible="false">
+    <UModal
+      v-model:open="showLeaveDialog"
+      :title="$t('common.leaveDirtyTitle')"
+      :description="$t('common.leaveDirty')"
+      :dismissible="false"
+    >
       <template #footer>
         <button class="ed-btn-ghost" @click="answerLeave(false)">{{ $t('common.cancel') }}</button>
-        <button class="ed-btn-primary" @click="answerLeave(true)">{{ $t('common.leaveAnyway') }}</button>
+        <button class="ed-btn-primary" @click="answerLeave(true)">
+          {{ $t('common.leaveAnyway') }}
+        </button>
       </template>
     </UModal>
   </div>
 </template>
-

@@ -63,15 +63,49 @@ export function parseCustomer(body: Record<string, unknown>): CustomerInput {
 
 // Column order shared by the INSERT and UPDATE statements.
 export const CUSTOMER_COLUMNS = [
-  'type', 'name', 'contact_person', 'email', 'phone', 'street', 'zip', 'city',
-  'country', 'language', 'customer_number', 'price_category', 'discount_percent',
-  'payment_term_days', 'website', 'founding_year', 'social', 'uid', 'mwst', 'hr_number'
+  'type',
+  'name',
+  'contact_person',
+  'email',
+  'phone',
+  'street',
+  'zip',
+  'city',
+  'country',
+  'language',
+  'customer_number',
+  'price_category',
+  'discount_percent',
+  'payment_term_days',
+  'website',
+  'founding_year',
+  'social',
+  'uid',
+  'mwst',
+  'hr_number'
 ]
 
 export function customerValues(c: CustomerInput) {
   return [
-    c.type, c.name, c.contactPerson, c.email, c.phone, c.street, c.zip, c.city,
-    c.country, c.language, c.customerNumber, c.priceCategory, c.discountPercent,
-    c.paymentTermDays, c.website, c.foundingYear, c.social, c.uid, c.mwst, c.hrNumber
+    c.type,
+    c.name,
+    c.contactPerson,
+    c.email,
+    c.phone,
+    c.street,
+    c.zip,
+    c.city,
+    c.country,
+    c.language,
+    c.customerNumber,
+    c.priceCategory,
+    c.discountPercent,
+    c.paymentTermDays,
+    c.website,
+    c.foundingYear,
+    c.social,
+    c.uid,
+    c.mwst,
+    c.hrNumber
   ]
 }

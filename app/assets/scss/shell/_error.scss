@@ -31,7 +31,10 @@
     font-size: 12px;
   }
 
-  .err-name { font-size: 15px; font-weight: 500; }
+  .err-name {
+    font-size: 15px;
+    font-weight: 500;
+  }
 
   .err-code {
     font-size: clamp(72px, 14vw, 132px);
@@ -49,7 +52,10 @@
     margin: 18px 0 8px;
   }
 
-  .err-serif { font-family: var(--font-serif); font-style: italic; }
+  .err-serif {
+    font-family: var(--font-serif);
+    font-style: italic;
+  }
   .err-desc {
     font-size: 13.5px;
     color: var(--ink-3);
@@ -57,5 +63,9 @@
     line-height: 1.5;
     margin: 0;
   }
-  .err-actions { display: inline-flex; gap: 10px; margin-top: 28px; }
+  .err-actions {
+    display: inline-flex;
+    gap: 10px;
+    margin-top: 28px;
+  }
 }

@@ -4,7 +4,9 @@
     cursor: pointer;
     caret-color: transparent;
 
-    &::selection { background: transparent; }
+    &::selection {
+      background: transparent;
+    }
   }
 }
 
@@ -42,9 +44,13 @@
   font-family: var(--font-sans);
 
   // Header chevron buttons inherit Nuxt UI button styling; tighten them.
-  button { font-family: inherit; }
+  button {
+    font-family: inherit;
+  }
 
   // Day cell triggers ship with rounded-full from Nuxt UI's theme; the
   // editorial system has no pills inside the calendar.
-  .rounded-full { border-radius: var(--radius-sm) !important; }
+  .rounded-full {
+    border-radius: var(--radius-sm) !important;
+  }
 }

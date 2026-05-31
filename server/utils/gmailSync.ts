@@ -10,6 +10,7 @@
 
 import type { Database } from 'better-sqlite3'
 import { decryptSecret, encryptSecret } from './secrets'
+import type { SyncResult } from './mailbox'
 
 // Distinct from the safe `MailboxRow` in server/utils/mailbox.ts on
 // purpose; this one carries the encrypted token columns + Google client
@@ -37,7 +38,10 @@ interface GmailListResponse {
   nextPageToken?: string
 }
 
-interface GmailHeader { name: string; value: string }
+interface GmailHeader {
+  name: string
+  value: string
+}
 interface GmailPart {
   mimeType?: string
   headers?: GmailHeader[]
@@ -68,8 +72,8 @@ function extractAnchors(payload: GmailPart | undefined): string[] {
   const ids: string[] = []
   const inReply = header(payload?.headers, 'In-Reply-To')
   const refs = header(payload?.headers, 'References')
-  if (inReply) ids.push(...inReply.match(/<[^>]+>/g) ?? [inReply])
-  if (refs)    ids.push(...refs.match(/<[^>]+>/g) ?? refs.split(/\s+/))
+  if (inReply) ids.push(...(inReply.match(/<[^>]+>/g) ?? [inReply]))
+  if (refs) ids.push(...(refs.match(/<[^>]+>/g) ?? refs.split(/\s+/)))
   return Array.from(new Set(ids.map(stripAngles).filter(Boolean)))
 }
 
@@ -88,7 +92,11 @@ function findPart(payload: GmailPart | undefined, wantMime: string): string {
 }
 
 async function refreshAccessToken(db: Database, mailbox: GmailSyncMailbox): Promise<string> {
-  if (!mailbox.refresh_token_enc || !mailbox.provider_client_id || !mailbox.provider_client_secret_enc) {
+  if (
+    !mailbox.refresh_token_enc ||
+    !mailbox.provider_client_id ||
+    !mailbox.provider_client_secret_enc
+  ) {
     throw new Error('mailbox missing refresh token or app credentials; reconnect required')
   }
   const refresh = decryptSecret(mailbox.refresh_token_enc)
@@ -153,13 +161,10 @@ async function getMessage(token: string, id: string): Promise<GmailMessage> {
   )
 }
 
-export interface SyncResult {
-  scanned: number
-  inserted: number
-  duplicates: number
-}
-
-export async function syncGmailMailbox(db: Database, mailbox: GmailSyncMailbox): Promise<SyncResult> {
+export async function syncGmailMailbox(
+  db: Database,
+  mailbox: GmailSyncMailbox
+): Promise<SyncResult> {
   const token = await ensureFreshToken(db, mailbox)
   // First sync: look back 7 days. Otherwise resume from last_sync_at
   // minus 5 minutes overlap so a slow-clock reply doesn't slip through.
@@ -173,14 +178,21 @@ export async function syncGmailMailbox(db: Database, mailbox: GmailSyncMailbox):
   // Pre-load every Message-ID batze has captured on outbound so we can
   // match without hitting the DB per message.
   const projectByMsgId = new Map<string, number>()
-  const outboundRows = db.prepare(
-    `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
-  ).all() as Array<{ project_id: number; message_id: string }>
+  const outboundRows = db
+    .prepare(
+      `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
+    )
+    .all() as Array<{ project_id: number; message_id: string }>
   for (const r of outboundRows) projectByMsgId.set(r.message_id, r.project_id)
 
   const existingInbound = new Set<string>(
-    (db.prepare(`SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`).all() as Array<{ message_id: string }>)
-      .map(r => r.message_id)
+    (
+      db
+        .prepare(
+          `SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`
+        )
+        .all() as Array<{ message_id: string }>
+    ).map((r) => r.message_id)
   )
 
   const insert = db.prepare(
@@ -193,15 +205,22 @@ export async function syncGmailMailbox(db: Database, mailbox: GmailSyncMailbox):
   let duplicates = 0
   for (const id of ids) {
     const msg = await getMessage(token, id)
-    const incomingMsgId = header(msg.payload?.headers, 'Message-Id') ?? header(msg.payload?.headers, 'Message-ID')
+    const incomingMsgId =
+      header(msg.payload?.headers, 'Message-Id') ?? header(msg.payload?.headers, 'Message-ID')
     const normalisedIncoming = incomingMsgId ? stripAngles(incomingMsgId) : null
-    if (normalisedIncoming && existingInbound.has(normalisedIncoming)) { duplicates += 1; continue }
+    if (normalisedIncoming && existingInbound.has(normalisedIncoming)) {
+      duplicates += 1
+      continue
+    }
 
     const anchors = extractAnchors(msg.payload)
     let projectId: number | undefined
     for (const a of anchors) {
       const match = projectByMsgId.get(a)
-      if (match !== undefined) { projectId = match; break }
+      if (match !== undefined) {
+        projectId = match
+        break
+      }
     }
     if (!projectId) continue
 
@@ -218,16 +237,20 @@ export async function syncGmailMailbox(db: Database, mailbox: GmailSyncMailbox):
     if (normalisedIncoming) existingInbound.add(normalisedIncoming)
   }
 
-  db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`)
-    .run(new Date().toISOString(), mailbox.id)
+  db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`).run(
+    new Date().toISOString(),
+    mailbox.id
+  )
 
   return { scanned: ids.length, inserted, duplicates }
 }
 
 export function listGmailMailboxes(db: Database): GmailSyncMailbox[] {
-  return db.prepare(
-    `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
+  return db
+    .prepare(
+      `SELECT id, provider, email_address, access_token_enc, refresh_token_enc,
             token_expires_at, provider_client_id, provider_client_secret_enc, last_sync_at
      FROM mailboxes WHERE provider = 'gmail'`
-  ).all() as GmailSyncMailbox[]
+    )
+    .all() as GmailSyncMailbox[]
 }

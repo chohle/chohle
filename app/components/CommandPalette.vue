@@ -1,9 +1,36 @@
 <script setup lang="ts">
-interface InvoiceHit { id: number, number: string, title: string, customer_name: string }
-interface CustomerHit { id: number, name: string, customer_number: string | null, city: string | null }
-interface ArticleHit { id: number, name: string, unit: string, default_price_rappen: number }
-interface ExpenseHit { id: number, title: string, vendor: string | null, date: string, amount_rappen: number }
-interface ProjectHit { id: number, name: string, direction: 'sales' | 'procurement', stage: string, customer_name: string | null }
+interface InvoiceHit {
+  id: number
+  number: string
+  title: string
+  customer_name: string
+}
+interface CustomerHit {
+  id: number
+  name: string
+  customer_number: string | null
+  city: string | null
+}
+interface ArticleHit {
+  id: number
+  name: string
+  unit: string
+  default_price_rappen: number
+}
+interface ExpenseHit {
+  id: number
+  title: string
+  vendor: string | null
+  date: string
+  amount_rappen: number
+}
+interface ProjectHit {
+  id: number
+  name: string
+  direction: 'sales' | 'procurement'
+  stage: string
+  customer_name: string | null
+}
 interface SearchResult {
   invoices: InvoiceHit[]
   customers: CustomerHit[]
@@ -15,7 +42,7 @@ interface SearchResult {
 interface Group {
   id: string
   label: string
-  items: { id: string, label: string, suffix?: string, icon: string, to: string }[]
+  items: { id: string; label: string; suffix?: string; icon: string; to: string }[]
 }
 
 type Scope = 'all' | 'invoices' | 'customers' | 'articles' | 'expenses' | 'projects'
@@ -26,23 +53,32 @@ const { t } = useI18n()
 const query = ref('')
 const scope = ref<Scope>('all')
 const loading = ref(false)
-const empty: SearchResult = { invoices: [], customers: [], articles: [], expenses: [], projects: [] }
+const empty: SearchResult = {
+  invoices: [],
+  customers: [],
+  articles: [],
+  expenses: [],
+  projects: []
+}
 const result = ref<SearchResult>({ ...empty })
 const inputRef = ref<HTMLInputElement>()
 
-const scopes = computed<{ id: Scope, label: string }[]>(() => [
-  { id: 'all',       label: t('search.scope.all') },
-  { id: 'invoices',  label: t('nav.invoices') },
+const scopes = computed<{ id: Scope; label: string }[]>(() => [
+  { id: 'all', label: t('search.scope.all') },
+  { id: 'invoices', label: t('nav.invoices') },
   { id: 'customers', label: t('nav.customers') },
-  { id: 'articles',  label: t('nav.articles') },
-  { id: 'expenses',  label: t('nav.expenses') },
-  { id: 'projects',  label: t('search.scope.projects') }
+  { id: 'articles', label: t('nav.articles') },
+  { id: 'expenses', label: t('nav.expenses') },
+  { id: 'projects', label: t('search.scope.projects') }
 ])
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let requestId = 0
 function fetchNow() {
-  if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null }
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+    debounceTimer = null
+  }
   // Always bump the id so any in-flight response from a prior keystroke
   // is discarded, even when we early-return on empty / on close.
   const id = ++requestId
@@ -54,7 +90,9 @@ function fetchNow() {
   loading.value = true
   debounceTimer = setTimeout(async () => {
     try {
-      const r = await $fetch<SearchResult>('/api/search', { query: { q: query.value, scope: scope.value } })
+      const r = await $fetch<SearchResult>('/api/search', {
+        query: { q: query.value, scope: scope.value }
+      })
       if (id === requestId) result.value = r
     } catch (err) {
       // Swallow so the rejection doesn't bubble as unhandled. Clear results
@@ -76,7 +114,10 @@ watch(open, async (v) => {
     inputRef.value?.focus()
   } else {
     // Invalidate any pending fetch so it can't write to result after close.
-    if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null }
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+      debounceTimer = null
+    }
     ++requestId
     query.value = ''
     scope.value = 'all'
@@ -86,7 +127,10 @@ watch(open, async (v) => {
 })
 
 function chf(rappen: number) {
-  return 'CHF ' + (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return (
+    'CHF ' +
+    (rappen / 100).toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  )
 }
 
 function go(to: string) {
@@ -94,74 +138,85 @@ function go(to: string) {
   navigateTo(to)
 }
 
-const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = { sales: 'vertrieb', procurement: 'einkauf' }
+const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
+  sales: 'vertrieb',
+  procurement: 'einkauf'
+}
 
-const groups = computed<Group[]>(() => [
-  {
-    id: 'invoices',
-    label: t('nav.invoices'),
-    items: result.value.invoices.map(i => ({
-      id: `inv-${i.id}`,
-      label: i.number || t('common.untitled'),
-      suffix: i.title ? `${i.title} - ${i.customer_name}` : i.customer_name,
-      icon: 'i-lucide-file-text',
-      to: `/invoices/${i.id}`
-    }))
-  },
-  {
-    id: 'customers',
-    label: t('nav.customers'),
-    items: result.value.customers.map(c => ({
-      id: `cus-${c.id}`,
-      label: c.name,
-      suffix: [c.customer_number, c.city].filter(Boolean).join(' - ') || undefined,
-      icon: 'i-lucide-users',
-      to: `/customers/${c.id}`
-    }))
-  },
-  {
-    id: 'articles',
-    label: t('nav.articles'),
-    items: result.value.articles.map(a => ({
-      id: `art-${a.id}`,
-      label: a.name,
-      suffix: `${chf(a.default_price_rappen)} / ${a.unit}`,
-      icon: 'i-lucide-package',
-      to: '/articles'
-    }))
-  },
-  {
-    id: 'expenses',
-    label: t('nav.expenses'),
-    items: result.value.expenses.map(e => ({
-      id: `exp-${e.id}`,
-      label: e.title,
-      suffix: [e.vendor, chf(e.amount_rappen)].filter(Boolean).join(' - '),
-      icon: 'i-lucide-receipt',
-      to: '/expenses'
-    }))
-  },
-  {
-    id: 'projects',
-    label: t('search.scope.projects'),
-    items: result.value.projects.map(p => ({
-      id: `prj-${p.id}`,
-      label: p.customer_name || p.name,
-      suffix: [
-        p.customer_name && p.name !== p.customer_name ? p.name : null,
-        p.direction === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
-      ].filter(Boolean).join(' - '),
-      icon: 'i-lucide-kanban',
-      to: `/${DIR_TO_SLUG[p.direction]}/${p.id}`
-    }))
-  }
-].filter(g => g.items.length))
+const groups = computed<Group[]>(() =>
+  [
+    {
+      id: 'invoices',
+      label: t('nav.invoices'),
+      items: result.value.invoices.map((i) => ({
+        id: `inv-${i.id}`,
+        label: i.number || t('common.untitled'),
+        suffix: i.title ? `${i.title} - ${i.customer_name}` : i.customer_name,
+        icon: 'i-lucide-file-text',
+        to: `/invoices/${i.id}`
+      }))
+    },
+    {
+      id: 'customers',
+      label: t('nav.customers'),
+      items: result.value.customers.map((c) => ({
+        id: `cus-${c.id}`,
+        label: c.name,
+        suffix: [c.customer_number, c.city].filter(Boolean).join(' - ') || undefined,
+        icon: 'i-lucide-users',
+        to: `/customers/${c.id}`
+      }))
+    },
+    {
+      id: 'articles',
+      label: t('nav.articles'),
+      items: result.value.articles.map((a) => ({
+        id: `art-${a.id}`,
+        label: a.name,
+        suffix: `${chf(a.default_price_rappen)} / ${a.unit}`,
+        icon: 'i-lucide-package',
+        to: '/articles'
+      }))
+    },
+    {
+      id: 'expenses',
+      label: t('nav.expenses'),
+      items: result.value.expenses.map((e) => ({
+        id: `exp-${e.id}`,
+        label: e.title,
+        suffix: [e.vendor, chf(e.amount_rappen)].filter(Boolean).join(' - '),
+        icon: 'i-lucide-receipt',
+        to: '/expenses'
+      }))
+    },
+    {
+      id: 'projects',
+      label: t('search.scope.projects'),
+      items: result.value.projects.map((p) => ({
+        id: `prj-${p.id}`,
+        label: p.customer_name || p.name,
+        suffix: [
+          p.customer_name && p.name !== p.customer_name ? p.name : null,
+          p.direction === 'procurement'
+            ? t('pipeline.direction.procurement')
+            : t('pipeline.direction.sales')
+        ]
+          .filter(Boolean)
+          .join(' - '),
+        icon: 'i-lucide-kanban',
+        to: `/${DIR_TO_SLUG[p.direction]}/${p.id}`
+      }))
+    }
+  ].filter((g) => g.items.length)
+)
 
 // Flat list across all groups so arrow keys can step through every visible
 // result. Reset to the first row whenever the results change.
-const flatItems = computed(() => groups.value.flatMap(g => g.items))
+const flatItems = computed(() => groups.value.flatMap((g) => g.items))
 const activeIndex = ref(0)
-watch(flatItems, () => { activeIndex.value = 0 })
+watch(flatItems, () => {
+  activeIndex.value = 0
+})
 
 function moveActive(delta: number) {
   const n = flatItems.value.length
@@ -174,11 +229,18 @@ function moveActive(delta: number) {
 }
 
 function onInputKeydown(e: KeyboardEvent) {
-  if (e.key === 'ArrowDown') { e.preventDefault(); moveActive(1) }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); moveActive(-1) }
-  else if (e.key === 'Enter') {
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    moveActive(1)
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    moveActive(-1)
+  } else if (e.key === 'Enter') {
     const item = flatItems.value[activeIndex.value]
-    if (item) { e.preventDefault(); go(item.to) }
+    if (item) {
+      e.preventDefault()
+      go(item.to)
+    }
   }
   // Escape is handled by UModal (closes the dialog), no extra wiring needed.
 }
@@ -210,9 +272,11 @@ function onInputKeydown(e: KeyboardEvent) {
               role="combobox"
               :aria-expanded="!!flatItems.length"
               aria-controls="command-palette-listbox"
-              :aria-activedescendant="flatItems[activeIndex] ? `cp-item-${flatItems[activeIndex]?.id}` : undefined"
+              :aria-activedescendant="
+                flatItems[activeIndex] ? `cp-item-${flatItems[activeIndex]?.id}` : undefined
+              "
               @keydown="onInputKeydown"
-            >
+            />
           </label>
 
           <div class="command-palette__scopes" role="tablist" :aria-label="t('search.scopeLabel')">
@@ -225,7 +289,9 @@ function onInputKeydown(e: KeyboardEvent) {
               role="tab"
               :aria-selected="scope === s.id"
               @click="scope = s.id"
-            >{{ s.label }}</button>
+            >
+              {{ s.label }}
+            </button>
           </div>
 
           <div class="command-palette__results">
@@ -237,17 +303,10 @@ function onInputKeydown(e: KeyboardEvent) {
             </div>
             <template v-else>
               <div id="command-palette-listbox" role="listbox">
-                <section
-                  v-for="g in groups"
-                  :key="g.id"
-                  class="command-palette__group"
-                >
+                <section v-for="g in groups" :key="g.id" class="command-palette__group">
                   <h4 class="command-palette__group-label eyebrow">— {{ g.label }}</h4>
                   <ul class="command-palette__list">
-                    <li
-                      v-for="item in g.items"
-                      :key="item.id"
-                    >
+                    <li v-for="item in g.items" :key="item.id">
                       <button
                         :id="`cp-item-${item.id}`"
                         type="button"
@@ -256,11 +315,13 @@ function onInputKeydown(e: KeyboardEvent) {
                         role="option"
                         :aria-selected="flatItems[activeIndex]?.id === item.id"
                         @click="go(item.to)"
-                        @mouseenter="activeIndex = flatItems.findIndex(i => i.id === item.id)"
+                        @mouseenter="activeIndex = flatItems.findIndex((i) => i.id === item.id)"
                       >
-                        <UIcon :name="item.icon" class="size-3.5 command-palette__item-icon" />
+                        <UIcon :name="item.icon" class="command-palette__item-icon size-3.5" />
                         <span class="command-palette__item-label">{{ item.label }}</span>
-                        <span v-if="item.suffix" class="command-palette__item-suffix mono">{{ item.suffix }}</span>
+                        <span v-if="item.suffix" class="command-palette__item-suffix mono">{{
+                          item.suffix
+                        }}</span>
                       </button>
                     </li>
                   </ul>
