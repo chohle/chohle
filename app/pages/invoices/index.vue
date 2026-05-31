@@ -7,6 +7,8 @@ interface InvoiceRow {
   issue_date: string
   customer_id: number
   customer_name: string
+  project_id: number | null
+  project_name: string | null
   total_rappen: number
 }
 
@@ -80,6 +82,7 @@ function open(id: number) {
             <th>{{ $t('invoices.number') }}</th>
             <th>{{ $t('customers.colCustomer') }}</th>
             <th>{{ $t('common.title') }}</th>
+            <th>{{ $t('invoices.projectCol') }}</th>
             <th>{{ $t('invoices.issueDate') }}</th>
             <th>{{ $t('invoices.statusLabel') }}</th>
             <th class="right">{{ $t('common.total') }}</th>
@@ -99,6 +102,10 @@ function open(id: number) {
             <td class="mono">{{ inv.number || '—' }}</td>
             <td>{{ inv.customer_name }}</td>
             <td class="page-invoices__muted">{{ inv.title || $t('common.untitled') }}</td>
+            <td class="page-invoices__muted">
+              <span v-if="inv.project_name" class="page-invoices__project">{{ inv.project_name }}</span>
+              <span v-else class="page-invoices__muted">—</span>
+            </td>
             <td class="mono">{{ dateCh(inv.issue_date) }}</td>
             <td><UiOutlinedChip :status="inv.status">{{ $t(`status.${inv.status}`) }}</UiOutlinedChip></td>
             <td class="right mono">CHF {{ chf(inv.total_rappen) }}</td>

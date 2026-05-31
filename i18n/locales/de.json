@@ -18,23 +18,27 @@
   },
   "pipeline": {
     "title": "Pipeline",
-    "subtitle": "Ziehe Deals durch die Stufen. {total} potenzieller Wert über {count} Deals.",
-    "newDeal": "Neuer Deal",
-    "addDeal": "Deal hinzufügen",
-    "editDeal": "Deal bearbeiten",
-    "dealName": "Bezeichnung",
+    "subtitle": "Ziehe Projekte durch die Stufen. {total} potenzieller Wert über {count} Projekte.",
+    "newProject": "Neues Projekt",
+    "addProject": "Projekt hinzufügen",
+    "editProject": "Projekt bearbeiten",
+    "projectName": "Projektname",
+    "projectMenu": "Projektmenü",
     "customer": "Kunde",
-    "noCustomerLink": "— nicht verknüpft —",
+    "noCustomerLink": "(nicht verknüpft)",
     "customerHelp": "Optional. Verknüpfe einen bestehenden Kundeneintrag; sonst werden Name und E-Mail oben verwendet.",
     "label": "Beschreibung",
-    "value": "Wert (CHF)",
+    "budget": "Budget (CHF)",
+    "budgetType": "Budgetart",
+    "budgetTypeFixed": "Festpreis",
+    "budgetTypeHourly": "Stundenbasis",
+    "budgetTypeEstimate": "Schätzung",
     "due": "Fällig",
-    "menu": "Deal-Menü",
     "reorderError": "Reihenfolge konnte nicht gespeichert werden",
-    "dropHere": "Deals hier ablegen",
-    "deleteTitle": "Deal löschen?",
+    "dropHere": "Projekte hier ablegen",
+    "deleteTitle": "Projekt löschen?",
     "deleteText": "{name} löschen? Das lässt sich nicht rückgängig machen.",
-    "wonTitle": "Deal gewonnen 🎉",
+    "wonTitle": "Projekt gewonnen 🎉",
     "wonText": "Als gewonnen markieren und Rechnung für {customer} erstellen?",
     "wonNoCustomer": "{name} ist noch nicht mit einem Kunden verknüpft. Verknüpfe einen Kunden, um abzurechnen.",
     "wonSkip": "Später",
@@ -46,6 +50,8 @@
       "contacted": "Kontaktiert",
       "proposal": "Angebot raus",
       "won": "Gewonnen",
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
       "need": "Bedarf",
       "requested": "Offerte angefragt",
       "received": "Offerte erhalten",
@@ -64,6 +70,13 @@
     "acceptedText": "CHF {amount} als Ausgabe für {vendor} erfassen?",
     "acceptedLog": "Ausgabe erfassen",
     "expenseLogged": "Ausgabe erfasst",
+    "picker": {
+      "searchProjectPlaceholder": "Projekte suchen oder neuen Projektnamen eintippen…",
+      "createNewProject": "Neues Projekt anlegen",
+      "createNamedProject": "Neues Projekt \"{name}\" anlegen",
+      "createProjectAndInvoice": "Projekt anlegen und weiter",
+      "createFailed": "Projekt konnte nicht angelegt werden"
+    },
     "detail": {
       "contact": "Kontakt",
       "supplier": "Lieferant",
@@ -82,7 +95,20 @@
       "sent": "Gesendet",
       "received": "Empfangen",
       "logReply": "Antwort erfassen",
-      "logSave": "Nachricht speichern"
+      "logSave": "Nachricht speichern",
+      "newInvoice": "Neue Rechnung",
+      "linkCustomerFirst": "Verknüpfe zuerst einen Kunden mit diesem Projekt",
+      "invoiceFailed": "Rechnung konnte nicht erstellt werden",
+      "budgetBurn": "Budget verbraucht",
+      "invoiced": "Fakturiert",
+      "paid": "Bezahlt",
+      "remaining": "Verbleibend",
+      "budgetTotal": "Budget",
+      "invoicesTitle": "Rechnungen aus diesem Projekt",
+      "noInvoicesTitle": "Noch keine Rechnungen",
+      "noInvoicesText": "Über den Button «Neue Rechnung» entwirfst du die erste Rechnung für dieses Projekt.",
+      "archive": "Archivieren",
+      "archived": "Projekt archiviert"
     }
   },
   "activity": {
@@ -150,12 +176,12 @@
   },
   "search": {
     "placeholder": "Suchen ...",
-    "hint": "Tippe, um Rechnungen, Kunden, Artikel, Ausgaben und Deals zu durchsuchen.",
+    "hint": "Tippe, um Rechnungen, Kunden, Artikel, Ausgaben und Projekte zu durchsuchen.",
     "empty": "Keine Treffer.",
     "scopeLabel": "Suchbereich",
     "scope": {
       "all": "Alle",
-      "deals": "Deals"
+      "projects": "Projekte"
     }
   },
   "errors": {
@@ -310,6 +336,13 @@
     "noInvoicesText": "Erstelle die erste Rechnung für diesen Kunden.",
     "kpiTotalBilled": "Gesamt fakturiert",
     "kpiPaid": "Bezahlt",
+    "projectsTab": "Projekte",
+    "projectsEmails": "E-Mails",
+    "projectsUpdated": "Aktualisiert",
+    "noProjectsTitle": "Noch keine Projekte",
+    "noProjectsText": "Vertriebs- und Einkaufsprojekte, die mit diesem Kunden verknüpft sind, erscheinen hier mit Budget und fakturierten Beträgen.",
+    "invoiceFromProjectHint": "Wähle das Projekt, zu dem diese Rechnung gehört, oder lege ein neues mit Name und Budget an.",
+    "invoiceCreateFailed": "Rechnung konnte nicht erstellt werden",
     "filterAll": "Alle",
     "filterCompany": "Firmen",
     "filterPerson": "Personen",
@@ -438,7 +471,9 @@
     "kpiTotal": "Total",
     "deltaCount": "{n} Rechnungen",
     "deltaDrafts": "{n} Entwürfe",
-    "deltaAll": "{n} insgesamt"
+    "deltaAll": "{n} insgesamt",
+    "projectCol": "Projekt",
+    "fromProject": "Aus Projekt"
   },
   "editor": {
     "uploadImage": "Bild hochladen",

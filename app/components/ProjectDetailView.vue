@@ -2,9 +2,9 @@
 import DOMPurify from 'isomorphic-dompurify'
 
 type Direction = 'sales' | 'procurement'
-type Stage = 'lead' | 'contacted' | 'proposal' | 'won' | 'need' | 'requested' | 'received' | 'accepted'
+type Stage = 'lead' | 'contacted' | 'proposal' | 'won' | 'active' | 'completed' | 'need' | 'requested' | 'received' | 'accepted'
 
-interface DealDetail {
+interface ProjectDetail {
   id: number
   name: string
   customer_id: number | null
@@ -16,16 +16,17 @@ interface DealDetail {
   direction: Direction
   stage: Stage
   label: string
-  value_rappen: number
+  budget_rappen: number
+  budget_type: string
   due_date: string | null
   notes: string | null
   created_at: string
   updated_at: string
 }
 
-interface DealEmail {
+interface ProjectEmail {
   id: number
-  deal_id: number
+  project_id: number
   direction: 'outbound' | 'inbound'
   from_address: string | null
   to_address: string | null
@@ -39,20 +40,76 @@ interface DealEmail {
 const props = defineProps<{ direction: Direction; id: string }>()
 
 const DIR_TO_SLUG: Record<Direction, string> = { sales: 'vertrieb', procurement: 'einkauf' }
-const SALES_STAGES: Stage[] = ['lead', 'contacted', 'proposal', 'won']
+// Detail page exposes the full lifecycle so the user can move a project into
+// 'active' (work in flight) or 'completed' (archived) after winning it.
+const SALES_STAGES: Stage[] = ['lead', 'contacted', 'proposal', 'won', 'active', 'completed']
 const PROC_STAGES: Stage[] = ['need', 'requested', 'received', 'accepted']
 
 const { t } = useI18n()
 const toast = useToast()
 
-const { data: deal, refresh: refreshDeal } = await useFetch<DealDetail>(`/api/deals/${props.id}`)
-const { data: emails, refresh: refreshEmails } = await useFetch<{ rows: DealEmail[] }>(`/api/deals/${props.id}/emails`, {
+const { data: project, refresh: refreshProject } = await useFetch<ProjectDetail>(`/api/projects/${props.id}`)
+const { data: emails, refresh: refreshEmails } = await useFetch<{ rows: ProjectEmail[] }>(`/api/projects/${props.id}/emails`, {
   default: () => ({ rows: [] })
 })
 
-// Bounce to the correct slug if the URL direction doesn't match the deal's.
-if (deal.value && deal.value.direction !== props.direction) {
-  await navigateTo(`/${DIR_TO_SLUG[deal.value.direction]}/${deal.value.id}`, { replace: true })
+interface ProjectInvoiceRow {
+  id: number
+  number: string
+  title: string
+  status: 'draft' | 'sent' | 'paid'
+  issue_date: string
+  due_date: string
+  total_rappen: number
+}
+const { data: invoices } = await useFetch<ProjectInvoiceRow[]>(`/api/projects/${props.id}/invoices`, {
+  default: () => []
+})
+
+// Budget burn: paid is locked in, sent is committed (awaiting payment), draft
+// hasn't been issued yet. Show them separately so the user can read both
+// "what we've billed" and "what's actually landed".
+const burn = computed(() => {
+  const list = invoices.value ?? []
+  const paid = list.filter(i => i.status === 'paid').reduce((s, i) => s + i.total_rappen, 0)
+  const sent = list.filter(i => i.status === 'sent').reduce((s, i) => s + i.total_rappen, 0)
+  const draft = list.filter(i => i.status === 'draft').reduce((s, i) => s + i.total_rappen, 0)
+  const invoiced = paid + sent + draft
+  const budget = project.value?.budget_rappen ?? 0
+  const remaining = Math.max(budget - invoiced, 0)
+  const pct = budget > 0 ? Math.min(100, Math.round((invoiced / budget) * 100)) : 0
+  return { paid, sent, draft, invoiced, budget, remaining, pct }
+})
+
+const archiving = ref(false)
+async function archive() {
+  if (!project.value) return
+  archiving.value = true
+  try {
+    await $fetch(`/api/projects/${props.id}`, { method: 'PUT', body: { stage: 'completed' } })
+    await refreshProject()
+    toast.add({ title: t('pipeline.detail.archived'), color: 'success' })
+  } finally { archiving.value = false }
+}
+
+const creatingInvoice = ref(false)
+async function newInvoice() {
+  if (!project.value) return
+  creatingInvoice.value = true
+  try {
+    const { id: invoiceId } = await $fetch<{ id: number }>(`/api/projects/${props.id}/invoices`, {
+      method: 'POST'
+    })
+    await navigateTo(`/invoices/${invoiceId}`)
+  } catch (err) {
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('pipeline.detail.invoiceFailed')
+    toast.add({ title: msg, color: 'error' })
+  } finally { creatingInvoice.value = false }
+}
+
+// Bounce to the correct slug if the URL direction doesn't match the project's.
+if (project.value && project.value.direction !== props.direction) {
+  await navigateTo(`/${DIR_TO_SLUG[project.value.direction]}/${project.value.id}`, { replace: true })
 }
 
 function chf(rappen: number) {
@@ -70,6 +127,8 @@ const STAGE_LABEL = computed<Record<Stage, string>>(() => ({
   contacted: t('pipeline.stage.contacted'),
   proposal: t('pipeline.stage.proposal'),
   won: t('pipeline.stage.won'),
+  active: t('pipeline.stage.active'),
+  completed: t('pipeline.stage.completed'),
   need: t('pipeline.stage.need'),
   requested: t('pipeline.stage.requested'),
   received: t('pipeline.stage.received'),
@@ -77,21 +136,21 @@ const STAGE_LABEL = computed<Record<Stage, string>>(() => ({
 }))
 
 const stageOptions = computed(() => {
-  if (!deal.value) return []
-  const stages = deal.value.direction === 'procurement' ? PROC_STAGES : SALES_STAGES
+  if (!project.value) return []
+  const stages = project.value.direction === 'procurement' ? PROC_STAGES : SALES_STAGES
   return stages.map(s => ({ value: s, label: STAGE_LABEL.value[s] }))
 })
 
 async function changeStage(newStage: Stage) {
-  if (!deal.value || deal.value.stage === newStage) return
-  await $fetch(`/api/deals/${props.id}`, {
+  if (!project.value || project.value.stage === newStage) return
+  await $fetch(`/api/projects/${props.id}`, {
     method: 'PUT',
     body: { stage: newStage }
   })
-  await refreshDeal()
+  await refreshProject()
 }
 
-// Basic RFC-ish check — good enough to catch typos like "aadsf" without
+// Basic RFC-ish check, good enough to catch typos like "aadsf" without
 // rejecting valid edge cases. Server is the source of truth.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -114,11 +173,11 @@ function validateComposerTo(): boolean {
 }
 watch(() => composer.to, () => { if (composerError.value) validateComposerTo() })
 
-// Resolve contact via the API's COALESCEd value first, then the raw deal
-// fields. Belt-and-braces: handles edge cases where the linked customer has
-// an empty-string email but the deal has its own inline one.
-const resolvedEmail = computed(() => deal.value?.customer_email || deal.value?.email || '')
-const resolvedPhone = computed(() => deal.value?.customer_phone || deal.value?.phone || '')
+// Resolve contact via the API's COALESCEd value first, then the raw project
+// fields. Belt and braces: handles edge cases where the linked customer has
+// an empty string email but the project has its own inline one.
+const resolvedEmail = computed(() => project.value?.customer_email || project.value?.email || '')
+const resolvedPhone = computed(() => project.value?.customer_phone || project.value?.phone || '')
 
 function openCompose() {
   composer.open = true
@@ -133,7 +192,7 @@ async function send() {
   if (!composer.subject.trim() || !composer.body_html.trim()) return
   sending.value = true
   try {
-    await $fetch(`/api/deals/${props.id}/emails`, {
+    await $fetch(`/api/projects/${props.id}/emails`, {
       method: 'POST',
       body: {
         subject: composer.subject.trim(),
@@ -160,7 +219,7 @@ const reply = reactive({
 const replyError = ref('')
 const logging = ref(false)
 
-// Reply From is optional (you may not know the sender for a verbal/phone
+// Reply From is optional (you may not know the sender for a verbal or phone
 // log), but if provided, it has to look like an email.
 function validateReplyFrom(): boolean {
   const v = reply.from.trim()
@@ -190,7 +249,7 @@ async function logReply() {
   if (!reply.subject.trim() && !reply.body_text.trim()) return
   logging.value = true
   try {
-    await $fetch(`/api/deals/${props.id}/emails/log`, {
+    await $fetch(`/api/projects/${props.id}/emails/log`, {
       method: 'POST',
       body: {
         subject: reply.subject.trim(),
@@ -204,35 +263,46 @@ async function logReply() {
 }
 
 const initials = computed(() => {
-  const n = deal.value?.customer_name || deal.value?.name || ''
+  const n = project.value?.customer_name || project.value?.name || ''
   return n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]!.toUpperCase()).join('')
 })
 
-const subscribeWord = computed(() => deal.value?.direction === 'procurement' ? t('pipeline.detail.supplier') : t('pipeline.detail.contact'))
-const backHref = computed(() => `/${DIR_TO_SLUG[deal.value?.direction ?? props.direction]}`)
+const subscribeWord = computed(() => project.value?.direction === 'procurement' ? t('pipeline.detail.supplier') : t('pipeline.detail.contact'))
+
+// Back goes to the customer when there is one (project belongs to a
+// customer record), otherwise falls back to the pipeline column the user
+// most likely came from.
+const back = computed(() => {
+  if (project.value?.customer_id) {
+    return { href: `/customers/${project.value.customer_id}`, label: project.value.customer_name || t('customers.colCustomer') }
+  }
+  const dir = project.value?.direction ?? props.direction
+  const dirLabel = dir === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
+  return { href: `/${DIR_TO_SLUG[dir]}`, label: dirLabel }
+})
 const headerCrumb = computed(() => {
-  const d = deal.value?.direction ?? props.direction
+  const d = project.value?.direction ?? props.direction
   const dirLabel = d === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
   return `${t('nav.workspace')} / ${dirLabel}`
 })
 </script>
 
 <template>
-  <div v-if="deal" class="page-deal-detail">
-    <NuxtLink :to="backHref" class="back">
+  <div v-if="project" class="page-deal-detail">
+    <NuxtLink :to="back.href" class="back">
       <UIcon name="i-lucide-arrow-left" class="size-3.5" />
-      <span class="mono">{{ deal.direction === 'procurement' ? $t('pipeline.direction.procurement') : $t('pipeline.direction.sales') }}</span>
+      <span class="mono">{{ back.label }}</span>
     </NuxtLink>
 
     <header class="page-deal-detail__head">
       <div class="page-deal-detail__avatar" aria-hidden="true">{{ initials }}</div>
       <div class="page-deal-detail__meta">
         <div class="eyebrow">{{ headerCrumb }}</div>
-        <h1 class="page-deal-detail__name">{{ deal.customer_name || deal.name }}</h1>
+        <h1 class="page-deal-detail__name">{{ project.customer_name || project.name }}</h1>
         <div class="page-deal-detail__meta-row mono">
-          <span>{{ STAGE_LABEL[deal.stage] }}</span>
-          <span v-if="deal.value_rappen > 0">· CHF {{ chf(deal.value_rappen) }}</span>
-          <span v-if="deal.due_date">· {{ dateCh(deal.due_date) }}</span>
+          <span>{{ STAGE_LABEL[project.stage] }}</span>
+          <span v-if="project.budget_rappen > 0">· CHF {{ chf(project.budget_rappen) }}</span>
+          <span v-if="project.due_date">· {{ dateCh(project.due_date) }}</span>
         </div>
       </div>
       <div class="page-deal-detail__actions">
@@ -240,20 +310,56 @@ const headerCrumb = computed(() => {
           <UIcon name="i-lucide-mail" class="size-3.5" />
           {{ resolvedEmail }}
         </a>
-        <button class="ed-btn-primary" type="button" @click="openCompose">
+        <button class="ed-btn" type="button" @click="openCompose">
           <UIcon name="i-lucide-send" class="size-3.5" />
           {{ $t('pipeline.detail.compose') }}
         </button>
+        <button
+          v-if="project.direction === 'sales' && project.stage !== 'completed'"
+          class="ed-btn"
+          type="button"
+          :disabled="archiving"
+          @click="archive"
+        >
+          <UIcon name="i-lucide-archive" class="size-3.5" />
+          {{ $t('pipeline.detail.archive') }}
+        </button>
+        <button
+          v-if="project.direction === 'sales'"
+          class="ed-btn-primary"
+          type="button"
+          :disabled="creatingInvoice || !project.customer_id"
+          :title="!project.customer_id ? $t('pipeline.detail.linkCustomerFirst') : ''"
+          @click="newInvoice"
+        >
+          <UIcon name="i-lucide-file-text" class="size-3.5" />
+          {{ $t('pipeline.detail.newInvoice') }}
+        </button>
       </div>
     </header>
+
+    <section v-if="project.direction === 'sales' && project.budget_rappen > 0" class="page-deal-detail__burn">
+      <UiCard>
+        <h3 class="eyebrow">{{ $t('pipeline.detail.budgetBurn') }}</h3>
+        <div class="page-deal-detail__burn-bar" :aria-label="`${burn.pct}%`">
+          <div class="page-deal-detail__burn-fill" :style="{ width: `${burn.pct}%` }" />
+        </div>
+        <div class="page-deal-detail__burn-stats mono">
+          <span>{{ $t('pipeline.detail.invoiced') }}: <b class="tabular">CHF {{ chf(burn.invoiced) }}</b></span>
+          <span>{{ $t('pipeline.detail.paid') }}: <b class="tabular">CHF {{ chf(burn.paid) }}</b></span>
+          <span>{{ $t('pipeline.detail.remaining') }}: <b class="tabular">CHF {{ chf(burn.remaining) }}</b></span>
+          <span>{{ $t('pipeline.detail.budgetTotal') }}: <b class="tabular">CHF {{ chf(burn.budget) }}</b></span>
+        </div>
+      </UiCard>
+    </section>
 
     <div class="page-deal-detail__grid">
       <UiCard>
         <h3 class="eyebrow">{{ subscribeWord }}</h3>
         <dl class="page-deal-detail__dl">
           <div class="page-deal-detail__dl-item">
-            <dt class="eyebrow">{{ $t('pipeline.dealName') }}</dt>
-            <dd>{{ deal.name }}</dd>
+            <dt class="eyebrow">{{ $t('pipeline.projectName') }}</dt>
+            <dd>{{ project.name }}</dd>
           </div>
           <div v-if="resolvedEmail" class="page-deal-detail__dl-item">
             <dt class="eyebrow">{{ $t('customers.email') }}</dt>
@@ -263,13 +369,13 @@ const headerCrumb = computed(() => {
             <dt class="eyebrow">{{ $t('customers.phone') }}</dt>
             <dd class="mono">{{ resolvedPhone }}</dd>
           </div>
-          <div v-if="deal.label" class="page-deal-detail__dl-item">
+          <div v-if="project.label" class="page-deal-detail__dl-item">
             <dt class="eyebrow">{{ $t('pipeline.label') }}</dt>
-            <dd>{{ deal.label }}</dd>
+            <dd>{{ project.label }}</dd>
           </div>
-          <div v-if="deal.value_rappen > 0" class="page-deal-detail__dl-item">
-            <dt class="eyebrow">{{ $t('pipeline.value') }}</dt>
-            <dd class="mono">CHF {{ chf(deal.value_rappen) }}</dd>
+          <div v-if="project.budget_rappen > 0" class="page-deal-detail__dl-item">
+            <dt class="eyebrow">{{ $t('pipeline.budget') }}</dt>
+            <dd class="mono">CHF {{ chf(project.budget_rappen) }}</dd>
           </div>
         </dl>
 
@@ -277,13 +383,13 @@ const headerCrumb = computed(() => {
 
         <h3 class="eyebrow">{{ $t('pipeline.stage.label') }}</h3>
         <div class="page-deal-detail__stage-row">
-          <USelect :model-value="deal.stage" :items="stageOptions" class="w-full" @update:model-value="changeStage" />
+          <USelect :model-value="project.stage" :items="stageOptions" class="w-full" @update:model-value="changeStage" />
         </div>
 
         <hr class="page-deal-detail__sep">
 
         <h3 class="eyebrow">{{ $t('common.notes') }}</h3>
-        <p v-if="deal.notes" class="page-deal-detail__notes">{{ deal.notes }}</p>
+        <p v-if="project.notes" class="page-deal-detail__notes">{{ project.notes }}</p>
         <p v-else class="page-deal-detail__notes muted">{{ $t('pipeline.detail.noNotes') }}</p>
       </UiCard>
 
@@ -325,6 +431,61 @@ const headerCrumb = computed(() => {
         </ul>
       </UiCard>
     </div>
+
+    <section v-if="project.direction === 'sales'" class="page-deal-detail__invoices">
+      <UiCard>
+        <div class="page-deal-detail__timeline-head">
+          <h3 class="eyebrow">{{ $t('pipeline.detail.invoicesTitle') }}</h3>
+          <button
+            class="ed-btn-ghost ed-btn-sm"
+            type="button"
+            :disabled="creatingInvoice || !project.customer_id"
+            @click="newInvoice"
+          >
+            <UIcon name="i-lucide-plus" class="size-3.5" />
+            {{ $t('pipeline.detail.newInvoice') }}
+          </button>
+        </div>
+
+        <EmptyState
+          v-if="!invoices.length"
+          :bordered="false"
+          icon="i-lucide-file-text"
+          :title="$t('pipeline.detail.noInvoicesTitle')"
+          :description="$t('pipeline.detail.noInvoicesText')"
+        />
+        <div v-else class="ed-scroll"><table class="ed-table">
+          <thead>
+            <tr>
+              <th>{{ $t('invoices.number') }}</th>
+              <th>{{ $t('common.title') }}</th>
+              <th>{{ $t('invoices.statusLabel') }}</th>
+              <th>{{ $t('invoices.issueDate') }}</th>
+              <th class="right">{{ $t('common.amount') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="inv in invoices"
+              :key="inv.id"
+              class="row"
+              tabindex="0"
+              role="button"
+              :aria-label="`${inv.number || $t('common.untitled')} ${inv.title || ''}`.trim()"
+              @click="navigateTo(`/invoices/${inv.id}`)"
+              @keyup.enter="navigateTo(`/invoices/${inv.id}`)"
+              @keyup.space.prevent="navigateTo(`/invoices/${inv.id}`)"
+            >
+              <td class="mono">{{ inv.number || '—' }}</td>
+              <td>{{ inv.title || '—' }}</td>
+              <td class="mono">{{ $t(`status.${inv.status}`) }}</td>
+              <td class="mono">{{ dateCh(inv.issue_date) }}</td>
+              <td class="right mono">CHF {{ chf(inv.total_rappen) }}</td>
+            </tr>
+          </tbody>
+        </table></div>
+      </UiCard>
+    </section>
 
     <USlideover
       v-model:open="composer.open"

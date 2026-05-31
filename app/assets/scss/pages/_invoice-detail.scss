@@ -1,4 +1,20 @@
 .page-invoice-detail {
+  &__project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    margin-top: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 12px;
+    text-decoration: none;
+
+    b { color: var(--ink); font-weight: 500; }
+    &:hover { color: var(--ink); }
+  }
+
   .back {
     display: inline-flex;
     align-items: center;

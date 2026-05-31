@@ -171,6 +171,35 @@
     }
   }
 
+  &__burn { margin: 0 0 22px; }
+
+  &__burn-bar {
+    height: 6px;
+    background: var(--surface-3);
+    margin: 14px 0 12px;
+    overflow: hidden;
+  }
+
+  &__burn-fill {
+    height: 100%;
+    background: var(--ink);
+    transition: width .25s ease;
+  }
+
+  &__burn-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    b { color: var(--ink); font-weight: 500; }
+  }
+
+  &__invoices { margin-top: 22px; }
+
   @media (max-width: 1000px) {
     &__grid { grid-template-columns: 1fr; }
   }

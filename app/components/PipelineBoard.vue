@@ -5,8 +5,9 @@ type Direction = 'sales' | 'procurement'
 type SalesStage = 'lead' | 'contacted' | 'proposal' | 'won'
 type ProcStage = 'need' | 'requested' | 'received' | 'accepted'
 type Stage = SalesStage | ProcStage
+type BudgetType = 'fixed' | 'hourly' | 'estimate'
 
-interface Deal {
+interface Project {
   id: number
   name: string
   customer_id: number | null
@@ -17,7 +18,8 @@ interface Deal {
   direction: Direction
   stage: Stage
   label: string
-  value_rappen: number
+  budget_rappen: number
+  budget_type: BudgetType
   due_date: string | null
   notes: string | null
   position: number
@@ -25,7 +27,7 @@ interface Deal {
 
 interface PipelinePayload {
   direction: Direction
-  stages: Record<string, Deal[]>
+  stages: Record<string, Project[]>
   totals: Record<string, number>
 }
 
@@ -43,12 +45,12 @@ const direction = props.direction
 const STAGES: Stage[] = direction === 'procurement' ? PROC_STAGES : SALES_STAGES
 const finalStage: Stage = direction === 'procurement' ? 'accepted' : 'won'
 
-const { data, refresh } = await useFetch<PipelinePayload>('/api/deals', {
+const { data, refresh } = await useFetch<PipelinePayload>('/api/projects', {
   query: { direction },
-  key: `deals-${direction}`
+  key: `projects-${direction}`
 })
 
-const board = reactive<Record<Stage, Deal[]>>({} as Record<Stage, Deal[]>)
+const board = reactive<Record<Stage, Project[]>>({} as Record<Stage, Project[]>)
 for (const s of STAGES) board[s] = []
 
 function syncBoard() {
@@ -74,7 +76,7 @@ function chf(rappen: number) {
 
 const totals = computed<Record<Stage, number>>(() => {
   const r = {} as Record<Stage, number>
-  for (const s of STAGES) r[s] = board[s].reduce((sum, d) => sum + d.value_rappen, 0)
+  for (const s of STAGES) r[s] = board[s].reduce((sum, p) => sum + p.budget_rappen, 0)
   return r
 })
 
@@ -83,23 +85,23 @@ const totalCount = computed(() => STAGES.reduce((sum, s) => sum + board[s].lengt
 
 let wonBeforeDrag = new Set<number>()
 function snapshotFinal() {
-  wonBeforeDrag = new Set(board[finalStage].map(d => d.id))
+  wonBeforeDrag = new Set(board[finalStage].map(p => p.id))
 }
 snapshotFinal()
 watch(() => data.value, snapshotFinal)
 
-const finalModal = ref<{ open: boolean; deal: Deal | null }>({ open: false, deal: null })
+const finalModal = ref<{ open: boolean; project: Project | null }>({ open: false, project: null })
 
 async function persistOrder() {
   const stages = Object.fromEntries(
-    STAGES.map(s => [s, board[s].map(d => d.id)])
+    STAGES.map(s => [s, board[s].map(p => p.id)])
   ) as Record<Stage, number[]>
   try {
-    await $fetch('/api/deals/reorder', { method: 'POST', body: { direction, stages } })
-    for (const s of STAGES) for (const d of board[s]) d.stage = s
+    await $fetch('/api/projects/reorder', { method: 'POST', body: { direction, stages } })
+    for (const s of STAGES) for (const p of board[s]) p.stage = s
 
-    const movedIn = board[finalStage].find(d => !wonBeforeDrag.has(d.id))
-    if (movedIn) finalModal.value = { open: true, deal: movedIn }
+    const movedIn = board[finalStage].find(p => !wonBeforeDrag.has(p.id))
+    if (movedIn) finalModal.value = { open: true, project: movedIn }
     snapshotFinal()
   } catch {
     toast.add({ title: t('pipeline.reorderError'), color: 'error' })
@@ -116,12 +118,17 @@ interface FormState {
   customer_id: number | null
   stage: Stage
   label: string
-  value: number | undefined
+  budget: number | undefined
+  budget_type: BudgetType
   due_date: string
   notes: string
 }
 function blankForm(stage: Stage = STAGES[0]!): FormState {
-  return { id: null, name: '', email: '', phone: '', customer_id: null, stage, label: '', value: undefined, due_date: '', notes: '' }
+  return {
+    id: null, name: '', email: '', phone: '', customer_id: null,
+    stage, label: '', budget: undefined, budget_type: 'fixed',
+    due_date: '', notes: ''
+  }
 }
 const form = reactive<FormState>(blankForm())
 const open = ref(false)
@@ -134,28 +141,35 @@ const customerItems = computed(() => [
   ...(customers.value ?? []).map(c => ({ label: c.name, value: c.id }))
 ])
 
+const budgetTypeItems = computed(() => [
+  { value: 'fixed',    label: t('pipeline.budgetTypeFixed') },
+  { value: 'hourly',   label: t('pipeline.budgetTypeHourly') },
+  { value: 'estimate', label: t('pipeline.budgetTypeEstimate') }
+])
+
 function openCreate(stage?: Stage) {
   Object.assign(form, blankForm(stage ?? STAGES[0]!))
   open.value = true
 }
-function openEdit(d: Deal) {
+function openEdit(p: Project) {
   Object.assign(form, {
-    id: d.id,
-    name: d.name,
-    email: d.email ?? '',
-    phone: d.phone ?? '',
-    customer_id: d.customer_id,
-    stage: d.stage,
-    label: d.label,
-    value: d.value_rappen / 100,
-    due_date: d.due_date ?? '',
-    notes: d.notes ?? ''
+    id: p.id,
+    name: p.name,
+    email: p.email ?? '',
+    phone: p.phone ?? '',
+    customer_id: p.customer_id,
+    stage: p.stage,
+    label: p.label,
+    budget: p.budget_rappen / 100,
+    budget_type: p.budget_type ?? 'fixed',
+    due_date: p.due_date ?? '',
+    notes: p.notes ?? ''
   })
   open.value = true
 }
 
 const formRef = ref()
-// Basic RFC-ish check — good enough to catch typos like "aadsf" without
+// Basic RFC-ish check, good enough to catch typos like "aadsf" without
 // rejecting valid edge cases. Server is the source of truth.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -181,68 +195,71 @@ async function save() {
       direction,
       stage,
       label: form.label.trim(),
-      value: form.value ?? 0,
+      budget: form.budget ?? 0,
+      budget_type: form.budget_type,
       due_date: form.due_date || null,
       notes: form.notes || null
     }
-    if (form.id) await $fetch(`/api/deals/${form.id}`, { method: 'PUT', body })
-    else await $fetch('/api/deals', { method: 'POST', body })
+    if (form.id) await $fetch(`/api/projects/${form.id}`, { method: 'PUT', body })
+    else await $fetch('/api/projects', { method: 'POST', body })
     open.value = false
     await refresh()
   } finally { saving.value = false }
 }
 
-const deleteModal = ref<{ open: boolean; deal: Deal | null }>({ open: false, deal: null })
+const deleteModal = ref<{ open: boolean; project: Project | null }>({ open: false, project: null })
 
-function confirmDelete(d: Deal) {
-  deleteModal.value = { open: true, deal: d }
+function confirmDelete(p: Project) {
+  deleteModal.value = { open: true, project: p }
 }
 
 async function performDelete() {
-  const d = deleteModal.value.deal
-  if (!d) return
-  await $fetch(`/api/deals/${d.id}`, { method: 'DELETE' })
-  deleteModal.value = { open: false, deal: null }
+  const p = deleteModal.value.project
+  if (!p) return
+  await $fetch(`/api/projects/${p.id}`, { method: 'DELETE' })
+  deleteModal.value = { open: false, project: null }
   await refresh()
 }
 
 const completing = ref(false)
 
 async function completeFinal() {
-  const d = finalModal.value.deal
-  if (!d) return
+  const p = finalModal.value.project
+  if (!p) return
   completing.value = true
   try {
     if (direction === 'sales') {
-      if (!d.customer_id) return
+      if (!p.customer_id) return
+      // Use the project-scoped invoice endpoint so the new invoice carries
+      // both customer_id and project_id (the latter is now NOT NULL).
       const { id: invoiceId } = await $fetch<{ id: number }>(
-        `/api/customers/${d.customer_id}/invoices`,
+        `/api/projects/${p.id}/invoices`,
         { method: 'POST' }
       )
-      finalModal.value = { open: false, deal: null }
+      finalModal.value = { open: false, project: null }
       await navigateTo(`/invoices/${invoiceId}`)
     } else {
       const today = new Date().toISOString().slice(0, 10)
-      const vendor = d.customer_name || d.name
-      const amount = d.value_rappen / 100
+      const vendor = p.customer_name || p.name
+      const amount = p.budget_rappen / 100
       await $fetch('/api/expenses', {
         method: 'POST',
         body: {
-          title: d.label || d.name,
+          title: p.label || p.name,
           amount: Math.max(amount, 0.01),
           date: today,
           vendor,
-          notes: d.notes || null
+          notes: p.notes || null
         }
       })
       toast.add({ title: t('pipeline.expenseLogged'), color: 'success' })
-      finalModal.value = { open: false, deal: null }
+      finalModal.value = { open: false, project: null }
     }
   } finally { completing.value = false }
 }
 
 function dismissFinalModal() {
-  finalModal.value = { open: false, deal: null }
+  finalModal.value = { open: false, project: null }
 }
 
 const stageOptions = computed(() => STAGES.map(s => ({ value: s, label: stageMeta[s].title })))
@@ -258,11 +275,11 @@ const crumb = computed(() => {
   const dir = direction === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
   return `${t('nav.workspace')} / ${dir}`
 })
-const newDealLabel = computed(() => direction === 'procurement' ? t('pipeline.newProcurement') : t('pipeline.newDeal'))
-const addDealLabel = computed(() => direction === 'procurement' ? t('pipeline.addProcurement') : t('pipeline.addDeal'))
+const newLabel = computed(() => direction === 'procurement' ? t('pipeline.newProcurement') : t('pipeline.newProject'))
+const addLabel = computed(() => direction === 'procurement' ? t('pipeline.addProcurement') : t('pipeline.addProject'))
 
-function goToDetail(d: Deal) {
-  navigateTo(`/${DIR_TO_SLUG[direction]}/${d.id}`)
+function goToDetail(p: Project) {
+  navigateTo(`/${DIR_TO_SLUG[direction]}/${p.id}`)
 }
 </script>
 
@@ -288,7 +305,7 @@ function goToDetail(d: Deal) {
         </div>
         <button class="ed-btn-primary" type="button" @click="openCreate()">
           <UIcon name="i-lucide-plus" class="size-3.5" />
-          {{ newDealLabel }}
+          {{ newLabel }}
         </button>
       </template>
     </UiPageHead>
@@ -307,7 +324,7 @@ function goToDetail(d: Deal) {
         <VueDraggable
           v-model="board[s]"
           :animation="180"
-          group="deals"
+          group="projects"
           ghost-class="page-pipeline__ghost"
           drag-class="page-pipeline__drag"
           :delay-on-touch-only="true"
@@ -317,37 +334,37 @@ function goToDetail(d: Deal) {
           @end="persistOrder"
         >
           <article
-            v-for="d in board[s]"
-            :key="d.id"
+            v-for="p in board[s]"
+            :key="p.id"
             class="deal-card"
             tabindex="0"
             role="button"
-            :aria-label="d.customer_name || d.name"
-            @click="goToDetail(d)"
-            @keyup.enter="goToDetail(d)"
-            @keyup.space.prevent="goToDetail(d)"
+            :aria-label="p.customer_name || p.name"
+            @click="goToDetail(p)"
+            @keyup.enter="goToDetail(p)"
+            @keyup.space.prevent="goToDetail(p)"
           >
             <header class="deal-card__head">
-              <h4 class="deal-card__title">{{ d.customer_name || d.name }}</h4>
+              <h4 class="deal-card__title">{{ p.customer_name || p.name }}</h4>
               <UDropdownMenu
                 :items="[
                   [
-                    { label: $t('common.edit'), icon: 'i-lucide-pencil', onSelect: () => openEdit(d) },
-                    { label: $t('common.delete'), icon: 'i-lucide-trash-2', onSelect: () => confirmDelete(d) }
+                    { label: $t('common.edit'), icon: 'i-lucide-pencil', onSelect: () => openEdit(p) },
+                    { label: $t('common.delete'), icon: 'i-lucide-trash-2', onSelect: () => confirmDelete(p) }
                   ]
                 ]"
               >
-                <button type="button" class="icon-btn deal-card__menu" :aria-label="$t('pipeline.menu')" @click.stop>
+                <button type="button" class="icon-btn deal-card__menu" :aria-label="$t('pipeline.projectMenu')" @click.stop>
                   <UIcon name="i-lucide-more-horizontal" />
                 </button>
               </UDropdownMenu>
             </header>
-            <p v-if="d.label" class="deal-card__label">{{ d.label }}</p>
+            <p v-if="p.label" class="deal-card__label">{{ p.label }}</p>
             <footer class="deal-card__foot">
-              <span class="deal-card__value mono">CHF {{ chf(d.value_rappen) }}</span>
-              <span v-if="d.due_date" class="deal-card__due mono">
+              <span class="deal-card__value mono">CHF {{ chf(p.budget_rappen) }}</span>
+              <span v-if="p.due_date" class="deal-card__due mono">
                 <UIcon name="i-lucide-calendar" class="size-3" />
-                {{ dateCh(d.due_date) }}
+                {{ dateCh(p.due_date) }}
               </span>
             </footer>
           </article>
@@ -359,19 +376,19 @@ function goToDetail(d: Deal) {
 
         <button class="page-pipeline__add" type="button" @click="openCreate(s)">
           <UIcon name="i-lucide-plus" class="size-3.5" />
-          <span>{{ addDealLabel }}</span>
+          <span>{{ addLabel }}</span>
         </button>
       </div>
     </div>
 
     <USlideover
       v-model:open="open"
-      :title="form.id ? $t('pipeline.editDeal') : newDealLabel"
+      :title="form.id ? $t('pipeline.editProject') : newLabel"
       :ui="{ content: 'max-w-full sm:max-w-md' }"
     >
       <template #body>
         <UForm ref="formRef" :state="form" :validate="validate" :validate-on="['input', 'blur']" novalidate class="flex flex-col gap-4" @submit="save">
-          <UFormField name="name" :label="direction === 'procurement' ? $t('pipeline.vendorName') : $t('pipeline.dealName')">
+          <UFormField name="name" :label="direction === 'procurement' ? $t('pipeline.vendorName') : $t('pipeline.projectName')">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
           <div class="grid sm:grid-cols-2 gap-3">
@@ -391,9 +408,14 @@ function goToDetail(d: Deal) {
           <UFormField :label="$t('pipeline.label')">
             <UInput v-model="form.label" class="w-full" />
           </UFormField>
-          <UFormField :label="$t('pipeline.value')">
-            <UInput v-model.number="form.value" type="number" step="50" class="w-full" />
-          </UFormField>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <UFormField :label="$t('pipeline.budget')">
+              <UInput v-model.number="form.budget" type="number" step="50" class="w-full" />
+            </UFormField>
+            <UFormField :label="$t('pipeline.budgetType')">
+              <USelect v-model="form.budget_type" :items="budgetTypeItems" class="w-full" />
+            </UFormField>
+          </div>
           <UFormField :label="$t('pipeline.due')">
             <UiDatePicker v-model="form.due_date" />
           </UFormField>
@@ -413,12 +435,12 @@ function goToDetail(d: Deal) {
     <UModal v-model:open="deleteModal.open" :title="$t('pipeline.deleteTitle')">
       <template #body>
         <p class="page-pipeline__modal-text">
-          {{ $t('pipeline.deleteText', { name: deleteModal.deal?.customer_name || deleteModal.deal?.name || '' }) }}
+          {{ $t('pipeline.deleteText', { name: deleteModal.project?.customer_name || deleteModal.project?.name || '' }) }}
         </p>
       </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <button class="ed-btn-ghost" type="button" @click="deleteModal = { open: false, deal: null }">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-ghost" type="button" @click="deleteModal = { open: false, project: null }">{{ $t('common.cancel') }}</button>
           <button class="ed-btn-primary" type="button" @click="performDelete">{{ $t('common.delete') }}</button>
         </div>
       </template>
@@ -426,21 +448,21 @@ function goToDetail(d: Deal) {
 
     <UModal v-if="direction === 'sales'" v-model:open="finalModal.open" :title="$t('pipeline.wonTitle')">
       <template #body>
-        <p v-if="finalModal.deal?.customer_id" class="page-pipeline__modal-text">
-          {{ $t('pipeline.wonText', { customer: finalModal.deal?.customer_name || finalModal.deal?.name || '' }) }}
+        <p v-if="finalModal.project?.customer_id" class="page-pipeline__modal-text">
+          {{ $t('pipeline.wonText', { customer: finalModal.project?.customer_name || finalModal.project?.name || '' }) }}
         </p>
         <p v-else class="page-pipeline__modal-text">
-          {{ $t('pipeline.wonNoCustomer', { name: finalModal.deal?.name || '' }) }}
+          {{ $t('pipeline.wonNoCustomer', { name: finalModal.project?.name || '' }) }}
         </p>
       </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" type="button" @click="dismissFinalModal">{{ $t('pipeline.wonSkip') }}</button>
-          <button v-if="finalModal.deal?.customer_id" class="ed-btn-primary" type="button" :disabled="completing" @click="completeFinal">
+          <button v-if="finalModal.project?.customer_id" class="ed-btn-primary" type="button" :disabled="completing" @click="completeFinal">
             <UIcon name="i-lucide-file-text" class="size-3.5" />
             {{ $t('pipeline.wonCreateInvoice') }}
           </button>
-          <button v-else class="ed-btn-primary" type="button" @click="dismissFinalModal(); finalModal.deal && openEdit(finalModal.deal)">
+          <button v-else class="ed-btn-primary" type="button" @click="dismissFinalModal(); finalModal.project && openEdit(finalModal.project)">
             <UIcon name="i-lucide-pencil" class="size-3.5" />
             {{ $t('pipeline.wonLinkCustomer') }}
           </button>
@@ -452,15 +474,15 @@ function goToDetail(d: Deal) {
       <template #body>
         <p class="page-pipeline__modal-text">
           {{ $t('pipeline.acceptedText', {
-            vendor: finalModal.deal?.customer_name || finalModal.deal?.name || '',
-            amount: chf(finalModal.deal?.value_rappen ?? 0)
+            vendor: finalModal.project?.customer_name || finalModal.project?.name || '',
+            amount: chf(finalModal.project?.budget_rappen ?? 0)
           }) }}
         </p>
       </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" type="button" @click="dismissFinalModal">{{ $t('pipeline.wonSkip') }}</button>
-          <button class="ed-btn-primary" type="button" :disabled="completing || (finalModal.deal?.value_rappen ?? 0) <= 0" @click="completeFinal">
+          <button class="ed-btn-primary" type="button" :disabled="completing || (finalModal.project?.budget_rappen ?? 0) <= 0" @click="completeFinal">
             <UIcon name="i-lucide-receipt" class="size-3.5" />
             {{ $t('pipeline.acceptedLog') }}
           </button>

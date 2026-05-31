@@ -1,5 +1,5 @@
 // Manually log a reply the user received in their normal mailbox.
-// No SMTP send happens — we just record what they pasted.
+// No SMTP send happens; we just record what they pasted.
 
 interface Body {
   subject?: string
@@ -26,15 +26,15 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const exists = db.prepare(`SELECT id FROM deals WHERE id = ?`).get(id)
-  if (!exists) throw createError({ statusCode: 404, statusMessage: 'deal not found' })
+  const exists = db.prepare(`SELECT id FROM projects WHERE id = ?`).get(id)
+  if (!exists) throw createError({ statusCode: 404, statusMessage: 'project not found' })
 
   const sentAt = body.sent_at && /^\d{4}-\d{2}-\d{2}/.test(body.sent_at)
     ? body.sent_at
     : new Date().toISOString().replace('T', ' ').slice(0, 19)
 
   const info = db.prepare(
-    `INSERT INTO deal_emails (deal_id, direction, from_address, to_address, subject, body_html, body_text, sent_at)
+    `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text, sent_at)
      VALUES (?, 'inbound', ?, NULL, ?, ?, ?, ?)`
   ).run(id, from, subject, html, text, sentAt)
 

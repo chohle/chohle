@@ -3,6 +3,13 @@ import type { Database } from 'better-sqlite3'
 interface Migration {
   name: string
   up: string
+  // When true, runMigrations disables foreign keys *outside* the migration
+  // transaction (PRAGMA foreign_keys cannot be toggled while a transaction
+  // is active; it would silently no-op). Use this for any migration that
+  // does a table rebuild (CREATE _new + DROP + RENAME) on a table that is
+  // referenced by foreign keys, otherwise DROP TABLE triggers an implicit
+  // DELETE that cascades to the referring rows.
+  fkOff?: boolean
 }
 
 // Ordered, append-only. Each entry runs once; never edit an applied migration.
@@ -351,6 +358,153 @@ const migrations: Migration[] = [
       ALTER TABLE deals ADD COLUMN email TEXT;
       ALTER TABLE deals ADD COLUMN phone TEXT;
     `
+  },
+  {
+    name: '0026_rename_deals_to_projects',
+    // Reframe the pipeline entity. A "deal" was always the pre and post sale
+    // entity carrying the customer link, value, and lifecycle stage; calling
+    // it a "project" matches how the user thinks about engagements (Moco
+    // style: project IS the central entity, invoices and expenses hang off
+    // it). `value_rappen` becomes `budget_rappen` and we add `budget_type`
+    // ('fixed' | 'hourly' | 'estimate') to support different billing models.
+    up: `
+      ALTER TABLE deals RENAME TO projects;
+      ALTER TABLE projects RENAME COLUMN value_rappen TO budget_rappen;
+      ALTER TABLE projects ADD COLUMN budget_type TEXT NOT NULL DEFAULT 'fixed';
+
+      ALTER TABLE deal_emails RENAME TO project_emails;
+      ALTER TABLE project_emails RENAME COLUMN deal_id TO project_id;
+      DROP INDEX IF EXISTS idx_deal_emails_deal_sent_at;
+      CREATE INDEX idx_project_emails_project_sent_at ON project_emails (project_id, sent_at);
+    `
+  },
+  {
+    name: '0027_invoices_project_id',
+    // Connect invoices back to the project that produced them so the project
+    // detail page can show a budget burn (sum of invoiced totals vs the
+    // project budget) and so the link survives even after the project is
+    // archived. SET NULL on delete keeps the invoice intact if the project
+    // ever gets removed.
+    up: `
+      ALTER TABLE invoices ADD COLUMN project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL;
+      CREATE INDEX idx_invoices_project_id ON invoices (project_id);
+    `
+  },
+  {
+    name: '0028_projects_active_completed_stages',
+    fkOff: true,
+    // Adds 'active' and 'completed' to the sales project lifecycle. SQLite
+    // can't widen a CHECK in place, so we rebuild the table without a stage
+    // CHECK and rely on server side validation (which knows the allowed set
+    // per direction). `fkOff` tells runMigrations to disable foreign keys
+    // *outside* the migration transaction (PRAGMA foreign_keys is a no-op
+    // inside one); otherwise the DROP TABLE projects would implicitly
+    // DELETE the rows, cascading into project_emails (ON DELETE CASCADE)
+    // and nulling out invoices.project_id (ON DELETE SET NULL).
+    up: `
+      DROP INDEX IF EXISTS idx_deals_direction_stage_position;
+      DROP INDEX IF EXISTS idx_projects_direction_stage_position;
+      CREATE TABLE projects_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+        direction TEXT NOT NULL DEFAULT 'sales' CHECK (direction IN ('sales', 'procurement')),
+        stage TEXT NOT NULL DEFAULT 'lead',
+        label TEXT NOT NULL DEFAULT '',
+        budget_rappen INTEGER NOT NULL DEFAULT 0,
+        budget_type TEXT NOT NULL DEFAULT 'fixed',
+        due_date TEXT,
+        notes TEXT,
+        position INTEGER NOT NULL DEFAULT 0,
+        email TEXT,
+        phone TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      INSERT INTO projects_new (id, name, customer_id, direction, stage, label,
+                                budget_rappen, budget_type, due_date, notes,
+                                position, email, phone, created_at, updated_at)
+        SELECT id, name, customer_id, direction, stage, label,
+               budget_rappen, budget_type, due_date, notes,
+               position, email, phone, created_at, updated_at
+        FROM projects;
+      DROP TABLE projects;
+      ALTER TABLE projects_new RENAME TO projects;
+      CREATE INDEX idx_projects_direction_stage_position ON projects (direction, stage, position);
+    `
+  },
+  {
+    name: '0029_invoices_require_project',
+    fkOff: true,
+    // Project becomes mandatory on every invoice. The model is "Customer
+    // has Projects, Project has Invoices". We backfill every existing
+    // standalone invoice with a small placeholder project named after the
+    // invoice title (or its number) so the link is never null. After the
+    // backfill, the invoices table is rebuilt with NOT NULL on project_id
+    // so the database enforces it. `fkOff` keeps the DROP TABLE invoices
+    // from cascading into invoice_items (ON DELETE CASCADE) during the
+    // rebuild.
+    up: `
+      -- 1. backfill: create a placeholder project per orphan invoice
+      INSERT INTO projects (name, customer_id, direction, stage, label, budget_rappen,
+                            budget_type, position, created_at, updated_at)
+        SELECT
+          CASE WHEN TRIM(i.title) = '' THEN 'Invoice ' || i.number ELSE i.title END,
+          i.customer_id,
+          'sales',
+          'completed',
+          'Auto-created from legacy invoice',
+          0,
+          'fixed',
+          0,
+          i.created_at,
+          datetime('now')
+        FROM invoices i
+        WHERE i.project_id IS NULL;
+
+      -- 2. link each orphan invoice to its newly minted project. We match
+      -- by the invoice number embedded in the project name (or by the
+      -- title) plus the customer to stay precise across rows.
+      UPDATE invoices AS i
+      SET project_id = (
+        SELECT p.id FROM projects p
+        WHERE p.customer_id = i.customer_id
+          AND p.stage = 'completed'
+          AND p.label = 'Auto-created from legacy invoice'
+          AND p.name = CASE WHEN TRIM(i.title) = '' THEN 'Invoice ' || i.number ELSE i.title END
+        ORDER BY p.id ASC
+        LIMIT 1
+      )
+      WHERE i.project_id IS NULL;
+
+      -- 3. rebuild invoices with NOT NULL on project_id. SQLite can't ALTER
+      -- a column to add NOT NULL in place, so we copy through a new table.
+      -- runMigrations disabled foreign keys before this transaction (see
+      -- the fkOff flag) so the DROP+RENAME does not cascade into
+      -- invoice_items.
+      CREATE TABLE invoices_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+        project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE RESTRICT,
+        number TEXT NOT NULL,
+        title TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'paid')),
+        issue_date TEXT NOT NULL,
+        due_date TEXT NOT NULL,
+        paid_at TEXT,
+        total_rappen INTEGER,
+        step INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      INSERT INTO invoices_new (id, customer_id, project_id, number, title, status,
+                                issue_date, due_date, paid_at, total_rappen, step, created_at)
+        SELECT id, customer_id, project_id, number, title, status,
+               issue_date, due_date, paid_at, total_rappen, step, created_at
+        FROM invoices;
+      DROP TABLE invoices;
+      ALTER TABLE invoices_new RENAME TO invoices;
+      CREATE INDEX idx_invoices_project_id ON invoices (project_id);
+    `
   }
 ]
 
@@ -371,10 +525,32 @@ export function runMigrations(db: Database): { applied: string[] } {
   const applied: string[] = []
   for (const migration of migrations) {
     if (done.has(migration.name)) continue
-    db.transaction(() => {
-      db.exec(migration.up)
-      db.prepare('INSERT INTO schema_migrations (name) VALUES (?)').run(migration.name)
-    })()
+
+    if (migration.fkOff) {
+      // FK toggles only take effect outside a transaction. We disable
+      // checks first, run the rebuild atomically inside a transaction, then
+      // re-enable + verify with foreign_key_check (throws if the rebuild
+      // produced any dangling references).
+      db.pragma('foreign_keys = OFF')
+      try {
+        db.transaction(() => {
+          db.exec(migration.up)
+          db.prepare('INSERT INTO schema_migrations (name) VALUES (?)').run(migration.name)
+        })()
+      } finally {
+        db.pragma('foreign_keys = ON')
+      }
+      const violations = db.pragma('foreign_key_check') as unknown[]
+      if (violations.length > 0) {
+        throw new Error(`Migration ${migration.name} left foreign key violations: ${JSON.stringify(violations)}`)
+      }
+    } else {
+      db.transaction(() => {
+        db.exec(migration.up)
+        db.prepare('INSERT INTO schema_migrations (name) VALUES (?)').run(migration.name)
+      })()
+    }
+
     applied.push(migration.name)
   }
   return { applied }

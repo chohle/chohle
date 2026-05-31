@@ -1,6 +1,6 @@
-interface DealEmailRow {
+interface ProjectEmailRow {
   id: number
-  deal_id: number
+  project_id: number
   direction: 'outbound' | 'inbound'
   from_address: string | null
   to_address: string | null
@@ -18,13 +18,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'invalid id' })
   }
 
-  const rows = useDb().prepare(
-    `SELECT id, deal_id, direction, from_address, to_address, subject,
+  const db = useDb()
+  const exists = db.prepare(`SELECT id FROM projects WHERE id = ?`).get(id)
+  if (!exists) {
+    throw createError({ statusCode: 404, statusMessage: 'project not found' })
+  }
+
+  const rows = db.prepare(
+    `SELECT id, project_id, direction, from_address, to_address, subject,
             body_html, body_text, sent_at, created_at
-     FROM deal_emails
-     WHERE deal_id = ?
+     FROM project_emails
+     WHERE project_id = ?
      ORDER BY sent_at ASC, id ASC`
-  ).all(id) as DealEmailRow[]
+  ).all(id) as ProjectEmailRow[]
 
   return { rows }
 })

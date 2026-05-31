@@ -3,13 +3,13 @@ interface InvoiceHit { id: number, number: string, title: string, customer_name:
 interface CustomerHit { id: number, name: string, customer_number: string | null, city: string | null }
 interface ArticleHit { id: number, name: string, unit: string, default_price_rappen: number }
 interface ExpenseHit { id: number, title: string, vendor: string | null, date: string, amount_rappen: number }
-interface DealHit { id: number, name: string, direction: 'sales' | 'procurement', stage: string, customer_name: string | null }
+interface ProjectHit { id: number, name: string, direction: 'sales' | 'procurement', stage: string, customer_name: string | null }
 interface SearchResult {
   invoices: InvoiceHit[]
   customers: CustomerHit[]
   articles: ArticleHit[]
   expenses: ExpenseHit[]
-  deals: DealHit[]
+  projects: ProjectHit[]
 }
 
 interface Group {
@@ -18,7 +18,7 @@ interface Group {
   items: { id: string, label: string, suffix?: string, icon: string, to: string }[]
 }
 
-type Scope = 'all' | 'invoices' | 'customers' | 'articles' | 'expenses' | 'deals'
+type Scope = 'all' | 'invoices' | 'customers' | 'articles' | 'expenses' | 'projects'
 
 const open = defineModel<boolean>('open', { default: false })
 const { t } = useI18n()
@@ -26,7 +26,7 @@ const { t } = useI18n()
 const query = ref('')
 const scope = ref<Scope>('all')
 const loading = ref(false)
-const empty: SearchResult = { invoices: [], customers: [], articles: [], expenses: [], deals: [] }
+const empty: SearchResult = { invoices: [], customers: [], articles: [], expenses: [], projects: [] }
 const result = ref<SearchResult>({ ...empty })
 const inputRef = ref<HTMLInputElement>()
 
@@ -36,7 +36,7 @@ const scopes = computed<{ id: Scope, label: string }[]>(() => [
   { id: 'customers', label: t('nav.customers') },
   { id: 'articles',  label: t('nav.articles') },
   { id: 'expenses',  label: t('nav.expenses') },
-  { id: 'deals',     label: t('search.scope.deals') }
+  { id: 'projects',  label: t('search.scope.projects') }
 ])
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -142,17 +142,17 @@ const groups = computed<Group[]>(() => [
     }))
   },
   {
-    id: 'deals',
-    label: t('search.scope.deals'),
-    items: result.value.deals.map(d => ({
-      id: `deal-${d.id}`,
-      label: d.customer_name || d.name,
+    id: 'projects',
+    label: t('search.scope.projects'),
+    items: result.value.projects.map(p => ({
+      id: `prj-${p.id}`,
+      label: p.customer_name || p.name,
       suffix: [
-        d.customer_name && d.name !== d.customer_name ? d.name : null,
-        d.direction === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
+        p.customer_name && p.name !== p.customer_name ? p.name : null,
+        p.direction === 'procurement' ? t('pipeline.direction.procurement') : t('pipeline.direction.sales')
       ].filter(Boolean).join(' - '),
       icon: 'i-lucide-kanban',
-      to: `/${DIR_TO_SLUG[d.direction]}/${d.id}`
+      to: `/${DIR_TO_SLUG[p.direction]}/${p.id}`
     }))
   }
 ].filter(g => g.items.length))

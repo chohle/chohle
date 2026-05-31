@@ -53,23 +53,27 @@
   },
   "pipeline": {
     "title": "Pipeline",
-    "subtitle": "Trascina i deal tra le fasi. {total} di valore potenziale su {count} deal.",
-    "newDeal": "Nuovo deal",
-    "addDeal": "Aggiungi deal",
-    "editDeal": "Modifica deal",
-    "dealName": "Nome del deal",
+    "subtitle": "Trascina i progetti tra le fasi. {total} di valore potenziale su {count} progetti.",
+    "newProject": "Nuovo progetto",
+    "addProject": "Aggiungi progetto",
+    "editProject": "Modifica progetto",
+    "projectName": "Nome del progetto",
+    "projectMenu": "Menu progetto",
     "customer": "Cliente",
-    "noCustomerLink": "— non collegato —",
+    "noCustomerLink": "(non collegato)",
     "customerHelp": "Opzionale. Collega un cliente esistente; altrimenti vengono usati nome ed email qui sopra.",
     "label": "Descrizione",
-    "value": "Valore (CHF)",
+    "budget": "Budget (CHF)",
+    "budgetType": "Tipo di budget",
+    "budgetTypeFixed": "Prezzo fisso",
+    "budgetTypeHourly": "Orario",
+    "budgetTypeEstimate": "Stima",
     "due": "Scadenza",
-    "menu": "Menu deal",
     "reorderError": "Impossibile salvare il nuovo ordine",
-    "dropHere": "Rilascia i deal qui",
-    "deleteTitle": "Eliminare il deal?",
+    "dropHere": "Rilascia i progetti qui",
+    "deleteTitle": "Eliminare il progetto?",
     "deleteText": "Eliminare {name}? Non è reversibile.",
-    "wonTitle": "Deal vinto 🎉",
+    "wonTitle": "Progetto vinto 🎉",
     "wonText": "Segna come vinto e crea una fattura per {customer}?",
     "wonNoCustomer": "{name} non è ancora collegato a un cliente. Collega un cliente per poter fatturare.",
     "wonSkip": "Più tardi",
@@ -81,6 +85,8 @@
       "contacted": "Contattati",
       "proposal": "Proposta inviata",
       "won": "Vinti",
+      "active": "Attivi",
+      "completed": "Completati",
       "need": "Necessità",
       "requested": "Preventivo richiesto",
       "received": "Preventivo ricevuto",
@@ -99,6 +105,13 @@
     "acceptedText": "Registrare CHF {amount} come spesa per {vendor}?",
     "acceptedLog": "Registra spesa",
     "expenseLogged": "Spesa registrata",
+    "picker": {
+      "searchProjectPlaceholder": "Cerca progetti o digita un nuovo nome di progetto…",
+      "createNewProject": "Crea un nuovo progetto",
+      "createNamedProject": "Crea il nuovo progetto \"{name}\"",
+      "createProjectAndInvoice": "Crea il progetto e continua",
+      "createFailed": "Impossibile creare il progetto"
+    },
     "detail": {
       "contact": "Contatto",
       "supplier": "Fornitore",
@@ -117,7 +130,20 @@
       "sent": "Inviato",
       "received": "Ricevuto",
       "logReply": "Registra risposta",
-      "logSave": "Salva messaggio"
+      "logSave": "Salva messaggio",
+      "newInvoice": "Nuova fattura",
+      "linkCustomerFirst": "Collega prima un cliente a questo progetto",
+      "invoiceFailed": "Impossibile creare la fattura",
+      "budgetBurn": "Budget consumato",
+      "invoiced": "Fatturato",
+      "paid": "Pagato",
+      "remaining": "Rimanente",
+      "budgetTotal": "Budget",
+      "invoicesTitle": "Fatture di questo progetto",
+      "noInvoicesTitle": "Ancora nessuna fattura",
+      "noInvoicesText": "Usa il pulsante Nuova fattura per creare la prima fattura di questo progetto.",
+      "archive": "Archivia",
+      "archived": "Progetto archiviato"
     }
   },
   "payments": {
@@ -150,12 +176,12 @@
   },
   "search": {
     "placeholder": "Cerca ...",
-    "hint": "Digita per cercare fatture, clienti, articoli, spese e deals.",
+    "hint": "Digita per cercare fatture, clienti, articoli, spese e progetti.",
     "empty": "Nessun risultato.",
     "scopeLabel": "Ambito di ricerca",
     "scope": {
       "all": "Tutti",
-      "deals": "Deals"
+      "projects": "Progetti"
     }
   },
   "errors": {
@@ -310,6 +336,13 @@
     "noInvoicesText": "Crea la prima fattura per questo cliente.",
     "kpiTotalBilled": "Totale fatturato",
     "kpiPaid": "Pagato",
+    "projectsTab": "Progetti",
+    "projectsEmails": "Email",
+    "projectsUpdated": "Aggiornato",
+    "noProjectsTitle": "Ancora nessun progetto",
+    "noProjectsText": "I progetti di vendita e acquisto collegati a questo cliente appaiono qui, con il loro budget e gli importi fatturati.",
+    "invoiceFromProjectHint": "Scegli il progetto a cui appartiene questa fattura, oppure creane uno nuovo con nome e budget.",
+    "invoiceCreateFailed": "Impossibile creare la fattura",
     "filterAll": "Tutti",
     "filterCompany": "Aziende",
     "filterPerson": "Privati",
@@ -438,7 +471,9 @@
     "kpiTotal": "Totale",
     "deltaCount": "{n} fatture",
     "deltaDrafts": "{n} bozze",
-    "deltaAll": "{n} in totale"
+    "deltaAll": "{n} in totale",
+    "projectCol": "Progetto",
+    "fromProject": "Dal progetto"
   },
   "editor": {
     "uploadImage": "Carica un'immagine",

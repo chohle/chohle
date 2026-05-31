@@ -1,9 +1,10 @@
 type Direction = 'sales' | 'procurement'
+// Only kanban stages can be reordered (active/completed are not kanban columns).
 type Stage = 'lead' | 'contacted' | 'proposal' | 'won' | 'need' | 'requested' | 'received' | 'accepted'
 
 interface Body {
   direction: Direction
-  // ordered list of deal IDs in each stage, per the new client-side state
+  // ordered list of project IDs in each stage, per the new client-side state
   stages: Partial<Record<Stage, number[]>>
 }
 
@@ -21,9 +22,9 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   // Direction is checked at the row level so a stale or hostile client
-  // can't sneak a sales deal into a procurement column (and vice versa).
+  // can't sneak a sales project into a procurement column (and vice versa).
   const update = db.prepare(
-    `UPDATE deals SET stage = ?, position = ?, updated_at = datetime('now')
+    `UPDATE projects SET stage = ?, position = ?, updated_at = datetime('now')
      WHERE id = ? AND direction = ?`
   )
   db.transaction(() => {

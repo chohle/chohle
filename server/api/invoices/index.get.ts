@@ -12,9 +12,11 @@ export default defineEventHandler(async (event) => {
   const invoices = db
     .prepare(
       `SELECT i.id, i.number, i.title, i.status, i.issue_date, i.due_date,
-              i.customer_id, c.name AS customer_name
+              i.customer_id, c.name AS customer_name,
+              i.project_id, p.name AS project_name
        FROM invoices i
        JOIN customers c ON c.id = i.customer_id
+       LEFT JOIN projects p ON p.id = i.project_id
        ORDER BY i.issue_date DESC, i.id DESC`
     )
     .all() as Array<Record<string, unknown> & { id: number }>

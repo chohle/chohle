@@ -47,6 +47,24 @@ const { data: customerArticles } = await useFetch<{ id: number }[]>(
   { default: () => [] }
 )
 
+interface ProjectRow {
+  id: number
+  name: string
+  direction: 'sales' | 'procurement'
+  stage: string
+  label: string
+  budget_rappen: number
+  budget_type: string
+  updated_at: string
+  email_count: number
+  invoice_count: number
+  invoiced_rappen: number
+  paid_rappen: number
+}
+const { data: projects } = await useFetch<ProjectRow[]>(`/api/customers/${id}/projects`, { default: () => [] })
+
+const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = { sales: 'vertrieb', procurement: 'einkauf' }
+
 const stats = computed(() => {
   const list = invoices.value
   return {
@@ -57,16 +75,38 @@ const stats = computed(() => {
   }
 })
 
-const tab = ref<'details' | 'articles' | 'invoices'>('details')
+const tab = ref<'details' | 'articles' | 'projects'>('details')
 const tabOptions = computed(() => [
   { value: 'details', label: t('customers.details') },
   { value: 'articles', label: t('nav.articles') },
-  { value: 'invoices', label: t('customers.invoices') }
+  { value: 'projects', label: t('customers.projectsTab') }
 ])
 
-async function newInvoice() {
-  const { id: invoiceId } = await $fetch<{ id: number }>(`/api/customers/${id}/invoices`, { method: 'POST' })
-  await navigateTo(`/invoices/${invoiceId}`)
+// Invoice creation always goes through a project now. The picker either
+// reuses an existing project for this customer or creates a new one with
+// name + budget, then the project drives the invoice draft.
+const pickerOpen = ref(false)
+const creatingInvoice = ref(false)
+
+function openInvoicePicker() {
+  pickerOpen.value = true
+}
+
+const toast = useToast()
+async function onProjectResolved(projectId: number) {
+  pickerOpen.value = false
+  creatingInvoice.value = true
+  try {
+    const { id: invoiceId } = await $fetch<{ id: number }>(
+      `/api/projects/${projectId}/invoices`, { method: 'POST' }
+    )
+    await navigateTo(`/invoices/${invoiceId}`)
+  } catch (err) {
+    // Reopen the picker so the user can try again, surface what went wrong.
+    pickerOpen.value = true
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('customers.invoiceCreateFailed')
+    toast.add({ title: msg, color: 'error' })
+  } finally { creatingInvoice.value = false }
 }
 
 function chf(rappen: number) {
@@ -117,7 +157,7 @@ const details = computed(() => {
         <a v-if="customer.email" class="ed-btn" :href="`mailto:${customer.email}`">
           <UIcon name="i-lucide-mail" class="size-3.5" /> Email
         </a>
-        <button class="ed-btn-primary" @click="newInvoice">
+        <button class="ed-btn-primary" :disabled="creatingInvoice" @click="openInvoicePicker">
           <UIcon name="i-lucide-plus" class="size-3.5" /> {{ t('customers.newInvoice') }}
         </button>
       </div>
@@ -150,6 +190,56 @@ const details = computed(() => {
       </dl>
     </UiCard>
 
+    <UiCard v-else-if="tab === 'projects'">
+      <EmptyState
+        v-if="!projects.length"
+        :bordered="false"
+        icon="i-lucide-kanban"
+        :title="$t('customers.noProjectsTitle')"
+        :description="$t('customers.noProjectsText')"
+      />
+      <div v-else class="ed-scroll"><table class="ed-table">
+        <thead>
+          <tr>
+            <th>{{ $t('common.name') }}</th>
+            <th>{{ $t('pipeline.directionLabel') }}</th>
+            <th>{{ $t('pipeline.stage.label') }}</th>
+            <th class="right">{{ $t('pipeline.budget') }}</th>
+            <th class="right">{{ $t('pipeline.detail.invoiced') }}</th>
+            <th class="right">{{ $t('customers.projectsEmails') }}</th>
+            <th>{{ $t('customers.projectsUpdated') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="p in projects"
+            :key="p.id"
+            class="row"
+            tabindex="0"
+            role="button"
+            :aria-label="p.name"
+            @click="navigateTo(`/${DIR_TO_SLUG[p.direction]}/${p.id}`)"
+            @keyup.enter="navigateTo(`/${DIR_TO_SLUG[p.direction]}/${p.id}`)"
+            @keyup.space.prevent="navigateTo(`/${DIR_TO_SLUG[p.direction]}/${p.id}`)"
+          >
+            <td>
+              <div>{{ p.name }}</div>
+              <div v-if="p.label" class="page-customer-detail__project-sub">{{ p.label }}</div>
+            </td>
+            <td class="mono">{{ p.direction === 'procurement' ? $t('pipeline.direction.procurement') : $t('pipeline.direction.sales') }}</td>
+            <td class="mono">{{ $t(`pipeline.stage.${p.stage}`) }}</td>
+            <td class="right mono">{{ p.budget_rappen > 0 ? `CHF ${chf(p.budget_rappen)}` : '—' }}</td>
+            <td class="right mono">
+              <span v-if="p.invoice_count">CHF {{ chf(p.invoiced_rappen) }} <span class="page-customer-detail__project-count">({{ p.invoice_count }})</span></span>
+              <span v-else>—</span>
+            </td>
+            <td class="right mono">{{ p.email_count || '—' }}</td>
+            <td class="mono">{{ dateCh(p.updated_at.slice(0, 10)) }}</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </UiCard>
+
     <UiCard v-else-if="tab === 'articles'">
       <ArticleManager
         :list-url="`/api/customers/${id}/articles`"
@@ -157,54 +247,16 @@ const details = computed(() => {
       />
     </UiCard>
 
-    <UiCard v-else-if="tab === 'invoices'">
-      <div v-if="invoices.length" class="page-customer-detail__inv-head">
-        <div class="eyebrow">{{ invoices.length }} {{ $t('customers.invoices') }}</div>
-        <button class="ed-btn-primary" @click="newInvoice">
-          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('customers.newInvoice') }}
-        </button>
-      </div>
-      <EmptyState
-        v-if="!invoices.length"
-        :bordered="false"
-        icon="i-lucide-file-text"
-        :title="$t('customers.noInvoicesTitle')"
-        :description="$t('customers.noInvoicesText')"
-      >
-        <template #action>
-          <button class="ed-btn-primary" @click="newInvoice">
-            <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('customers.newInvoice') }}
-          </button>
-        </template>
-      </EmptyState>
-      <div v-else class="ed-scroll"><table class="ed-table page-customer-detail__inv-table">
-        <thead>
-          <tr>
-            <th>{{ $t('invoices.number') }}</th>
-            <th>{{ $t('common.title') }}</th>
-            <th>{{ $t('invoices.statusLabel') }}</th>
-            <th class="right">{{ $t('common.amount') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="inv in invoices"
-            :key="inv.id"
-            class="row"
-            tabindex="0"
-            role="button"
-            :aria-label="`${inv.number || $t('common.untitled')} ${inv.title || ''}`.trim()"
-            @click="navigateTo(`/invoices/${inv.id}`)"
-            @keyup.enter="navigateTo(`/invoices/${inv.id}`)"
-            @keyup.space.prevent="navigateTo(`/invoices/${inv.id}`)"
-          >
-            <td class="mono">{{ inv.number }}</td>
-            <td>{{ inv.title || $t('common.untitled') }}</td>
-            <td><UiOutlinedChip :status="inv.status as any">{{ $t(`status.${inv.status}`) }}</UiOutlinedChip></td>
-            <td class="right mono">CHF {{ chf(inv.total_rappen) }}</td>
-          </tr>
-        </tbody>
-      </table></div>
-    </UiCard>
+    <UModal v-model:open="pickerOpen" :title="$t('customers.newInvoice')">
+      <template #body>
+        <p class="page-customer-detail__picker-hint">{{ $t('customers.invoiceFromProjectHint') }}</p>
+        <ProjectPicker
+          :customer-id="Number(id)"
+          :projects="projects.map(p => ({ id: p.id, name: p.name, stage: p.stage, budget_rappen: p.budget_rappen }))"
+          @resolved="onProjectResolved"
+          @cancel="pickerOpen = false"
+        />
+      </template>
+    </UModal>
   </div>
 </template>

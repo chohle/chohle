@@ -1,12 +1,18 @@
 <script setup lang="ts">
 interface InvoiceRow {
   customer_id: number
+  project_id: number | null
   number: string
   title: string
   status: 'draft' | 'sent' | 'paid'
   issue_date: string
   due_date: string
   step: number
+}
+interface ProjectMini {
+  id: number
+  name: string
+  direction: 'sales' | 'procurement'
 }
 interface ItemRow {
   article_id: number | null
@@ -30,9 +36,13 @@ const route = useRoute()
 const id = route.params.id as string
 const toast = useToast()
 
-const { data } = await useFetch<{ invoice: InvoiceRow, items: ItemRow[] }>(`/api/invoices/${id}`)
+const { data } = await useFetch<{ invoice: InvoiceRow, items: ItemRow[], project: ProjectMini | null }>(`/api/invoices/${id}`)
 const inv = data.value!.invoice
+const linkedProject = data.value!.project
 const customerId = inv.customer_id
+
+const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = { sales: 'vertrieb', procurement: 'einkauf' }
+const projectHref = computed(() => linkedProject ? `/${DIR_TO_SLUG[linkedProject.direction]}/${linkedProject.id}` : null)
 
 const { data: globalArticles } = await useFetch<Article[]>('/api/articles', { default: () => [] })
 const { data: customerArticles } = await useFetch<Article[]>(`/api/customers/${customerId}/articles`, { default: () => [] })
@@ -192,12 +202,18 @@ const emailMessage = computed({
 
 <template>
   <div class="page-invoice-detail">
-    <NuxtLink :to="`/customers/${customerId}`" class="back">
+    <NuxtLink :to="projectHref ?? `/customers/${customerId}`" class="back">
       <UIcon name="i-lucide-arrow-left" class="size-3.5" />
-      <span class="mono">{{ customer?.name || $t('customers.colCustomer') }}</span>
+      <span class="mono">{{ linkedProject?.name || customer?.name || $t('customers.colCustomer') }}</span>
     </NuxtLink>
 
     <UiPageHead :title="$t('invoices.titleNumber', { number: header.number })">
+      <template #subtitle>
+        <NuxtLink v-if="linkedProject && projectHref" :to="projectHref" class="page-invoice-detail__project-link">
+          <UIcon name="i-lucide-kanban" class="size-3.5" />
+          <span>{{ $t('invoices.fromProject') }}: <b>{{ linkedProject.name }}</b></span>
+        </NuxtLink>
+      </template>
       <template #actions>
         <button class="ed-btn-ghost" @click="confirmDelete = true">
           <UIcon name="i-lucide-trash-2" class="size-3.5" /> {{ $t('common.delete') }}

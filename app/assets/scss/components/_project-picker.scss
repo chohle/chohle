@@ -1,0 +1,104 @@
+.project-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px 0 36px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+
+    &:focus-within { border-color: var(--ink); }
+
+    input {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      font-size: 14px;
+      color: var(--ink);
+
+      &::placeholder { color: var(--ink-3); }
+    }
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-3);
+    pointer-events: none;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--border-strong);
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  &__list li + li { border-top: 1px solid var(--border); }
+
+  &__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--ink);
+    font-size: 13.5px;
+
+    &:hover { background: var(--surface-2); }
+    &:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+    &--create {
+      color: var(--ink);
+      font-weight: 500;
+    }
+  }
+
+  &__item-icon { color: var(--ink-3); flex-shrink: 0; }
+  &__item-name { flex: 1; }
+  &__item-meta { font-size: 11px; color: var(--ink-3); }
+
+  &__create-row { background: var(--surface-2); }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__back {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 0;
+    color: var(--ink-3);
+    font-size: 12.5px;
+    cursor: pointer;
+
+    &:hover { color: var(--ink); }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+}

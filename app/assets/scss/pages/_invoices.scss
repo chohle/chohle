@@ -2,5 +2,15 @@
   &__filter-row { padding: 22px 0 18px; }
   &__muted { color: var(--ink-3); }
 
+  &__project {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border: 1px solid var(--border-strong);
+    font-size: 11px;
+    color: var(--ink-2);
+    background: var(--surface-2);
+  }
+
   .ed-table tr.row { cursor: pointer; }
 }

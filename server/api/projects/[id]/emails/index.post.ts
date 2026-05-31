@@ -5,7 +5,7 @@ interface Body {
 }
 
 interface SenderRow { email: string | null; name: string }
-interface DealRow {
+interface ProjectRow {
   id: number
   customer_id: number | null
 }
@@ -41,14 +41,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const deal = db.prepare(`SELECT id, customer_id FROM deals WHERE id = ?`).get(id) as DealRow | undefined
-  if (!deal) throw createError({ statusCode: 404, statusMessage: 'deal not found' })
+  const project = db.prepare(`SELECT id, customer_id FROM projects WHERE id = ?`).get(id) as ProjectRow | undefined
+  if (!project) throw createError({ statusCode: 404, statusMessage: 'project not found' })
 
   // Resolve the recipient: explicit body.to wins, otherwise pull from the
   // linked customer record so the UI can default-fill the field.
   let to = (body.to ?? '').trim()
-  if (!to && deal.customer_id) {
-    const c = db.prepare(`SELECT email FROM customers WHERE id = ?`).get(deal.customer_id) as CustomerRow | undefined
+  if (!to && project.customer_id) {
+    const c = db.prepare(`SELECT email FROM customers WHERE id = ?`).get(project.customer_id) as CustomerRow | undefined
     if (c?.email) to = c.email
   }
   if (!to) {
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const info = db.prepare(
-    `INSERT INTO deal_emails (deal_id, direction, from_address, to_address, subject, body_html, body_text)
+    `INSERT INTO project_emails (project_id, direction, from_address, to_address, subject, body_html, body_text)
      VALUES (?, 'outbound', ?, ?, ?, ?, ?)`
   ).run(id, sender.email, to, subject, html, text)
 
