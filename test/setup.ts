@@ -1,0 +1,17 @@
+// Global test setup. We don't need Nuxt's runtime here, but the modules
+// under test do reference `$fetch` (Nuxt auto-import). Stub it so any
+// accidental call surfaces as a clear test failure instead of an
+// undefined-function crash.
+
+import { vi } from 'vitest'
+
+// Default: any unmocked $fetch call throws. Individual tests override
+// with `vi.stubGlobal('$fetch', ...)`.
+const defaultFetch = vi.fn(async () => {
+  throw new Error('$fetch was called without a per-test stub being installed')
+})
+vi.stubGlobal('$fetch', defaultFetch)
+
+// outlookSync.ts encrypts/decrypts via BATZE_SECRET. Set a deterministic
+// value so encrypt+decrypt round-trips work in tests.
+process.env.BATZE_SECRET ??= 'test-secret-for-vitest-runs-only'

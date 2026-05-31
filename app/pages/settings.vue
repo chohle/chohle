@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 const { current, options, set } = useAppLocale()
 const { tweaks, setTheme } = useTweaks()
 
@@ -14,6 +16,96 @@ async function saveTemplate() {
     toast.add({ title: t('settings.emailTemplateSaved'), color: 'success' })
   } finally { savingTemplate.value = false }
 }
+
+// --- Mail sync ---------------------------------------------------------
+interface MailboxRow {
+  id: number
+  provider: 'outlook' | 'gmail' | 'imap'
+  provider_label: string
+  label: string
+  email_address: string | null
+  token_expires_at: string | null
+  last_sync_at: string | null
+  last_error: string | null
+  created_at: string
+}
+const { data: mailboxes, refresh: refreshMailboxes } = await useFetch<MailboxRow[]>('/api/mailboxes', { default: () => [] })
+
+const connectOpen = ref(false)
+const connecting = ref(false)
+const outlookForm = reactive({
+  clientId: '',
+  tenantId: 'common',
+  label: ''
+})
+
+function openConnectOutlook() {
+  outlookForm.clientId = ''
+  outlookForm.tenantId = 'common'
+  outlookForm.label = ''
+  connectOpen.value = true
+}
+
+async function startOutlookConnect() {
+  connecting.value = true
+  try {
+    const { url } = await $fetch<{ url: string }>('/api/auth/outlook/start', {
+      method: 'POST',
+      body: { clientId: outlookForm.clientId.trim(), tenantId: outlookForm.tenantId.trim(), label: outlookForm.label.trim() }
+    })
+    window.location.href = url
+  } catch (err) {
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('settings.mailSync.connectFailed')
+    toast.add({ title: msg, color: 'error' })
+  } finally { connecting.value = false }
+}
+
+async function disconnect(id: number) {
+  try {
+    await $fetch(`/api/mailboxes/${id}`, { method: 'DELETE' })
+    await refreshMailboxes()
+  } catch (err) {
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('settings.mailSync.disconnectFailed')
+    toast.add({ title: msg, color: 'error' })
+  }
+}
+
+const syncingId = ref<number | null>(null)
+async function syncNow(id: number) {
+  syncingId.value = id
+  try {
+    const r = await $fetch<{ inserted: number; scanned: number; duplicates: number }>(
+      `/api/mailboxes/${id}/sync`, { method: 'POST' }
+    )
+    toast.add({
+      title: r.inserted > 0
+        ? t('settings.mailSync.syncedWithNew', { n: r.inserted })
+        : t('settings.mailSync.syncedNothingNew'),
+      color: 'success'
+    })
+    await refreshMailboxes()
+  } catch (err) {
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('settings.mailSync.syncFailed')
+    toast.add({ title: msg, color: 'error' })
+    await refreshMailboxes()
+  } finally { syncingId.value = null }
+}
+
+// React to the post-OAuth redirect (`?mailbox=connected` or `=error`)
+onMounted(() => {
+  const status = route.query.mailbox
+  if (status === 'connected') {
+    toast.add({ title: t('settings.mailSync.connected'), color: 'success' })
+    refreshMailboxes()
+  } else if (status === 'error') {
+    const reason = String(route.query.reason ?? '')
+    toast.add({ title: t('settings.mailSync.connectFailed') + (reason ? `: ${reason}` : ''), color: 'error' })
+  }
+  if (status) {
+    // Clear the query so a reload doesn't re-fire the toast.
+    router.replace({ query: { ...route.query, mailbox: undefined, reason: undefined } })
+  }
+})
 
 const selected = ref(current.value)
 watch(current, v => { selected.value = v })
@@ -39,10 +131,14 @@ async function confirmChange() {
 }
 function cancelChange() { selected.value = current.value; confirmOpen.value = false }
 
-const tab = ref<'appearance' | 'general' | 'email'>('appearance')
+type Tab = 'appearance' | 'general' | 'mail' | 'email'
+// Hash-driven so the OAuth callback's `#mail-sync` redirect lands on the
+// right tab without a separate state ping pong.
+const tab = ref<Tab>(route.hash === '#mail-sync' ? 'mail' : 'appearance')
 const tabs = computed(() => [
   { value: 'appearance', label: 'Appearance' },
   { value: 'general', label: t('settings.tabGeneral') },
+  { value: 'mail', label: t('settings.mailSync.tab') },
   { value: 'email', label: t('settings.emailTemplate') }
 ])
 
@@ -104,6 +200,73 @@ const themes = [
           </UiCard>
         </template>
 
+        <template v-else-if="tab === 'mail'">
+          <p class="note">{{ $t('settings.mailSync.intro') }}</p>
+
+          <UiSectionLabel>{{ $t('settings.mailSync.connected') }}</UiSectionLabel>
+          <UiCard v-if="!mailboxes.length" :flush="true" class="mail-sync__empty">
+            <EmptyState
+              :bordered="false"
+              icon="i-lucide-mail"
+              :title="$t('settings.mailSync.emptyTitle')"
+              :description="$t('settings.mailSync.emptyText')"
+            />
+          </UiCard>
+          <UiCard v-else :flush="true">
+            <ul class="mail-sync__list">
+              <li v-for="mb in mailboxes" :key="mb.id" class="mail-sync__row">
+                <div class="mail-sync__row-main">
+                  <div class="mail-sync__row-name">{{ mb.label }}</div>
+                  <div class="mail-sync__row-meta mono">
+                    <span>{{ mb.provider_label }}</span>
+                    <span v-if="mb.email_address">· {{ mb.email_address }}</span>
+                    <span v-if="mb.last_sync_at">· {{ $t('settings.mailSync.lastSync') }} {{ dateCh(mb.last_sync_at.slice(0, 10)) }}</span>
+                    <span v-else>· {{ $t('settings.mailSync.neverSynced') }}</span>
+                  </div>
+                  <div v-if="mb.last_error" class="mail-sync__row-error">{{ mb.last_error }}</div>
+                </div>
+                <div class="mail-sync__row-actions">
+                  <button class="ed-btn" type="button" :disabled="syncingId === mb.id" @click="syncNow(mb.id)">
+                    <UIcon :name="syncingId === mb.id ? 'i-lucide-loader-2' : 'i-lucide-refresh-cw'" class="size-3.5" :class="{ 'animate-spin': syncingId === mb.id }" />
+                    {{ $t('settings.mailSync.syncNow') }}
+                  </button>
+                  <button class="ed-btn" type="button" @click="disconnect(mb.id)">
+                    <UIcon name="i-lucide-trash-2" class="size-3.5" />
+                    {{ $t('settings.mailSync.disconnect') }}
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </UiCard>
+
+          <UiSectionLabel>{{ $t('settings.mailSync.connect') }}</UiSectionLabel>
+          <UiCard>
+            <div class="mail-sync__providers">
+              <button class="mail-sync__provider" type="button" @click="openConnectOutlook">
+                <UIcon name="i-lucide-mail" class="size-5" />
+                <div>
+                  <div class="mail-sync__provider-name">Outlook / Microsoft 365</div>
+                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.outlookDesc') }}</div>
+                </div>
+              </button>
+              <div class="mail-sync__provider mail-sync__provider--soon">
+                <UIcon name="i-lucide-mail" class="size-5" />
+                <div>
+                  <div class="mail-sync__provider-name">Gmail</div>
+                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.comingSoon') }}</div>
+                </div>
+              </div>
+              <div class="mail-sync__provider mail-sync__provider--soon">
+                <UIcon name="i-lucide-mail" class="size-5" />
+                <div>
+                  <div class="mail-sync__provider-name">IMAP (Proton, Fastmail, iCloud, …)</div>
+                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.comingSoon') }}</div>
+                </div>
+              </div>
+            </div>
+          </UiCard>
+        </template>
+
         <template v-else-if="tab === 'email'">
           <p class="note">{{ $t('settings.emailTemplateHelp') }}</p>
           <ClientOnly>
@@ -149,6 +312,32 @@ const themes = [
         <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="cancelChange">{{ t('common.cancel') }}</button>
           <button class="ed-btn-primary" :disabled="saving" @click="confirmChange">{{ t('common.confirm') }}</button>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="connectOpen" :title="$t('settings.mailSync.outlookConnectTitle')">
+      <template #body>
+        <p class="note">{{ $t('settings.mailSync.outlookConnectHint') }}</p>
+        <form class="flex flex-col gap-3 mt-3" novalidate @submit.prevent="startOutlookConnect">
+          <UFormField :label="$t('settings.mailSync.clientId')" :help="$t('settings.mailSync.clientIdHelp')">
+            <UInput v-model="outlookForm.clientId" placeholder="00000000-0000-0000-0000-000000000000" class="w-full mono" />
+          </UFormField>
+          <UFormField :label="$t('settings.mailSync.tenantId')" :help="$t('settings.mailSync.tenantIdHelp')">
+            <UInput v-model="outlookForm.tenantId" class="w-full mono" />
+          </UFormField>
+          <UFormField :label="$t('settings.mailSync.connectionLabel')" :help="$t('settings.mailSync.connectionLabelHelp')">
+            <UInput v-model="outlookForm.label" placeholder="Work inbox" class="w-full" />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" @click="connectOpen = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" :disabled="connecting || !outlookForm.clientId.trim()" @click="startOutlookConnect">
+            <UIcon name="i-lucide-external-link" class="size-3.5" />
+            {{ $t('settings.mailSync.signInWith', { provider: 'Microsoft' }) }}
+          </button>
         </div>
       </template>
     </UModal>

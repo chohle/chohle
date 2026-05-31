@@ -537,6 +537,16 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
     `
+  },
+  {
+    name: '0031_mailboxes_provider_app_ids',
+    // Store the OAuth app's client_id (+ tenant_id for Outlook) on the
+    // mailbox row so the sync worker can refresh access tokens later. We
+    // can't extract these from the stored access token alone.
+    up: `
+      ALTER TABLE mailboxes ADD COLUMN provider_client_id TEXT;
+      ALTER TABLE mailboxes ADD COLUMN provider_tenant_id TEXT;
+    `
   }
 ]
 
