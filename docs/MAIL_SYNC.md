@@ -11,7 +11,7 @@ setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
 | ------------------------------------------- | ----------- | ------------------------------------ |
 | Microsoft 365 / Outlook                     | Available   | [OUTLOOK_SYNC](OUTLOOK_SYNC.md)      |
 | Gmail / Google Workspace                    | Available   | [GMAIL_SYNC](GMAIL_SYNC.md)          |
-| IMAP (Proton Bridge, Fastmail, iCloud, …)   | Coming soon | (planned)                            |
+| IMAP (Proton Bridge, Fastmail, iCloud, …)   | Available   | [IMAP_SYNC](IMAP_SYNC.md)            |
 
 ## Requirements
 

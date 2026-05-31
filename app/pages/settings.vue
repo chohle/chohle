@@ -33,6 +33,7 @@ const { data: mailboxes, refresh: refreshMailboxes } = await useFetch<MailboxRow
 
 const connectOpen = ref(false)
 const connectGmailOpen = ref(false)
+const connectImapOpen = ref(false)
 const connecting = ref(false)
 const outlookForm = reactive({
   clientId: '',
@@ -42,6 +43,13 @@ const outlookForm = reactive({
 const gmailForm = reactive({
   clientId: '',
   clientSecret: '',
+  label: ''
+})
+const imapForm = reactive({
+  host: '',
+  port: 993,
+  user: '',
+  password: '',
   label: ''
 })
 
@@ -57,6 +65,15 @@ function openConnectGmail() {
   gmailForm.clientSecret = ''
   gmailForm.label = ''
   connectGmailOpen.value = true
+}
+
+function openConnectImap() {
+  imapForm.host = ''
+  imapForm.port = 993
+  imapForm.user = ''
+  imapForm.password = ''
+  imapForm.label = ''
+  connectImapOpen.value = true
 }
 
 async function startOutlookConnect() {
@@ -81,6 +98,28 @@ async function startGmailConnect() {
       body: { clientId: gmailForm.clientId.trim(), clientSecret: gmailForm.clientSecret.trim(), label: gmailForm.label.trim() }
     })
     window.location.href = url
+  } catch (err) {
+    const msg = (err as { statusMessage?: string }).statusMessage ?? t('settings.mailSync.connectFailed')
+    toast.add({ title: msg, color: 'error' })
+  } finally { connecting.value = false }
+}
+
+async function startImapConnect() {
+  connecting.value = true
+  try {
+    await $fetch('/api/auth/imap/connect', {
+      method: 'POST',
+      body: {
+        host: imapForm.host.trim(),
+        port: Number(imapForm.port),
+        user: imapForm.user.trim(),
+        password: imapForm.password,
+        label: imapForm.label.trim()
+      }
+    })
+    connectImapOpen.value = false
+    toast.add({ title: t('settings.mailSync.connected'), color: 'success' })
+    await refreshMailboxes()
   } catch (err) {
     const msg = (err as { statusMessage?: string }).statusMessage ?? t('settings.mailSync.connectFailed')
     toast.add({ title: msg, color: 'error' })
@@ -283,13 +322,13 @@ const themes = [
                   <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.gmailDesc') }}</div>
                 </div>
               </button>
-              <div class="mail-sync__provider mail-sync__provider--soon">
+              <button class="mail-sync__provider" type="button" @click="openConnectImap">
                 <UIcon name="i-lucide-mail" class="size-5" />
                 <div>
                   <div class="mail-sync__provider-name">IMAP (Proton, Fastmail, iCloud, …)</div>
-                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.comingSoon') }}</div>
+                  <div class="mail-sync__provider-desc mono">{{ $t('settings.mailSync.imapDesc') }}</div>
                 </div>
-              </div>
+              </button>
             </div>
           </UiCard>
         </template>
@@ -339,6 +378,40 @@ const themes = [
         <div class="flex w-full justify-end gap-2">
           <button class="ed-btn-ghost" @click="cancelChange">{{ t('common.cancel') }}</button>
           <button class="ed-btn-primary" :disabled="saving" @click="confirmChange">{{ t('common.confirm') }}</button>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="connectImapOpen" :title="$t('settings.mailSync.imapConnectTitle')">
+      <template #body>
+        <p class="note">{{ $t('settings.mailSync.imapConnectHint') }}</p>
+        <form class="flex flex-col gap-3 mt-3" novalidate @submit.prevent="startImapConnect">
+          <div class="grid grid-cols-3 gap-3">
+            <UFormField :label="$t('settings.mailSync.imapHost')" class="col-span-2">
+              <UInput v-model="imapForm.host" placeholder="imap.example.com" class="w-full mono" />
+            </UFormField>
+            <UFormField :label="$t('settings.mailSync.imapPort')">
+              <UInput v-model.number="imapForm.port" type="number" class="w-full mono" />
+            </UFormField>
+          </div>
+          <UFormField :label="$t('settings.mailSync.imapUser')" :help="$t('settings.mailSync.imapUserHelp')">
+            <UInput v-model="imapForm.user" placeholder="you@example.com" class="w-full mono" />
+          </UFormField>
+          <UFormField :label="$t('settings.mailSync.imapPassword')" :help="$t('settings.mailSync.imapPasswordHelp')">
+            <UInput v-model="imapForm.password" type="password" class="w-full mono" />
+          </UFormField>
+          <UFormField :label="$t('settings.mailSync.connectionLabel')" :help="$t('settings.mailSync.connectionLabelHelp')">
+            <UInput v-model="imapForm.label" placeholder="Work inbox" class="w-full" />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" @click="connectImapOpen = false">{{ $t('common.cancel') }}</button>
+          <button class="ed-btn-primary" :disabled="connecting || !imapForm.host.trim() || !imapForm.user.trim() || !imapForm.password" @click="startImapConnect">
+            <UIcon name="i-lucide-plug" class="size-3.5" />
+            {{ $t('settings.mailSync.testAndConnect') }}
+          </button>
         </div>
       </template>
     </UModal>

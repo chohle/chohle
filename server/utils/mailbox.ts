@@ -95,3 +95,32 @@ export function insertGmailMailbox(db: import('better-sqlite3').Database, input:
   )
   return Number(info.lastInsertRowid)
 }
+
+export interface InsertImapMailboxInput {
+  label: string
+  emailAddress: string | null
+  host: string
+  port: number
+  user: string
+  password: string
+}
+
+// IMAP has no OAuth; the user supplies host/port/user/password directly.
+// We encrypt the password at rest (AES-256-GCM) like the OAuth tokens.
+// The connect endpoint must have already verified the credentials by
+// logging in once before calling this.
+export function insertImapMailbox(db: import('better-sqlite3').Database, input: InsertImapMailboxInput): number {
+  const info = db.prepare(
+    `INSERT INTO mailboxes (provider, label, email_address,
+                             imap_host, imap_port, imap_user, imap_password_enc)
+     VALUES ('imap', ?, ?, ?, ?, ?, ?)`
+  ).run(
+    input.label.trim() || input.emailAddress || input.user,
+    input.emailAddress,
+    input.host.trim(),
+    input.port,
+    input.user.trim(),
+    encryptSecret(input.password)
+  )
+  return Number(info.lastInsertRowid)
+}

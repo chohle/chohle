@@ -4,6 +4,7 @@
 
 import { syncOutlookMailbox, listOutlookMailboxes, recordSyncError } from '~~/server/utils/outlookSync'
 import { syncGmailMailbox, listGmailMailboxes } from '~~/server/utils/gmailSync'
+import { syncImapMailbox, listImapMailboxes } from '~~/server/utils/imapSync'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -34,6 +35,17 @@ export default defineEventHandler(async (event) => {
     if (!mailbox) throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })
     try {
       return { ok: true, ...(await syncGmailMailbox(db, mailbox)) }
+    } catch (err) {
+      const msg = (err as { message?: string }).message ?? 'sync failed'
+      recordSyncError(db, id, msg)
+      throw createError({ statusCode: 502, statusMessage: msg, cause: err })
+    }
+  }
+  if (provider === 'imap') {
+    const mailbox = listImapMailboxes(db).find(m => m.id === id)
+    if (!mailbox) throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })
+    try {
+      return { ok: true, ...(await syncImapMailbox(db, mailbox)) }
     } catch (err) {
       const msg = (err as { message?: string }).message ?? 'sync failed'
       recordSyncError(db, id, msg)
