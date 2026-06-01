@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import DOMPurify from 'isomorphic-dompurify'
+
+// The preview body is owner-authored template HTML with customer fields
+// substituted in; sanitize before binding via v-html, same as the inbound
+// email renderers in conversations.vue / ProjectDetailView.vue.
+function sanitizeHtml(html: string) {
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
+}
+
 interface ReminderRow {
   invoice_id: number
   number: string
@@ -251,7 +260,7 @@ function levelLabel(level: 1 | 2 | 3 | null) {
             <span class="eyebrow">{{ $t('reminders.previewSubject') }}</span>
             <span>{{ preview.subject }}</span>
           </div>
-          <div class="preview-body" v-html="preview.body" />
+          <div class="preview-body" v-html="sanitizeHtml(preview.body)" />
           <p class="note mt-3">{{ $t('reminders.previewAttachmentHint') }}</p>
         </div>
       </template>
