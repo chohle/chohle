@@ -1,33 +1,32 @@
 // Persisted desktop preference: icon-only collapsed sidebar.
 // Mobile uses the drawer (useMobileNav), independent of this.
+//
+// Stored in a cookie (not localStorage) so the server can read it during
+// SSR and render the correct collapsed/expanded state on first paint. That
+// keeps the `is-collapsed` class and the `--sidebar-w` width in sync and
+// avoids the hydration flash where a narrow column briefly shows full labels.
 
 const STORAGE_KEY = 'chohle.sidebar-collapsed'
-const COLLAPSED_W = '64px'
-const EXPANDED_W = '232px'
-
-const isCollapsed = ref(false)
-let initialised = false
-
-function applyWidth(collapsed: boolean) {
-  if (typeof document === 'undefined') return
-  document.documentElement.style.setProperty('--sidebar-w', collapsed ? COLLAPSED_W : EXPANDED_W)
-}
 
 export function useSidebarCollapse() {
-  if (!initialised && typeof window !== 'undefined') {
-    initialised = true
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw === '1') isCollapsed.value = true
-    } catch {}
-    applyWidth(isCollapsed.value)
-    watch(isCollapsed, (v) => {
-      try {
-        localStorage.setItem(STORAGE_KEY, v ? '1' : '0')
-      } catch {}
-      applyWidth(v)
-    })
-  }
+  const cookie = useCookie<boolean>(STORAGE_KEY, {
+    default: () => false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 365
+  })
+
+  // Shared reactive state seeded from the cookie so SSR and every component
+  // (layout, sidebar, topbar) read the same value; the cookie is persistence.
+  const state = useState<boolean>('sidebar-collapsed', () => !!cookie.value)
+
+  const isCollapsed = computed({
+    get: () => state.value,
+    set: (v) => {
+      state.value = v
+      cookie.value = v
+    }
+  })
 
   return {
     isCollapsed,

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const paletteOpen = ref(false)
 const { isOpen: mobileNavOpen, close: closeMobileNav } = useMobileNav()
+const { isCollapsed } = useSidebarCollapse()
 
 onMounted(() => {
   function onKey(e: KeyboardEvent) {
@@ -18,7 +19,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="app-shell">
+  <div class="app-shell" :class="{ 'is-nav-collapsed': isCollapsed }">
     <AppSidebar />
     <div
       v-if="mobileNavOpen"

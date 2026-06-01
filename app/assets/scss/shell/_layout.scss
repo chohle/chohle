@@ -3,6 +3,13 @@
   background: var(--bg);
   color: var(--ink);
 
+  // Collapsed desktop sidebar: narrow the shared width token here so the
+  // sidebar width and the content offset both follow the same reactive
+  // class, instead of an imperatively-set var that desyncs on reload.
+  &.is-nav-collapsed {
+    --sidebar-w: 64px;
+  }
+
   &__backdrop {
     position: fixed;
     inset: 0;
