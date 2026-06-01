@@ -46,13 +46,16 @@ export default defineEventHandler(async (event) => {
   if (!password) throw createError({ statusCode: 400, statusMessage: 'password is required' })
 
   // 993 is the IANA assigned port for IMAPS (implicit TLS). For other
-  // ports we let imapflow upgrade with STARTTLS when the server
-  // advertises it; rejected if the server is plain text only.
+  // ports requireTLS forces a STARTTLS upgrade and fails the connection
+  // if the server can't (or a MITM stripped it), so the password is never
+  // sent over cleartext. servername sets the SNI/cert-validation host.
   const secure = port === 993
   const client = new ImapFlow({
     host,
     port,
     secure,
+    requireTLS: true,
+    servername: host,
     auth: { user, pass: password },
     logger: false
   })

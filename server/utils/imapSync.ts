@@ -60,6 +60,8 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
     host: mailbox.imap_host,
     port: mailbox.imap_port,
     secure: mailbox.imap_port === 993,
+    requireTLS: true,
+    servername: mailbox.imap_host,
     auth: { user: mailbox.imap_user, pass: decryptSecret(mailbox.imap_password_enc) },
     logger: false
   })
