@@ -77,7 +77,31 @@
   .nav {
     flex: 1;
     overflow-y: auto;
+    overscroll-behavior: contain;
     padding-top: 6px;
+
+    // Keep the scroll affordance but hide the bulky default chrome: a thin
+    // track that stays invisible until the nav is hovered. Stops the ugly
+    // bar from sitting in the narrow collapsed column on shorter viewports.
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover {
+      scrollbar-color: var(--border) transparent;
+    }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: var(--radius-pill);
+    }
+    &:hover::-webkit-scrollbar-thumb {
+      background: var(--border);
+    }
   }
 
   .nav-section + .nav-section {
