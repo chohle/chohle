@@ -18,13 +18,10 @@ export const ALLOWED_RECEIPT_TYPES = [
   'image/gif'
 ]
 
-export const ALLOWED_IMAGE_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/gif',
-  'image/svg+xml'
-]
+// SVG is intentionally excluded: it can carry inline <script>/onload that
+// executes when the file is opened directly, and these uploads are served
+// from the app's own origin. Raster formats cover the logo use case.
+export const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif']
 
 const CONTENT_TYPES: Record<string, string> = {
   '.png': 'image/png',
@@ -32,7 +29,6 @@ const CONTENT_TYPES: Record<string, string> = {
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
   '.pdf': 'application/pdf'
 }
 
@@ -69,5 +65,7 @@ export function serveUpload(event: H3Event, storedName: string | null | undefine
     'Content-Type',
     CONTENT_TYPES[extname(storedName).toLowerCase()] ?? 'application/octet-stream'
   )
+  // Don't let the browser MIME-sniff a stored file into an executable type.
+  setHeader(event, 'X-Content-Type-Options', 'nosniff')
   return sendStream(event, createReadStream(path))
 }
