@@ -7,7 +7,7 @@ interface Tweaks {
 }
 
 const DEFAULTS: Tweaks = { theme: 'light' }
-const STORAGE_KEY = 'batze.tweaks'
+const STORAGE_KEY = 'chohle.tweaks'
 
 const state = ref<Tweaks>({ ...DEFAULTS })
 let initialised = false

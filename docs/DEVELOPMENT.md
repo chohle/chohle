@@ -1,6 +1,6 @@
 # Development
 
-batze runs entirely in Docker for development: the Nuxt app plus a Mailpit mail server.
+chohle runs entirely in Docker for development: the Nuxt app plus a Mailpit mail server.
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ docker compose exec app yarn install
 
 ## Database
 
-batze uses SQLite (better-sqlite3) at `data/batze.db`. The whole `data/` folder
+chohle uses SQLite (better-sqlite3) at `data/chohle.db`. The whole `data/` folder
 (database plus uploaded files) is your data: back it up and you have backed up
 everything. It is gitignored.
 
@@ -96,7 +96,7 @@ This only affects dev. The production build is a clean `yarn build`, not HMR.
 ## Production build
 
 ```bash
-docker build --target prod -t batze .
+docker build --target prod -t chohle .
 ```
 
 The production image runs the self-contained Nitro server with

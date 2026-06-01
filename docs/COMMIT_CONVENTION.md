@@ -1,6 +1,6 @@
 # Commit message convention
 
-batze uses [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
+chohle uses [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 A consistent history is easy to scan and lets us automate changelogs and versioning
 later.
 
@@ -36,7 +36,7 @@ later.
 
 ## Scopes
 
-The scope is optional and names the area touched. Common batze scopes:
+The scope is optional and names the area touched. Common chohle scopes:
 
 `expenses`, `income`, `customers`, `articles`, `invoices`, `categories`,
 `dashboard`, `auth`, `settings`, `db`, `ui`, `docker`, `deps`.

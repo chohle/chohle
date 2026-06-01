@@ -34,8 +34,8 @@ async function onSubmit() {
   <div class="page-login">
     <div class="page-login__card">
       <div class="page-login__brand">
-        <span class="page-login__mark">b</span>
-        <span class="page-login__name">batze</span>
+        <span class="page-login__mark">c</span>
+        <span class="page-login__name">chohle</span>
       </div>
       <p class="page-login__welcome">
         {{ $t('login.welcome') }}<span class="page-login__serif">.</span>

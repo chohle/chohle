@@ -5322,9 +5322,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"batze@workspace:.":
+"chohle@workspace:.":
   version: 0.0.0-use.local
-  resolution: "batze@workspace:."
+  resolution: "chohle@workspace:."
   dependencies:
     "@iconify-json/lucide": "npm:^1.2.109"
     "@nuxt/ui": "npm:^4.8.0"

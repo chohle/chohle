@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { decryptSecret, encryptSecret, secretIsAvailable } from '../server/utils/secrets'
 
 describe('secrets', () => {
-  const originalSecret = process.env.BATZE_SECRET
+  const originalSecret = process.env.CHOHLE_SECRET
 
   afterEach(() => {
-    if (originalSecret === undefined) delete process.env.BATZE_SECRET
-    else process.env.BATZE_SECRET = originalSecret
+    if (originalSecret === undefined) delete process.env.CHOHLE_SECRET
+    else process.env.CHOHLE_SECRET = originalSecret
   })
 
   it('round-trips a plaintext through encrypt + decrypt', () => {
@@ -44,14 +44,14 @@ describe('secrets', () => {
     expect(() => decryptSecret('not-three-parts')).toThrow(/malformed/)
   })
 
-  it('refuses to encrypt without BATZE_SECRET (or too short)', async () => {
+  it('refuses to encrypt without CHOHLE_SECRET (or too short)', async () => {
     // The module caches the derived key on first call, so we have to drop
     // it from the module cache and import a fresh copy with no env set.
-    delete process.env.BATZE_SECRET
+    delete process.env.CHOHLE_SECRET
     vi.resetModules()
     const mod = await import('../server/utils/secrets')
     expect(mod.secretIsAvailable()).toBe(false)
-    expect(() => mod.encryptSecret('x')).toThrow(/BATZE_SECRET/)
+    expect(() => mod.encryptSecret('x')).toThrow(/CHOHLE_SECRET/)
   })
 
   it('secretIsAvailable returns true when key is set', () => {

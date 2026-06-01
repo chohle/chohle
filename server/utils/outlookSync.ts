@@ -4,7 +4,7 @@
 // mailbox on a schedule (and the manual "Sync now" endpoint calls it
 // directly). It refreshes the access token if needed, pulls inbox
 // messages since the last sync, and inserts the ones whose
-// In-Reply-To / References headers match a Message-ID batze previously
+// In-Reply-To / References headers match a Message-ID chohle previously
 // captured on outbound. No whole-inbox import; only replies to mail we
 // actually sent.
 
@@ -160,9 +160,9 @@ export async function syncOutlookMailbox(
 
   const messages = await fetchInboxSince(token, lookback)
 
-  // Pre-load every Message-ID batze has captured on outbound so we can
+  // Pre-load every Message-ID chohle has captured on outbound so we can
   // match without hitting the DB per message. The map fits in memory for
-  // any realistic batze install and replaces a second sentIds Set whose
+  // any realistic chohle install and replaces a second sentIds Set whose
   // `.has` was always redundant with `projectByMsgId.has`.
   const projectByMsgId = new Map<string, number>()
   const outboundRows = db

@@ -52,8 +52,8 @@ function makeDb() {
   db.prepare(
     `INSERT INTO project_emails (project_id, direction, from_address, to_address,
                                   subject, body_html, body_text, message_id)
-     VALUES (?, 'outbound', 'us@batze.ch', 'thomas@acme.ch', 'Proposal',
-             '<p>Hi Thomas</p>', 'Hi Thomas', 'original-1@batze.ch')`
+     VALUES (?, 'outbound', 'us@chohle.ch', 'thomas@acme.ch', 'Proposal',
+             '<p>Hi Thomas</p>', 'Hi Thomas', 'original-1@chohle.ch')`
   ).run(projectId)
 
   return { db, projectId }
@@ -63,8 +63,8 @@ function makeMailbox(db: Database.Database) {
   db.prepare(
     `INSERT INTO mailboxes (provider, label, email_address,
                              imap_host, imap_port, imap_user, imap_password_enc)
-     VALUES ('imap', 'Test', 'us@batze.ch', 'imap.example.com', 993,
-             'us@batze.ch', ?)`
+     VALUES ('imap', 'Test', 'us@chohle.ch', 'imap.example.com', 993,
+             'us@chohle.ch', ?)`
   ).run(encryptSecret('imap-password'))
   return db
     .prepare(
@@ -93,7 +93,7 @@ function buildRfc5322(m: MessageFixture): string {
     m.inReplyTo ? `In-Reply-To: <${m.inReplyTo}>` : null,
     m.references ? `References: ${m.references}` : null,
     `From: ${m.from ?? 'someone@example.com'}`,
-    `To: ${m.to ?? 'us@batze.ch'}`,
+    `To: ${m.to ?? 'us@chohle.ch'}`,
     `Subject: ${m.subject ?? '(no subject)'}`,
     `Date: ${m.date ?? new Date().toUTCString()}`,
     'MIME-Version: 1.0',
@@ -132,8 +132,8 @@ describe('syncImapMailbox', () => {
       {
         uid: 1,
         messageId: 'reply-1@acme.ch',
-        inReplyTo: 'original-1@batze.ch',
-        references: '<original-1@batze.ch>',
+        inReplyTo: 'original-1@chohle.ch',
+        references: '<original-1@chohle.ch>',
         subject: 'Re: Proposal',
         from: 'Thomas <thomas@acme.ch>',
         body: 'Sounds great'
@@ -184,7 +184,7 @@ describe('syncImapMailbox', () => {
     const fixture = {
       uid: 1,
       messageId: 'reply-1@acme.ch',
-      inReplyTo: 'original-1@batze.ch',
+      inReplyTo: 'original-1@chohle.ch',
       subject: 'Re: Proposal'
     }
     stubFetch([fixture])
@@ -214,14 +214,14 @@ describe('syncImapMailbox', () => {
     const { db, projectId } = makeDb()
     db.prepare(
       `INSERT INTO project_emails (project_id, direction, message_id, subject, body_html, body_text)
-       VALUES (?, 'outbound', 'original-2@batze.ch', 'Follow up', '', '')`
+       VALUES (?, 'outbound', 'original-2@chohle.ch', 'Follow up', '', '')`
     ).run(projectId)
     const mailbox = makeMailbox(db)
     stubFetch([
       {
         uid: 1,
         messageId: 'reply-2@acme.ch',
-        references: '<some-other@x.com> <original-2@batze.ch>',
+        references: '<some-other@x.com> <original-2@chohle.ch>',
         subject: 'Re: Follow up'
       }
     ])

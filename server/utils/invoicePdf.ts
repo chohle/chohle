@@ -129,7 +129,7 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
     .fillColor('#000')
     .font('Helvetica-Bold')
     .fontSize(16)
-    .text(sender.name || 'batze', 50, 50)
+    .text(sender.name || 'chohle', 50, 50)
   pdf
     .font('Helvetica')
     .fontSize(9)

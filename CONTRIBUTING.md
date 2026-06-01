@@ -1,6 +1,6 @@
-# Contributing to batze
+# Contributing to chohle
 
-batze is a single-user, self-hosted finance tool for a solo Swiss freelancer or
+chohle is a single-user, self-hosted finance tool for a solo Swiss freelancer or
 one-person company. Contributions that keep it lean, correct, and private are
 welcome.
 

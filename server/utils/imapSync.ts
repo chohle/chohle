@@ -6,7 +6,7 @@
 // manual "Sync now" endpoint. It opens a real IMAP session, searches
 // the INBOX for messages newer than last_sync_at, parses each one with
 // mailparser, and inserts the ones whose In-Reply-To / References
-// match a Message-ID batze previously captured on outbound.
+// match a Message-ID chohle previously captured on outbound.
 
 import type { Database } from 'better-sqlite3'
 import { ImapFlow, type FetchMessageObject } from 'imapflow'
@@ -64,7 +64,7 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
     logger: false
   })
 
-  // Pre-load every Message-ID batze has captured on outbound so we can
+  // Pre-load every Message-ID chohle has captured on outbound so we can
   // match without hitting the DB per message.
   const projectByMsgId = new Map<string, number>()
   const outboundRows = db

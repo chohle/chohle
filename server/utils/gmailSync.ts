@@ -5,7 +5,7 @@
 // endpoint calls it directly). It refreshes the access token if needed,
 // lists inbox message IDs since the last sync, fetches each message's
 // headers + body, and inserts the ones whose In-Reply-To / References
-// match a Message-ID batze previously captured on outbound. No
+// match a Message-ID chohle previously captured on outbound. No
 // whole-inbox import; only replies to mail we actually sent.
 
 import type { Database } from 'better-sqlite3'
@@ -175,7 +175,7 @@ export async function syncGmailMailbox(
 
   const ids = await listInboxIdsSince(token, sinceUnix)
 
-  // Pre-load every Message-ID batze has captured on outbound so we can
+  // Pre-load every Message-ID chohle has captured on outbound so we can
   // match without hitting the DB per message.
   const projectByMsgId = new Map<string, number>()
   const outboundRows = db

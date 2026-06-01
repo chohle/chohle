@@ -12,6 +12,6 @@ const defaultFetch = vi.fn(async () => {
 })
 vi.stubGlobal('$fetch', defaultFetch)
 
-// outlookSync.ts encrypts/decrypts via BATZE_SECRET. Set a deterministic
+// outlookSync.ts encrypts/decrypts via CHOHLE_SECRET. Set a deterministic
 // value so encrypt+decrypt round-trips work in tests.
-process.env.BATZE_SECRET ??= 'test-secret-for-vitest-runs-only'
+process.env.CHOHLE_SECRET ??= 'test-secret-for-vitest-runs-only'

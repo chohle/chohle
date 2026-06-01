@@ -33,8 +33,8 @@ function makeDb() {
   db.prepare(
     `INSERT INTO project_emails (project_id, direction, from_address, to_address,
                                   subject, body_html, body_text, message_id)
-     VALUES (?, 'outbound', 'us@batze.ch', 'thomas@acme.ch', 'Proposal',
-             '<p>Hi Thomas</p>', 'Hi Thomas', 'original-1@batze.ch')`
+     VALUES (?, 'outbound', 'us@chohle.ch', 'thomas@acme.ch', 'Proposal',
+             '<p>Hi Thomas</p>', 'Hi Thomas', 'original-1@chohle.ch')`
   ).run(projectId)
 
   return { db, projectId }
@@ -46,7 +46,7 @@ function makeMailbox(db: Database.Database, opts: { tokenExpiresAt?: string } = 
     `INSERT INTO mailboxes (provider, label, email_address, access_token_enc,
                              refresh_token_enc, token_expires_at,
                              provider_client_id, provider_client_secret_enc)
-     VALUES ('gmail', 'Test', 'us@batze.ch', ?, ?, ?, ?, ?)`
+     VALUES ('gmail', 'Test', 'us@chohle.ch', ?, ?, ?, ?, ?)`
   ).run(
     encryptSecret('fake-access-token'),
     encryptSecret('fake-refresh-token'),
@@ -129,11 +129,11 @@ const matchingReply: GmailMessageStub = {
   internalDate: String(Date.parse('2026-05-31T10:00:00Z')),
   headers: [
     { name: 'Message-Id', value: '<reply-1@gmail.com>' },
-    { name: 'In-Reply-To', value: '<original-1@batze.ch>' },
-    { name: 'References', value: '<original-1@batze.ch>' },
+    { name: 'In-Reply-To', value: '<original-1@chohle.ch>' },
+    { name: 'References', value: '<original-1@chohle.ch>' },
     { name: 'Subject', value: 'Re: Proposal' },
     { name: 'From', value: 'Thomas <thomas@acme.ch>' },
-    { name: 'To', value: 'us@batze.ch' }
+    { name: 'To', value: 'us@chohle.ch' }
   ],
   htmlBody: '<p>Sounds great</p>',
   textBody: 'Sounds great'
@@ -240,7 +240,7 @@ describe('syncGmailMailbox', () => {
     const { db, projectId } = makeDb()
     db.prepare(
       `INSERT INTO project_emails (project_id, direction, message_id, subject, body_html, body_text)
-       VALUES (?, 'outbound', 'original-2@batze.ch', 'Follow up', '', '')`
+       VALUES (?, 'outbound', 'original-2@chohle.ch', 'Follow up', '', '')`
     ).run(projectId)
     const mailbox = makeMailbox(db)
     stubGmail({
@@ -250,7 +250,7 @@ describe('syncGmailMailbox', () => {
           id: 'gmsg2',
           headers: [
             { name: 'Message-Id', value: '<reply-2@gmail.com>' },
-            { name: 'References', value: '<some-other@x.com> <original-2@batze.ch>' },
+            { name: 'References', value: '<some-other@x.com> <original-2@chohle.ch>' },
             { name: 'Subject', value: 'Re: Follow up' },
             { name: 'From', value: 'thomas@acme.ch' }
           ],

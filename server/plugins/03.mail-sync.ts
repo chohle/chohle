@@ -1,6 +1,6 @@
 // Background mail sync.
 //
-// Every BATZE_MAIL_SYNC_INTERVAL_MS (default 5 minutes) we walk every
+// Every CHOHLE_MAIL_SYNC_INTERVAL_MS (default 5 minutes) we walk every
 // connected mailbox and pull inbound replies via its provider driver
 // (Outlook + Gmail + generic IMAP). The first run fires 30s after boot
 // so the app finishes hydrating before we start hammering external
@@ -26,7 +26,7 @@ let runningPromise: Promise<void> | null = null
 
 async function runOnce(): Promise<void> {
   if (runningPromise) return runningPromise
-  // Guard before claiming the lock so a missing BATZE_SECRET doesn't
+  // Guard before claiming the lock so a missing CHOHLE_SECRET doesn't
   // leave a resolved promise stuck in runningPromise forever (the IIFE's
   // finally only fires when we enter the try below).
   if (!secretIsAvailable()) return
@@ -85,7 +85,7 @@ async function runOnce(): Promise<void> {
 }
 
 export default defineNitroPlugin(() => {
-  const interval = Number(process.env.BATZE_MAIL_SYNC_INTERVAL_MS) || DEFAULT_INTERVAL_MS
+  const interval = Number(process.env.CHOHLE_MAIL_SYNC_INTERVAL_MS) || DEFAULT_INTERVAL_MS
   // Skip in test runs and in build output where we have no DB.
   if (process.env.NODE_ENV === 'test') return
 

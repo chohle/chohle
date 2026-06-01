@@ -522,7 +522,7 @@ const migrations: Migration[] = [
         provider TEXT NOT NULL CHECK (provider IN ('outlook', 'gmail', 'imap')),
         label TEXT NOT NULL DEFAULT '',
         email_address TEXT,
-        -- Encrypted with BATZE_SECRET (see server/utils/secrets.ts).
+        -- Encrypted with CHOHLE_SECRET (see server/utils/secrets.ts).
         access_token_enc TEXT,
         refresh_token_enc TEXT,
         token_expires_at TEXT,
@@ -553,7 +553,7 @@ const migrations: Migration[] = [
     // Google's Web OAuth client requires a client_secret on the token
     // exchange even when PKCE is in use (only Desktop/Installed client
     // types skip it, and those need loopback redirects which don't fit
-    // hosted batze). Stored encrypted at rest like the tokens.
+    // hosted chohle). Stored encrypted at rest like the tokens.
     up: `
       ALTER TABLE mailboxes ADD COLUMN provider_client_secret_enc TEXT;
     `

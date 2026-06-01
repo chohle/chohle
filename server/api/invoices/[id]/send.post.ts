@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
 
   const from = sender.email
     ? `${sender.name} <${sender.email}>`
-    : `${sender.name} <no-reply@batze.local>`
+    : `${sender.name} <no-reply@chohle.local>`
   await getMailer().sendMail({
     from,
     to: customer.email,

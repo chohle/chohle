@@ -35,8 +35,8 @@ function makeDb() {
   db.prepare(
     `INSERT INTO project_emails (project_id, direction, from_address, to_address,
                                   subject, body_html, body_text, message_id)
-     VALUES (?, 'outbound', 'us@batze.ch', 'thomas@acme.ch', 'Proposal',
-             '<p>Hi Thomas</p>', 'Hi Thomas', 'original-1@batze.ch')`
+     VALUES (?, 'outbound', 'us@chohle.ch', 'thomas@acme.ch', 'Proposal',
+             '<p>Hi Thomas</p>', 'Hi Thomas', 'original-1@chohle.ch')`
   ).run(projectId)
 
   return { db, projectId }
@@ -49,7 +49,7 @@ function makeMailbox(db: Database.Database, opts: { tokenExpiresAt?: string } = 
     `INSERT INTO mailboxes (provider, label, email_address, access_token_enc,
                              refresh_token_enc, token_expires_at,
                              provider_client_id, provider_tenant_id)
-     VALUES ('outlook', 'Test', 'us@batze.ch', ?, ?, ?, ?, ?)`
+     VALUES ('outlook', 'Test', 'us@chohle.ch', ?, ?, ?, ?, ?)`
   ).run(
     encryptSecret('fake-access-token'),
     encryptSecret('fake-refresh-token'),
@@ -92,11 +92,11 @@ const replyMatching: GraphMessage = {
   bodyPreview: "Sounds great, let's do it.",
   body: { contentType: 'html', content: '<p>Sounds great, let&apos;s do it.</p>' },
   from: { emailAddress: { address: 'thomas@acme.ch', name: 'Thomas' } },
-  toRecipients: [{ emailAddress: { address: 'us@batze.ch' } }],
+  toRecipients: [{ emailAddress: { address: 'us@chohle.ch' } }],
   receivedDateTime: '2026-05-31T10:00:00Z',
   internetMessageHeaders: [
-    { name: 'In-Reply-To', value: '<original-1@batze.ch>' },
-    { name: 'References', value: '<original-1@batze.ch>' }
+    { name: 'In-Reply-To', value: '<original-1@chohle.ch>' },
+    { name: 'References', value: '<original-1@chohle.ch>' }
   ]
 }
 
@@ -106,7 +106,7 @@ const replyUnrelated: GraphMessage = {
   subject: 'Buy more synergy',
   body: { contentType: 'text', content: 'Limited time offer' },
   from: { emailAddress: { address: 'spam@spam.com' } },
-  toRecipients: [{ emailAddress: { address: 'us@batze.ch' } }],
+  toRecipients: [{ emailAddress: { address: 'us@chohle.ch' } }],
   receivedDateTime: '2026-05-31T11:00:00Z',
   internetMessageHeaders: []
 }
@@ -191,7 +191,7 @@ describe('syncOutlookMailbox', () => {
     // Add a second outbound so References has more than one matching anchor.
     db.prepare(
       `INSERT INTO project_emails (project_id, direction, message_id, subject, body_html, body_text)
-       VALUES (?, 'outbound', 'original-2@batze.ch', 'Follow up', '', '')`
+       VALUES (?, 'outbound', 'original-2@chohle.ch', 'Follow up', '', '')`
     ).run(projectId)
     const mailbox = makeMailbox(db)
     stubGraphResponses([
@@ -201,7 +201,7 @@ describe('syncOutlookMailbox', () => {
             ...replyMatching,
             internetMessageId: '<reply-2@outlook.com>',
             internetMessageHeaders: [
-              { name: 'References', value: '<some-other@x.com> <original-2@batze.ch>' }
+              { name: 'References', value: '<some-other@x.com> <original-2@chohle.ch>' }
             ]
           }
         ]

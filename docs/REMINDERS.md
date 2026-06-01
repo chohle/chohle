@@ -1,6 +1,6 @@
 # Mahnungen (overdue payment reminders)
 
-batze can send escalating reminders for overdue invoices. Three
+chohle can send escalating reminders for overdue invoices. Three
 levels per Swiss practice: **1. Mahnung**, **2. Mahnung**, **letzte
 Mahnung** (1st reminder, 2nd reminder, final notice).
 
@@ -69,14 +69,14 @@ useful.
 
 Each reminder is one email:
 
-- **From**: your sender name + email (or `no-reply@batze.local` if
+- **From**: your sender name + email (or `no-reply@chohle.local` if
   the sender has no email set).
 - **To**: the customer's email address (required).
 - **Subject + body**: rendered from the level template.
 - **Attachment**: the original invoice PDF, regenerated fresh so it
   always reflects the current invoice rows.
 
-Before sending, batze validates that your sender block has a valid
+Before sending, chohle validates that your sender block has a valid
 IBAN and a complete street / zip / city. That's the same gate as
 the regular invoice send because the PDF needs them for the QR
 slip.
@@ -103,7 +103,7 @@ curl -X POST http://localhost:3000/api/invoices/42/remind \
   -d '{"level": 2}'
 ```
 
-batze will skip the auto pick and use the level you specified.
+chohle will skip the auto pick and use the level you specified.
 
 ## Not in this version
 

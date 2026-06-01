@@ -23,8 +23,8 @@ function handleReload() {
   <UApp :locale="uiLocale">
     <div class="err-wrap">
       <NuxtLink to="/" class="err-brand">
-        <span class="err-mark">b</span>
-        <span class="err-name">batze</span>
+        <span class="err-mark">c</span>
+        <span class="err-name">chohle</span>
       </NuxtLink>
 
       <div class="err-code mono">{{ statusCode }}</div>

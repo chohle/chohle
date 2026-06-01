@@ -3,13 +3,13 @@
 Connects your **Google Workspace or personal Gmail** mailbox so replies
 to emails you send from a project land back in the project's
 Conversations thread automatically. This document covers the Gmail
-specific setup. For the shared concepts (BATZE_SECRET, threading, what
+specific setup. For the shared concepts (CHOHLE_SECRET, threading, what
 gets synced, where to find it in the UI) see
 [MAIL_SYNC](MAIL_SYNC.md).
 
 ## Prerequisites
 
-- `BATZE_SECRET` set on the running batze instance (see
+- `CHOHLE_SECRET` set on the running chohle instance (see
   [MAIL_SYNC](MAIL_SYNC.md#requirements)).
 - A Google account with access to https://console.cloud.google.com so
   you can create a Google Cloud project and an OAuth client. Any
@@ -19,7 +19,7 @@ gets synced, where to find it in the UI) see
 
 1. Sign in to https://console.cloud.google.com.
 2. Top bar → project picker → **New Project**.
-3. Name it `batze` (any name works, just for your reference) and
+3. Name it `chohle` (any name works, just for your reference) and
    create. Make sure that project is selected in the top bar before
    continuing.
 
@@ -37,9 +37,9 @@ gets synced, where to find it in the UI) see
      only want users in your own workspace to connect.
    - **External** for personal `@gmail.com` accounts or anyone outside
      your workspace.
-3. Fill in **App name** (`batze`), **User support email**, and
+3. Fill in **App name** (`chohle`), **User support email**, and
    **Developer contact** with your own email.
-4. **Scopes**: add the three batze needs:
+4. **Scopes**: add the three chohle needs:
 
    | Scope                                            | Why                                                            |
    | ------------------------------------------------ | -------------------------------------------------------------- |
@@ -51,49 +51,49 @@ gets synced, where to find it in the UI) see
    the consent screen is in **Testing** state, only listed test users
    can sign in. You can leave it in Testing forever for personal use;
    only publish if you want others to be able to connect their own
-   accounts to your batze instance.
+   accounts to your chohle instance.
 
 ## Step 4: create the OAuth client
 
 1. **APIs & Services** → **Credentials** → **Create credentials** →
    **OAuth client ID**.
 2. **Application type**: **Web application**.
-3. **Name**: `batze` (any name).
-4. **Authorized redirect URIs**: add your batze callback. For local
+3. **Name**: `chohle` (any name).
+4. **Authorized redirect URIs**: add your chohle callback. For local
    dev:
 
    ```text
    http://localhost:3000/api/auth/gmail/callback
    ```
 
-   For a hosted batze, swap in your domain.
+   For a hosted chohle, swap in your domain.
 
 5. Click **Create**. A dialog shows your **Client ID** and **Client
-   secret**. Copy both into batze. The secret is also visible later
+   secret**. Copy both into chohle. The secret is also visible later
    from the same Credentials page.
 
-## Step 5: connect from batze
+## Step 5: connect from chohle
 
-1. Open batze and go to **Settings → Mail sync**.
+1. Open chohle and go to **Settings → Mail sync**.
 2. Click **Google / Gmail**.
 3. Paste the Client ID and Client Secret you copied above.
 4. Optionally set a label (defaults to your Google profile name).
 5. Click **Sign in with Google**.
 6. A Google consent screen opens. Sign in and approve the requested
    scopes.
-7. You're redirected back to batze and the mailbox shows up in the
+7. You're redirected back to chohle and the mailbox shows up in the
    connected list.
 
 ## Disconnecting
 
-Settings → Mail sync → row → **Disconnect**. batze forgets the tokens
-locally. To revoke at Google's side too, remove batze from
+Settings → Mail sync → row → **Disconnect**. chohle forgets the tokens
+locally. To revoke at Google's side too, remove chohle from
 [myaccount.google.com/permissions](https://myaccount.google.com/permissions).
 
 ## Gmail specific troubleshooting
 
 - **"Error 400: redirect_uri_mismatch"**: the redirect URI in your
-  Google OAuth client must exactly match the one batze posts.
+  Google OAuth client must exactly match the one chohle posts.
   Including the scheme, host, port, and path. Add the exact URL under
   **Credentials** → your client → **Authorized redirect URIs**.
 - **"Access blocked: This app's request is invalid"** or
@@ -105,11 +105,11 @@ locally. To revoke at Google's side too, remove batze from
   Secret you pasted is wrong. Copy it again from **Credentials** →
   your client. Note that secrets are displayed only once at creation;
   if you lost it you can rotate it from the same page.
-- **"Google did not return a refresh_token"**: batze always requests
+- **"Google did not return a refresh_token"**: chohle always requests
   `access_type=offline` with `prompt=consent`, so this should not
   happen on a fresh consent. If it does, disconnect the mailbox and
   reconnect; Google will reissue a refresh token.
 
-For non Gmail troubleshooting (BATZE_SECRET, threading not matching,
+For non Gmail troubleshooting (CHOHLE_SECRET, threading not matching,
 manual Sync now button etc.) see
 [MAIL_SYNC](MAIL_SYNC.md#troubleshooting).

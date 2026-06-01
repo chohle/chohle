@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const db = new Database(join(root, 'data', 'batze.db'))
+const db = new Database(join(root, 'data', 'chohle.db'))
 db.pragma('foreign_keys = ON')
 
 const chf = (amount) => Math.round(amount * 100)
@@ -147,9 +147,9 @@ for (const m of months) {
 // --- Sender (your business identity) ------------------------------------
 db.prepare('INSERT OR IGNORE INTO sender (id) VALUES (1)').run()
 db.prepare(
-  `UPDATE sender SET type='company', name='batze GmbH', street='Bahnhofstrasse 12',
-     zip='6003', city='Luzern', country='CH', email='hello@batze.ch', phone='+41 41 555 12 34',
-     website='batze.ch', iban='CH93 0076 2011 6238 5295 7', uid='CHE-123.456.789',
+  `UPDATE sender SET type='company', name='chohle GmbH', street='Bahnhofstrasse 12',
+     zip='6003', city='Luzern', country='CH', email='hello@chohle.ch', phone='+41 41 555 12 34',
+     website='chohle.ch', iban='CH93 0076 2011 6238 5295 7', uid='CHE-123.456.789',
      mwst='CHE-123.456.789 MWST', hr_number='CH-100.4.789.012-3', founding_year=2021,
      vat_registered=1 WHERE id=1`
 ).run()
@@ -535,11 +535,11 @@ const insertEmail = db.prepare(
 insertEmail.run(
   proposalProjectId,
   'outbound',
-  'hello@batze.ch',
+  'hello@chohle.ch',
   'info@muellerbau.ch',
   'Proposal: Marketing site',
-  '<p>Hi Thomas,</p><p>Following up on our call, please find attached the proposal for the new Müller Bau marketing site.</p><p>Budget: CHF 6,000 fixed price, two milestones.</p><p>Looking forward to your feedback.</p><p>Best,<br>batze</p>',
-  'Hi Thomas,\n\nFollowing up on our call, please find attached the proposal for the new Müller Bau marketing site.\n\nBudget: CHF 6,000 fixed price, two milestones.\n\nLooking forward to your feedback.\n\nBest,\nbatze',
+  '<p>Hi Thomas,</p><p>Following up on our call, please find attached the proposal for the new Müller Bau marketing site.</p><p>Budget: CHF 6,000 fixed price, two milestones.</p><p>Looking forward to your feedback.</p><p>Best,<br>chohle</p>',
+  'Hi Thomas,\n\nFollowing up on our call, please find attached the proposal for the new Müller Bau marketing site.\n\nBudget: CHF 6,000 fixed price, two milestones.\n\nLooking forward to your feedback.\n\nBest,\nchohle',
   day(0, 6) + ' 10:32:00',
   day(0, 6) + ' 10:32:00'
 )

@@ -117,7 +117,7 @@ function printPage() {
         <!-- Logo -->
         <div class="mb-16 h-12">
           <img v-if="senderLogo" :src="senderLogo" alt="Logo" class="h-12 object-contain" />
-          <div v-else class="text-2xl font-bold tracking-tight">{{ sender?.name || 'batze' }}</div>
+          <div v-else class="text-2xl font-bold tracking-tight">{{ sender?.name || 'chohle' }}</div>
         </div>
 
         <!-- Meta block (left) + addresses (right) -->

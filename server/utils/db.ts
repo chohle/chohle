@@ -9,7 +9,7 @@ let db: Database.Database | null = null
 export function useDb(): Database.Database {
   if (db) return db
 
-  const file = process.env.DATABASE_PATH || 'data/batze.db'
+  const file = process.env.DATABASE_PATH || 'data/chohle.db'
   mkdirSync(dirname(file), { recursive: true })
 
   db = new Database(file)

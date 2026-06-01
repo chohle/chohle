@@ -5,9 +5,9 @@ export default defineEventHandler(async () => {
   }
 
   const info = await getMailer().sendMail({
-    from: 'batze <no-reply@batze.local>',
-    to: 'owner@batze.local',
-    subject: 'Mailpit test from batze',
+    from: 'chohle <no-reply@chohle.local>',
+    to: 'owner@chohle.local',
+    subject: 'Mailpit test from chohle',
     text: 'If you can read this in Mailpit, the SMTP pipe works.'
   })
 

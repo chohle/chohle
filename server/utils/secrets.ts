@@ -1,5 +1,5 @@
 // AES-256-GCM symmetric encryption for at-rest secrets (OAuth tokens,
-// IMAP passwords). The key is derived from `process.env.BATZE_SECRET`
+// IMAP passwords). The key is derived from `process.env.CHOHLE_SECRET`
 // via SHA-256 so any non-empty string yields a valid 32-byte key.
 //
 // Stored format: `<iv hex>:<authTag hex>:<ciphertext hex>` so the row
@@ -7,7 +7,7 @@
 // 12-byte IV is generated fresh per encryption (NIST recommends 96 bits
 // for GCM); never reused for the same key.
 //
-// Rotating BATZE_SECRET invalidates every stored token; affected
+// Rotating CHOHLE_SECRET invalidates every stored token; affected
 // mailboxes need to be reconnected. Acceptable for a single user
 // self-hosted tool.
 
@@ -20,9 +20,9 @@ let cachedKey: Buffer | null = null
 
 function getKey(): Buffer {
   if (cachedKey) return cachedKey
-  const raw = process.env.BATZE_SECRET
+  const raw = process.env.CHOHLE_SECRET
   if (!raw || raw.length < 16) {
-    throw new Error('BATZE_SECRET is required (16+ chars) to encrypt mailbox credentials')
+    throw new Error('CHOHLE_SECRET is required (16+ chars) to encrypt mailbox credentials')
   }
   cachedKey = createHash('sha256').update(raw, 'utf8').digest()
   return cachedKey
@@ -47,7 +47,7 @@ export function decryptSecret(stored: string): string {
   return dec.toString('utf8')
 }
 
-// `secretIsAvailable` lets the UI surface a helpful "set BATZE_SECRET" hint
+// `secretIsAvailable` lets the UI surface a helpful "set CHOHLE_SECRET" hint
 // instead of failing the first encrypt() call deep in an OAuth callback.
 export function secretIsAvailable(): boolean {
   try {

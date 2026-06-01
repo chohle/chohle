@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💸 batze
+# 💸 chohle
 
 **A clean, self-hosted finance tool for one person.**
 
@@ -18,9 +18,9 @@ server, no subscription.
 
 ---
 
-## What is batze?
+## What is chohle?
 
-batze (Swiss-German slang for money) is a single-user finance app for a Swiss
+chohle (Swiss-German slang for money) is a single-user finance app for a Swiss
 freelancer or one-person GmbH. It handles the boring money admin of running a solo
 business, from "I bought something" to "I sent the invoice and got paid", without a
 SaaS subscription and without your financial data living on someone else's server.
@@ -50,11 +50,11 @@ cantonal public holidays, and the QR-bill are first-class, not afterthoughts.
 
 ## Quick start
 
-batze runs in Docker.
+chohle runs in Docker.
 
 ```bash
-git clone https://github.com/zeaiso/batze.git
-cd batze
+git clone https://github.com/zeaiso/chohle.git
+cd chohle
 cp .env.example .env   # then edit the secrets
 docker compose up
 ```

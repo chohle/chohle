@@ -1,6 +1,6 @@
 # Quotes (Offerten / Devis / Offerte)
 
-batze quotes are pre sale proposals that turn into invoices when the
+chohle quotes are pre sale proposals that turn into invoices when the
 customer accepts. Same shape as an invoice minus payment specific
 bits: there's no QR slip on the PDF (a quote isn't a payment
 instrument), no due date, and the validity window uses a `valid_until`

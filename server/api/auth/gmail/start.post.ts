@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   if (!secretIsAvailable()) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'BATZE_SECRET environment variable must be set before connecting a mailbox'
+      statusMessage: 'CHOHLE_SECRET environment variable must be set before connecting a mailbox'
     })
   }
 

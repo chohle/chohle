@@ -121,9 +121,9 @@ const userMenu = computed<DropdownMenuItem[][]>(() => [
 <template>
   <aside class="app-sidebar" :class="{ 'is-open': mobileOpen, 'is-collapsed': isCollapsed }">
     <div class="brand">
-      <NuxtLink to="/" class="brand-link" aria-label="batze">
-        <img v-if="!isCollapsed" src="/logo.svg" alt="batze" class="brand-logo" />
-        <span v-else class="brand-mark" aria-hidden="true">b</span>
+      <NuxtLink to="/" class="brand-link" aria-label="chohle">
+        <img v-if="!isCollapsed" src="/chohle.svg" alt="chohle" class="brand-logo" />
+        <span v-else class="brand-mark" aria-hidden="true">c</span>
       </NuxtLink>
       <button
         class="app-sidebar__close"
