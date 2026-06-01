@@ -557,6 +557,38 @@ const migrations: Migration[] = [
     up: `
       ALTER TABLE mailboxes ADD COLUMN provider_client_secret_enc TEXT;
     `
+  },
+  {
+    name: '0033_invoice_reminders',
+    // Mahnungen / overdue payment reminders. Three escalation levels per
+    // Swiss practice; each level has its own subject + body template +
+    // wait days (days to wait after due date for level 1, then after
+    // the previous reminder for levels 2 and 3). Sent reminders log to
+    // invoice_reminders so we can show history per invoice, compute
+    // eligibility for the next level, and dedup ("already sent today").
+    up: `
+      CREATE TABLE invoice_reminders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        invoice_id INTEGER NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+        level INTEGER NOT NULL CHECK (level BETWEEN 1 AND 3),
+        sent_at TEXT NOT NULL DEFAULT (datetime('now')),
+        subject TEXT NOT NULL,
+        body TEXT NOT NULL
+      );
+      CREATE INDEX idx_invoice_reminders_invoice ON invoice_reminders(invoice_id);
+
+      ALTER TABLE sender ADD COLUMN reminder1_wait_days INTEGER NOT NULL DEFAULT 7;
+      ALTER TABLE sender ADD COLUMN reminder1_subject TEXT NOT NULL DEFAULT 'Zahlungserinnerung Rechnung {number}';
+      ALTER TABLE sender ADD COLUMN reminder1_body TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>vermutlich entgangen: die Rechnung {number} vom {issued} über CHF {amount} ist seit dem {due} fällig.</p><p>Wir bitten Sie, den Betrag in den nächsten Tagen zu überweisen.</p><p>Freundliche Grüsse<br>{sender}</p>';
+
+      ALTER TABLE sender ADD COLUMN reminder2_wait_days INTEGER NOT NULL DEFAULT 14;
+      ALTER TABLE sender ADD COLUMN reminder2_subject TEXT NOT NULL DEFAULT '2. Mahnung Rechnung {number}';
+      ALTER TABLE sender ADD COLUMN reminder2_body TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>trotz unserer ersten Zahlungserinnerung ist die Rechnung {number} über CHF {amount} (fällig seit {due}, {days_overdue} Tage überfällig) weiterhin offen.</p><p>Wir bitten Sie, den Betrag umgehend zu begleichen.</p><p>Freundliche Grüsse<br>{sender}</p>';
+
+      ALTER TABLE sender ADD COLUMN reminder3_wait_days INTEGER NOT NULL DEFAULT 30;
+      ALTER TABLE sender ADD COLUMN reminder3_subject TEXT NOT NULL DEFAULT 'Letzte Mahnung Rechnung {number}';
+      ALTER TABLE sender ADD COLUMN reminder3_body TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>die Rechnung {number} über CHF {amount} ist seit {days_overdue} Tagen überfällig. Sollte der Betrag nicht innert 10 Tagen eingehen, leiten wir rechtliche Schritte ein.</p><p>Freundliche Grüsse<br>{sender}</p>';
+    `
   }
 ]
 

@@ -41,6 +41,33 @@
     gap: 12px;
   }
 
+  .sub-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    width: fit-content;
+  }
+  .sub-tab {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--ink-2);
+    border-radius: var(--radius-xs);
+
+    &:hover {
+      color: var(--ink);
+    }
+    &.active {
+      color: var(--ink);
+      background: var(--surface);
+      font-weight: 500;
+    }
+  }
+
   .note {
     font-size: 13px;
     color: var(--ink-2);

@@ -6,7 +6,19 @@ const router = useRouter()
 const { current, options, set } = useAppLocale()
 const { tweaks, setTheme } = useTweaks()
 
-const { data: sender } = await useFetch<{ email_template: string }>('/api/sender')
+interface SenderRow {
+  email_template: string
+  reminder1_wait_days: number
+  reminder1_subject: string
+  reminder1_body: string
+  reminder2_wait_days: number
+  reminder2_subject: string
+  reminder2_body: string
+  reminder3_wait_days: number
+  reminder3_subject: string
+  reminder3_body: string
+}
+const { data: sender } = await useFetch<SenderRow>('/api/sender')
 const template = ref(sender.value?.email_template ?? '')
 const savingTemplate = ref(false)
 async function saveTemplate() {
@@ -18,6 +30,49 @@ async function saveTemplate() {
     savingTemplate.value = false
   }
 }
+
+const reminderForm = reactive({
+  level1: {
+    wait_days: sender.value?.reminder1_wait_days ?? 7,
+    subject: sender.value?.reminder1_subject ?? '',
+    body: sender.value?.reminder1_body ?? ''
+  },
+  level2: {
+    wait_days: sender.value?.reminder2_wait_days ?? 14,
+    subject: sender.value?.reminder2_subject ?? '',
+    body: sender.value?.reminder2_body ?? ''
+  },
+  level3: {
+    wait_days: sender.value?.reminder3_wait_days ?? 30,
+    subject: sender.value?.reminder3_subject ?? '',
+    body: sender.value?.reminder3_body ?? ''
+  }
+})
+const savingReminders = ref(false)
+async function saveReminders() {
+  savingReminders.value = true
+  try {
+    await $fetch('/api/reminder-templates', { method: 'PUT', body: reminderForm })
+    toast.add({ title: t('settings.reminderTemplates.saved'), color: 'success' })
+  } finally {
+    savingReminders.value = false
+  }
+}
+// Sub-tab inside the Reminders settings tab so each level (1 / 2 /
+// final) gets its own focused editor instead of stacking three cards
+// on one page.
+const reminderLevel = ref<1 | 2 | 3>(1)
+const reminderSubTabs = computed(() => [
+  { value: 1 as const, label: t('settings.reminderTemplates.level1Header') },
+  { value: 2 as const, label: t('settings.reminderTemplates.level2Header') },
+  { value: 3 as const, label: t('settings.reminderTemplates.level3Header') }
+])
+// Direct refs into the form for the active sub-tab so v-model is happy.
+const activeReminder = computed(() => {
+  if (reminderLevel.value === 1) return reminderForm.level1
+  if (reminderLevel.value === 2) return reminderForm.level2
+  return reminderForm.level3
+})
 
 // --- Mail sync ---------------------------------------------------------
 interface MailboxRow {
@@ -233,7 +288,7 @@ function cancelChange() {
   confirmOpen.value = false
 }
 
-type Tab = 'appearance' | 'general' | 'mail' | 'email'
+type Tab = 'appearance' | 'general' | 'mail' | 'reminders' | 'email'
 // Hash-driven so the OAuth callback's `#mail-sync` redirect lands on the
 // right tab without a separate state ping pong.
 const tab = ref<Tab>(route.hash === '#mail-sync' ? 'mail' : 'appearance')
@@ -241,6 +296,7 @@ const tabs = computed(() => [
   { value: 'appearance', label: 'Appearance' },
   { value: 'general', label: t('settings.tabGeneral') },
   { value: 'mail', label: t('settings.mailSync.tab') },
+  { value: 'reminders', label: t('settings.reminderTemplates.tab') },
   { value: 'email', label: t('settings.emailTemplate') }
 ])
 
@@ -395,6 +451,96 @@ const themes = [
               </button>
             </div>
           </UiCard>
+        </template>
+
+        <template v-else-if="tab === 'reminders'">
+          <p class="note">{{ $t('settings.reminderTemplates.intro') }}</p>
+
+          <div class="sub-tabs">
+            <button
+              v-for="st in reminderSubTabs"
+              :key="st.value"
+              class="sub-tab"
+              :class="{ active: reminderLevel === st.value }"
+              type="button"
+              @click="reminderLevel = st.value"
+            >
+              {{ st.label }}
+            </button>
+          </div>
+
+          <UiCard>
+            <div class="flex flex-col gap-4">
+              <UFormField
+                :label="$t('settings.reminderTemplates.waitDays')"
+                :help="
+                  reminderLevel === 1
+                    ? $t('settings.reminderTemplates.waitDaysHelpAfterDue')
+                    : $t('settings.reminderTemplates.waitDaysHelpAfterPrevious')
+                "
+              >
+                <UInput
+                  v-model.number="activeReminder.wait_days"
+                  type="number"
+                  min="0"
+                  max="365"
+                  class="mono w-32"
+                />
+              </UFormField>
+              <UFormField :label="$t('settings.reminderTemplates.subject')">
+                <UInput v-model="activeReminder.subject" class="mono w-full" />
+              </UFormField>
+              <UFormField :label="$t('settings.reminderTemplates.body')">
+                <ClientOnly>
+                  <UEditor
+                    :key="`reminder-${reminderLevel}`"
+                    v-model="activeReminder.body"
+                    content-type="html"
+                    :extensions="emailEditorExtensions"
+                    :handlers="emailEditorHandlers"
+                    :ui="{
+                      root: 'email-editor email-editor--tall',
+                      content: 'flex-1 overflow-y-auto'
+                    }"
+                  >
+                    <template #default="{ editor }">
+                      <UEditorToolbar
+                        :editor="editor"
+                        :items="emailEditorItems"
+                        class="email-editor__toolbar flex-wrap"
+                      >
+                        <template #link><EditorLinkPopover :editor="editor" /></template>
+                      </UEditorToolbar>
+                    </template>
+                  </UEditor>
+                  <template #fallback>
+                    <div class="email-editor email-editor--tall email-editor--fallback" />
+                  </template>
+                </ClientOnly>
+              </UFormField>
+            </div>
+          </UiCard>
+
+          <div class="email-foot">
+            <div>
+              <div class="eyebrow">{{ $t('settings.reminderTemplates.placeholders') }}</div>
+              <div class="ph mono">
+                <span><code>{customer}</code> {{ $t('settings.placeholderCustomer') }}</span>
+                <span><code>{number}</code> {{ $t('settings.placeholderNumber') }}</span>
+                <span><code>{amount}</code> {{ $t('settings.reminderTemplates.phAmount') }}</span>
+                <span><code>{due}</code> {{ $t('settings.placeholderDue') }}</span>
+                <span><code>{issued}</code> {{ $t('settings.reminderTemplates.phIssued') }}</span>
+                <span
+                  ><code>{days_overdue}</code>
+                  {{ $t('settings.reminderTemplates.phDaysOverdue') }}</span
+                >
+                <span><code>{sender}</code> {{ $t('settings.placeholderSender') }}</span>
+              </div>
+            </div>
+            <button class="ed-btn-primary" :disabled="savingReminders" @click="saveReminders">
+              {{ $t('common.save') }}
+            </button>
+          </div>
         </template>
 
         <template v-else-if="tab === 'email'">

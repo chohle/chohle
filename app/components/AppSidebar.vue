@@ -67,6 +67,7 @@ const sections = computed<Section[]>(() => [
       { label: t('nav.income'), icon: 'i-lucide-banknote', to: '/income' },
       { label: t('nav.expenses'), icon: 'i-lucide-receipt', to: '/expenses' },
       { label: t('nav.payments'), icon: 'i-lucide-wallet', to: '/payments' },
+      { label: t('nav.reminders'), icon: 'i-lucide-bell', to: '/reminders' },
       { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' }
     ]
   }
