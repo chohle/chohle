@@ -4,6 +4,7 @@
 // open INBOX read-only) before persisting, so we never store a
 // configuration that we already know is broken.
 
+import { lookup } from 'node:dns/promises'
 import { ImapFlow } from 'imapflow'
 import { insertImapMailbox } from '~~/server/utils/mailbox'
 import { secretIsAvailable } from '~~/server/utils/secrets'
@@ -15,6 +16,56 @@ interface Body {
   password?: string
   label?: string
   emailAddress?: string | null
+}
+
+// SSRF guard: a user supplies the IMAP host, which we then dial (here and
+// on every scheduled sync). Block loopback, link-local (incl. the cloud
+// metadata endpoint) and private ranges so the host can't be aimed at
+// internal services. Self-hosters with a LAN/Docker mail server can opt
+// out with IMAP_ALLOW_PRIVATE_HOSTS=1.
+function isBlockedV4(ip: string): boolean {
+  const p = ip.split('.').map(Number)
+  if (p.length !== 4 || p.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true
+  const [a, b] = p
+  if (a === 0 || a === 127) return true // unspecified / loopback
+  if (a === 169 && b === 254) return true // link-local + 169.254.169.254 metadata
+  if (a === 10) return true // private
+  if (a === 172 && b >= 16 && b <= 31) return true // private
+  if (a === 192 && b === 168) return true // private
+  return false
+}
+
+function isBlockedIp(ip: string): boolean {
+  const v = ip.toLowerCase()
+  if (v.includes(':')) {
+    if (v === '::' || v === '::1') return true // unspecified / loopback
+    if (v.startsWith('fe8') || v.startsWith('fe9') || v.startsWith('fea') || v.startsWith('feb'))
+      return true // fe80::/10 link-local
+    if (v.startsWith('fc') || v.startsWith('fd')) return true // fc00::/7 unique-local
+    const mapped = v.match(/::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/)
+    if (mapped) return isBlockedV4(mapped[1]!)
+    return false
+  }
+  return isBlockedV4(v)
+}
+
+async function assertConnectableHost(host: string): Promise<void> {
+  if (
+    process.env.IMAP_ALLOW_PRIVATE_HOSTS === '1' ||
+    process.env.IMAP_ALLOW_PRIVATE_HOSTS === 'true'
+  )
+    return
+  const addrs = await lookup(host, { all: true }).catch(() => [] as { address: string }[])
+  if (addrs.length === 0) {
+    throw createError({ statusCode: 400, statusMessage: `Could not resolve IMAP host: ${host}` })
+  }
+  if (addrs.some((a) => isBlockedIp(a.address))) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        'IMAP host resolves to a private or loopback address. Set IMAP_ALLOW_PRIVATE_HOSTS=1 to allow a local/LAN mail server.'
+    })
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -44,6 +95,8 @@ export default defineEventHandler(async (event) => {
   }
   if (!user) throw createError({ statusCode: 400, statusMessage: 'user is required' })
   if (!password) throw createError({ statusCode: 400, statusMessage: 'password is required' })
+
+  await assertConnectableHost(host)
 
   // 993 is the IANA assigned port for IMAPS (implicit TLS). For other
   // ports requireTLS forces a STARTTLS upgrade and fails the connection
