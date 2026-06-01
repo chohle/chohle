@@ -589,6 +589,48 @@ const migrations: Migration[] = [
       ALTER TABLE sender ADD COLUMN reminder3_subject TEXT NOT NULL DEFAULT 'Letzte Mahnung Rechnung {number}';
       ALTER TABLE sender ADD COLUMN reminder3_body TEXT NOT NULL DEFAULT '<p>Guten Tag {customer}</p><p>die Rechnung {number} über CHF {amount} ist seit {days_overdue} Tagen überfällig. Sollte der Betrag nicht innert 10 Tagen eingehen, leiten wir rechtliche Schritte ein.</p><p>Freundliche Grüsse<br>{sender}</p>';
     `
+  },
+  {
+    name: '0034_quotes',
+    // Quotes (Offerten / Angebote / Devis / Offerte). Pre-sale documents
+    // that turn into invoices once the customer accepts. Same shape as
+    // invoices minus QR-bill semantics: no due_date (quotes aren't paid),
+    // optional valid_until for the offer expiry, separate Q-YYYY-NNN
+    // number sequence, and a converted_invoice_id pointer so we don't
+    // ever convert the same quote twice.
+    up: `
+      CREATE TABLE quotes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+        project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+        number TEXT NOT NULL,
+        title TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'accepted', 'declined')),
+        issue_date TEXT NOT NULL,
+        valid_until TEXT,
+        total_rappen INTEGER,
+        converted_invoice_id INTEGER REFERENCES invoices(id) ON DELETE SET NULL,
+        accepted_at TEXT,
+        declined_at TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX idx_quotes_customer ON quotes(customer_id);
+      CREATE INDEX idx_quotes_project ON quotes(project_id);
+
+      CREATE TABLE quote_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        article_id INTEGER REFERENCES articles(id) ON DELETE SET NULL,
+        description TEXT NOT NULL DEFAULT '',
+        quantity REAL NOT NULL DEFAULT 1,
+        unit TEXT NOT NULL DEFAULT '',
+        unit_price_rappen INTEGER NOT NULL DEFAULT 0,
+        discount_percent REAL NOT NULL DEFAULT 0,
+        mwst_percent REAL NOT NULL DEFAULT 8.1,
+        position INTEGER NOT NULL DEFAULT 0
+      );
+      CREATE INDEX idx_quote_items_quote ON quote_items(quote_id);
+    `
   }
 ]
 

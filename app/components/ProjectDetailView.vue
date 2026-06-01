@@ -84,6 +84,20 @@ const { data: invoices } = await useFetch<ProjectInvoiceRow[]>(
   }
 )
 
+interface ProjectQuoteRow {
+  id: number
+  number: string
+  title: string
+  status: 'draft' | 'sent' | 'accepted' | 'declined'
+  issue_date: string
+  valid_until: string | null
+  converted_invoice_id: number | null
+  total_rappen: number
+}
+const { data: quotes } = await useFetch<ProjectQuoteRow[]>(`/api/projects/${props.id}/quotes`, {
+  default: () => []
+})
+
 // Budget burn: paid is locked in, sent is committed (awaiting payment), draft
 // hasn't been issued yet. Show them separately so the user can read both
 // "what we've billed" and "what's actually landed".
@@ -127,6 +141,24 @@ async function newInvoice() {
     toast.add({ title: msg, color: 'error' })
   } finally {
     creatingInvoice.value = false
+  }
+}
+
+const creatingQuote = ref(false)
+async function newQuote() {
+  if (!project.value) return
+  creatingQuote.value = true
+  try {
+    const { id: quoteId } = await $fetch<{ id: number }>(`/api/projects/${props.id}/quotes`, {
+      method: 'POST'
+    })
+    await navigateTo(`/quotes/${quoteId}`)
+  } catch (err) {
+    const msg =
+      (err as { statusMessage?: string }).statusMessage ?? t('pipeline.detail.quoteFailed')
+    toast.add({ title: msg, color: 'error' })
+  } finally {
+    creatingQuote.value = false
   }
 }
 
@@ -527,6 +559,62 @@ const headerCrumb = computed(() => {
 
     <section v-if="project.direction === 'sales'" class="page-deal-detail__invoices">
       <UiCard>
+        <div class="page-deal-detail__timeline-head">
+          <h3 class="eyebrow">{{ $t('pipeline.detail.quotesTitle') }}</h3>
+          <button
+            class="ed-btn-ghost ed-btn-sm"
+            type="button"
+            :disabled="creatingQuote || !project.customer_id"
+            @click="newQuote"
+          >
+            <UIcon name="i-lucide-plus" class="size-3.5" />
+            {{ $t('pipeline.detail.newQuote') }}
+          </button>
+        </div>
+
+        <EmptyState
+          v-if="!quotes.length"
+          :bordered="false"
+          icon="i-lucide-file-pen"
+          :title="$t('pipeline.detail.noQuotesTitle')"
+          :description="$t('pipeline.detail.noQuotesText')"
+        />
+        <div v-else class="ed-scroll">
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>{{ $t('quotes.number') }}</th>
+                <th>{{ $t('common.title') }}</th>
+                <th>{{ $t('quotes.statusLabel') }}</th>
+                <th>{{ $t('quotes.issueDate') }}</th>
+                <th>{{ $t('quotes.validUntil') }}</th>
+                <th class="right">{{ $t('common.amount') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="q in quotes"
+                :key="q.id"
+                class="row"
+                tabindex="0"
+                role="button"
+                :aria-label="`${q.number || $t('common.untitled')} ${q.title || ''}`.trim()"
+                @click="navigateTo(`/quotes/${q.id}`)"
+                @keyup.enter="navigateTo(`/quotes/${q.id}`)"
+                @keyup.space.prevent="navigateTo(`/quotes/${q.id}`)"
+              >
+                <td class="mono">{{ q.number || '—' }}</td>
+                <td>{{ q.title || '—' }}</td>
+                <td class="mono">{{ $t(`status.${q.status}`) }}</td>
+                <td class="mono">{{ dateCh(q.issue_date) }}</td>
+                <td class="mono">{{ q.valid_until ? dateCh(q.valid_until) : '—' }}</td>
+                <td class="right mono">CHF {{ chf(q.total_rappen) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </UiCard>
+      <UiCard class="mt-4">
         <div class="page-deal-detail__timeline-head">
           <h3 class="eyebrow">{{ $t('pipeline.detail.invoicesTitle') }}</h3>
           <button

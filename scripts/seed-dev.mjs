@@ -26,8 +26,14 @@ const day = (offset, dd) => `${ym(offset)}-${String(dd).padStart(2, '0')}`
 const months = [5, 4, 3, 2, 1, 0].map(ym)
 
 const wipe = db.transaction(() => {
+  // FK order matters: child tables before parents. quote_items -> quotes,
+  // and quotes references invoices(converted_invoice_id), so quotes goes
+  // before invoices to avoid the FK tripping mid-wipe.
   for (const t of [
     'project_emails',
+    'invoice_reminders',
+    'quote_items',
+    'quotes',
     'invoice_items',
     'invoices',
     'projects',
@@ -686,12 +692,157 @@ addInvoice(cafeId, quickConsultingId, '2026-005', 'Beratung Digitalisierung', 'd
   { article: art['Beratung'], desc: 'Beratung', qty: 4, unit: 'Stunden', price: 150, discount: 5 }
 ])
 
+// --- Quotes (Offerten) --------------------------------------------------
+// One per status so the /quotes page shows the full workflow:
+// draft / sent / accepted (ready to convert) / converted (already linked
+// to an invoice) / declined.
+const insertQuote = db.prepare(
+  `INSERT INTO quotes (customer_id, project_id, number, title, status,
+                       issue_date, valid_until, converted_invoice_id,
+                       accepted_at, declined_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+)
+const insertQuoteItem = db.prepare(
+  `INSERT INTO quote_items
+     (quote_id, article_id, description, quantity, unit, unit_price_rappen,
+      discount_percent, mwst_percent, position)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+)
+const addQuote = (
+  customerId,
+  projectId,
+  number,
+  title,
+  status,
+  issueOffset,
+  validityDays,
+  items,
+  extras = {}
+) => {
+  const issue = day(issueOffset, 6)
+  const vd = new Date(now.getFullYear(), now.getMonth() - issueOffset, 6 + validityDays)
+  const validUntil = `${vd.getFullYear()}-${String(vd.getMonth() + 1).padStart(2, '0')}-${String(vd.getDate()).padStart(2, '0')}`
+  const id = insertQuote.run(
+    customerId,
+    projectId,
+    number,
+    title,
+    status,
+    issue,
+    validUntil,
+    extras.convertedInvoiceId ?? null,
+    extras.acceptedAt ?? null,
+    extras.declinedAt ?? null
+  ).lastInsertRowid
+  items.forEach((it, i) => {
+    insertQuoteItem.run(
+      id,
+      it.article ?? null,
+      it.desc,
+      it.qty,
+      it.unit ?? '',
+      chf(it.price),
+      it.discount ?? 0,
+      it.mwst ?? 8.1,
+      i
+    )
+  })
+  return id
+}
+
+// Sent: waiting on the studio's "Marketing site" project proposal.
+addQuote(studioId, proposalProjectId, 'Q-2026-001', 'Marketing site relaunch', 'sent', 0, 30, [
+  {
+    article: art['Webdesign'],
+    desc: 'Konzept, Wireframes, Designsystem',
+    qty: 1,
+    unit: 'Pauschal',
+    price: 7500
+  },
+  { article: art['Beratung'], desc: 'Stakeholder Workshops', qty: 12, unit: 'Stunden', price: 150 }
+])
+
+// Accepted (ready to convert): cafe wants more consulting.
+addQuote(
+  cafeId,
+  quickConsultingId,
+  'Q-2026-002',
+  'Folge-Beratung Digitalisierung',
+  'accepted',
+  0,
+  30,
+  [
+    {
+      article: art['Beratung'],
+      desc: 'Workshop und Begleitung',
+      qty: 10,
+      unit: 'Stunden',
+      price: 150
+    },
+    { article: art['Spesen'], desc: 'Anfahrten', qty: 1, unit: 'Pauschal', price: 60 }
+  ],
+  { acceptedAt: day(0, 12) }
+)
+
+// Draft: brand new, not sent yet. No project link to demo the "no project"
+// guard on the Convert button.
+addQuote(annaId, null, 'Q-2026-003', 'Branding refresh', 'draft', 0, 30, [
+  { article: art['Webdesign'], desc: 'Logo Variationen', qty: 1, unit: 'Pauschal', price: 1800 },
+  { article: art['Beratung'], desc: 'Strategiegespräch', qty: 3, unit: 'Stunden', price: 150 }
+])
+
+// Declined: customer said no. Surfaces under the Declined filter.
+addQuote(
+  techhubId,
+  null,
+  'Q-2025-099',
+  'IT-Audit Q4',
+  'declined',
+  2,
+  14,
+  [
+    {
+      article: art['Beratung'],
+      desc: 'Audit, Bericht und Empfehlungen',
+      qty: 16,
+      unit: 'Stunden',
+      price: 150
+    }
+  ],
+  { declinedAt: day(2, 20) }
+)
+
+// Already converted: this quote turned into invoice 2026-002 (the studio's
+// Website relaunch phase 1). Surfaces with a "Converted to ..." banner and
+// no Convert button.
+const phase1InvoiceId = db.prepare("SELECT id FROM invoices WHERE number = '2026-002'").get().id
+addQuote(
+  studioId,
+  activeProjectId,
+  'Q-2026-000',
+  'Website relaunch (Angebot)',
+  'accepted',
+  1,
+  30,
+  [
+    {
+      article: art['Webdesign'],
+      desc: 'Konzept und Design',
+      qty: 1,
+      unit: 'Pauschal',
+      price: 6000
+    },
+    { article: art['Beratung'], desc: 'Stakeholder Workshops', qty: 8, unit: 'Stunden', price: 150 }
+  ],
+  { convertedInvoiceId: phase1InvoiceId, acceptedAt: day(1, 6) }
+)
+
 // 2 extra projects are inserted later (legacyHeating + quickConsulting), so
 // add them to the count for an accurate summary.
 console.log(
   'Seeded:',
   `${categories.length} categories, ${expenses.length} expenses, 2 income sources,`,
   `${customers.length} customers, ${articles.length + 3} articles,`,
-  `${projects.length + 2} projects (8 sales + 4 procurement + 2 legacy wrappers), 2 project emails, 7 invoices.`
+  `${projects.length + 2} projects (8 sales + 4 procurement + 2 legacy wrappers), 2 project emails, 7 invoices, 5 quotes.`
 )
 db.close()
