@@ -26,7 +26,8 @@ interface Body {
 function isBlockedV4(ip: string): boolean {
   const p = ip.split('.').map(Number)
   if (p.length !== 4 || p.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true
-  const [a, b] = p
+  // Defaults are inert (length is already 4 here) but tell TS a/b are defined.
+  const [a = 0, b = 0] = p
   if (a === 0 || a === 127) return true // unspecified / loopback
   if (a === 169 && b === 254) return true // link-local + 169.254.169.254 metadata
   if (a === 10) return true // private
@@ -99,7 +100,7 @@ export default defineEventHandler(async (event) => {
   await assertConnectableHost(host)
 
   // 993 is the IANA assigned port for IMAPS (implicit TLS). For other
-  // ports requireTLS forces a STARTTLS upgrade and fails the connection
+  // ports doSTARTTLS forces a STARTTLS upgrade and fails the connection
   // if the server can't (or a MITM stripped it), so the password is never
   // sent over cleartext. servername sets the SNI/cert-validation host.
   const secure = port === 993
@@ -107,7 +108,7 @@ export default defineEventHandler(async (event) => {
     host,
     port,
     secure,
-    requireTLS: true,
+    doSTARTTLS: true,
     servername: host,
     auth: { user, pass: password },
     logger: false
@@ -118,7 +119,7 @@ export default defineEventHandler(async (event) => {
     // Open read only just to confirm the account can actually see an
     // INBOX. Bad credentials throw at connect(); a sane account with
     // no INBOX would throw here.
-    const lock = await client.getMailboxLock('INBOX', { readonly: true })
+    const lock = await client.getMailboxLock('INBOX', { readOnly: true })
     lock.release()
   } catch (err) {
     const msg =

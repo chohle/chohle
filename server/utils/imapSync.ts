@@ -60,7 +60,9 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
     host: mailbox.imap_host,
     port: mailbox.imap_port,
     secure: mailbox.imap_port === 993,
-    requireTLS: true,
+    // Require TLS so credentials never cross the wire in cleartext: implicit
+    // TLS on 993 (secure), otherwise force a STARTTLS upgrade before auth.
+    doSTARTTLS: true,
     servername: mailbox.imap_host,
     auth: { user: mailbox.imap_user, pass: decryptSecret(mailbox.imap_password_enc) },
     logger: false
@@ -98,7 +100,7 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
 
   await client.connect()
   try {
-    const lock = await client.getMailboxLock('INBOX', { readonly: true })
+    const lock = await client.getMailboxLock('INBOX', { readOnly: true })
     try {
       // SEARCH SINCE returns sequence numbers; { uid: true } makes them UIDs
       // so the subsequent fetch is stable across new arrivals mid sync.
@@ -108,7 +110,7 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
       // messageset (issue #209), and skipping the loop still falls
       // through to the last_sync_at UPDATE so a quiet inbox doesn't keep
       // re-searching the same lookback window forever.
-      const limited = (uids ?? []).slice(-200)
+      const limited = (Array.isArray(uids) ? uids : []).slice(-200)
       if (limited.length > 0)
         for await (const msg of client.fetch(
           limited,
