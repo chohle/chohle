@@ -1,0 +1,51 @@
+# Production deploy: the Nitro prod build behind Caddy (automatic HTTPS).
+#
+# On the server:
+#   1. Point a DNS A record for your domain at this host's IP.
+#   2. cp .env.example .env  &&  edit it (DOMAIN, CHOHLE_SECRET,
+#      NUXT_SESSION_PASSWORD, admin creds, CHOHLE_DEMO).
+#   3. docker compose -f docker-compose.prod.yml up -d --build
+#
+# Caddy fetches a Let's Encrypt certificate for $DOMAIN on first boot, so the
+# domain must already resolve here and ports 80/443 must be open.
+services:
+  app:
+    build:
+      context: .
+      target: prod
+    restart: unless-stopped
+    environment:
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+      # SQLite db, uploads and (in demo mode) per-session sandboxes all live on
+      # the persistent volume below. On a Linux host a normal volume is safe for
+      # SQLite — the fsync/locking corruption only affects macOS Docker bind mounts.
+      - DATABASE_PATH=/app/data/chohle.db
+      - DEMO_DATA_PATH=/app/data/demo
+    env_file:
+      - .env
+    volumes:
+      - appdata:/app/data
+    # Not published to the host — only Caddy reaches it over the compose network.
+    expose:
+      - '3000'
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  appdata:
+  caddy_data:
+  caddy_config:

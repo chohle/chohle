@@ -1,0 +1,7 @@
+# Reverse proxy with automatic HTTPS (Let's Encrypt). $DOMAIN comes from the
+# environment (set DOMAIN in .env). Caddy provisions and renews the certificate
+# on its own — nothing else to configure.
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000
+}
