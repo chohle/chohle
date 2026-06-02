@@ -1,7 +1,9 @@
 // Demo mode wiring (runs only when CHOHLE_DEMO=true). For each request it:
-//   1. ensures a demo_sid cookie (the visitor's sandbox identity),
-//   2. binds that session's database to event.context so useDb() resolves it,
-//   3. auto-logins a guest so the app's requireUserSession() gates pass with no
+//   1. blocks endpoints that reach external services (mailbox connect/sync) so
+//      a public visitor can't make the demo talk to real bank/mail servers,
+//   2. ensures a demo_sid cookie (the visitor's sandbox identity),
+//   3. binds that session's database to event.context so useDb() resolves it,
+//   4. auto-logins a guest so the app's requireUserSession() gates pass with no
 //      login wall.
 // The seed language for a brand-new sandbox follows the browser's
 // Accept-Language; switching the UI later (or Reset) reseeds in that language.
@@ -20,8 +22,25 @@ function initialLocale(event: Parameters<typeof getHeader>[0]): string {
   return normLocale(tag)
 }
 
+// Endpoints that open a connection to a real external service (IMAP/SMTP
+// servers, Gmail/Outlook OAuth + sync). Harmless local routes — listing or
+// deleting mailbox rows — stay available inside the sandbox.
+function reachesExternalService(path: string): boolean {
+  return (
+    path === '/api/auth/imap/connect' ||
+    path.startsWith('/api/auth/gmail/') ||
+    path.startsWith('/api/auth/outlook/') ||
+    /^\/api\/mailboxes\/\d+\/sync$/.test(path)
+  )
+}
+
 export default defineEventHandler(async (event) => {
   if (!isDemo()) return
+
+  const path = (event.path || '').split('?')[0]!
+  if (reachesExternalService(path)) {
+    throw createError({ statusCode: 403, statusMessage: 'Disabled in the demo' })
+  }
 
   let sid = getCookie(event, DEMO_COOKIE)
   if (!sid || !/^[a-f0-9]{32}$/.test(sid)) {
