@@ -33,12 +33,20 @@ cantonal public holidays, and the QR-bill are first-class, not afterthoughts.
 - **Expenses** with receipt uploads (PDF or image), categories, and filters
 - **Income** for salary and clients, with automatic Swiss pay-date calculation that
   shifts around weekends and cantonal holidays
-- **Customers** book with per-customer rates
+- **Customers** with per-customer rates and document language
 - **Articles**: reusable invoice line items
+- **Quotes** (Offerten) you can convert to an invoice in one click
 - **Invoices** with correct MWST, 5-Rappen rounding, a print-ready PDF, and the Swiss
   QR-bill
+- **Projects & pipeline**: track sales and procurement deals across stages
+- **Reminders**: staged overdue-payment reminders (1st, 2nd, final notice)
+- **Email**: per-project conversations, with IMAP / Gmail / Outlook inbox sync
 - **Dashboard**: income vs expenses, net, a 6-month trend, and what is still outstanding
 - **Single owner** login; everything private and stored locally under `data/`
+
+> Want to put it online or run a public playground? See
+> [Hosting](docs/HOSTING.md) and [Demo mode](docs/DEMO_MODE.md). Both are
+> optional — chohle runs fine entirely on your own machine.
 
 ## Tech stack
 
@@ -53,7 +61,7 @@ cantonal public holidays, and the QR-bill are first-class, not afterthoughts.
 chohle runs in Docker.
 
 ```bash
-git clone https://github.com/zeaiso/chohle.git
+git clone https://github.com/chohle/chohle.git
 cd chohle
 cp .env.example .env   # then edit the secrets
 docker compose up
@@ -66,11 +74,15 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 
 ## Documentation
 
-| Doc                                            | What's inside                                         |
-| ---------------------------------------------- | ----------------------------------------------------- |
-| [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure |
-| [Contributing](CONTRIBUTING.md)                | How to contribute                                     |
-| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                 |
+| Doc                                            | What's inside                                           |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure   |
+| [Reminders](docs/REMINDERS.md)                 | Staged overdue-payment reminders                        |
+| [Quotes](docs/QUOTES.md)                       | Offers and convert-to-invoice                           |
+| [Mail sync](docs/MAIL_SYNC.md)                 | Connecting an inbox (IMAP / Gmail / Outlook)            |
+| [Hosting](docs/HOSTING.md)                     | _Optional_ — putting it online (VPS + Docker + Caddy)   |
+| [Demo mode](docs/DEMO_MODE.md)                 | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`) |
+| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                   |
 
 ## Contributing
 
