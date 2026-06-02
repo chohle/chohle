@@ -258,6 +258,10 @@ function openCompose() {
   composerError.value = ''
 }
 
+// Group the flat thread into per-subject conversations so replies sit under
+// the email they answer, and a fresh subject starts a new block.
+const emailGroups = computed(() => groupEmailsBySubject(emails.value.rows))
+
 // Prefix a subject with "Re:" for a reply, without stacking on an existing one.
 function reSubject(subject: string | null) {
   const s = (subject ?? '').trim()
@@ -554,46 +558,62 @@ const headerCrumb = computed(() => {
           :title="$t('pipeline.detail.emptyTitle')"
           :description="$t('pipeline.detail.emptyText')"
         />
-        <ul v-else class="page-deal-detail__thread">
-          <li
-            v-for="ev in emails.rows"
-            :key="ev.id"
-            class="email-msg"
-            :class="`is-${ev.direction}`"
-          >
-            <header class="email-msg__head">
-              <span class="mono email-msg__dir">{{
-                ev.direction === 'outbound'
-                  ? $t('pipeline.detail.sent')
-                  : $t('pipeline.detail.received')
-              }}</span>
-              <span class="mono email-msg__time">{{ fmtTimestamp(ev.sent_at) }}</span>
+        <div v-else class="email-groups">
+          <section v-for="g in emailGroups" :key="g.key" class="email-group">
+            <header class="email-group__head">
+              <h4 class="email-group__subject">{{ g.subject || $t('conversations.noSubject') }}</h4>
+              <span class="email-group__count mono"
+                >{{ g.messages.length }} {{ $t('conversations.messages') }}</span
+              >
             </header>
-            <h4 class="email-msg__subject">{{ ev.subject || '(no subject)' }}</h4>
-            <div v-if="ev.body_html" class="email-msg__body" v-html="sanitizeHtml(ev.body_html)" />
-            <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{
-              ev.body_text
-            }}</pre>
-            <footer
-              v-if="ev.from_address || ev.to_address || ev.direction === 'inbound'"
-              class="email-msg__foot mono"
-            >
-              <span v-if="ev.direction === 'outbound' && ev.to_address">→ {{ ev.to_address }}</span>
-              <span v-else-if="ev.direction === 'inbound' && ev.from_address"
-                >← {{ ev.from_address }}</span
+            <ul class="email-group__list">
+              <li
+                v-for="ev in g.messages"
+                :key="ev.id"
+                class="email-msg"
+                :class="`is-${ev.direction}`"
               >
-              <button
-                v-if="ev.direction === 'inbound'"
-                type="button"
-                class="email-msg__reply"
-                @click="replyTo(ev)"
-              >
-                <UIcon name="i-lucide-reply" class="size-3.5" />
-                {{ $t('pipeline.detail.reply') }}
-              </button>
-            </footer>
-          </li>
-        </ul>
+                <header class="email-msg__head">
+                  <span class="mono email-msg__dir">{{
+                    ev.direction === 'outbound'
+                      ? $t('pipeline.detail.sent')
+                      : $t('pipeline.detail.received')
+                  }}</span>
+                  <span class="mono email-msg__time">{{ fmtTimestamp(ev.sent_at) }}</span>
+                </header>
+                <h4 class="email-msg__subject">{{ ev.subject || '(no subject)' }}</h4>
+                <div
+                  v-if="ev.body_html"
+                  class="email-msg__body"
+                  v-html="sanitizeHtml(ev.body_html)"
+                />
+                <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{
+                  ev.body_text
+                }}</pre>
+                <footer
+                  v-if="ev.from_address || ev.to_address || ev.direction === 'inbound'"
+                  class="email-msg__foot mono"
+                >
+                  <span v-if="ev.direction === 'outbound' && ev.to_address"
+                    >→ {{ ev.to_address }}</span
+                  >
+                  <span v-else-if="ev.direction === 'inbound' && ev.from_address"
+                    >← {{ ev.from_address }}</span
+                  >
+                  <button
+                    v-if="ev.direction === 'inbound'"
+                    type="button"
+                    class="email-msg__reply"
+                    @click="replyTo(ev)"
+                  >
+                    <UIcon name="i-lucide-reply" class="size-3.5" />
+                    {{ $t('pipeline.detail.reply') }}
+                  </button>
+                </footer>
+              </li>
+            </ul>
+          </section>
+        </div>
       </UiCard>
     </div>
 

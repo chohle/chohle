@@ -1,3 +1,51 @@
+// A subject-grouped conversation: a heading with the message count, then the
+// reply chain beneath it. Shared by the project detail page and Conversations.
+.email-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.email-group {
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  &__subject {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__count {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
 // One email card in a thread. Shared by the project detail page and the
 // Conversations page.
 .email-msg {
