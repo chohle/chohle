@@ -1,5 +1,15 @@
 <script setup lang="ts">
-defineProps<{ crumb?: string; title: string; subtitle?: string }>()
+const props = defineProps<{
+  crumb?: string
+  title: string
+  subtitle?: string
+  // Override the browser tab title when it should differ from the visible
+  // heading (e.g. the dashboard shows a greeting but the tab says "Dashboard").
+  docTitle?: string
+}>()
+
+// Every page that shows a page header also gets the matching browser tab title.
+useHead({ title: () => props.docTitle ?? props.title })
 </script>
 <template>
   <header class="page-head">

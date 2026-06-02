@@ -61,6 +61,7 @@ const toast = useToast()
 const { data: project, refresh: refreshProject } = await useFetch<ProjectDetail>(
   `/api/projects/${props.id}`
 )
+useHead({ title: () => project.value?.customer_name || project.value?.name })
 const { data: emails, refresh: refreshEmails } = await useFetch<{ rows: ProjectEmail[] }>(
   `/api/projects/${props.id}/emails`,
   {

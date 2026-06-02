@@ -31,6 +31,7 @@ const id = route.params.id as string
 const { data: customer, refresh: refreshCustomer } = await useFetch<Customer>(
   `/api/customers/${id}`
 )
+useHead({ title: () => customer.value?.name })
 const logoSrc = computed(() =>
   customer.value?.logo_path ? `/api/customers/${id}/logo?v=${customer.value.logo_path}` : null
 )

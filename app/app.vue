@@ -6,6 +6,12 @@ const locale_ = computed(() => uiLocales[locale.value as keyof typeof uiLocales]
 
 // Initialise tweaks (theme + radius) and apply to <html> on mount.
 useTweaks()
+
+// Browser tab title: "chohle | <page>" when a page sets a title, else just
+// "chohle" (also for the bare default title from nuxt.config).
+useHead({
+  titleTemplate: (title) => (!title || title === 'chohle' ? 'chohle' : `chohle | ${title}`)
+})
 </script>
 
 <template>

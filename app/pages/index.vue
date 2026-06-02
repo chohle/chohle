@@ -90,6 +90,7 @@ const greeting = computed(() => {
     <UiPageHead
       :crumb="`${$t('nav.workspace')} / ${$t('nav.dashboard')}`"
       :title="`${greeting}, ${username}.`"
+      :doc-title="$t('nav.dashboard')"
     >
       <template #title>
         {{ greeting }}, <em class="page-overview__italic">{{ username }}</em
