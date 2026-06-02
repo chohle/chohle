@@ -1,4 +1,6 @@
 export default defineNitroPlugin(async () => {
+  // Demo sandboxes seed their own owner from the template; no shared db here.
+  if (isDemo()) return
   const db = useDb()
   const exists = db.prepare('SELECT 1 FROM owner WHERE id = 1').get()
   if (exists) return

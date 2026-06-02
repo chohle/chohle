@@ -69,6 +69,10 @@
     "finance": "Finanze",
     "system": "Sistema"
   },
+  "demo": {
+    "notice": "Demo — le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",
+    "reset": "Reimposta demo"
+  },
   "reminders": {
     "title": "Solleciti",
     "subtitle": "Invia solleciti di pagamento per fatture scadute. Tre livelli di escalation: 1° sollecito, 2° sollecito, ultimo avviso.",

@@ -69,6 +69,10 @@
     "finance": "Finances",
     "system": "Système"
   },
+  "demo": {
+    "notice": "Démo — vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",
+    "reset": "Réinitialiser la démo"
+  },
   "reminders": {
     "title": "Relances",
     "subtitle": "Envoyez des rappels de paiement pour les factures en retard. Trois niveaux d'escalade : 1ère relance, 2e relance, dernière relance.",

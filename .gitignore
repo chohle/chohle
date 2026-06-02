@@ -11,6 +11,8 @@ node_modules
 
 # Private app data (SQLite db + uploaded files)
 data/
+# Demo / named-volume db path when run outside Docker
+dbdata/
 
 # Logs
 logs

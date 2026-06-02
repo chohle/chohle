@@ -19,6 +19,10 @@
     "finance": "Finanzen",
     "system": "System"
   },
+  "demo": {
+    "notice": "Demo — Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
+    "reset": "Demo zurücksetzen"
+  },
   "reminders": {
     "title": "Mahnungen",
     "subtitle": "Zahlungserinnerungen für überfällige Rechnungen versenden. Drei Eskalationsstufen: 1. Mahnung, 2. Mahnung, letzte Mahnung.",

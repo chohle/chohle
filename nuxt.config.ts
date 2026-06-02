@@ -36,12 +36,23 @@ export default defineNuxtConfig({
       ]
     }
   },
+  // Demo mode (CHOHLE_DEMO=true) gives every visitor an isolated, per-session
+  // sandbox database. It needs Nitro's async context so a request-scoped db can
+  // be resolved from any server util via useEvent(). Off in normal deployments.
+  nitro: {
+    experimental: {
+      asyncContext: true
+    }
+  },
   runtimeConfig: {
     adminUsername: '',
     adminPassword: '',
     smtp: {
       host: '',
       port: '1025'
+    },
+    public: {
+      demo: process.env.CHOHLE_DEMO === 'true'
     }
   },
   // Bind-mounted source on macOS doesn't emit fs events; poll inside Docker.

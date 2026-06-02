@@ -86,8 +86,9 @@ async function runOnce(): Promise<void> {
 
 export default defineNitroPlugin(() => {
   const interval = Number(process.env.CHOHLE_MAIL_SYNC_INTERVAL_MS) || DEFAULT_INTERVAL_MS
-  // Skip in test runs and in build output where we have no DB.
-  if (process.env.NODE_ENV === 'test') return
+  // Skip in test runs, and in demo mode (no shared db, and a public visitor's
+  // sandbox must not reach out to real mailboxes).
+  if (process.env.NODE_ENV === 'test' || isDemo()) return
 
   // setInterval keeps the event loop alive across the process lifetime.
   // `.unref()` so the timer doesn't block a graceful shutdown if the

@@ -19,6 +19,10 @@
     "finance": "Finance",
     "system": "System"
   },
+  "demo": {
+    "notice": "Demo — your changes stay private to your browser and reset when idle.",
+    "reset": "Reset demo"
+  },
   "reminders": {
     "title": "Reminders",
     "subtitle": "Send overdue payment reminders. Three escalation levels: 1st, 2nd, final notice.",

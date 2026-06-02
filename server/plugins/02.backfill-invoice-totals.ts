@@ -1,6 +1,7 @@
 // One-time backfill: freeze total_rappen for invoices that were already paid
 // before the snapshot column existed. Idempotent (only fills NULLs).
 export default defineNitroPlugin(() => {
+  if (isDemo()) return
   const db = useDb()
   const pending = db
     .prepare("SELECT id FROM invoices WHERE status = 'paid' AND total_rappen IS NULL")

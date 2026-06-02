@@ -12,8 +12,17 @@ services:
       - .:/app
       - node_modules:/app/node_modules
       - ./data:/app/data
+      # SQLite databases (the main db and every per-session demo sandbox) live
+      # on a NAMED VOLUME, not the ./data bind mount. SQLite over a macOS Docker
+      # bind mount (gRPC-FUSE/virtiofs) doesn't honor fsync/locking and corrupts
+      # the file; a named volume is backed by the VM's ext4, where it's safe.
+      - dbdata:/app/dbdata
     environment:
       - DOCKER=true
+      - DATABASE_PATH=/app/dbdata/chohle.db
+      # Per-session demo sandboxes also go on the safe volume. CHOHLE_DEMO is
+      # off here; set it to 'true' to run this instance as a public demo.
+      - DEMO_DATA_PATH=/app/dbdata/demo
       # Inside the container, reach Mailpit by its compose service name
       # (overrides the host-facing values in .env).
       - NUXT_SMTP_HOST=mailpit
@@ -36,3 +45,4 @@ services:
 
 volumes:
   node_modules:
+  dbdata:

@@ -28,6 +28,7 @@ onMounted(() => {
       @click="closeMobileNav"
     />
     <main class="app-main">
+      <DemoBanner />
       <AppTopbar @open-palette="paletteOpen = true" />
       <div class="app-content">
         <slot />
