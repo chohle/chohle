@@ -5,4 +5,10 @@
     align-items: center;
     padding-bottom: 14px;
   }
+
+  // Rows open the editor on click, so the hover highlight should read as
+  // interactive (pointer cursor), not like hovering plain text.
+  .ed-table tbody tr.row {
+    cursor: pointer;
+  }
 }

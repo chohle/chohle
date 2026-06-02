@@ -126,16 +126,16 @@ function chf(rappen: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="a in articles" :key="a.id" class="row">
+          <tr v-for="a in articles" :key="a.id" class="row" @click="openEdit(a)">
             <td>{{ a.name }}</td>
             <td class="mono">{{ a.unit || '—' }}</td>
             <td class="right mono">CHF {{ chf(a.default_price_rappen) }}</td>
             <td class="right mono">{{ a.default_mwst ? `${a.default_mwst}%` : '—' }}</td>
             <td class="actions">
-              <button class="icon-btn" @click="openEdit(a)">
+              <button class="icon-btn" @click.stop="openEdit(a)">
                 <UIcon name="i-lucide-pencil" />
               </button>
-              <button class="icon-btn" @click="remove(a.id)">
+              <button class="icon-btn" @click.stop="remove(a.id)">
                 <UIcon name="i-lucide-trash-2" />
               </button>
             </td>

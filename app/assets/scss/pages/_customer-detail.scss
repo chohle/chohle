@@ -82,10 +82,11 @@
     padding-bottom: 14px;
   }
 
-  &__inv-table {
-    tbody tr.row {
-      cursor: pointer;
-    }
+  // Clickable rows — the projects and invoices tables both navigate on click,
+  // so the hover highlight should read as interactive (pointer), not like
+  // hovering plain text.
+  .ed-table tbody tr.row {
+    cursor: pointer;
   }
 
   @media (max-width: 700px) {
