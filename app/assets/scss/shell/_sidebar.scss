@@ -308,32 +308,59 @@
   }
 }
 
-// Below 900px the sidebar becomes a full-screen slide-in drawer.
+// Below 900px the sidebar becomes a full-screen slide-in drawer. With the
+// whole viewport to work with, give the drawer more generous side padding,
+// roomier tap targets, and a calmer logo size than the dense desktop rail.
 @media (max-width: 900px) {
   .app-sidebar {
     width: 100vw !important;
     max-width: 100vw;
     transform: translateX(-100%);
+    padding: 18px 18px 16px;
 
     &.is-open {
       transform: translateX(0);
     }
 
+    .brand {
+      align-items: center;
+      padding: 0 2px 16px;
+    }
+
+    .brand-logo {
+      height: 24px;
+    }
+
+    // Comfortable touch targets across nav rows and the user button.
+    .nav-item {
+      padding: 11px 6px;
+    }
+    .nav-child {
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .nav-section + .nav-section {
+      margin-top: 22px;
+    }
+    .user-btn {
+      padding: 10px 6px;
+    }
+
     &.is-collapsed {
       // Collapsed mode is desktop-only; on mobile force the expanded layout
       // so labels show in the full-screen drawer.
-      padding: 22px 14px 14px;
+      padding: 18px 18px 16px;
 
       .brand {
         justify-content: space-between;
-        padding: 0 4px 18px;
+        padding: 0 2px 16px;
       }
       .nav-label {
         display: block;
       }
       .nav-item {
         justify-content: flex-start;
-        padding: 7px 4px;
+        padding: 11px 6px;
       }
       .nav-text {
         display: block;
@@ -349,7 +376,7 @@
       }
       .user-btn {
         justify-content: flex-start;
-        padding: 6px 4px;
+        padding: 10px 6px;
       }
       .user-meta,
       .user-icon {
@@ -363,10 +390,6 @@
 
     &__close {
       display: inline-flex;
-    }
-
-    .brand-logo {
-      height: 28px;
     }
   }
 }
