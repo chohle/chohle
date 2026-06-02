@@ -12,6 +12,23 @@
     height: 500px;
     min-height: 18rem;
     resize: vertical;
+
+    // Make the editable surface fill the whole box below the toolbar, so a
+    // click anywhere lands the cursor — not only on the first line of text.
+    // UEditor nests the .ProseMirror inside an [data-slot="content"] wrapper;
+    // both need to stretch and pass the height down.
+    [data-slot="content"] {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    [contenteditable="true"] {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
   }
 
   &--fallback {
