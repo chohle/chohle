@@ -258,6 +258,34 @@ function openCompose() {
   composerError.value = ''
 }
 
+// Prefix a subject with "Re:" for a reply, without stacking on an existing one.
+function reSubject(subject: string | null) {
+  const s = (subject ?? '').trim()
+  if (!s) return 'Re:'
+  return /^re:\s*/i.test(s) ? s : `Re: ${s}`
+}
+
+// Reply to a specific message: open the composer addressed to the other party
+// on that message, with a "Re:" subject. The body is left blank to type into.
+function replyTo(ev: ProjectEmail) {
+  composer.open = true
+  composer.to =
+    (ev.direction === 'inbound' ? ev.from_address : ev.to_address) || resolvedEmail.value
+  composer.subject = reSubject(ev.subject)
+  composer.body_html = ''
+  composerError.value = ''
+}
+
+// Deep link from the Conversations page (?reply=<emailId>) opens the composer
+// pre-filled for that message once the thread has loaded.
+const route = useRoute()
+onMounted(() => {
+  const replyId = Number(route.query.reply)
+  if (!Number.isFinite(replyId) || replyId <= 0) return
+  const target = emails.value.rows.find((e) => e.id === replyId)
+  if (target) replyTo(target)
+})
+
 async function send() {
   if (!validateComposerTo()) return
   if (!composer.subject.trim() || !composer.body_html.trim()) return
@@ -546,11 +574,23 @@ const headerCrumb = computed(() => {
             <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{
               ev.body_text
             }}</pre>
-            <footer v-if="ev.from_address || ev.to_address" class="email-msg__foot mono">
+            <footer
+              v-if="ev.from_address || ev.to_address || ev.direction === 'inbound'"
+              class="email-msg__foot mono"
+            >
               <span v-if="ev.direction === 'outbound' && ev.to_address">→ {{ ev.to_address }}</span>
               <span v-else-if="ev.direction === 'inbound' && ev.from_address"
                 >← {{ ev.from_address }}</span
               >
+              <button
+                v-if="ev.direction === 'inbound'"
+                type="button"
+                class="email-msg__reply"
+                @click="replyTo(ev)"
+              >
+                <UIcon name="i-lucide-reply" class="size-3.5" />
+                {{ $t('pipeline.detail.reply') }}
+              </button>
             </footer>
           </li>
         </ul>
@@ -677,7 +717,7 @@ const headerCrumb = computed(() => {
     >
       <template #body>
         <form novalidate class="flex flex-col gap-4" @submit.prevent="send">
-          <UFormField :label="$t('pipeline.detail.to')" :error="composerError">
+          <UFormField :label="$t('pipeline.detail.to')" :error="composerError || undefined">
             <UInput v-model="composer.to" inputmode="email" autocomplete="email" class="w-full" />
           </UFormField>
           <UFormField :label="$t('pipeline.detail.subject')">
@@ -725,7 +765,7 @@ const headerCrumb = computed(() => {
     <UModal v-model:open="reply.open" :title="$t('pipeline.detail.logReply')">
       <template #body>
         <div class="flex flex-col gap-3">
-          <UFormField :label="$t('pipeline.detail.from')" :error="replyError">
+          <UFormField :label="$t('pipeline.detail.from')" :error="replyError || undefined">
             <UInput v-model="reply.from" inputmode="email" autocomplete="email" class="w-full" />
           </UFormField>
           <UFormField :label="$t('pipeline.detail.subject')">

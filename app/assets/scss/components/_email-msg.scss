@@ -61,5 +61,35 @@
     font-size: 11px;
     color: var(--ink-3);
     letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  // Reply sits at the trailing edge of the footer; margin-left auto keeps it
+  // right-aligned even when no address is shown alongside it.
+  &__reply {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--ink-2);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition:
+      color 0.12s ease,
+      background-color 0.12s ease,
+      border-color 0.12s ease;
+
+    &:hover {
+      color: var(--ink);
+      background: var(--surface-3);
+      border-color: var(--ink);
+    }
   }
 }

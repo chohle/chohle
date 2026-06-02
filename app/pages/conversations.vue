@@ -86,6 +86,13 @@ const projectHref = computed(() =>
     : '#'
 )
 
+// Replying happens in the project detail (which owns the composer): jump there
+// with ?reply=<id> so it opens the composer pre-filled for this message.
+function replyToMessage(ev: ProjectEmail) {
+  if (!selectedThread.value) return
+  router.push({ path: projectHref.value, query: { reply: ev.id } })
+}
+
 function fmtTimestamp(s: string) {
   const ymd = s.slice(0, 10)
   const hm = s.slice(11, 16)
@@ -200,11 +207,23 @@ watch(selectedId, async () => {
             <pre v-else-if="ev.body_text" class="email-msg__body email-msg__body--text">{{
               ev.body_text
             }}</pre>
-            <footer v-if="ev.from_address || ev.to_address" class="email-msg__foot mono">
+            <footer
+              v-if="ev.from_address || ev.to_address || ev.direction === 'inbound'"
+              class="email-msg__foot mono"
+            >
               <span v-if="ev.direction === 'outbound' && ev.to_address">→ {{ ev.to_address }}</span>
               <span v-else-if="ev.direction === 'inbound' && ev.from_address"
                 >← {{ ev.from_address }}</span
               >
+              <button
+                v-if="ev.direction === 'inbound'"
+                type="button"
+                class="email-msg__reply"
+                @click="replyToMessage(ev)"
+              >
+                <UIcon name="i-lucide-reply" class="size-3.5" />
+                {{ $t('pipeline.detail.reply') }}
+              </button>
             </footer>
           </li>
         </ul>

@@ -184,6 +184,7 @@
       "sent": "Sent",
       "received": "Received",
       "logReply": "Log a reply",
+      "reply": "Reply",
       "logSave": "Log message",
       "newInvoice": "New invoice",
       "linkCustomerFirst": "Link a customer to this project first",
