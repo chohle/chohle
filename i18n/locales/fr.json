@@ -2,6 +2,7 @@
   "conversations": {
     "title": "Conversations",
     "subtitle": "Tous les e-mails de tous vos projets, au même endroit.",
+    "openProject": "Ouvrir le projet",
     "emptyTitle": "Aucune conversation pour l'instant",
     "emptyText": "Envoyez un e-mail depuis un projet et le fil apparaîtra ici.",
     "messages": "messages",

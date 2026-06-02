@@ -2,6 +2,7 @@
   "conversations": {
     "title": "Conversazioni",
     "subtitle": "Ogni email di ogni progetto, in un unico posto.",
+    "openProject": "Apri progetto",
     "emptyTitle": "Ancora nessuna conversazione",
     "emptyText": "Invia un'email da un progetto e il thread apparirà qui.",
     "messages": "messaggi",

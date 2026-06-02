@@ -56,8 +56,8 @@ const sections = computed<Section[]>(() => [
         label: t('nav.pipeline'),
         icon: 'i-lucide-kanban',
         children: [
-          { label: t('nav.vertrieb'), icon: 'i-lucide-trending-up', to: '/vertrieb' },
-          { label: t('nav.einkauf'), icon: 'i-lucide-shopping-cart', to: '/einkauf' }
+          { label: t('nav.vertrieb'), icon: 'i-lucide-trending-up', to: '/sales' },
+          { label: t('nav.einkauf'), icon: 'i-lucide-shopping-cart', to: '/procurement' }
         ]
       }
     ]

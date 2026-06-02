@@ -208,6 +208,7 @@
   "conversations": {
     "title": "Conversations",
     "subtitle": "Every email exchanged on every project, in one place.",
+    "openProject": "Open project",
     "emptyTitle": "No conversations yet",
     "emptyText": "Send an email from a project and the thread will show up here.",
     "messages": "messages",

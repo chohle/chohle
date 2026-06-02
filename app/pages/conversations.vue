@@ -74,9 +74,17 @@ const selectedThread = computed(
 )
 
 const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
-  sales: 'vertrieb',
-  procurement: 'einkauf'
+  sales: 'sales',
+  procurement: 'procurement'
 }
+
+// Where the "open project" header link points: the full project detail page,
+// which carries the whole conversation plus quotes, invoices and budget.
+const projectHref = computed(() =>
+  selectedThread.value
+    ? `/${DIR_TO_SLUG[selectedThread.value.project_direction]}/${selectedThread.value.project_id}`
+    : '#'
+)
 
 function fmtTimestamp(s: string) {
   const ymd = s.slice(0, 10)
@@ -143,18 +151,25 @@ watch(selectedId, async () => {
 
       <section class="conv-thread">
         <header v-if="selectedThread" class="conv-thread__head">
-          <div class="conv-thread__title-row">
-            <h2 class="conv-thread__title">
-              {{ selectedThread.customer_name || selectedThread.project_name }}
-            </h2>
-            <NuxtLink
-              :to="`/${DIR_TO_SLUG[selectedThread.project_direction]}/${selectedThread.project_id}`"
-              class="conv-thread__project-link mono"
-            >
-              <UIcon name="i-lucide-kanban" class="size-3.5" />
-              {{ selectedThread.project_name }}
-            </NuxtLink>
-          </div>
+          <NuxtLink
+            :to="projectHref"
+            class="conv-thread__open"
+            :aria-label="`${$t('conversations.openProject')} — ${selectedThread.project_name}`"
+          >
+            <span class="conv-thread__open-main">
+              <h2 class="conv-thread__title">
+                {{ selectedThread.customer_name || selectedThread.project_name }}
+              </h2>
+              <span class="conv-thread__project mono">
+                <UIcon name="i-lucide-kanban" class="size-3.5" />
+                {{ selectedThread.project_name }}
+              </span>
+            </span>
+            <span class="conv-thread__open-cue mono">
+              {{ $t('conversations.openProject') }}
+              <UIcon name="i-lucide-arrow-right" class="size-3.5" />
+            </span>
+          </NuxtLink>
           <div class="conv-thread__meta mono">
             <span>{{ selectedThread.total }} {{ $t('conversations.messages') }}</span>
             <span>· {{ selectedThread.inbound }} {{ $t('conversations.received') }}</span>

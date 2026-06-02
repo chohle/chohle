@@ -46,8 +46,8 @@ const linkedProject = data.value!.project
 const customerId = inv.customer_id
 
 const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
-  sales: 'vertrieb',
-  procurement: 'einkauf'
+  sales: 'sales',
+  procurement: 'procurement'
 }
 const projectHref = computed(() =>
   linkedProject ? `/${DIR_TO_SLUG[linkedProject.direction]}/${linkedProject.id}` : null

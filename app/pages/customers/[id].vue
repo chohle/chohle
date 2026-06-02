@@ -70,8 +70,8 @@ const { data: projects } = await useFetch<ProjectRow[]>(`/api/customers/${id}/pr
 })
 
 const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
-  sales: 'vertrieb',
-  procurement: 'einkauf'
+  sales: 'sales',
+  procurement: 'procurement'
 }
 
 const stats = computed(() => {

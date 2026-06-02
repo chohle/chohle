@@ -35,7 +35,7 @@ const props = defineProps<{ direction: Direction }>()
 
 const SALES_STAGES: SalesStage[] = ['lead', 'contacted', 'proposal', 'won']
 const PROC_STAGES: ProcStage[] = ['need', 'requested', 'received', 'accepted']
-const DIR_TO_SLUG: Record<Direction, string> = { sales: 'vertrieb', procurement: 'einkauf' }
+const DIR_TO_SLUG: Record<Direction, string> = { sales: 'sales', procurement: 'procurement' }
 
 const { t } = useI18n()
 const toast = useToast()
@@ -289,8 +289,8 @@ function dismissThenEditProject() {
 const stageOptions = computed(() => STAGES.map((s) => ({ value: s, label: stageMeta[s].title })))
 
 const directionTabs = computed(() => [
-  { label: t('pipeline.direction.sales'), to: '/vertrieb' },
-  { label: t('pipeline.direction.procurement'), to: '/einkauf' }
+  { label: t('pipeline.direction.sales'), to: '/sales' },
+  { label: t('pipeline.direction.procurement'), to: '/procurement' }
 ])
 
 const subtitleKey =

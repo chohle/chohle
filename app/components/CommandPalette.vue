@@ -139,8 +139,8 @@ function go(to: string) {
 }
 
 const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
-  sales: 'vertrieb',
-  procurement: 'einkauf'
+  sales: 'sales',
+  procurement: 'procurement'
 }
 
 const groups = computed<Group[]>(() =>

@@ -49,7 +49,7 @@ interface ProjectEmail {
 
 const props = defineProps<{ direction: Direction; id: string }>()
 
-const DIR_TO_SLUG: Record<Direction, string> = { sales: 'vertrieb', procurement: 'einkauf' }
+const DIR_TO_SLUG: Record<Direction, string> = { sales: 'sales', procurement: 'procurement' }
 // Detail page exposes the full lifecycle so the user can move a project into
 // 'active' (work in flight) or 'completed' (archived) after winning it.
 const SALES_STAGES: Stage[] = ['lead', 'contacted', 'proposal', 'won', 'active', 'completed']

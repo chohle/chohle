@@ -116,12 +116,35 @@
     margin-bottom: 14px;
   }
 
-  &__title-row {
+  // The whole title block is one clickable target into the project detail,
+  // with an explicit "open project" cue so it reads as navigable.
+  &__open {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: -8px -10px 0;
+    padding: 8px 10px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+    &:hover .conv-thread__open-cue {
+      color: var(--ink);
+    }
+  }
+
+  &__open-main {
+    display: flex;
     align-items: baseline;
     gap: 12px;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   &__title {
@@ -130,7 +153,7 @@
     margin: 0;
   }
 
-  &__project-link {
+  &__project {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -138,11 +161,18 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-3);
-    text-decoration: none;
+  }
 
-    &:hover {
-      color: var(--ink);
-    }
+  &__open-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    transition: color 0.12s ease;
   }
 
   &__meta {
