@@ -203,7 +203,9 @@ async function startImapConnect() {
   }
 }
 
+const confirm = useConfirm()
 async function disconnect(id: number) {
+  if (!(await confirm())) return
   try {
     await $fetch(`/api/mailboxes/${id}`, { method: 'DELETE' })
     await refreshMailboxes()

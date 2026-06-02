@@ -118,7 +118,9 @@ async function save() {
     saving.value = false
   }
 }
+const confirm = useConfirm()
 async function remove(id: number) {
+  if (!(await confirm())) return
   await $fetch(`/api/income/sources/${id}`, { method: 'DELETE' })
   await refresh()
 }

@@ -25,7 +25,9 @@ async function onFiles(event: Event) {
   }
 }
 
+const confirm = useConfirm()
 async function remove(id: number) {
+  if (!(await confirm())) return
   await $fetch(`/api/attachments/${id}`, { method: 'DELETE' })
   emit('changed')
 }

@@ -694,6 +694,8 @@
   "common": {
     "close": "Chiudi",
     "cancel": "Annulla",
+    "deleteTitle": "Eliminare?",
+    "deleteConfirm": "Questa azione non può essere annullata.",
     "confirm": "Cambia",
     "leaveDirtyTitle": "Modifiche non salvate",
     "leaveDirty": "Hai modifiche non salvate. Uscire comunque?",

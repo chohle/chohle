@@ -694,6 +694,8 @@
   "common": {
     "close": "Schließen",
     "cancel": "Abbrechen",
+    "deleteTitle": "Löschen?",
+    "deleteConfirm": "Dies kann nicht rückgängig gemacht werden.",
     "confirm": "Ändern",
     "leaveDirtyTitle": "Ungespeicherte Änderungen",
     "leaveDirty": "Du hast nicht gespeicherte Änderungen. Trotzdem verlassen?",

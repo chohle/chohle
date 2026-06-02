@@ -694,6 +694,8 @@
   "common": {
     "close": "Close",
     "cancel": "Cancel",
+    "deleteTitle": "Delete?",
+    "deleteConfirm": "This can't be undone.",
     "confirm": "Change",
     "leaveDirtyTitle": "Unsaved changes",
     "leaveDirty": "You have unsaved changes. Leave anyway?",

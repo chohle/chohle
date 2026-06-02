@@ -75,7 +75,9 @@ async function save() {
     saving.value = false
   }
 }
+const confirm = useConfirm()
 async function removeCategory(id: number) {
+  if (!(await confirm())) return
   await $fetch(`/api/categories/${id}`, { method: 'DELETE' })
   await refresh()
 }

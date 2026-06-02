@@ -20,7 +20,9 @@ async function onFile(event: Event) {
   }
 }
 
+const confirm = useConfirm()
 async function remove() {
+  if (!(await confirm())) return
   busy.value = true
   try {
     await $fetch(props.removeUrl, { method: 'DELETE' })
