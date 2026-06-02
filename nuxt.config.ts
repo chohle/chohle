@@ -3,6 +3,13 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxt/ui', 'nuxt-auth-utils', '@nuxtjs/i18n'],
+  // Don't follow the visitor's OS theme: our editorial theme is driven by
+  // `data-theme` and defaults to light. Pin color-mode to light so Nuxt UI
+  // components match on SSR / first paint; useTweaks syncs it afterwards.
+  colorMode: {
+    preference: 'light',
+    fallback: 'light'
+  },
   css: ['~/assets/css/main.css', '~/assets/scss/main.scss'],
   i18n: {
     strategy: 'no_prefix',

@@ -18,6 +18,19 @@ function apply(t: Tweaks) {
 }
 
 export function useTweaks() {
+  // Nuxt UI components read the `.dark` class driven by @nuxtjs/color-mode,
+  // not our `data-theme` attribute. Keep the two in lockstep so components
+  // (buttons, inputs, modals, dropdowns) match the editorial shell instead
+  // of following the visitor's OS preference independently.
+  const colorMode = useColorMode()
+  const syncColorMode = (theme: Theme) => {
+    colorMode.preference = theme === 'dark' ? 'dark' : 'light'
+  }
+
+  // Run on every caller's setup so a fresh component mount re-asserts the
+  // mapping even when the singleton state was initialised earlier.
+  syncColorMode(state.value.theme)
+
   if (!initialised && typeof window !== 'undefined') {
     initialised = true
     try {
@@ -30,6 +43,7 @@ export function useTweaks() {
       }
     } catch {}
     apply(state.value)
+    syncColorMode(state.value.theme)
 
     // Detached scope so the watcher survives the first caller's unmount.
     const scope = effectScope(true)
@@ -41,6 +55,7 @@ export function useTweaks() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(v))
           } catch {}
           apply(v)
+          syncColorMode(v.theme)
         },
         { deep: true }
       )
