@@ -54,7 +54,7 @@ function open(id: number) {
 // The project link (optional) is set later in the editor where the
 // project picker has more room.
 const newOpen = ref(false)
-const newCustomerId = ref<number | null>(null)
+const newCustomerId = ref<number>()
 const creating = ref(false)
 const { data: customers } = await useFetch<Array<{ id: number; name: string }>>('/api/customers', {
   default: () => []
@@ -64,7 +64,7 @@ const customerOptions = computed(() =>
 )
 
 function openCreate() {
-  newCustomerId.value = null
+  newCustomerId.value = undefined
   newOpen.value = true
 }
 async function submitCreate() {
