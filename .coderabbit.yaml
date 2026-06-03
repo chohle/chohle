@@ -1,0 +1,38 @@
+# CodeRabbit configuration — https://docs.coderabbit.ai/reference/configuration
+language: en-US
+early_access: false
+
+reviews:
+  # "assertive" surfaces more, "chill" is quieter. This is a finance app, so
+  # err on the side of flagging — dial down to "chill" if it gets noisy.
+  profile: assertive
+  # Don't hard-block merges with a "changes requested" review (you're solo).
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  poem: false
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+  path_filters:
+    - '!**/yarn.lock'
+    - '!**/*.min.*'
+    - '!**/dist/**'
+    - '!**/.nuxt/**'
+  path_instructions:
+    - path: 'server/**'
+      instructions: >-
+        Nuxt/Nitro backend for a single-user Swiss finance app. Flag missing
+        input validation, unsafe better-sqlite3 queries (SQL injection), and any
+        leakage of secrets, auth tokens, or IMAP/SMTP credentials. Money math
+        must respect CHF, 8.1% MWST and 5-Rappen rounding.
+    - path: '**/*.vue'
+      instructions: >-
+        Vue 3 + Nuxt UI. Flag accessibility issues, unhandled async/error
+        states, and any rendering of unsanitised user/email HTML.
+
+chat:
+  auto_reply: true
