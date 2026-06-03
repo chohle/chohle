@@ -304,7 +304,6 @@ const tabs = computed(() => [
 
 const themes = [
   { value: 'light', label: 'Light' },
-  { value: 'warm', label: 'Warm' },
   { value: 'dark', label: 'Dark' }
 ] as const
 </script>

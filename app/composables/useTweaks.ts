@@ -1,6 +1,9 @@
 import { effectScope } from 'vue'
 
-export type Theme = 'light' | 'warm' | 'dark'
+export type Theme = 'light' | 'dark'
+
+const THEMES: readonly Theme[] = ['light', 'dark']
+const isTheme = (v: unknown): v is Theme => THEMES.includes(v as Theme)
 
 interface Tweaks {
   theme: Theme
@@ -49,7 +52,8 @@ export function useTweaks() {
         const parsed = JSON.parse(raw) as Partial<Tweaks>
         // Older clients persisted a `radius` field — ignore it silently
         // so removing the setting doesn't blow up on existing installs.
-        if (parsed.theme) state.value.theme = parsed.theme
+        // The removed `warm` theme (and any junk) falls back to light.
+        if (isTheme(parsed.theme)) state.value.theme = parsed.theme
       }
     } catch {}
     apply(state.value)

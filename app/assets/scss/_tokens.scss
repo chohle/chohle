@@ -19,22 +19,6 @@
   --accent-ink: #ffffff;
 }
 
-:root[data-theme="warm"] {
-  --bg: #f7f4ee;
-  --surface: #f7f4ee;
-  --surface-2: #f1ede4;
-  --surface-3: #e9e4d7;
-  --inset: #e9e4d7;
-  --border: #e2dccb;
-  --border-strong: #c9c2ae;
-  --ink: #1b1b17;
-  --ink-2: #5c5851;
-  --ink-3: #8e897f;
-  --ink-4: #bcb6a4;
-  --accent: #1b1b17;
-  --accent-ink: #f7f4ee;
-}
-
 :root[data-theme="dark"] {
   --bg: #0a0a0a;
   --surface: #0a0a0a;
