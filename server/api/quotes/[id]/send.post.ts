@@ -2,46 +2,9 @@
 // minus the IBAN gate (a quote isn't a payment instrument so no QR
 // slip and no IBAN dependency). Marks the quote as 'sent' on success.
 
-function escapeHtml(s: string) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
-
-function buildHtml(
-  bodyHtml: string,
-  sender: {
-    name: string
-    phone: string | null
-    email: string | null
-    website: string | null
-    mwst: string | null
-  }
-) {
-  const footer = [sender.phone, sender.email, sender.website, sender.mwst]
-    .filter(Boolean)
-    .join(' &middot; ')
-  return (
-    `<div style="font-family:Arial,Helvetica,sans-serif;color:#1b1b1b;max-width:600px;margin:0 auto;padding:24px">` +
-    `<div style="font-size:18px;font-weight:bold;border-bottom:1px solid #eaeaea;padding-bottom:12px;margin-bottom:20px">${escapeHtml(sender.name)}</div>` +
-    `<div style="font-size:14px;line-height:1.5">${bodyHtml}</div>` +
-    (footer
-      ? `<div style="margin-top:28px;padding-top:12px;border-top:1px solid #eaeaea;font-size:12px;color:#888">${footer}</div>`
-      : '') +
-    `</div>`
-  )
-}
-
-function htmlToText(html: string) {
-  return html
-    .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
-    .replace(/<br\s*\/?>(?!$)/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
-}
+// HTML shell, plaintext, and the contact footer come from the shared branded
+// template (server/utils/emailTemplate.ts), auto-imported, so every outbound
+// email looks identical.
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -93,7 +56,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const sender = db
-    .prepare('SELECT name, email, phone, website, mwst FROM sender WHERE id = 1')
+    .prepare('SELECT name, email, phone, website, mwst, logo_path FROM sender WHERE id = 1')
     .get() as
     | {
         name: string
@@ -101,6 +64,7 @@ export default defineEventHandler(async (event) => {
         phone: string | null
         website: string | null
         mwst: string | null
+        logo_path: string | null
       }
     | undefined
   if (!sender?.name) {
@@ -112,12 +76,13 @@ export default defineEventHandler(async (event) => {
   const from = sender.email
     ? `${sender.name} <${sender.email}>`
     : `${sender.name} <no-reply@chohle.local>`
+  const { html, text } = await buildBrandedEmail(sender, message)
   await getMailer().sendMail({
     from,
     to: customer.email,
     subject,
-    text: htmlToText(message),
-    html: buildHtml(message, sender),
+    text,
+    html,
     attachments: [
       {
         filename: `${quote.number || 'quote'}.pdf`,

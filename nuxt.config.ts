@@ -47,6 +47,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     adminUsername: '',
     adminPassword: '',
+    // Public origin of this instance, used to build absolute URLs in emails
+    // (e.g. the hosted logo). Override with NUXT_SITE_URL; otherwise derived
+    // from DOMAIN in production. Empty in plain dev → emails fall back to a text
+    // wordmark instead of the hosted logo image. (Not NUXT_APP_* — that's
+    // reserved by Nuxt for app.baseURL and would break the dev server.)
+    siteUrl: process.env.NUXT_SITE_URL || (process.env.DOMAIN ? `https://${process.env.DOMAIN}` : ''),
     smtp: {
       host: '',
       port: '1025',

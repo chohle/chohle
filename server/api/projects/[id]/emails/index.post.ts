@@ -9,6 +9,10 @@ interface Body {
 interface SenderRow {
   email: string | null
   name: string
+  phone: string | null
+  website: string | null
+  mwst: string | null
+  logo_path: string | null
 }
 interface ProjectRow {
   id: number
@@ -18,20 +22,8 @@ interface CustomerRow {
   email: string | null
 }
 
-function htmlToText(html: string): string {
-  // Tiny stripper for plaintext fallback. Good enough for email clients
-  // that fall back when there's no text/plain part.
-  return html
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .trim()
-}
+// The branded shell, plaintext fallback, and footer come from the shared
+// template (server/utils/emailTemplate.ts), auto-imported.
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -66,9 +58,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'recipient address required' })
   }
 
-  const sender = db.prepare(`SELECT email, name FROM sender WHERE id = 1`).get() as
-    | SenderRow
-    | undefined
+  const sender = db
+    .prepare(`SELECT email, name, phone, website, mwst, logo_path FROM sender WHERE id = 1`)
+    .get() as SenderRow | undefined
   if (!sender?.email) {
     throw createError({
       statusCode: 400,
@@ -79,7 +71,9 @@ export default defineEventHandler(async (event) => {
   // Pass the address object form so nodemailer encodes display names with
   // special characters (quotes, commas, non-ASCII) into a valid RFC 5322 header.
   const from = sender.name ? { name: sender.name, address: sender.email } : sender.email
-  const text = htmlToText(html)
+  // Send the body wrapped in the shared branded shell; the raw `html` is what we
+  // store on the conversation row (the thread UI shouldn't show email chrome).
+  const { html: brandedHtml, text } = await buildBrandedEmail(sender, html)
 
   // Generate our own RFC 5322 Message-ID and hand it to nodemailer rather than
   // trusting the one it/the SMTP server reports back: relays (Gmail, Outlook)
@@ -89,7 +83,14 @@ export default defineEventHandler(async (event) => {
   const domain = sender.email.split('@')[1] || 'chohle.local'
   const messageIdHeader = `<chohle-${randomUUID()}@${domain}>`
   try {
-    await getMailer().sendMail({ from, to, subject, html, text, messageId: messageIdHeader })
+    await getMailer().sendMail({
+      from,
+      to,
+      subject,
+      html: brandedHtml,
+      text,
+      messageId: messageIdHeader
+    })
   } catch (err) {
     throw createError({ statusCode: 502, statusMessage: 'SMTP send failed', cause: err })
   }

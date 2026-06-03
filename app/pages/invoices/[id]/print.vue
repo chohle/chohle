@@ -116,7 +116,12 @@ function printPage() {
       <div class="flex flex-1 flex-col px-[20mm] pt-[18mm] pb-6">
         <!-- Logo -->
         <div class="mb-16 h-12">
-          <img v-if="senderLogo" :src="senderLogo" alt="Logo" class="h-12 object-contain" />
+          <img
+            v-if="senderLogo"
+            :src="senderLogo"
+            alt="Logo"
+            class="h-12 max-w-[280px] object-contain object-left"
+          />
           <div v-else class="text-2xl font-bold tracking-tight">{{ sender?.name || 'chohle' }}</div>
         </div>
 
