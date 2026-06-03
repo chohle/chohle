@@ -257,7 +257,12 @@
       "noQuotesTitle": "Aucun devis pour l'instant",
       "noQuotesText": "Utilisez le bouton Nouveau devis pour préparer un devis à envoyer au client.",
       "archive": "Archiver",
-      "archived": "Projet archivé"
+      "archived": "Projet archivé",
+      "tabOverview": "Aperçu",
+      "tabQuotes": "Devis",
+      "tabInvoices": "Factures",
+      "you": "Vous",
+      "noContact": "ce projet"
     }
   },
   "payments": {

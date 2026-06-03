@@ -207,7 +207,12 @@
       "noQuotesTitle": "Noch keine Offerten",
       "noQuotesText": "Über «Neue Offerte» entwirfst du eine Offerte, die du dem Kunden senden kannst.",
       "archive": "Archivieren",
-      "archived": "Projekt archiviert"
+      "archived": "Projekt archiviert",
+      "tabOverview": "Übersicht",
+      "tabQuotes": "Offerten",
+      "tabInvoices": "Rechnungen",
+      "you": "Sie",
+      "noContact": "dieses Projekt"
     }
   },
   "conversations": {

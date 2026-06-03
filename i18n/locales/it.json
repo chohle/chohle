@@ -257,7 +257,12 @@
       "noQuotesTitle": "Ancora nessuna offerta",
       "noQuotesText": "Usa il pulsante Nuova offerta per preparare un'offerta da inviare al cliente.",
       "archive": "Archivia",
-      "archived": "Progetto archiviato"
+      "archived": "Progetto archiviato",
+      "tabOverview": "Panoramica",
+      "tabQuotes": "Preventivi",
+      "tabInvoices": "Fatture",
+      "you": "Tu",
+      "noContact": "questo progetto"
     }
   },
   "payments": {

@@ -207,7 +207,12 @@
       "noQuotesTitle": "No quotes yet",
       "noQuotesText": "Use the New quote button to draft a quote you can send to the customer.",
       "archive": "Archive",
-      "archived": "Project archived"
+      "archived": "Project archived",
+      "tabOverview": "Overview",
+      "tabQuotes": "Quotes",
+      "tabInvoices": "Invoices",
+      "you": "You",
+      "noContact": "this project"
     }
   },
   "conversations": {
