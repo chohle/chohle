@@ -14,7 +14,17 @@ let initialised = false
 
 function apply(t: Tweaks) {
   if (typeof document === 'undefined') return
-  document.documentElement.setAttribute('data-theme', t.theme)
+  const el = document.documentElement
+  el.setAttribute('data-theme', t.theme)
+  // Nuxt UI components read the `.dark` class (driven by @nuxtjs/color-mode,
+  // which keeps its OWN persisted preference under `nuxt-color-mode`). That
+  // separate store can go stale and leave `.dark` on while our editorial theme
+  // is light — the exact `class="dark" data-theme="light"` mismatch. Own the
+  // class here so `data-theme` is the single source of truth: the two can't
+  // diverge regardless of what color-mode restored on first paint.
+  const isDark = t.theme === 'dark'
+  el.classList.toggle('dark', isDark)
+  el.classList.toggle('light', !isDark)
 }
 
 export function useTweaks() {
