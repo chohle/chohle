@@ -17,7 +17,8 @@
     "einkauf": "Einkauf",
     "workspace": "Arbeitsbereich",
     "finance": "Finanzen",
-    "system": "System"
+    "system": "System",
+    "triage": "Triage"
   },
   "demo": {
     "notice": "Demo — Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
@@ -734,5 +735,21 @@
     "username": "Benutzername",
     "password": "Passwort",
     "delete": "Löschen"
+  },
+  "triage": {
+    "title": "Triage",
+    "subtitle": "Eingehende Mail ohne passendes Projekt. Zuweisen oder verwerfen.",
+    "emptyTitle": "Nichts zu sichten",
+    "emptyText": "Synchronisierte Antworten ohne passendes Projekt erscheinen hier zur Zuweisung.",
+    "assignToSuggested": "Zuweisen",
+    "chooseProject": "Projekt wählen…",
+    "dismiss": "Verwerfen",
+    "assigned": "Projekt zugewiesen",
+    "assignFailed": "Zuweisung fehlgeschlagen",
+    "dismissFailed": "Verwerfen fehlgeschlagen",
+    "unknownSender": "Unbekannter Absender",
+    "noCustomerMatch": "Kein passender Kunde",
+    "noProjectSuggestion": "Kein Projektvorschlag",
+    "loading": "Wird geladen…"
   }
 }
