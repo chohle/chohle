@@ -25,7 +25,7 @@ services:
       - DEMO_DATA_PATH=/app/dbdata/demo
       # Default to the Mailpit sidecar (reachable by service name inside the
       # compose network). Set NUXT_SMTP_HOST/PORT in .env to point the container
-      # at a real provider instead (e.g. to test metanet sending end-to-end).
+      # at a real provider instead (e.g. to test example sending end-to-end).
       - NUXT_SMTP_HOST=${NUXT_SMTP_HOST:-mailpit}
       - NUXT_SMTP_PORT=${NUXT_SMTP_PORT:-1025}
     env_file:

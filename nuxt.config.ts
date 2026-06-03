@@ -52,7 +52,7 @@ export default defineNuxtConfig({
       port: '1025',
       // Auth is optional: left blank for the no-auth Mailpit dev relay, set in
       // production (NUXT_SMTP_USER / NUXT_SMTP_PASS) for a real provider like
-      // metanet. The user is normally the full sending address (hello@chohle.ch).
+      // example. The user is normally the full sending address (hello@chohle.ch).
       user: '',
       pass: '',
       // Leave blank to derive from the port (465 → implicit TLS, else STARTTLS).

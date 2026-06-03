@@ -1,5 +1,5 @@
 // Dev-only smoke test for the outbound SMTP pipe. Sends one message through the
-// configured transport — Mailpit in dev, or a real provider like metanet once
+// configured transport — Mailpit in dev, or a real provider like example once
 // NUXT_SMTP_USER/PASS are set — so you can confirm auth, TLS, and the From-domain
 // guard all line up BEFORE sending a real invoice. Mirrors the live send paths:
 // From is the Billing sender, so the guard is exercised exactly as an invoice

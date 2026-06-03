@@ -23,12 +23,25 @@ the presence of a username _is_ the flag.
 
 ### Mailpit (the default — nothing to configure)
 
-Out of the box `.env` points at the Mailpit catch-all that ships in
-`docker-compose.yml`. Every send is captured, nothing leaves your machine,
-and you can read it at **http://localhost:8125**. This is all most
-contributors ever need.
+Out of the box every send is captured by the Mailpit catch-all that ships in
+`docker-compose.yml`; nothing leaves your machine and you read it at
+**http://localhost:8125**. This is all most contributors ever need.
+
+In **Docker** (the default), leave the SMTP host/port **unset** in `.env` —
+compose points the container at the Mailpit sidecar automatically:
+
+```yaml
+- NUXT_SMTP_HOST=${NUXT_SMTP_HOST:-mailpit}
+- NUXT_SMTP_PORT=${NUXT_SMTP_PORT:-1025}
+```
+
+> Don't set `NUXT_SMTP_HOST=localhost` for Docker — inside the container
+> `localhost` is the container itself, not the host, so the send fails. Those
+> `localhost:1125` values are only for running **host `yarn dev`** (no Docker),
+> where they reach Mailpit's published port:
 
 ```env
+# host `yarn dev` only:
 NUXT_SMTP_HOST=localhost
 NUXT_SMTP_PORT=1125
 # NUXT_SMTP_USER unset → Mailpit mode

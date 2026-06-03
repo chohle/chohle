@@ -33,7 +33,7 @@ function fromDomain(from: unknown): string {
 }
 
 // Guard: when we authenticate to a real SMTP account, the From must sit on the
-// same domain we log in as — otherwise the provider (metanet et al.) rejects or
+// same domain we log in as — otherwise the provider (example et al.) rejects or
 // rewrites it and the recipient's SPF/DKIM checks fail. This catches the exact
 // mismatch of a Billing sender email that doesn't match NUXT_SMTP_USER. Wraps
 // sendMail at the single choke point so every path (replies, invoices, quotes,
