@@ -653,6 +653,38 @@ const migrations: Migration[] = [
       CREATE UNIQUE INDEX idx_project_emails_message_id
         ON project_emails (message_id) WHERE message_id IS NOT NULL;
     `
+  },
+  {
+    name: '0036_inbound_triage',
+    // Inbound that doesn't thread to any project we wrote used to be dropped.
+    // Park it here instead with a non-binding suggested project (derived from
+    // the sender address) so the user can review and assign it — capturing
+    // cold inbound and header-stripped replies WITHOUT ever auto-mis-filing.
+    // assigned/dismissed rows are kept as tombstones so a later sync doesn't
+    // re-triage the same message; the unique message_id index enforces that.
+    up: `
+      CREATE TABLE inbound_triage (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        mailbox_id INTEGER REFERENCES mailboxes(id) ON DELETE CASCADE,
+        message_id TEXT,
+        in_reply_to TEXT,
+        references_ids TEXT,
+        from_address TEXT,
+        to_address TEXT,
+        subject TEXT NOT NULL DEFAULT '',
+        body_html TEXT NOT NULL DEFAULT '',
+        body_text TEXT NOT NULL DEFAULT '',
+        sent_at TEXT,
+        suggested_customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+        suggested_project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'assigned', 'dismissed')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE UNIQUE INDEX idx_inbound_triage_message_id
+        ON inbound_triage (message_id) WHERE message_id IS NOT NULL;
+      CREATE INDEX idx_inbound_triage_status ON inbound_triage (status, sent_at);
+    `
   }
 ]
 

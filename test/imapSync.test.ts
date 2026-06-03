@@ -154,7 +154,7 @@ describe('syncImapMailbox', () => {
     expect(inbound[0]!.message_id).toBe('reply-1@acme.ch')
   })
 
-  it('ignores messages whose anchors do not match any captured outbound id', async () => {
+  it('triages (does not attach) a message whose anchors match no captured outbound id', async () => {
     const { db } = makeDb()
     const mailbox = makeMailbox(db)
     stubFetch([
@@ -169,6 +169,8 @@ describe('syncImapMailbox', () => {
     const result = await syncImapMailbox(db, mailbox)
     expect(result.scanned).toBe(1)
     expect(result.inserted).toBe(0)
+    expect(result.triaged).toBe(1)
+    // Nothing attached to a project...
     expect(
       (
         db
@@ -176,6 +178,37 @@ describe('syncImapMailbox', () => {
           .get() as { n: number }
       ).n
     ).toBe(0)
+    // ...it's parked in triage instead, with no suggestion (unknown sender).
+    const triage = db
+      .prepare(`SELECT message_id, status, suggested_project_id FROM inbound_triage`)
+      .all() as Array<{ message_id: string; status: string; suggested_project_id: number | null }>
+    expect(triage).toHaveLength(1)
+    expect(triage[0]!.message_id).toBe('random@spam.com')
+    expect(triage[0]!.status).toBe('pending')
+    expect(triage[0]!.suggested_project_id).toBeNull()
+  })
+
+  it('suggests the sender’s project when triaging mail from a known customer', async () => {
+    const { db, projectId } = makeDb()
+    db.prepare(`UPDATE customers SET email = 'thomas@acme.ch'`).run()
+    const mailbox = makeMailbox(db)
+    stubFetch([
+      {
+        uid: 1,
+        messageId: 'cold-1@acme.ch',
+        subject: 'New enquiry',
+        from: 'Thomas <thomas@acme.ch>',
+        body: 'Can you help with a new site?'
+      }
+    ])
+
+    const result = await syncImapMailbox(db, mailbox)
+    expect(result.triaged).toBe(1)
+    const triage = db
+      .prepare(`SELECT suggested_project_id, suggested_customer_id FROM inbound_triage`)
+      .get() as { suggested_project_id: number | null; suggested_customer_id: number | null }
+    expect(triage.suggested_project_id).toBe(projectId)
+    expect(triage.suggested_customer_id).not.toBeNull()
   })
 
   it('does not insert the same message twice (dedup via Message-Id)', async () => {
@@ -243,6 +276,6 @@ describe('syncImapMailbox', () => {
     const mailbox = makeMailbox(db)
     // Default mock: search returns []
     const result = await syncImapMailbox(db, mailbox)
-    expect(result).toEqual({ scanned: 0, inserted: 0, duplicates: 0 })
+    expect(result).toEqual({ scanned: 0, inserted: 0, duplicates: 0, triaged: 0 })
   })
 })

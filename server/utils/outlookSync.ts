@@ -11,6 +11,7 @@
 import type { Database } from 'better-sqlite3'
 import { decryptSecret, encryptSecret } from './secrets'
 import type { SyncResult } from './mailbox'
+import { loadHandledInboundIds, triageInbound } from './triage'
 
 // Server side mailbox row. Includes the encrypted token columns and the
 // OAuth app credentials needed to refresh the access token; distinct on
@@ -171,16 +172,9 @@ export async function syncOutlookMailbox(
     .all() as Array<{ project_id: number; message_id: string }>
   for (const r of anchorRows) projectByMsgId.set(r.message_id, r.project_id)
 
-  // Dedup: skip messages we've already imported (by Graph internetMessageId).
-  const existingInbound = new Set<string>(
-    (
-      db
-        .prepare(
-          `SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`
-        )
-        .all() as Array<{ message_id: string }>
-    ).map((r) => r.message_id)
-  )
+  // Already-handled inbound ids: attached to a project OR sitting in triage
+  // (by Graph internetMessageId).
+  const existingInbound = loadHandledInboundIds(db)
 
   // OR IGNORE: a DB-level backstop on the unique message_id index in case two
   // runs overlap and both clear the in-memory dedup check.
@@ -192,6 +186,7 @@ export async function syncOutlookMailbox(
 
   let inserted = 0
   let duplicates = 0
+  let triaged = 0
   for (const msg of messages) {
     const incomingId = msg.internetMessageId ? stripAngles(msg.internetMessageId) : null
     if (incomingId && existingInbound.has(incomingId)) {
@@ -208,7 +203,6 @@ export async function syncOutlookMailbox(
         break
       }
     }
-    if (!projectId) continue
 
     const html = msg.body?.contentType === 'html' ? (msg.body.content ?? '') : ''
     const text =
@@ -220,6 +214,29 @@ export async function syncOutlookMailbox(
         .filter(Boolean)
         .join(', ') || null
     const sentAt = (msg.receivedDateTime ?? new Date().toISOString()).replace('T', ' ').slice(0, 19)
+
+    // No header thread match → park it in triage with a suggestion instead of
+    // dropping it. Never auto-attached to a project.
+    if (!projectId) {
+      if (
+        triageInbound(db, {
+          mailboxId: mailbox.id,
+          messageId: incomingId,
+          inReplyTo: anchors[0] ?? null,
+          referencesIds: anchors.length ? anchors.join(' ') : null,
+          fromAddress: from,
+          toAddress: to,
+          subject: msg.subject ?? '',
+          bodyHtml: html,
+          bodyText: text,
+          sentAt
+        }) === 'triaged'
+      ) {
+        triaged += 1
+        if (incomingId) existingInbound.add(incomingId)
+      }
+      continue
+    }
 
     const info = insert.run(projectId, from, to, msg.subject ?? '', html, text, sentAt, incomingId)
     if (info.changes > 0) {
@@ -240,7 +257,7 @@ export async function syncOutlookMailbox(
     mailbox.id
   )
 
-  return { scanned: messages.length, inserted, duplicates }
+  return { scanned: messages.length, inserted, duplicates, triaged }
 }
 
 export function listOutlookMailboxes(db: Database): OutlookSyncMailbox[] {

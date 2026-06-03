@@ -14,6 +14,8 @@ export interface SyncResult {
   scanned: number
   inserted: number
   duplicates: number
+  // Unmatched inbound parked in the triage queue (see server/utils/triage.ts).
+  triaged: number
 }
 
 export interface MailboxRow {
