@@ -108,7 +108,9 @@ export default defineEventHandler(async (event) => {
     host,
     port,
     secure,
-    doSTARTTLS: true,
+    // STARTTLS only applies to plaintext (non-implicit-TLS) connections;
+    // setting it alongside secure=true is rejected as a misconfiguration.
+    doSTARTTLS: !secure,
     servername: host,
     auth: { user, pass: password },
     logger: false

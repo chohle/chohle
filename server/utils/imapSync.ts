@@ -56,13 +56,16 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
     : Date.now() - 7 * 24 * 60 * 60 * 1000
   const since = new Date(sinceMs)
 
+  const secure = mailbox.imap_port === 993
   const client = new ImapFlow({
     host: mailbox.imap_host,
     port: mailbox.imap_port,
-    secure: mailbox.imap_port === 993,
+    secure,
     // Require TLS so credentials never cross the wire in cleartext: implicit
     // TLS on 993 (secure), otherwise force a STARTTLS upgrade before auth.
-    doSTARTTLS: true,
+    // STARTTLS and implicit TLS are mutually exclusive — setting both is
+    // rejected by ImapFlow as a misconfiguration.
+    doSTARTTLS: !secure,
     servername: mailbox.imap_host,
     auth: { user: mailbox.imap_user, pass: decryptSecret(mailbox.imap_password_enc) },
     logger: false
