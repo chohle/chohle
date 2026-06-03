@@ -5,6 +5,7 @@ import {
   calculateSCORReferenceChecksum,
   isQRIBAN
 } from 'swissqrbill/utils'
+import { readUpload } from './uploads'
 import enLocale from '../../i18n/locales/en.json'
 import deLocale from '../../i18n/locales/de.json'
 import frLocale from '../../i18n/locales/fr.json'
@@ -65,7 +66,11 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
     | undefined
   if (!invoice) throw createError({ statusCode: 404, statusMessage: 'Invoice not found' })
 
-  const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party & { iban: string }
+  const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party & {
+    iban: string
+    logo_path: string | null
+  }
+  const logo = await readUpload(sender.logo_path)
   const customer = db
     .prepare('SELECT * FROM customers WHERE id = ?')
     .get(invoice.customer_id) as Party
@@ -140,6 +145,17 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
         .join(', '),
       50
     )
+
+  // Sender logo, top-right (right-aligned, scaled into a fixed box so any size
+  // fits). The customer address sits below at y=120, so there's no collision.
+  // Guarded: a corrupt/unsupported image is skipped rather than failing the PDF.
+  if (logo) {
+    try {
+      pdf.image(logo, 395, 45, { fit: [150, 50], align: 'right', valign: 'top' })
+    } catch {
+      // ignore — never break invoice generation over a logo
+    }
+  }
 
   // Customer address (right)
   pdf

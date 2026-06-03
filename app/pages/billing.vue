@@ -104,6 +104,7 @@ async function save() {
           :src="logoSrc"
           upload-url="/api/sender/logo"
           remove-url="/api/sender/logo"
+          accept="image/png"
           @changed="refresh"
         />
 

@@ -604,7 +604,9 @@
   "logoUpload": {
     "upload": "Carica logo",
     "replace": "Sostituisci logo",
-    "remove": "Rimuovi"
+    "remove": "Rimuovi",
+    "invalidType": "Tipo di file non supportato.",
+    "uploadFailed": "Caricamento non riuscito."
   },
   "invoices": {
     "allSubtitle": "Tutte le fatture di tutti i clienti.",

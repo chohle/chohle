@@ -604,7 +604,9 @@
   "logoUpload": {
     "upload": "Logo hochladen",
     "replace": "Logo ersetzen",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "invalidType": "Dateityp nicht unterstützt.",
+    "uploadFailed": "Hochladen fehlgeschlagen."
   },
   "invoices": {
     "allSubtitle": "Alle Rechnungen über alle Kunden.",

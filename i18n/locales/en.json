@@ -604,7 +604,9 @@
   "logoUpload": {
     "upload": "Upload logo",
     "replace": "Replace logo",
-    "remove": "Remove"
+    "remove": "Remove",
+    "invalidType": "Unsupported file type.",
+    "uploadFailed": "Upload failed."
   },
   "invoices": {
     "allSubtitle": "All invoices across your customers.",

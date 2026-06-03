@@ -1,7 +1,9 @@
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const storedName = await saveImageUpload(event)
+  // PNG only: the logo is embedded in the invoice/quote PDF, where PNG renders
+  // reliably and keeps transparency. Other raster types are rejected here.
+  const storedName = await saveImageUpload(event, ['image/png'])
 
   const db = useDb()
   db.prepare('INSERT OR IGNORE INTO sender (id) VALUES (1)').run()

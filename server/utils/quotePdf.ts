@@ -3,6 +3,7 @@ import enLocale from '../../i18n/locales/en.json'
 import deLocale from '../../i18n/locales/de.json'
 import frLocale from '../../i18n/locales/fr.json'
 import itLocale from '../../i18n/locales/it.json'
+import { readUpload } from './uploads'
 
 // Quote (Offerte / Devis / Offerta) PDF. Near twin of invoicePdf.ts
 // minus the Swiss QR-bill: quotes aren't payment instruments, so the
@@ -65,13 +66,16 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
   // /api/sender yet, the row may not exist and we'd crash on access.
   // customer is guaranteed to exist because quotes.customer_id is a
   // NOT NULL FK with ON DELETE CASCADE, so it follows the quote.
-  const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party | undefined
+  const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as
+    | (Party & { logo_path: string | null })
+    | undefined
   if (!sender) {
     throw createError({
       statusCode: 422,
       statusMessage: 'Complete your sender block in Billing before generating a quote PDF'
     })
   }
+  const logo = await readUpload(sender.logo_path)
   const customer = db
     .prepare('SELECT * FROM customers WHERE id = ?')
     .get(quote.customer_id) as Party
@@ -114,6 +118,17 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
         .join(', '),
       50
     )
+
+  // Sender logo, top-right (right-aligned, scaled into a fixed box). The
+  // customer address sits below at y=120, so there's no collision. Guarded:
+  // a corrupt/unsupported image is skipped rather than failing the PDF.
+  if (logo) {
+    try {
+      pdf.image(logo, 395, 45, { fit: [150, 50], align: 'right', valign: 'top' })
+    } catch {
+      // ignore — never break quote generation over a logo
+    }
+  }
 
   pdf
     .fillColor('#000')
