@@ -68,15 +68,15 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
     logger: false
   })
 
-  // Pre-load every Message-ID chohle has captured on outbound so we can
-  // match without hitting the DB per message.
+  // Pre-load every Message-ID chohle has on file — outbound AND already-matched
+  // inbound — so a reply can thread off any earlier message in the chain, not
+  // only the one we originally sent. Long threads sometimes reference just a
+  // prior inbound message in In-Reply-To with a truncated References header.
   const projectByMsgId = new Map<string, number>()
-  const outboundRows = db
-    .prepare(
-      `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
-    )
+  const anchorRows = db
+    .prepare(`SELECT project_id, message_id FROM project_emails WHERE message_id IS NOT NULL`)
     .all() as Array<{ project_id: number; message_id: string }>
-  for (const r of outboundRows) projectByMsgId.set(r.message_id, r.project_id)
+  for (const r of anchorRows) projectByMsgId.set(r.message_id, r.project_id)
 
   const existingInbound = new Set<string>(
     (
@@ -88,8 +88,10 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
     ).map((r) => r.message_id)
   )
 
+  // OR IGNORE: a DB-level backstop on the unique message_id index in case two
+  // runs overlap and both clear the in-memory dedup check.
   const insert = db.prepare(
-    `INSERT INTO project_emails (project_id, direction, from_address, to_address,
+    `INSERT OR IGNORE INTO project_emails (project_id, direction, from_address, to_address,
                                  subject, body_html, body_text, sent_at, message_id)
      VALUES (?, 'inbound', ?, ?, ?, ?, ?, ?, ?)`
   )
@@ -159,9 +161,18 @@ export async function syncImapMailbox(db: Database, mailbox: ImapSyncMailbox): P
           const dateMs = (parsed.date ?? msg.internalDate ?? new Date()).valueOf()
           const sentAt = new Date(dateMs).toISOString().replace('T', ' ').slice(0, 19)
 
-          insert.run(projectId, from, to, subject, html, text, sentAt, incomingId)
-          inserted += 1
-          if (incomingId) existingInbound.add(incomingId)
+          const info = insert.run(projectId, from, to, subject, html, text, sentAt, incomingId)
+          if (info.changes > 0) {
+            inserted += 1
+            if (incomingId) {
+              existingInbound.add(incomingId)
+              // Register as an anchor so a later message in this same batch can
+              // thread off it.
+              projectByMsgId.set(incomingId, projectId)
+            }
+          } else {
+            duplicates += 1
+          }
         }
     } finally {
       lock.release()

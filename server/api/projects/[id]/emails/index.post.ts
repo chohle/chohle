@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 interface Body {
   subject?: string
   to?: string
@@ -79,16 +81,19 @@ export default defineEventHandler(async (event) => {
   const from = sender.name ? { name: sender.name, address: sender.email } : sender.email
   const text = htmlToText(html)
 
-  // nodemailer returns the Message-ID it assigned (or that the SMTP server
-  // assigned). We persist it so the sync worker can thread inbound replies
-  // by matching their In-Reply-To / References headers against it.
-  let messageId: string | null = null
+  // Generate our own RFC 5322 Message-ID and hand it to nodemailer rather than
+  // trusting the one it/the SMTP server reports back: relays (Gmail, Outlook)
+  // sometimes rewrite an auto-generated id, which would break threading when
+  // the reply's In-Reply-To / References point at the id the recipient saw.
+  // Setting it explicitly keeps it stable and known to us.
+  const domain = sender.email.split('@')[1] || 'chohle.local'
+  const messageIdHeader = `<chohle-${randomUUID()}@${domain}>`
   try {
-    const sendInfo = await getMailer().sendMail({ from, to, subject, html, text })
-    messageId = (sendInfo as { messageId?: string }).messageId?.replace(/^<|>$/g, '') ?? null
+    await getMailer().sendMail({ from, to, subject, html, text, messageId: messageIdHeader })
   } catch (err) {
     throw createError({ statusCode: 502, statusMessage: 'SMTP send failed', cause: err })
   }
+  const messageId = messageIdHeader.replace(/^<|>$/g, '')
 
   const info = db
     .prepare(

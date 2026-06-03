@@ -631,6 +631,28 @@ const migrations: Migration[] = [
       );
       CREATE INDEX idx_quote_items_quote ON quote_items(quote_id);
     `
+  },
+  {
+    name: '0035_project_emails_message_id_unique',
+    // Harden inbound dedup with a DB-level guarantee instead of relying only
+    // on each sync worker's in-memory Set. First null out the legacy demo
+    // sentinel ('demo-suppressed', stored once per suppressed outbound email
+    // in demo mode) and any other duplicate message_ids — keeping the earliest
+    // row of each group — so the unique index can be created on existing data.
+    // The index is partial (WHERE message_id IS NOT NULL) so manually logged
+    // replies, which have no Message-ID, are unaffected.
+    up: `
+      UPDATE project_emails SET message_id = NULL WHERE message_id = 'demo-suppressed';
+      UPDATE project_emails SET message_id = NULL
+      WHERE message_id IS NOT NULL
+        AND id NOT IN (
+          SELECT MIN(id) FROM project_emails
+          WHERE message_id IS NOT NULL GROUP BY message_id
+        );
+      DROP INDEX IF EXISTS idx_project_emails_message_id;
+      CREATE UNIQUE INDEX idx_project_emails_message_id
+        ON project_emails (message_id) WHERE message_id IS NOT NULL;
+    `
   }
 ]
 

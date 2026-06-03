@@ -175,15 +175,15 @@ export async function syncGmailMailbox(
 
   const ids = await listInboxIdsSince(token, sinceUnix)
 
-  // Pre-load every Message-ID chohle has captured on outbound so we can
-  // match without hitting the DB per message.
+  // Pre-load every Message-ID chohle has on file — outbound AND already-matched
+  // inbound — so a reply can thread off any earlier message in the chain, not
+  // only the one we originally sent. Long threads sometimes reference just a
+  // prior inbound message in In-Reply-To with a truncated References header.
   const projectByMsgId = new Map<string, number>()
-  const outboundRows = db
-    .prepare(
-      `SELECT project_id, message_id FROM project_emails WHERE direction = 'outbound' AND message_id IS NOT NULL`
-    )
+  const anchorRows = db
+    .prepare(`SELECT project_id, message_id FROM project_emails WHERE message_id IS NOT NULL`)
     .all() as Array<{ project_id: number; message_id: string }>
-  for (const r of outboundRows) projectByMsgId.set(r.message_id, r.project_id)
+  for (const r of anchorRows) projectByMsgId.set(r.message_id, r.project_id)
 
   const existingInbound = new Set<string>(
     (
@@ -195,8 +195,10 @@ export async function syncGmailMailbox(
     ).map((r) => r.message_id)
   )
 
+  // OR IGNORE: a DB-level backstop on the unique message_id index in case two
+  // runs overlap and both clear the in-memory dedup check.
   const insert = db.prepare(
-    `INSERT INTO project_emails (project_id, direction, from_address, to_address,
+    `INSERT OR IGNORE INTO project_emails (project_id, direction, from_address, to_address,
                                  subject, body_html, body_text, sent_at, message_id)
      VALUES (?, 'inbound', ?, ?, ?, ?, ?, ?, ?)`
   )
@@ -232,9 +234,18 @@ export async function syncGmailMailbox(
     const dateMs = msg.internalDate ? Number(msg.internalDate) : Date.now()
     const sentAt = new Date(dateMs).toISOString().replace('T', ' ').slice(0, 19)
 
-    insert.run(projectId, from, to, subject, html, text, sentAt, normalisedIncoming)
-    inserted += 1
-    if (normalisedIncoming) existingInbound.add(normalisedIncoming)
+    const info = insert.run(projectId, from, to, subject, html, text, sentAt, normalisedIncoming)
+    if (info.changes > 0) {
+      inserted += 1
+      if (normalisedIncoming) {
+        existingInbound.add(normalisedIncoming)
+        // Register as an anchor so a later message in this same batch can
+        // thread off it.
+        projectByMsgId.set(normalisedIncoming, projectId)
+      }
+    } else {
+      duplicates += 1
+    }
   }
 
   db.prepare(`UPDATE mailboxes SET last_sync_at = ?, last_error = NULL WHERE id = ?`).run(
