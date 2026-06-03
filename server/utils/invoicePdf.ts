@@ -69,6 +69,10 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
   const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party & {
     iban: string
     logo_path: string | null
+    phone: string | null
+    email: string | null
+    website: string | null
+    mwst: string | null
   }
   const logo = await readUpload(sender.logo_path)
   const customer = db
@@ -129,58 +133,84 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
   pdf.on('data', (c: Buffer) => chunks.push(c))
   const done = new Promise<Buffer>((resolve) => pdf.on('end', () => resolve(Buffer.concat(chunks))))
 
-  // Sender
-  pdf
-    .fillColor('#000')
-    .font('Helvetica-Bold')
-    .fontSize(16)
-    .text(sender.name || 'chohle', 50, 50)
-  pdf
-    .font('Helvetica')
-    .fontSize(9)
-    .fillColor('#555')
-    .text(
-      [sender.street, [sender.zip, sender.city].filter(Boolean).join(' ')]
-        .filter(Boolean)
-        .join(', '),
-      50
-    )
-
-  // Sender logo, top-right (right-aligned, scaled into a fixed box so any size
-  // fits). The customer address sits below at y=120, so there's no collision.
-  // Guarded: a corrupt/unsupported image is skipped rather than failing the PDF.
+  // --- Letterhead, matching the on-screen preview (print.vue) ---
+  // Logo alone, top-left (no address beneath it); the sender address appears as
+  // the underlined return line above the recipient. Falls back to the company
+  // name when no logo is set. A corrupt image is skipped so it never fails.
+  pdf.fillColor('#000')
+  let logoDrawn = false
   if (logo) {
     try {
-      pdf.image(logo, 395, 45, { fit: [150, 50], align: 'right', valign: 'top' })
+      pdf.image(logo, 50, 50, { fit: [170, 40], valign: 'top' })
+      logoDrawn = true
     } catch {
-      // ignore — never break invoice generation over a logo
+      // ignore — fall back to the text name below
     }
   }
+  if (!logoDrawn) {
+    pdf.font('Helvetica-Bold').fontSize(16).fillColor('#000').text(sender.name || 'chohle', 50, 54)
+  }
 
-  // Customer address (right)
+  // Meta block (left): title + "Page 1 / 1", then a label/value table.
+  const metaTop = 135
+  pdf.font('Helvetica-Bold').fontSize(10).fillColor('#000').text(L.invoice, 50, metaTop)
+  pdf.font('Helvetica').fontSize(9).fillColor('#888').text(L.page, 120, metaTop + 1)
+  const metaRow = (label: string, value: string, ry: number) => {
+    pdf
+      .font('Helvetica')
+      .fontSize(9)
+      .fillColor('#666')
+      .text(label, 50, ry, { width: 75, lineBreak: false })
+    pdf.fillColor('#000').text(value, 130, ry, { width: 170, lineBreak: false })
+  }
+  let my = metaTop + 22
+  metaRow(L.invoiceNo, invoice.number, my)
+  my += 14
+  if (customer.customer_number) {
+    metaRow(L.customerNo, customer.customer_number, my)
+    my += 14
+  }
+  metaRow(L.date, dateFmt(invoice.issue_date), my)
+  my += 14
+  metaRow(L.payableUntil, dateFmt(invoice.due_date), my)
+  my += 14
+  const leftBottom = my
+
+  // Address block (right): underlined sender return line, then the recipient.
+  const returnLine = [
+    sender.name,
+    sender.street,
+    [sender.zip, sender.city].filter(Boolean).join(' ')
+  ]
+    .filter(Boolean)
+    .join(', ')
+  if (returnLine) {
+    pdf
+      .font('Helvetica')
+      .fontSize(8)
+      .fillColor('#000')
+      .text(returnLine, 330, metaTop, { width: 215, underline: true })
+  }
+  const addrTop = returnLine ? pdf.y + 8 : metaTop
   pdf
-    .fillColor('#000')
-    .fontSize(10)
     .font('Helvetica-Bold')
-    .text(customer.name, 330, 120, { width: 215 })
-  pdf.font('Helvetica')
+    .fontSize(10)
+    .fillColor('#000')
+    .text(customer.name, 330, addrTop, { width: 215 })
+  pdf.font('Helvetica').fontSize(9)
   if (customer.contact_person) pdf.text(customer.contact_person, 330, undefined, { width: 215 })
   pdf.text(customer.street ?? '', 330, undefined, { width: 215 })
   pdf.text([customer.zip, customer.city].filter(Boolean).join(' '), 330, undefined, { width: 215 })
   if (customer.country && customer.country !== 'CH')
     pdf.text(customer.country, 330, undefined, { width: 215 })
+  const rightBottom = pdf.y
 
-  // Invoice meta (left)
-  pdf.font('Helvetica-Bold').fontSize(13).text(L.invoice, 50, 120)
-  pdf.font('Helvetica').fontSize(9).fillColor('#000')
-  pdf.text(`${L.invoiceNo} ${invoice.number}`, 50, 145)
-  if (customer.customer_number) pdf.text(`${L.customerNo} ${customer.customer_number}`, 50)
-  pdf.text(`${L.date} ${dateFmt(invoice.issue_date)}`, 50)
-  pdf.text(`${L.payableUntil} ${dateFmt(invoice.due_date)}`, 50)
-
-  let y = 215
+  // Subject, below the taller of the two columns.
+  let y = Math.max(leftBottom, rightBottom) + 26
   if (invoice.title) {
-    pdf.font('Helvetica-Bold').fontSize(11).text(invoice.title, 50, y, { width: 495 })
+    pdf.font('Helvetica-Bold').fontSize(11).fillColor('#000').text(invoice.title, 50, y, {
+      width: 495
+    })
     y = pdf.y + 14
   }
 
@@ -231,6 +261,18 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
     totalRow(L.vatLine.replace('{rate}', String(r.rate)), chf(r.mwstRappen))
   }
   totalRow(L.invoiceAmountChf, chf(totals.totalRappen), true)
+
+  // Contact footer, centered just above the QR-bill (mirrors the preview).
+  const footerLine = [sender.phone, sender.email, sender.website, sender.mwst]
+    .filter(Boolean)
+    .join('   ·   ')
+  if (footerLine) {
+    pdf
+      .font('Helvetica')
+      .fontSize(8)
+      .fillColor('#888')
+      .text(footerLine, 50, 524, { width: 495, align: 'center', lineBreak: false })
+  }
 
   // Swiss QR-bill, placed at the bottom of the page in the customer's language.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
