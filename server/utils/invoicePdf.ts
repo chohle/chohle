@@ -148,13 +148,21 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
     }
   }
   if (!logoDrawn) {
-    pdf.font('Helvetica-Bold').fontSize(16).fillColor('#000').text(sender.name || 'chohle', 50, 54)
+    pdf
+      .font('Helvetica-Bold')
+      .fontSize(16)
+      .fillColor('#000')
+      .text(sender.name || 'chohle', 50, 54)
   }
 
   // Meta block (left): title + "Page 1 / 1", then a label/value table.
   const metaTop = 135
   pdf.font('Helvetica-Bold').fontSize(10).fillColor('#000').text(L.invoice, 50, metaTop)
-  pdf.font('Helvetica').fontSize(9).fillColor('#888').text(L.page, 120, metaTop + 1)
+  pdf
+    .font('Helvetica')
+    .fontSize(9)
+    .fillColor('#888')
+    .text(L.page, 120, metaTop + 1)
   const metaRow = (label: string, value: string, ry: number) => {
     pdf
       .font('Helvetica')

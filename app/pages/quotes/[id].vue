@@ -297,9 +297,15 @@ const emailMessage = computed({
 // Signature picker + write/preview toggle for the send modal.
 const { signatures, defaultSignatureId, signatureItems } = useSignatures()
 const signatureId = ref<number | null>(null)
-watch(defaultSignatureId, (v) => { if (signatureId.value === null) signatureId.value = v }, {
-  immediate: true
-})
+watch(
+  defaultSignatureId,
+  (v) => {
+    if (signatureId.value === null) signatureId.value = v
+  },
+  {
+    immediate: true
+  }
+)
 const sendPreview = ref(false)
 
 async function openSend() {
@@ -620,20 +626,23 @@ const isExpired = computed(
       <template #footer>
         <div class="flex w-full justify-end gap-2">
           <template v-if="!sendPreview">
-            <button class="ed-btn-ghost" @click="sendOpen = false">{{ $t('common.cancel') }}</button>
-            <button
-              class="ed-btn-primary"
-              :disabled="!customer?.email"
-              @click="sendPreview = true"
-            >
+            <button class="ed-btn-ghost" @click="sendOpen = false">
+              {{ $t('common.cancel') }}
+            </button>
+            <button class="ed-btn-primary" :disabled="!customer?.email" @click="sendPreview = true">
               <UIcon name="i-lucide-eye" class="size-3.5" /> {{ $t('settings.signatures.preview') }}
             </button>
           </template>
           <template v-else>
             <button class="ed-btn-ghost" @click="sendPreview = false">
-              <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('settings.signatures.edit') }}
+              <UIcon name="i-lucide-arrow-left" class="size-3.5" />
+              {{ $t('settings.signatures.edit') }}
             </button>
-            <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendQuote">
+            <button
+              class="ed-btn-primary"
+              :disabled="saving || !customer?.email"
+              @click="sendQuote"
+            >
               <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('quotes.send') }}
             </button>
           </template>

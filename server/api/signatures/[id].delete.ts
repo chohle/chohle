@@ -17,9 +17,9 @@ export default defineEventHandler(async (event) => {
   db.transaction(() => {
     db.prepare(`DELETE FROM signatures WHERE id = ?`).run(id)
     if (row.is_default) {
-      const next = db.prepare(`SELECT id FROM signatures ORDER BY created_at DESC LIMIT 1`).get() as
-        | { id: number }
-        | undefined
+      const next = db
+        .prepare(`SELECT id FROM signatures ORDER BY created_at DESC LIMIT 1`)
+        .get() as { id: number } | undefined
       if (next) db.prepare(`UPDATE signatures SET is_default = 1 WHERE id = ?`).run(next.id)
     }
   })()

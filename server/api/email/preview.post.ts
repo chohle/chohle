@@ -24,14 +24,21 @@ export default defineEventHandler(async (event) => {
     website: string | null
     mwst: string | null
     logo_path: string | null
-  } | null) ?? { name: 'chohle', email: null, phone: null, website: null, mwst: null, logo_path: null }
+  } | null) ?? {
+    name: 'chohle',
+    email: null,
+    phone: null,
+    website: null,
+    mwst: null,
+    logo_path: null
+  }
 
   // Resolve the signature: explicit html (live editing) wins, else by id.
   let signatureHtml = signature_html?.trim() || undefined
   if (!signatureHtml && Number.isInteger(Number(signature_id))) {
-    const sig = db.prepare(`SELECT content_html FROM signatures WHERE id = ?`).get(Number(signature_id)) as
-      | { content_html: string }
-      | undefined
+    const sig = db
+      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
+      .get(Number(signature_id)) as { content_html: string } | undefined
     signatureHtml = sig?.content_html || undefined
   }
 

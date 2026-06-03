@@ -281,9 +281,15 @@ const emailMessage = computed({
 // Signature picker + write/preview toggle for the send step.
 const { signatures, defaultSignatureId, signatureItems } = useSignatures()
 const signatureId = ref<number | null>(null)
-watch(defaultSignatureId, (v) => { if (signatureId.value === null) signatureId.value = v }, {
-  immediate: true
-})
+watch(
+  defaultSignatureId,
+  (v) => {
+    if (signatureId.value === null) signatureId.value = v
+  },
+  {
+    immediate: true
+  }
+)
 const sendPreview = ref(false)
 </script>
 
@@ -471,56 +477,61 @@ const sendPreview = ref(false)
       <UiCard>
         <div class="space-y-6">
           <template v-if="!sendPreview">
-          <UFormField :label="$t('invoices.dueDate')">
-            <UiDatePicker v-model="header.dueDate" />
-          </UFormField>
+            <UFormField :label="$t('invoices.dueDate')">
+              <UiDatePicker v-model="header.dueDate" />
+            </UFormField>
 
-          <div class="preview-row">
-            <div>
-              <div class="eyebrow">{{ $t('common.total') }}</div>
-              <div class="preview-amt mono">CHF {{ chf(totals.totalRappen) }}</div>
+            <div class="preview-row">
+              <div>
+                <div class="eyebrow">{{ $t('common.total') }}</div>
+                <div class="preview-amt mono">CHF {{ chf(totals.totalRappen) }}</div>
+              </div>
+              <button class="ed-btn" @click="previewPdf">
+                <UIcon name="i-lucide-file-text" class="size-3.5" /> {{ $t('invoices.pdfPreview') }}
+              </button>
             </div>
-            <button class="ed-btn" @click="previewPdf">
-              <UIcon name="i-lucide-file-text" class="size-3.5" /> {{ $t('invoices.pdfPreview') }}
-            </button>
-          </div>
 
-          <UFormField :label="$t('invoices.recipient')">
-            <UInput v-if="customer?.email" :model-value="customer.email" disabled class="w-full" />
-            <p v-else class="warn">{{ $t('invoices.noEmail') }}</p>
-          </UFormField>
-          <UFormField :label="$t('invoices.emailSubject')">
-            <UInput v-model="emailSubject" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('invoices.emailMessage')">
-            <ClientOnly>
-              <UEditor
-                v-model="emailMessage"
-                content-type="html"
-                :extensions="emailEditorExtensions"
-                :handlers="emailEditorHandlers"
-                class="email-editor email-editor--tall"
-              >
-                <template #default="{ editor }">
-                  <UEditorToolbar
-                    :editor="editor"
-                    :items="emailEditorItems"
-                    class="email-editor__toolbar flex-wrap"
-                  >
-                    <template #link><EditorLinkPopover :editor="editor" /></template>
-                  </UEditorToolbar>
+            <UFormField :label="$t('invoices.recipient')">
+              <UInput
+                v-if="customer?.email"
+                :model-value="customer.email"
+                disabled
+                class="w-full"
+              />
+              <p v-else class="warn">{{ $t('invoices.noEmail') }}</p>
+            </UFormField>
+            <UFormField :label="$t('invoices.emailSubject')">
+              <UInput v-model="emailSubject" class="w-full" />
+            </UFormField>
+            <UFormField :label="$t('invoices.emailMessage')">
+              <ClientOnly>
+                <UEditor
+                  v-model="emailMessage"
+                  content-type="html"
+                  :extensions="emailEditorExtensions"
+                  :handlers="emailEditorHandlers"
+                  class="email-editor email-editor--tall"
+                >
+                  <template #default="{ editor }">
+                    <UEditorToolbar
+                      :editor="editor"
+                      :items="emailEditorItems"
+                      class="email-editor__toolbar flex-wrap"
+                    >
+                      <template #link><EditorLinkPopover :editor="editor" /></template>
+                    </UEditorToolbar>
+                  </template>
+                </UEditor>
+                <template #fallback>
+                  <div class="email-editor email-editor--tall email-editor--fallback" />
                 </template>
-              </UEditor>
-              <template #fallback>
-                <div class="email-editor email-editor--tall email-editor--fallback" />
-              </template>
-            </ClientOnly>
-          </UFormField>
-          <UFormField v-if="signatures.length" :label="$t('settings.signatures.tab')">
-            <USelect v-model="signatureId" :items="signatureItems" class="w-full" />
-          </UFormField>
+              </ClientOnly>
+            </UFormField>
+            <UFormField v-if="signatures.length" :label="$t('settings.signatures.tab')">
+              <USelect v-model="signatureId" :items="signatureItems" class="w-full" />
+            </UFormField>
 
-          <p class="muted-note">{{ $t('invoices.sendNote') }}</p>
+            <p class="muted-note">{{ $t('invoices.sendNote') }}</p>
           </template>
           <EmailPreviewFrame v-else :body-html="emailMessage" :signature-id="signatureId" />
         </div>
@@ -531,19 +542,20 @@ const sendPreview = ref(false)
           <button class="ed-btn-ghost" @click="step = 0">
             <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('common.back') }}
           </button>
-          <button
-            class="ed-btn-primary"
-            :disabled="!customer?.email"
-            @click="sendPreview = true"
-          >
+          <button class="ed-btn-primary" :disabled="!customer?.email" @click="sendPreview = true">
             <UIcon name="i-lucide-eye" class="size-3.5" /> {{ $t('settings.signatures.preview') }}
           </button>
         </template>
         <template v-else>
           <button class="ed-btn-ghost" @click="sendPreview = false">
-            <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('settings.signatures.edit') }}
+            <UIcon name="i-lucide-arrow-left" class="size-3.5" />
+            {{ $t('settings.signatures.edit') }}
           </button>
-          <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendInvoice">
+          <button
+            class="ed-btn-primary"
+            :disabled="saving || !customer?.email"
+            @click="sendInvoice"
+          >
             <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('invoices.sendInvoice') }}
           </button>
         </template>

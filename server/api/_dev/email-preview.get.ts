@@ -17,7 +17,14 @@ export default defineEventHandler(async (event) => {
     website: string | null
     mwst: string | null
     logo_path: string | null
-  } | null) ?? { name: 'chohle', email: null, phone: null, website: null, mwst: null, logo_path: null }
+  } | null) ?? {
+    name: 'chohle',
+    email: null,
+    phone: null,
+    website: null,
+    mwst: null,
+    logo_path: null
+  }
 
   const body =
     `<p>Guten Tag Emanuell Ademi</p>` +

@@ -123,7 +123,11 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
     }
   }
   if (!logoDrawn) {
-    pdf.font('Helvetica-Bold').fontSize(16).fillColor('#000').text(sender.name || 'chohle', 50, 54)
+    pdf
+      .font('Helvetica-Bold')
+      .fontSize(16)
+      .fillColor('#000')
+      .text(sender.name || 'chohle', 50, 54)
   }
 
   // Meta block (left): title, then a label/value table. (Quotes have no "page"

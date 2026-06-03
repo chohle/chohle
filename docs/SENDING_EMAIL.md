@@ -13,10 +13,10 @@ configure it.
 
 There is exactly one thing to decide: **is `NUXT_SMTP_USER` set or not?**
 
-| `NUXT_SMTP_USER` | Mode            | What happens                                                       |
-| ---------------- | --------------- | ------------------------------------------------------------------ |
-| **unset / blank** | Mailpit / dev  | No auth, no TLS, no From check. All mail lands in the Mailpit UI.  |
-| **set**           | Real provider  | Authenticates, derives TLS from the port, enforces the From guard. |
+| `NUXT_SMTP_USER`  | Mode          | What happens                                                       |
+| ----------------- | ------------- | ------------------------------------------------------------------ |
+| **unset / blank** | Mailpit / dev | No auth, no TLS, no From check. All mail lands in the Mailpit UI.  |
+| **set**           | Real provider | Authenticates, derives TLS from the port, enforces the From guard. |
 
 That's the whole model. You don't need a separate "use Mailpit yes/no" flag —
 the presence of a username _is_ the flag.

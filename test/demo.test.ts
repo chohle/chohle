@@ -27,10 +27,12 @@ describe('demo session isolation', () => {
   it('seeds a non-empty sandbox per session', () => {
     const a = resolveSessionDb(SID_A, 'en')
     expect(customerCount(a)).toBeGreaterThan(0)
-    expect((a.prepare('SELECT locale FROM owner WHERE id = 1').get() as { locale: string }).locale).toBe('en')
+    expect(
+      (a.prepare('SELECT locale FROM owner WHERE id = 1').get() as { locale: string }).locale
+    ).toBe('en')
   })
 
-  it('keeps one session\'s writes invisible to another', () => {
+  it("keeps one session's writes invisible to another", () => {
     const a = resolveSessionDb(SID_A, 'en')
     const b = resolveSessionDb(SID_B, 'en')
 
@@ -38,33 +40,55 @@ describe('demo session isolation', () => {
       "INSERT INTO customers (type, name, country, language) VALUES ('company', 'SoloOnlyInA', 'CH', 'en')"
     ).run()
 
-    const inA = a.prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'").get() as { c: number }
-    const inB = b.prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'").get() as { c: number }
+    const inA = a
+      .prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'")
+      .get() as { c: number }
+    const inB = b
+      .prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'")
+      .get() as { c: number }
     expect(inA.c).toBe(1)
     expect(inB.c).toBe(0)
   })
 
   it('seeds demo data in the requested locale', () => {
     const de = resolveSessionDb('d'.repeat(32), 'de')
-    expect((de.prepare('SELECT locale FROM owner WHERE id = 1').get() as { locale: string }).locale).toBe('de')
+    expect(
+      (de.prepare('SELECT locale FROM owner WHERE id = 1').get() as { locale: string }).locale
+    ).toBe('de')
     // customer document language follows the seed locale
-    const langs = de.prepare('SELECT DISTINCT language FROM customers').all() as { language: string }[]
+    const langs = de.prepare('SELECT DISTINCT language FROM customers').all() as {
+      language: string
+    }[]
     expect(langs.some((l) => l.language === 'de')).toBe(true)
   })
 
   it('falls back to English for an unknown locale', () => {
     const x = resolveSessionDb('e'.repeat(32), 'zz')
-    expect((x.prepare('SELECT locale FROM owner WHERE id = 1').get() as { locale: string }).locale).toBe('en')
+    expect(
+      (x.prepare('SELECT locale FROM owner WHERE id = 1').get() as { locale: string }).locale
+    ).toBe('en')
   })
 
   it('Reset wipes a session back to the pristine template', () => {
     const a = resolveSessionDb(SID_A, 'en')
-    expect((a.prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'").get() as { c: number }).c).toBe(1)
+    expect(
+      (
+        a.prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'").get() as {
+          c: number
+        }
+      ).c
+    ).toBe(1)
 
     resetSessionDb(SID_A, 'en')
 
     const fresh = resolveSessionDb(SID_A, 'en')
-    expect((fresh.prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'").get() as { c: number }).c).toBe(0)
+    expect(
+      (
+        fresh.prepare("SELECT COUNT(*) AS c FROM customers WHERE name = 'SoloOnlyInA'").get() as {
+          c: number
+        }
+      ).c
+    ).toBe(0)
     expect(customerCount(fresh)).toBeGreaterThan(0) // back to seeded baseline
   })
 })
