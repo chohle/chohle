@@ -330,8 +330,16 @@ const projectHref = computed(() =>
     : null
 )
 
+// `new Date()` would make this differ between the SSR render and the client's
+// first (hydration) render, toggling the v-if and tripping a hydration
+// mismatch. Only evaluate the date check after mount so both renders agree.
+const mounted = ref(false)
+onMounted(() => {
+  mounted.value = true
+})
 const isExpired = computed(
   () =>
+    mounted.value &&
     !!header.validUntil &&
     header.validUntil < new Date().toISOString().slice(0, 10) &&
     header.status !== 'accepted' &&
