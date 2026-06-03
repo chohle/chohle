@@ -1,0 +1,70 @@
+name: 🐞 Bug report
+description: Something isn't working the way it should
+labels: ['bug']
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search existing issues to avoid duplicates.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    attributes:
+      label: Area
+      description: Which part of chohle is affected?
+      options:
+        - Invoices
+        - Quotes (Offerten)
+        - Expenses / receipts
+        - Income / pay-date logic
+        - Customers / articles
+        - PDF / Swiss QR-bill
+        - Email (IMAP/SMTP, conversations, triage)
+        - Settings / profile
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current behavior
+      description: A concise description of what's happening.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Environment
+      description: Helps narrow things down.
+      value: |
+        - chohle version / commit:
+        - Deployment: (Docker / bare Node)
+        - Node.js version:
+        - Browser:
+        - OS:
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Logs, screenshots, anything else?
+      description: |
+        Server logs, console errors, or screenshots. You can drag & drop files here.
+
+        ⚠️ This is a finance app — please redact real customer data, amounts, IBANs, and any SMTP/IMAP credentials before posting.
+    validations:
+      required: false
