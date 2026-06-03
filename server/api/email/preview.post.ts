@@ -1,14 +1,18 @@
-// Authenticated email preview for the Settings signature editor: renders the
-// branded shell with a sample body and the given signature HTML in its slot, so
-// the user sees exactly how a sent email looks — live, as they edit. Returned as
-// HTML for an <iframe srcdoc>.
+// Authenticated email preview, used in two places:
+//  - Settings signature editor: pass { signature_html } (the unsaved content) —
+//    rendered in the signature slot over a neutral placeholder body.
+//  - Send flows (project / invoice / quote): pass { body_html, signature_id } —
+//    renders exactly what will be sent (real message + chosen signature).
+// Returned as HTML for an <iframe srcdoc>.
 interface Body {
-  content_html?: string
+  body_html?: string
+  signature_id?: number
+  signature_html?: string
 }
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const { content_html } = await readBody<Body>(event)
+  const { body_html, signature_id, signature_html } = await readBody<Body>(event)
 
   const db = useDb()
   const sender = (db
@@ -22,15 +26,24 @@ export default defineEventHandler(async (event) => {
     logo_path: string | null
   } | null) ?? { name: 'chohle', email: null, phone: null, website: null, mwst: null, logo_path: null }
 
-  // No invented sample text — the message area is a neutral, language-agnostic
-  // placeholder (faint bars) so the focus is the signature, not made-up prose.
+  // Resolve the signature: explicit html (live editing) wins, else by id.
+  let signatureHtml = signature_html?.trim() || undefined
+  if (!signatureHtml && Number.isInteger(Number(signature_id))) {
+    const sig = db.prepare(`SELECT content_html FROM signatures WHERE id = ?`).get(Number(signature_id)) as
+      | { content_html: string }
+      | undefined
+    signatureHtml = sig?.content_html || undefined
+  }
+
+  // Real message when given; otherwise a neutral, language-agnostic placeholder
+  // (faint bars) so a signature can be previewed without inventing prose.
   const bar = (w: string) =>
     `<div style="height:11px;background:#ededed;border-radius:5px;margin:0 0 11px;width:${w}"></div>`
-  const body = `${bar('45%')}${bar('92%')}${bar('88%')}${bar('60%')}`
+  const body = body_html?.trim() || `${bar('45%')}${bar('92%')}${bar('88%')}${bar('60%')}`
 
   const html = renderEmail(sender, body, {
     logo: await logoInfoFor(sender.logo_path),
-    signatureHtml: content_html?.trim() || undefined
+    signatureHtml
   })
   setHeader(event, 'Content-Type', 'text/html; charset=utf-8')
   return html

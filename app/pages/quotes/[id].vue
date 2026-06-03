@@ -294,8 +294,17 @@ const emailMessage = computed({
   }
 })
 
+// Signature picker + write/preview toggle for the send modal.
+const { signatures, defaultSignatureId, signatureItems } = useSignatures()
+const signatureId = ref<number | null>(null)
+watch(defaultSignatureId, (v) => { if (signatureId.value === null) signatureId.value = v }, {
+  immediate: true
+})
+const sendPreview = ref(false)
+
 async function openSend() {
   await save()
+  sendPreview.value = false
   sendOpen.value = true
 }
 async function sendQuote() {
@@ -303,7 +312,11 @@ async function sendQuote() {
   try {
     await $fetch(`/api/quotes/${id}/send`, {
       method: 'POST',
-      body: { subject: emailSubject.value, message: emailMessage.value }
+      body: {
+        subject: emailSubject.value,
+        message: emailMessage.value,
+        signature_id: signatureId.value ?? undefined
+      }
     })
     header.status = 'sent'
     baseline.value = snapshot()
@@ -560,50 +573,70 @@ const isExpired = computed(
     >
       <template #body>
         <div class="space-y-4">
-          <UFormField :label="$t('invoices.recipient')">
-            <UInput
-              v-if="customer?.email"
-              :model-value="customer.email"
-              disabled
-              class="mono w-full"
-            />
-            <p v-else class="warn">{{ $t('invoices.noEmail') }}</p>
-          </UFormField>
-          <UFormField :label="$t('quotes.subject')">
-            <UInput v-model="emailSubject" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('quotes.message')">
-            <ClientOnly>
-              <UEditor
-                v-model="emailMessage"
-                content-type="html"
-                :extensions="emailEditorExtensions"
-                :handlers="emailEditorHandlers"
-                class="email-editor email-editor--tall"
-              >
-                <template #default="{ editor }">
-                  <UEditorToolbar
-                    :editor="editor"
-                    :items="emailEditorItems"
-                    class="email-editor__toolbar flex-wrap"
-                  >
-                    <template #link><EditorLinkPopover :editor="editor" /></template>
-                  </UEditorToolbar>
+          <template v-if="!sendPreview">
+            <UFormField :label="$t('invoices.recipient')">
+              <UInput
+                v-if="customer?.email"
+                :model-value="customer.email"
+                disabled
+                class="mono w-full"
+              />
+              <p v-else class="warn">{{ $t('invoices.noEmail') }}</p>
+            </UFormField>
+            <UFormField :label="$t('quotes.subject')">
+              <UInput v-model="emailSubject" class="w-full" />
+            </UFormField>
+            <UFormField :label="$t('quotes.message')">
+              <ClientOnly>
+                <UEditor
+                  v-model="emailMessage"
+                  content-type="html"
+                  :extensions="emailEditorExtensions"
+                  :handlers="emailEditorHandlers"
+                  class="email-editor email-editor--tall"
+                >
+                  <template #default="{ editor }">
+                    <UEditorToolbar
+                      :editor="editor"
+                      :items="emailEditorItems"
+                      class="email-editor__toolbar flex-wrap"
+                    >
+                      <template #link><EditorLinkPopover :editor="editor" /></template>
+                    </UEditorToolbar>
+                  </template>
+                </UEditor>
+                <template #fallback>
+                  <div class="email-editor email-editor--tall email-editor--fallback" />
                 </template>
-              </UEditor>
-              <template #fallback>
-                <div class="email-editor email-editor--tall email-editor--fallback" />
-              </template>
-            </ClientOnly>
-          </UFormField>
+              </ClientOnly>
+            </UFormField>
+            <UFormField v-if="signatures.length" :label="$t('settings.signatures.tab')">
+              <USelect v-model="signatureId" :items="signatureItems" class="w-full" />
+            </UFormField>
+          </template>
+          <EmailPreviewFrame v-else :body-html="emailMessage" :signature-id="signatureId" />
         </div>
       </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <button class="ed-btn-ghost" @click="sendOpen = false">{{ $t('common.cancel') }}</button>
-          <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendQuote">
-            <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('quotes.send') }}
-          </button>
+          <template v-if="!sendPreview">
+            <button class="ed-btn-ghost" @click="sendOpen = false">{{ $t('common.cancel') }}</button>
+            <button
+              class="ed-btn-primary"
+              :disabled="!customer?.email"
+              @click="sendPreview = true"
+            >
+              <UIcon name="i-lucide-eye" class="size-3.5" /> {{ $t('settings.signatures.preview') }}
+            </button>
+          </template>
+          <template v-else>
+            <button class="ed-btn-ghost" @click="sendPreview = false">
+              <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('settings.signatures.edit') }}
+            </button>
+            <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendQuote">
+              <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('quotes.send') }}
+            </button>
+          </template>
         </div>
       </template>
     </UModal>

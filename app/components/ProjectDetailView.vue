@@ -287,23 +287,18 @@ function replyTo(ev: ProjectEmail) {
   composer.subject = reSubject(ev.subject)
   composer.body_html = ''
   composer.signature_id = defaultSignatureId.value
+  composer.step = 'write'
   composerError.value = ''
 }
 
 // Signatures to offer in the composer; default is preselected when opening.
-const { data: signaturesData } = await useFetch<{
-  rows: { id: number; name: string; is_default: number }[]
-}>('/api/signatures')
-const signatures = computed(() => signaturesData.value?.rows ?? [])
-const defaultSignatureId = computed(() => signatures.value.find((s) => s.is_default)?.id ?? null)
-const signatureItems = computed(() => [
-  { label: t('settings.signatures.none'), value: null as number | null },
-  ...signatures.value.map((s) => ({ label: s.name, value: s.id as number | null }))
-])
+const { signatures, defaultSignatureId, signatureItems } = useSignatures()
 
 // --- Compose: new email (Compose button) or reply (replyTo) via the slideover ---
+// step gates the write → preview → send flow.
 const composer = reactive({
   open: false,
+  step: 'write' as 'write' | 'preview',
   subject: '',
   to: '',
   body_html: '',
@@ -338,7 +333,15 @@ function openCompose() {
   composer.subject = ''
   composer.body_html = ''
   composer.signature_id = defaultSignatureId.value
+  composer.step = 'write'
   composerError.value = ''
+}
+
+// Write → Vorschau: validate, then show the preview of the exact email.
+function goPreview() {
+  if (!validateComposerTo()) return
+  if (!composer.subject.trim() || !composer.body_html.trim()) return
+  composer.step = 'preview'
 }
 
 async function send() {
@@ -798,7 +801,12 @@ const headerCrumb = computed(() => {
       :ui="{ content: 'max-w-full sm:max-w-2xl' }"
     >
       <template #body>
-        <form novalidate class="flex flex-col gap-4" @submit.prevent="send">
+        <form
+          v-show="composer.step === 'write'"
+          novalidate
+          class="flex flex-col gap-4"
+          @submit.prevent="goPreview"
+        >
           <UFormField :label="$t('pipeline.detail.to')" :error="composerError || undefined">
             <UInput v-model="composer.to" inputmode="email" autocomplete="email" class="w-full" />
           </UFormField>
@@ -833,16 +841,33 @@ const headerCrumb = computed(() => {
             <USelect v-model="composer.signature_id" :items="signatureItems" class="w-full" />
           </UFormField>
         </form>
+        <EmailPreviewFrame
+          v-if="composer.step === 'preview'"
+          :body-html="composer.body_html"
+          :signature-id="composer.signature_id"
+        />
       </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <button class="ed-btn-ghost" type="button" @click="composer.open = false">
-            {{ $t('common.cancel') }}
-          </button>
-          <button class="ed-btn-primary" type="button" :disabled="sending" @click="send">
-            <UIcon name="i-lucide-send" class="size-3.5" />
-            {{ $t('pipeline.detail.send') }}
-          </button>
+          <template v-if="composer.step === 'write'">
+            <button class="ed-btn-ghost" type="button" @click="composer.open = false">
+              {{ $t('common.cancel') }}
+            </button>
+            <button class="ed-btn-primary" type="button" @click="goPreview">
+              <UIcon name="i-lucide-eye" class="size-3.5" />
+              {{ $t('settings.signatures.preview') }}
+            </button>
+          </template>
+          <template v-else>
+            <button class="ed-btn-ghost" type="button" @click="composer.step = 'write'">
+              <UIcon name="i-lucide-arrow-left" class="size-3.5" />
+              {{ $t('settings.signatures.edit') }}
+            </button>
+            <button class="ed-btn-primary" type="button" :disabled="sending" @click="send">
+              <UIcon name="i-lucide-send" class="size-3.5" />
+              {{ $t('pipeline.detail.send') }}
+            </button>
+          </template>
         </div>
       </template>
     </USlideover>

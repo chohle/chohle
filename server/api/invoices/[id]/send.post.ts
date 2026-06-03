@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
   }
 
-  const { subject, message } = await readBody(event)
+  const { subject, message, signature_id } = await readBody(event)
   if (!subject?.trim() || !message?.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Subject and message are required' })
   }
@@ -64,7 +64,14 @@ export default defineEventHandler(async (event) => {
   const from = sender.email
     ? `${sender.name} <${sender.email}>`
     : `${sender.name} <no-reply@chohle.local>`
-  const { html, text } = await buildBrandedEmail(sender, message)
+  let signatureHtml: string | undefined
+  if (Number.isInteger(Number(signature_id))) {
+    const sig = db
+      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
+      .get(Number(signature_id)) as { content_html: string } | undefined
+    signatureHtml = sig?.content_html || undefined
+  }
+  const { html, text } = await buildBrandedEmail(sender, message, { signatureHtml })
   await getMailer().sendMail({
     from,
     to: customer.email,

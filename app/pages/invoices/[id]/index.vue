@@ -210,6 +210,7 @@ async function previewPdf() {
 }
 async function continueToSend() {
   await save()
+  sendPreview.value = false
   step.value = 1
 }
 async function sendInvoice() {
@@ -218,7 +219,11 @@ async function sendInvoice() {
     await $fetch(`/api/invoices/${id}`, { method: 'PUT', body: { ...header, items: items.value } })
     await $fetch(`/api/invoices/${id}/send`, {
       method: 'POST',
-      body: { subject: emailSubject.value, message: emailMessage.value }
+      body: {
+        subject: emailSubject.value,
+        message: emailMessage.value,
+        signature_id: signatureId.value ?? undefined
+      }
     })
     header.status = 'sent'
     baseline.value = snapshot()
@@ -272,6 +277,14 @@ const emailMessage = computed({
     messageOverride.value = v
   }
 })
+
+// Signature picker + write/preview toggle for the send step.
+const { signatures, defaultSignatureId, signatureItems } = useSignatures()
+const signatureId = ref<number | null>(null)
+watch(defaultSignatureId, (v) => { if (signatureId.value === null) signatureId.value = v }, {
+  immediate: true
+})
+const sendPreview = ref(false)
 </script>
 
 <template>
@@ -457,6 +470,7 @@ const emailMessage = computed({
     <template v-else-if="step === 1">
       <UiCard>
         <div class="space-y-6">
+          <template v-if="!sendPreview">
           <UFormField :label="$t('invoices.dueDate')">
             <UiDatePicker v-model="header.dueDate" />
           </UFormField>
@@ -502,18 +516,37 @@ const emailMessage = computed({
               </template>
             </ClientOnly>
           </UFormField>
+          <UFormField v-if="signatures.length" :label="$t('settings.signatures.tab')">
+            <USelect v-model="signatureId" :items="signatureItems" class="w-full" />
+          </UFormField>
 
           <p class="muted-note">{{ $t('invoices.sendNote') }}</p>
+          </template>
+          <EmailPreviewFrame v-else :body-html="emailMessage" :signature-id="signatureId" />
         </div>
       </UiCard>
 
       <div class="foot">
-        <button class="ed-btn-ghost" @click="step = 0">
-          <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('common.back') }}
-        </button>
-        <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendInvoice">
-          <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('invoices.sendInvoice') }}
-        </button>
+        <template v-if="!sendPreview">
+          <button class="ed-btn-ghost" @click="step = 0">
+            <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('common.back') }}
+          </button>
+          <button
+            class="ed-btn-primary"
+            :disabled="!customer?.email"
+            @click="sendPreview = true"
+          >
+            <UIcon name="i-lucide-eye" class="size-3.5" /> {{ $t('settings.signatures.preview') }}
+          </button>
+        </template>
+        <template v-else>
+          <button class="ed-btn-ghost" @click="sendPreview = false">
+            <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('settings.signatures.edit') }}
+          </button>
+          <button class="ed-btn-primary" :disabled="saving || !customer?.email" @click="sendInvoice">
+            <UIcon name="i-lucide-send" class="size-3.5" /> {{ $t('invoices.sendInvoice') }}
+          </button>
+        </template>
       </div>
     </template>
 

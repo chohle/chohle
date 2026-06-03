@@ -103,7 +103,7 @@ let sigPreviewTimer: ReturnType<typeof setTimeout> | undefined
 async function refreshSigPreview() {
   sigPreview.value = await $fetch<string>('/api/email/preview', {
     method: 'POST',
-    body: { content_html: sigForm.content_html }
+    body: { signature_html: sigForm.content_html }
   })
 }
 watch(
