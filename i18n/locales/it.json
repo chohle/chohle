@@ -330,6 +330,22 @@
     "placeholderDue": "Data di scadenza",
     "placeholderSender": "Il tuo nome",
     "emailTemplateSaved": "Modello e-mail salvato",
+    "signatures": {
+      "tab": "Firme",
+      "intro": "Blocchi di firma riutilizzabili. Creane una, imposta una predefinita e sceglila quando componi un'e-mail. L'anteprima mostra esattamente come appare l'e-mail inviata.",
+      "default": "Predefinita",
+      "empty": "Ancora nessuna firma.",
+      "new": "Nuova firma",
+      "name": "Nome",
+      "namePlaceholder": "es. Standard",
+      "content": "Firma",
+      "setDefault": "Usa come firma predefinita",
+      "edit": "Modifica",
+      "preview": "Anteprima",
+      "saved": "Firma salvata",
+      "nameRequired": "Assegna un nome alla firma",
+      "none": "Nessuna firma"
+    },
     "reminderTemplates": {
       "tab": "Solleciti",
       "intro": "Modelli e tempi di attesa per i solleciti di pagamento. Ogni livello ha il proprio oggetto e corpo; il livello 1 attende N giorni dopo la scadenza, i livelli 2 e 3 attendono N giorni dopo il sollecito precedente.",

@@ -31,6 +31,99 @@ async function saveTemplate() {
   }
 }
 
+// --- Signatures: reusable sign-off blocks picked when composing. ---
+interface Signature {
+  id: number
+  name: string
+  content_html: string
+  is_default: number
+}
+const { data: signaturesData, refresh: refreshSignatures } = await useFetch<{ rows: Signature[] }>(
+  '/api/signatures'
+)
+const signatures = computed(() => signaturesData.value?.rows ?? [])
+
+const sigForm = reactive<{
+  id: number | null
+  name: string
+  content_html: string
+  is_default: boolean
+}>({ id: null, name: '', content_html: '', is_default: false })
+const savingSig = ref(false)
+const sigSubTab = ref<'edit' | 'preview'>('edit')
+
+function newSignature() {
+  sigForm.id = null
+  sigForm.name = ''
+  sigForm.content_html = ''
+  sigForm.is_default = signatures.value.length === 0
+}
+function editSignature(s: Signature) {
+  sigForm.id = s.id
+  sigForm.name = s.name
+  sigForm.content_html = s.content_html
+  sigForm.is_default = !!s.is_default
+}
+async function saveSignature() {
+  if (!sigForm.name.trim()) {
+    toast.add({ title: t('settings.signatures.nameRequired'), color: 'error' })
+    return
+  }
+  savingSig.value = true
+  try {
+    const payload = {
+      name: sigForm.name.trim(),
+      content_html: sigForm.content_html,
+      is_default: sigForm.is_default
+    }
+    if (sigForm.id) {
+      await $fetch(`/api/signatures/${sigForm.id}`, { method: 'PUT', body: payload })
+    } else {
+      const { id } = await $fetch<{ id: number }>('/api/signatures', {
+        method: 'POST',
+        body: payload
+      })
+      sigForm.id = id
+    }
+    await refreshSignatures()
+    toast.add({ title: t('settings.signatures.saved'), color: 'success' })
+  } finally {
+    savingSig.value = false
+  }
+}
+async function deleteSignature(id: number) {
+  await $fetch(`/api/signatures/${id}`, { method: 'DELETE' })
+  if (sigForm.id === id) newSignature()
+  await refreshSignatures()
+}
+
+// Live preview (iframe srcdoc) of the signature being edited.
+const sigPreview = ref('')
+let sigPreviewTimer: ReturnType<typeof setTimeout> | undefined
+async function refreshSigPreview() {
+  sigPreview.value = await $fetch<string>('/api/email/preview', {
+    method: 'POST',
+    body: { content_html: sigForm.content_html }
+  })
+}
+watch(
+  () => sigForm.content_html,
+  () => {
+    clearTimeout(sigPreviewTimer)
+    sigPreviewTimer = setTimeout(refreshSigPreview, 350)
+  }
+)
+function showSigPreview() {
+  sigSubTab.value = 'preview'
+  refreshSigPreview()
+}
+onMounted(() => {
+  const def = signatures.value.find((s) => s.is_default) ?? signatures.value[0]
+  if (def) editSignature(def)
+  else newSignature()
+  refreshSigPreview()
+})
+
 const reminderForm = reactive({
   level1: {
     wait_days: sender.value?.reminder1_wait_days ?? 7,
@@ -290,7 +383,7 @@ function cancelChange() {
   confirmOpen.value = false
 }
 
-type Tab = 'appearance' | 'general' | 'mail' | 'reminders' | 'email'
+type Tab = 'appearance' | 'general' | 'mail' | 'reminders' | 'email' | 'signatures'
 // Hash-driven so the OAuth callback's `#mail-sync` redirect lands on the
 // right tab without a separate state ping pong.
 const tab = ref<Tab>(route.hash === '#mail-sync' ? 'mail' : 'appearance')
@@ -299,7 +392,8 @@ const tabs = computed(() => [
   { value: 'general', label: t('settings.tabGeneral') },
   { value: 'mail', label: t('settings.mailSync.tab') },
   { value: 'reminders', label: t('settings.reminderTemplates.tab') },
-  { value: 'email', label: t('settings.emailTemplate') }
+  { value: 'email', label: t('settings.emailTemplate') },
+  { value: 'signatures', label: t('settings.signatures.tab') }
 ])
 
 const themes = [
@@ -586,6 +680,109 @@ const themes = [
             </button>
           </div>
         </template>
+
+        <template v-else-if="tab === 'signatures'">
+          <p class="note">{{ $t('settings.signatures.intro') }}</p>
+          <UiCard :flush="true">
+            <ul class="sig-list">
+              <li
+                v-for="s in signatures"
+                :key="s.id"
+                class="sig-row"
+                :class="{ active: sigForm.id === s.id }"
+              >
+                <button class="sig-row__main" type="button" @click="editSignature(s)">
+                  <span class="sig-row__name">{{ s.name }}</span>
+                  <span v-if="s.is_default" class="sig-row__badge mono">{{
+                    $t('settings.signatures.default')
+                  }}</span>
+                </button>
+                <button class="ed-btn-ghost ed-btn-sm" type="button" @click="deleteSignature(s.id)">
+                  <UIcon name="i-lucide-trash-2" class="size-3" />
+                </button>
+              </li>
+              <li v-if="!signatures.length" class="sig-empty note">
+                {{ $t('settings.signatures.empty') }}
+              </li>
+            </ul>
+            <div class="sig-list__foot">
+              <button class="ed-btn ed-btn-sm" type="button" @click="newSignature">
+                <UIcon name="i-lucide-plus" class="size-3" />
+                {{ $t('settings.signatures.new') }}
+              </button>
+            </div>
+          </UiCard>
+
+          <div class="sub-tabs">
+            <button
+              class="sub-tab"
+              :class="{ active: sigSubTab === 'edit' }"
+              type="button"
+              @click="sigSubTab = 'edit'"
+            >
+              {{ $t('settings.signatures.edit') }}
+            </button>
+            <button
+              class="sub-tab"
+              :class="{ active: sigSubTab === 'preview' }"
+              type="button"
+              @click="showSigPreview"
+            >
+              {{ $t('settings.signatures.preview') }}
+            </button>
+          </div>
+
+          <UiCard v-if="sigSubTab === 'edit'">
+            <div class="flex flex-col gap-4">
+              <UFormField :label="$t('settings.signatures.name')">
+                <UInput
+                  v-model="sigForm.name"
+                  :placeholder="$t('settings.signatures.namePlaceholder')"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField :label="$t('settings.signatures.content')">
+                <ClientOnly>
+                  <UEditor
+                    v-model="sigForm.content_html"
+                    content-type="html"
+                    :extensions="emailEditorExtensions"
+                    :handlers="emailEditorHandlers"
+                    :ui="{ root: 'email-editor', content: 'flex-1 overflow-y-auto' }"
+                  >
+                    <template #default="{ editor }">
+                      <UEditorToolbar
+                        :editor="editor"
+                        :items="emailEditorItems"
+                        class="email-editor__toolbar flex-wrap"
+                      >
+                        <template #link><EditorLinkPopover :editor="editor" /></template>
+                      </UEditorToolbar>
+                    </template>
+                  </UEditor>
+                  <template #fallback>
+                    <div class="email-editor email-editor--fallback" />
+                  </template>
+                </ClientOnly>
+              </UFormField>
+              <UCheckbox
+                v-model="sigForm.is_default"
+                :label="$t('settings.signatures.setDefault')"
+              />
+              <div class="flex justify-end">
+                <button class="ed-btn-primary" :disabled="savingSig" @click="saveSignature">
+                  {{ $t('common.save') }}
+                </button>
+              </div>
+            </div>
+          </UiCard>
+          <iframe
+            v-else
+            :srcdoc="sigPreview"
+            class="sig-preview"
+            :title="$t('settings.signatures.preview')"
+          />
+        </template>
       </div>
     </div>
 
@@ -745,3 +942,58 @@ const themes = [
     </UModal>
   </div>
 </template>
+
+<style scoped>
+.sig-list {
+  display: flex;
+  flex-direction: column;
+}
+.sig-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.sig-row:last-child {
+  border-bottom: none;
+}
+.sig-row.active {
+  background: var(--surface-2);
+}
+.sig-row__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.sig-row__name {
+  font-weight: 500;
+}
+.sig-row__badge {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.sig-empty {
+  padding: 14px;
+}
+.sig-list__foot {
+  padding: 10px;
+  border-top: 1px solid var(--border);
+}
+.sig-preview {
+  width: 100%;
+  height: 560px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+}
+</style>

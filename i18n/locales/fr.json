@@ -330,6 +330,22 @@
     "placeholderDue": "Date d’échéance",
     "placeholderSender": "Votre nom",
     "emailTemplateSaved": "Modèle d'e-mail enregistré",
+    "signatures": {
+      "tab": "Signatures",
+      "intro": "Blocs de signature réutilisables. Créez-en une, définissez une signature par défaut et choisissez-la lors de la rédaction d'un e-mail. L'aperçu montre exactement le rendu de l'e-mail envoyé.",
+      "default": "Par défaut",
+      "empty": "Aucune signature pour l'instant.",
+      "new": "Nouvelle signature",
+      "name": "Nom",
+      "namePlaceholder": "p. ex. Standard",
+      "content": "Signature",
+      "setDefault": "Utiliser comme signature par défaut",
+      "edit": "Modifier",
+      "preview": "Aperçu",
+      "saved": "Signature enregistrée",
+      "nameRequired": "Donnez un nom à la signature",
+      "none": "Aucune signature"
+    },
     "reminderTemplates": {
       "tab": "Relances",
       "intro": "Modèles et délais pour les relances de paiement. Chaque niveau a son propre objet et corps ; le niveau 1 attend N jours après l'échéance, les niveaux 2 et 3 attendent N jours après la relance précédente.",

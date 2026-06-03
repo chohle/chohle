@@ -330,6 +330,22 @@
     "placeholderDue": "Due date",
     "placeholderSender": "Your name",
     "emailTemplateSaved": "Email template saved",
+    "signatures": {
+      "tab": "Signatures",
+      "intro": "Reusable sign-off blocks. Create one, set a default, and pick it when composing an email. The preview shows exactly how a sent email looks.",
+      "default": "Default",
+      "empty": "No signatures yet.",
+      "new": "New signature",
+      "name": "Name",
+      "namePlaceholder": "e.g. Standard",
+      "content": "Signature",
+      "setDefault": "Use as default signature",
+      "edit": "Edit",
+      "preview": "Preview",
+      "saved": "Signature saved",
+      "nameRequired": "Give the signature a name",
+      "none": "No signature"
+    },
     "reminderTemplates": {
       "tab": "Reminders",
       "intro": "Templates and wait days for overdue payment reminders. Each level has its own subject and body; level 1 waits N days after the due date, levels 2 and 3 wait N days after the previous reminder.",

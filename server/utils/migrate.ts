@@ -685,6 +685,22 @@ const migrations: Migration[] = [
         ON inbound_triage (message_id) WHERE message_id IS NOT NULL;
       CREATE INDEX idx_inbound_triage_status ON inbound_triage (status, sent_at);
     `
+  },
+  {
+    name: '0037_signatures',
+    // Reusable email sign-off blocks. The user creates named signatures (rich
+    // HTML, can include an uploaded photo) and picks one when composing; it's
+    // rendered into the branded email's signature slot. At most one is_default=1
+    // is enforced in the API, not the schema.
+    up: `
+      CREATE TABLE signatures (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        content_html TEXT NOT NULL DEFAULT '',
+        is_default INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+    `
   }
 ]
 

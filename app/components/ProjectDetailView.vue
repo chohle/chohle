@@ -268,7 +268,12 @@ function sanitizeHtml(html: string) {
 
 // Sanitize handled above; the Compose slideover handles both new emails and
 // replies (replyTo pre-fills it as a reply, then opens it).
-async function postEmail(payload: { subject: string; to?: string; body_html: string }) {
+async function postEmail(payload: {
+  subject: string
+  to?: string
+  body_html: string
+  signature_id?: number | null
+}) {
   await $fetch(`/api/projects/${props.id}/emails`, { method: 'POST', body: payload })
   await refreshEmails()
 }
@@ -281,15 +286,28 @@ function replyTo(ev: ProjectEmail) {
     (ev.direction === 'inbound' ? ev.from_address : ev.to_address) || resolvedEmail.value
   composer.subject = reSubject(ev.subject)
   composer.body_html = ''
+  composer.signature_id = defaultSignatureId.value
   composerError.value = ''
 }
+
+// Signatures to offer in the composer; default is preselected when opening.
+const { data: signaturesData } = await useFetch<{
+  rows: { id: number; name: string; is_default: number }[]
+}>('/api/signatures')
+const signatures = computed(() => signaturesData.value?.rows ?? [])
+const defaultSignatureId = computed(() => signatures.value.find((s) => s.is_default)?.id ?? null)
+const signatureItems = computed(() => [
+  { label: t('settings.signatures.none'), value: null as number | null },
+  ...signatures.value.map((s) => ({ label: s.name, value: s.id as number | null }))
+])
 
 // --- Compose: new email (Compose button) or reply (replyTo) via the slideover ---
 const composer = reactive({
   open: false,
   subject: '',
   to: '',
-  body_html: ''
+  body_html: '',
+  signature_id: null as number | null
 })
 const composerError = ref('')
 const sending = ref(false)
@@ -319,6 +337,7 @@ function openCompose() {
   composer.to = resolvedEmail.value
   composer.subject = ''
   composer.body_html = ''
+  composer.signature_id = defaultSignatureId.value
   composerError.value = ''
 }
 
@@ -330,7 +349,8 @@ async function send() {
     await postEmail({
       subject: composer.subject.trim(),
       to: composer.to.trim() || undefined,
-      body_html: composer.body_html
+      body_html: composer.body_html,
+      signature_id: composer.signature_id ?? undefined
     })
     composer.open = false
     toast.add({ title: t('pipeline.detail.emailSent'), color: 'success' })
@@ -808,6 +828,9 @@ const headerCrumb = computed(() => {
                 <div class="email-editor email-editor--tall email-editor--fallback" />
               </template>
             </ClientOnly>
+          </UFormField>
+          <UFormField v-if="signatures.length" :label="$t('settings.signatures.tab')">
+            <USelect v-model="composer.signature_id" :items="signatureItems" class="w-full" />
           </UFormField>
         </form>
       </template>

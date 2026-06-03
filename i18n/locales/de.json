@@ -330,6 +330,22 @@
     "placeholderDue": "Fälligkeitsdatum",
     "placeholderSender": "Dein Name",
     "emailTemplateSaved": "E-Mail-Vorlage gespeichert",
+    "signatures": {
+      "tab": "Signaturen",
+      "intro": "Wiederverwendbare Grussformeln. Erstellen Sie eine, legen Sie eine Standardsignatur fest und wählen Sie sie beim Verfassen einer E-Mail. Die Vorschau zeigt, wie die gesendete E-Mail aussieht.",
+      "default": "Standard",
+      "empty": "Noch keine Signaturen.",
+      "new": "Neue Signatur",
+      "name": "Name",
+      "namePlaceholder": "z. B. Standard",
+      "content": "Signatur",
+      "setDefault": "Als Standardsignatur verwenden",
+      "edit": "Bearbeiten",
+      "preview": "Vorschau",
+      "saved": "Signatur gespeichert",
+      "nameRequired": "Geben Sie der Signatur einen Namen",
+      "none": "Keine Signatur"
+    },
     "reminderTemplates": {
       "tab": "Mahnungen",
       "intro": "Vorlagen und Wartezeiten für Zahlungserinnerungen. Jede Stufe hat einen eigenen Betreff und Text; Stufe 1 wartet N Tage nach Fälligkeit, Stufen 2 und 3 warten N Tage nach der vorherigen Mahnung.",

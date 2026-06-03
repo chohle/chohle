@@ -4,6 +4,8 @@ interface Body {
   subject?: string
   to?: string
   body_html?: string
+  // Optional signature to render in the email's signature slot.
+  signature_id?: number
 }
 
 interface SenderRow {
@@ -73,7 +75,16 @@ export default defineEventHandler(async (event) => {
   const from = sender.name ? { name: sender.name, address: sender.email } : sender.email
   // Send the body wrapped in the shared branded shell; the raw `html` is what we
   // store on the conversation row (the thread UI shouldn't show email chrome).
-  const { html: brandedHtml, text } = await buildBrandedEmail(sender, html)
+  // Render the chosen signature into the template's signature slot (kept out of
+  // the stored body so the conversation thread shows just the message).
+  let signatureHtml: string | undefined
+  if (Number.isInteger(Number(body.signature_id))) {
+    const sig = db
+      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
+      .get(Number(body.signature_id)) as { content_html: string } | undefined
+    signatureHtml = sig?.content_html || undefined
+  }
+  const { html: brandedHtml, text } = await buildBrandedEmail(sender, html, { signatureHtml })
 
   // Generate our own RFC 5322 Message-ID and hand it to nodemailer rather than
   // trusting the one it/the SMTP server reports back: relays (Gmail, Outlook)
