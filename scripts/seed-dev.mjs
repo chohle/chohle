@@ -22,7 +22,9 @@ if (requested && !SUPPORTED_LOCALES.includes(requested)) {
   )
 }
 
-const db = new Database(join(root, 'data', 'chohle.db'))
+// Respect DATABASE_PATH (matches server/utils/db.ts) so we seed the same file
+// the app reads — e.g. a Docker named volume — not a stale default path.
+const db = new Database(process.env.DATABASE_PATH || join(root, 'data', 'chohle.db'))
 const r = seedDemo(db, requested ?? 'en')
 db.close()
 
