@@ -67,7 +67,8 @@
     "einkauf": "Achats",
     "workspace": "Espace de travail",
     "finance": "Finances",
-    "system": "Système"
+    "system": "Système",
+    "triage": "Triage"
   },
   "demo": {
     "notice": "Démo — vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",
@@ -734,5 +735,21 @@
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
     "delete": "Supprimer"
+  },
+  "triage": {
+    "title": "Triage",
+    "subtitle": "Courrier entrant sans projet correspondant. Attribuez-le ou ignorez-le.",
+    "emptyTitle": "Rien à trier",
+    "emptyText": "Les réponses synchronisées sans projet correspondant apparaissent ici pour attribution.",
+    "assignToSuggested": "Attribuer",
+    "chooseProject": "Choisir un projet…",
+    "dismiss": "Ignorer",
+    "assigned": "Attribué au projet",
+    "assignFailed": "Attribution impossible",
+    "dismissFailed": "Impossible d’ignorer",
+    "unknownSender": "Expéditeur inconnu",
+    "noCustomerMatch": "Aucun client correspondant",
+    "noProjectSuggestion": "Aucun projet à suggérer",
+    "loading": "Chargement…"
   }
 }

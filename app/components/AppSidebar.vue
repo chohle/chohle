@@ -12,6 +12,10 @@ const { isOpen: mobileOpen, close: closeMobile } = useMobileNav()
 const { isCollapsed } = useSidebarCollapse()
 const router = useRouter()
 
+// Pending inbound-triage count drives the badge next to the Triage link.
+const { count: triageCount, refresh: refreshTriageCount } = useTriageCount()
+onMounted(refreshTriageCount)
+
 async function onSignOut() {
   await clear()
   await navigateTo('/login')
@@ -52,6 +56,12 @@ const sections = computed<Section[]>(() => [
       { label: t('nav.articles'), icon: 'i-lucide-package', to: '/articles' },
       { label: t('nav.activity'), icon: 'i-lucide-activity', to: '/activity' },
       { label: t('nav.conversations'), icon: 'i-lucide-mail', to: '/conversations' },
+      {
+        label: t('nav.triage'),
+        icon: 'i-lucide-inbox',
+        to: '/triage',
+        count: triageCount.value > 0 ? triageCount.value : undefined
+      },
       {
         label: t('nav.pipeline'),
         icon: 'i-lucide-kanban',

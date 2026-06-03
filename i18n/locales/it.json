@@ -67,7 +67,8 @@
     "einkauf": "Acquisti",
     "workspace": "Area di lavoro",
     "finance": "Finanze",
-    "system": "Sistema"
+    "system": "Sistema",
+    "triage": "Triage"
   },
   "demo": {
     "notice": "Demo — le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",
@@ -734,5 +735,21 @@
     "username": "Nome utente",
     "password": "Password",
     "delete": "Elimina"
+  },
+  "triage": {
+    "title": "Triage",
+    "subtitle": "Posta in arrivo senza progetto corrispondente. Assegnala o ignorala.",
+    "emptyTitle": "Niente da smistare",
+    "emptyText": "Le risposte sincronizzate senza progetto corrispondente appaiono qui per lassegnazione.",
+    "assignToSuggested": "Assegna",
+    "chooseProject": "Scegli progetto…",
+    "dismiss": "Ignora",
+    "assigned": "Assegnato al progetto",
+    "assignFailed": "Assegnazione non riuscita",
+    "dismissFailed": "Impossibile ignorare",
+    "unknownSender": "Mittente sconosciuto",
+    "noCustomerMatch": "Nessun cliente corrispondente",
+    "noProjectSuggestion": "Nessun progetto da suggerire",
+    "loading": "Caricamento…"
   }
 }

@@ -17,7 +17,8 @@
     "einkauf": "Procurement",
     "workspace": "Workspace",
     "finance": "Finance",
-    "system": "System"
+    "system": "System",
+    "triage": "Triage"
   },
   "demo": {
     "notice": "Demo — your changes stay private to your browser and reset when idle.",
@@ -734,5 +735,21 @@
     "username": "Username",
     "password": "Password",
     "delete": "Delete"
+  },
+  "triage": {
+    "title": "Triage",
+    "subtitle": "Inbound mail that did not match a project. Assign it or dismiss it.",
+    "emptyTitle": "Nothing to triage",
+    "emptyText": "Synced replies that do not match a project show up here for you to assign.",
+    "assignToSuggested": "Assign",
+    "chooseProject": "Choose project…",
+    "dismiss": "Dismiss",
+    "assigned": "Assigned to project",
+    "assignFailed": "Could not assign",
+    "dismissFailed": "Could not dismiss",
+    "unknownSender": "Unknown sender",
+    "noCustomerMatch": "No matching customer",
+    "noProjectSuggestion": "No project to suggest",
+    "loading": "Loading…"
   }
 }
