@@ -11,6 +11,7 @@
 import type { Database } from 'better-sqlite3'
 import { decryptSecret, encryptSecret } from './secrets'
 import type { SyncResult } from './mailbox'
+import { loadHandledInboundIds, triageInbound } from './triage'
 
 // Distinct from the safe `MailboxRow` in server/utils/mailbox.ts on
 // purpose; this one carries the encrypted token columns + Google client
@@ -185,15 +186,8 @@ export async function syncGmailMailbox(
     .all() as Array<{ project_id: number; message_id: string }>
   for (const r of anchorRows) projectByMsgId.set(r.message_id, r.project_id)
 
-  const existingInbound = new Set<string>(
-    (
-      db
-        .prepare(
-          `SELECT message_id FROM project_emails WHERE direction = 'inbound' AND message_id IS NOT NULL`
-        )
-        .all() as Array<{ message_id: string }>
-    ).map((r) => r.message_id)
-  )
+  // Already-handled inbound ids: attached to a project OR sitting in triage.
+  const existingInbound = loadHandledInboundIds(db)
 
   // OR IGNORE: a DB-level backstop on the unique message_id index in case two
   // runs overlap and both clear the in-memory dedup check.
@@ -205,6 +199,7 @@ export async function syncGmailMailbox(
 
   let inserted = 0
   let duplicates = 0
+  let triaged = 0
   for (const id of ids) {
     const msg = await getMessage(token, id)
     const incomingMsgId =
@@ -224,7 +219,6 @@ export async function syncGmailMailbox(
         break
       }
     }
-    if (!projectId) continue
 
     const html = findPart(msg.payload, 'text/html')
     const text = findPart(msg.payload, 'text/plain')
@@ -233,6 +227,29 @@ export async function syncGmailMailbox(
     const subject = header(msg.payload?.headers, 'Subject') ?? ''
     const dateMs = msg.internalDate ? Number(msg.internalDate) : Date.now()
     const sentAt = new Date(dateMs).toISOString().replace('T', ' ').slice(0, 19)
+
+    // No header thread match → park it in triage with a suggestion instead of
+    // dropping it. Never auto-attached to a project.
+    if (!projectId) {
+      if (
+        triageInbound(db, {
+          mailboxId: mailbox.id,
+          messageId: normalisedIncoming,
+          inReplyTo: anchors[0] ?? null,
+          referencesIds: anchors.length ? anchors.join(' ') : null,
+          fromAddress: from,
+          toAddress: to,
+          subject,
+          bodyHtml: html,
+          bodyText: text,
+          sentAt
+        }) === 'triaged'
+      ) {
+        triaged += 1
+        if (normalisedIncoming) existingInbound.add(normalisedIncoming)
+      }
+      continue
+    }
 
     const info = insert.run(projectId, from, to, subject, html, text, sentAt, normalisedIncoming)
     if (info.changes > 0) {
@@ -253,7 +270,7 @@ export async function syncGmailMailbox(
     mailbox.id
   )
 
-  return { scanned: ids.length, inserted, duplicates }
+  return { scanned: ids.length, inserted, duplicates, triaged }
 }
 
 export function listGmailMailboxes(db: Database): GmailSyncMailbox[] {
