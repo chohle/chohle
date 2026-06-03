@@ -80,6 +80,7 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 | [Reminders](docs/REMINDERS.md)                 | Staged overdue-payment reminders                        |
 | [Quotes](docs/QUOTES.md)                       | Offers and convert-to-invoice                           |
 | [Mail sync](docs/MAIL_SYNC.md)                 | Connecting an inbox (IMAP / Gmail / Outlook)            |
+| [Sending email](docs/SENDING_EMAIL.md)         | SMTP setup for outbound (invoices, quotes, replies)     |
 | [Hosting](docs/HOSTING.md)                     | _Optional_ — putting it online (VPS + Docker + Caddy)   |
 | [Demo mode](docs/DEMO_MODE.md)                 | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`) |
 | [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                   |
