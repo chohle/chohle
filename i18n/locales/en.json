@@ -663,7 +663,8 @@
   },
   "editor": {
     "uploadImage": "Upload an image",
-    "uploadHint": "SVG, PNG, JPG or GIF"
+    "uploadHint": "PNG, JPG, WebP or GIF",
+    "uploadFailed": "Image upload failed."
   },
   "email": {
     "subject": "Invoice {number}",

@@ -663,7 +663,8 @@
   },
   "editor": {
     "uploadImage": "Bild hochladen",
-    "uploadHint": "SVG, PNG, JPG oder GIF"
+    "uploadHint": "PNG, JPG, WebP oder GIF",
+    "uploadFailed": "Bild-Upload fehlgeschlagen."
   },
   "email": {
     "subject": "Rechnung {number}",

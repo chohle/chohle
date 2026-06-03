@@ -663,7 +663,8 @@
   },
   "editor": {
     "uploadImage": "Carica un'immagine",
-    "uploadHint": "SVG, PNG, JPG o GIF"
+    "uploadHint": "PNG, JPG, WebP o GIF",
+    "uploadFailed": "Caricamento dell'immagine non riuscito."
   },
   "email": {
     "subject": "Fattura {number}",

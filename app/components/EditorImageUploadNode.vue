@@ -3,30 +3,37 @@ import type { NodeViewProps } from '@tiptap/vue-3'
 import { NodeViewWrapper } from '@tiptap/vue-3'
 
 const props = defineProps<NodeViewProps>()
+const { t } = useI18n()
+const toast = useToast()
 const file = ref<File | null>(null)
 const loading = ref(false)
 
-watch(file, (newFile) => {
+// Upload the picked image to the server and insert it by hosted URL — never as
+// a base64 data URI, which several email clients (Gmail) refuse to display.
+watch(file, async (newFile) => {
   if (!newFile) return
   loading.value = true
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    const dataUrl = e.target?.result as string
+  try {
+    const body = new FormData()
+    body.append('image', newFile)
+    const { url } = await $fetch<{ url: string }>('/api/uploads/email-image', {
+      method: 'POST',
+      body
+    })
     const pos = props.getPos()
-    if (!dataUrl || typeof pos !== 'number') {
-      loading.value = false
-      return
-    }
+    if (!url || typeof pos !== 'number') return
     // Replace this upload placeholder node with the actual image.
     props.editor
       .chain()
       .focus()
       .deleteRange({ from: pos, to: pos + 1 })
-      .setImage({ src: dataUrl })
+      .setImage({ src: url })
       .run()
+  } catch {
+    toast.add({ title: t('editor.uploadFailed'), color: 'error' })
+  } finally {
     loading.value = false
   }
-  reader.readAsDataURL(newFile)
 })
 </script>
 

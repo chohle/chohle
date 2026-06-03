@@ -663,7 +663,8 @@
   },
   "editor": {
     "uploadImage": "Téléverser une image",
-    "uploadHint": "SVG, PNG, JPG ou GIF"
+    "uploadHint": "PNG, JPG, WebP ou GIF",
+    "uploadFailed": "Échec du téléversement de l'image."
   },
   "email": {
     "subject": "Facture {number}",
