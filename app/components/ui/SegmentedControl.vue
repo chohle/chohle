@@ -15,7 +15,7 @@ function select(value: string, index: number) {
 
 function onKey(e: KeyboardEvent, index: number) {
   const last = props.options.length - 1
-  let next = index
+  let next: number
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = index === last ? 0 : index + 1
   else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = index === 0 ? last : index - 1
   else if (e.key === 'Home') next = 0

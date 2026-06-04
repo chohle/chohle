@@ -32,10 +32,15 @@ function escapeHtml(s: string): string {
 // newlines and unescapes the common entities; good enough for clients that
 // don't render the HTML part.
 export function htmlToText(html: string): string {
-  return html
-    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, '\n')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
+  let text = html.replace(/<\/(p|div|li|h[1-6]|tr)>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+  // Strip remaining tags, looping until stable so overlapping brackets like
+  // "<scr<script>ipt>" can't reveal a fresh tag after a single pass.
+  let prev: string
+  do {
+    prev = text
+    text = text.replace(/<[^>]+>/g, '')
+  } while (text !== prev)
+  return text
     .replace(/&nbsp;/g, ' ')
     .replace(/&middot;/g, '·')
     .replace(/&amp;/g, '&')

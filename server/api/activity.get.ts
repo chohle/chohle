@@ -24,8 +24,9 @@ function chf(rappen: number) {
 
 function escapeMd(s: string) {
   // Inline emphasis uses ** and * — escape user-controlled strings so they
-  // don't accidentally enter italic/bold.
-  return s.replace(/[*_]/g, '\\$&')
+  // don't accidentally enter italic/bold. Backslash is escaped first (it's in
+  // the character class) so an existing "\" can't escape our escape.
+  return s.replace(/[\\*_]/g, '\\$&')
 }
 
 export default defineEventHandler(async (event) => {
