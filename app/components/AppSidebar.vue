@@ -215,7 +215,11 @@ const userMenu = computed<DropdownMenuItem[][]>(() => [
             <NuxtLink :to="i.to" class="nav-item" :class="{ active: isActive(i.to) }">
               <UIcon :name="i.icon" class="nav-icon" />
               <span class="nav-text">{{ i.label }}</span>
-              <span v-if="i.count != null" class="nav-count mono">{{ i.count }}</span>
+              <!-- Count is fetched on mount (client-only), so keep it out of SSR
+                   to avoid a hydration mismatch on the badge. -->
+              <ClientOnly>
+                <span v-if="i.count != null" class="nav-count mono">{{ i.count }}</span>
+              </ClientOnly>
             </NuxtLink>
           </UTooltip>
         </template>

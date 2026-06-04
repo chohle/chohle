@@ -77,7 +77,10 @@ const yearSeries = computed(() => [
 ])
 const yearLabels = computed(() => (yearData.value?.months ?? []).map((m) => monthLabel(m.ym)))
 
-const greeting = computed(() => {
+// Computed once on the server and hydrated as-is via useState, so the
+// time-based greeting can't mismatch between SSR and client hydration
+// (the initializer doesn't re-run on the client).
+const greeting = useState('dashboard-greeting', () => {
   const h = new Date().getHours()
   if (h < 12) return 'Good morning'
   if (h < 18) return 'Good afternoon'

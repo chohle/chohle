@@ -38,7 +38,11 @@ const panelLabel = computed(() => (isCollapsed.value ? t('sidebar.expand') : t('
       <kbd class="search-kbd mono">⌘K</kbd>
     </button>
     <div class="topbar-right">
-      <span class="date mono">{{ monoDate }}</span>
+      <!-- `new Date()` differs between the SSR render and client hydration
+           (timezone / across midnight); render it client-only. -->
+      <ClientOnly>
+        <span class="date mono">{{ monoDate }}</span>
+      </ClientOnly>
     </div>
   </header>
 </template>
