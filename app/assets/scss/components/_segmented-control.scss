@@ -1,11 +1,24 @@
 .seg-ctrl {
   display: inline-flex;
+  // Never exceed the container: on narrow screens the options scroll
+  // horizontally (swipe) instead of spilling past the viewport. Scrollbar is
+  // hidden so the pill stays clean; on desktop it never overflows so it's moot.
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none; // Firefox
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 2px;
   background: var(--surface);
 
+  &::-webkit-scrollbar {
+    display: none; // Chrome / Safari
+  }
+
   &__opt {
+    flex: 0 0 auto; // keep each tab's size; don't squeeze or wrap the labels
+    white-space: nowrap;
     background: transparent;
     border: 0;
     padding: 5px 12px;
