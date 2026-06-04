@@ -1,0 +1,9 @@
+# Force people through the structured forms above instead of blank issues
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & ideas
+    url: https://github.com/chohle/chohle/discussions
+    about: For usage questions and open-ended discussion (enable Discussions in repo settings if this 404s).
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/chohle/chohle/security/advisories/new
+    about: Please report security issues privately, not as a public issue.

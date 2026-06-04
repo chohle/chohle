@@ -1,0 +1,42 @@
+name: 💡 Feature request
+description: Suggest an idea or improvement
+labels: ['enhancement']
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing request for this?
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    attributes:
+      label: Area
+      options:
+        - Invoices
+        - Quotes (Offerten)
+        - Expenses / receipts
+        - Income / pay-date logic
+        - Customers / articles
+        - PDF / Swiss QR-bill
+        - Email (IMAP/SMTP, conversations, triage)
+        - Settings / profile
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What problem does this solve?
+      description: What are you trying to do that's hard or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed solution
+      description: How would you like it to work?
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
