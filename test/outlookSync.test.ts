@@ -219,7 +219,7 @@ describe('syncOutlookMailbox', () => {
     let fetchCalls = 0
     const fetchMock = vi.fn(async (url: string) => {
       fetchCalls += 1
-      if (url.includes('login.microsoftonline.com')) {
+      if (new URL(url).hostname === 'login.microsoftonline.com') {
         return {
           access_token: 'fresh-access',
           refresh_token: 'fresh-refresh',
