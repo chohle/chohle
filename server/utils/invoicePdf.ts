@@ -1,10 +1,6 @@
 import PDFDocument from 'pdfkit'
 import { SwissQRBill } from 'swissqrbill/pdf'
-import {
-  calculateQRReferenceChecksum,
-  calculateSCORReferenceChecksum,
-  isQRIBAN
-} from 'swissqrbill/utils'
+import { buildReference } from './qrReference'
 import { readUpload } from './uploads'
 import enLocale from '../../i18n/locales/en.json'
 import deLocale from '../../i18n/locales/de.json'
@@ -98,12 +94,9 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
   )
 
   const iban = (sender?.iban ?? '').replace(/\s/g, '')
-  const reference = isQRIBAN(iban)
-    ? (() => {
-        const base = String(id).padStart(26, '0')
-        return base + calculateQRReferenceChecksum(base)
-      })()
-    : `RF${calculateSCORReferenceChecksum(String(id))}${id}`
+  // Shared with the reconciliation matcher so the reference printed here is the
+  // exact one parseReference() reverses back to this invoice (qrReference.ts).
+  const reference = buildReference(id, iban)
 
   const qrData: Record<string, unknown> = {
     currency: 'CHF',

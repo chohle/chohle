@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>MSG-08-001</MsgId>
+      <CreDtTm>2026-02-01T03:00:00</CreDtTm>
+    </GrpHdr>
+    <Stmt>
+      <Id>STMT-2026-001</Id>
+      <Acct>
+        <Id><IBAN>CH4431999123000889012</IBAN></Id>
+        <Ccy>CHF</Ccy>
+      </Acct>
+      <FrToDt>
+        <FrDtTm>2026-01-01T00:00:00</FrDtTm>
+        <ToDtTm>2026-01-31T23:59:59</ToDtTm>
+      </FrToDt>
+      <!-- Incoming QR-referenced payment. AcctSvcrRef present at both the
+           entry and tx level: the entry-level one must win. -->
+      <Ntry>
+        <Amt Ccy="CHF">5796.85</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-01-15</Dt></BookgDt>
+        <ValDt><Dt>2026-01-16</Dt></ValDt>
+        <AcctSvcrRef>ACCT-REF-0001</AcctSvcrRef>
+        <NtryDtls>
+          <TxDtls>
+            <Refs>
+              <AcctSvcrRef>TX-REF-0001</AcctSvcrRef>
+              <EndToEndId>E2E-0001</EndToEndId>
+            </Refs>
+            <RmtInf>
+              <Strd>
+                <CdtrRefInf>
+                  <Tp><CdOrPrtry><Cd>SCOR</Cd></CdOrPrtry></Tp>
+                  <Ref>210000000003139471430009017</Ref>
+                </CdtrRefInf>
+              </Strd>
+            </RmtInf>
+            <RltdPties>
+              <Dbtr><Pty><Nm>Müller AG</Nm></Pty></Dbtr>
+            </RltdPties>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <!-- Outgoing debit: must be skipped entirely. -->
+      <Ntry>
+        <Amt Ccy="CHF">100.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <BookgDt><Dt>2026-01-17</Dt></BookgDt>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties><Dbtr><Pty><Nm>Stadtwerke</Nm></Pty></Dbtr></RltdPties>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <!-- Incoming payment without a structured reference (fuzzy candidate).
+           EndToEndId carries the ISO "no reference" sentinel. -->
+      <Ntry>
+        <Amt Ccy="CHF">250.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <BookgDt><Dt>2026-01-20</Dt></BookgDt>
+        <AcctSvcrRef>ACCT-REF-0003</AcctSvcrRef>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>NOTPROVIDED</EndToEndId></Refs>
+            <RltdPties><Dbtr><Pty><Nm>Jürg Beispiel</Nm></Pty></Dbtr></RltdPties>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

@@ -1,10 +1,5 @@
 import { SwissQRBill } from 'swissqrbill/svg'
-import {
-  calculateQRReferenceChecksum,
-  calculateSCORReferenceChecksum,
-  isIBANValid,
-  isQRIBAN
-} from 'swissqrbill/utils'
+import { isIBANValid } from 'swissqrbill/utils'
 
 interface Party {
   name: string
@@ -73,13 +68,7 @@ export default defineEventHandler(async (event) => {
     vat
   )
 
-  // QR-IBAN mandates a QRR reference; a regular IBAN uses a SCOR reference.
-  const reference = isQRIBAN(iban)
-    ? (() => {
-        const base = String(id).padStart(26, '0')
-        return base + calculateQRReferenceChecksum(base)
-      })()
-    : `RF${calculateSCORReferenceChecksum(String(id))}${id}`
+  const reference = buildReference(id, iban)
 
   const data: Record<string, unknown> = {
     currency: 'CHF',
