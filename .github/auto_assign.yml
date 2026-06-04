@@ -1,0 +1,17 @@
+# Config for kentaro-m/auto-assign-action (see .github/workflows/auto-assign.yml).
+
+# Assign the maintainer to every new PR (works on your own PRs too).
+addAssignees: true
+assignees:
+  - zeaiso
+
+# Request review from the maintainer. The action skips the PR author, so this
+# is a no-op on your own PRs and only requests review on bot PRs
+# (Renovate / CodeRabbit). Set to false if you don't want review requests.
+addReviewers: true
+reviewers:
+  - zeaiso
+
+# Skip when the PR title/body contains any of these.
+skipKeywords:
+  - wip
