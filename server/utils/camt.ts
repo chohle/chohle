@@ -5,9 +5,10 @@ import { XMLParser } from 'fast-xml-parser'
 // be unit-tested against fixture files without a database — see test/camt.test.ts.
 //
 // Scope: only SPS-2021 (camt.053.001.04) and SPS-2022 (camt.053.001.08) are
-// accepted, matching bexio, which refuses any other version (e.g. Wise's
-// .001.10). We keep only incoming credits (CdtDbtInd === 'CRDT'); debits are a
-// bank's outgoing payments and never settle one of our invoices.
+// accepted; any other version (e.g. a .001.10 export) is rejected with a clear
+// error rather than mis-parsed. We keep only incoming credits
+// (CdtDbtInd === 'CRDT'); debits are outgoing payments and never settle one of
+// our invoices.
 
 export interface ParsedCredit {
   /** Booking date, YYYY-MM-DD (Ntry/BookgDt). Used as the invoice paid_at. */

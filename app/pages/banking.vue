@@ -49,6 +49,7 @@ interface BankConnection {
   provider: 'folder' | 'ebics'
   status: 'pending' | 'active' | 'disabled' | 'error'
   config: Record<string, string>
+  keysReady?: boolean
   last_sync_at: string | null
   last_status: 'ok' | 'error' | null
   last_error: string | null
@@ -193,6 +194,7 @@ const connSyncing = ref(false)
 const connForm = reactive({
   provider: 'folder' as 'folder' | 'ebics',
   dir: '',
+  version: 'H005' as 'H004' | 'H005',
   hostURL: '',
   hostId: '',
   partnerId: '',
@@ -203,6 +205,7 @@ function openConnManage() {
   const c = connection.value
   connForm.provider = c?.provider ?? 'folder'
   connForm.dir = c?.config?.dir ?? ''
+  connForm.version = (c?.config?.version as 'H004' | 'H005') ?? 'H005'
   connForm.hostURL = c?.config?.hostURL ?? ''
   connForm.hostId = c?.config?.hostId ?? ''
   connForm.partnerId = c?.config?.partnerId ?? ''
@@ -210,11 +213,17 @@ function openConnManage() {
   connOpen.value = true
 }
 
+// Open the signed INI letter in a new tab to print and send to the bank.
+function openIniLetter() {
+  window.open('/api/bank/connection/ini-letter', '_blank')
+}
+
 async function saveConnection() {
   const config =
     connForm.provider === 'folder'
       ? { dir: connForm.dir }
       : {
+          version: connForm.version,
           hostURL: connForm.hostURL,
           hostId: connForm.hostId,
           partnerId: connForm.partnerId,
@@ -585,6 +594,17 @@ function errMessage(err: unknown): string {
             <div class="conn__note">
               <UIcon name="i-lucide-info" class="size-3.5" /> {{ $t('banking.connEbicsNote') }}
             </div>
+            <UFormField :label="$t('banking.connEbicsVersion')">
+              <USelect
+                v-model="connForm.version"
+                :items="[
+                  { label: 'EBICS 3.0 (H005)', value: 'H005' },
+                  { label: 'EBICS 2.5 (H004)', value: 'H004' }
+                ]"
+                value-key="value"
+                class="w-full"
+              />
+            </UFormField>
             <UFormField :label="$t('banking.connEbicsHostUrl')">
               <UInput
                 v-model="connForm.hostURL"
@@ -601,6 +621,16 @@ function errMessage(err: unknown): string {
             <UFormField :label="$t('banking.connEbicsUserId')">
               <UInput v-model="connForm.userId" class="w-full" />
             </UFormField>
+
+            <!-- After the connection is saved, keys exist → offer the INI letter. -->
+            <div v-if="connection?.provider === 'ebics' && connection?.keysReady" class="conn__ini">
+              <div class="conn__ini-head">{{ $t('banking.connEbicsActivation') }}</div>
+              <p class="conn__ini-text">{{ $t('banking.connEbicsActivationHint') }}</p>
+              <button class="ed-btn" type="button" @click="openIniLetter">
+                <UIcon name="i-lucide-printer" class="size-3.5" />
+                {{ $t('banking.connEbicsIniLetter') }}
+              </button>
+            </div>
           </template>
         </div>
       </template>
@@ -694,6 +724,23 @@ function errMessage(err: unknown): string {
     background: color-mix(in oklab, var(--warning, #d97706) 12%, transparent);
     color: var(--warning, #b45309);
     font-size: 0.78rem;
+  }
+
+  &__ini {
+    margin-top: 0.25rem;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+    border-radius: var(--radius, 10px);
+
+    &-head {
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    &-text {
+      margin: 0.25rem 0 0.6rem;
+      font-size: 0.78rem;
+      color: var(--ink-3, #71717a);
+    }
   }
 }
 

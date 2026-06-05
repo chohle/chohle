@@ -815,7 +815,7 @@
     "connProvider_ebics": "EBICS (Bankprotokoll)",
     "connFolderDir": "Ordnerpfad",
     "connFolderHint": "Pfad, in den Ihre Bank camt.053-Dateien ablegt (z. B. ein SFTP-Mount).",
-    "connEbicsNote": "EBICS-Aktivierung folgt – die Verbindung kann bereits konfiguriert werden.",
+    "connEbicsNote": "EBICS-Zugang konfigurieren. Beim Speichern werden Ihre Schlüssel erzeugt.",
     "connEbicsHostUrl": "EBICS-Host-URL",
     "connEbicsHostId": "Host-ID",
     "connEbicsPartnerId": "Partner-ID",
@@ -830,6 +830,10 @@
     "connSaveError": "Verbindung konnte nicht gespeichert werden",
     "connSyncDone": "{imported} Auszüge · {auto} automatisch abgeglichen",
     "connSyncFail": "Synchronisierung fehlgeschlagen",
-    "connDisconnected": "Verbindung getrennt"
+    "connDisconnected": "Verbindung getrennt",
+    "connEbicsVersion": "EBICS-Version",
+    "connEbicsActivation": "Aktivierung",
+    "connEbicsActivationHint": "Schlüssel erzeugt. Drucken Sie den Initialisierungsbrief, unterschreiben Sie ihn und senden Sie ihn an Ihre Bank, um den Teilnehmer zu aktivieren. Der Auszugsabruf startet, sobald die Bank Sie freigeschaltet hat.",
+    "connEbicsIniLetter": "INI-Brief drucken"
   }
 }

@@ -1,7 +1,7 @@
 // The current bank connection (single, single-tenant) with its last-sync
 // status. Secret config fields are stripped by sanitizeConfig.
 
-import { getConnection, sanitizeConfig } from '~~/server/utils/bankSync'
+import { configHasKeys, getConnection, sanitizeConfig } from '~~/server/utils/bankSync'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
       provider: conn.provider,
       status: conn.status,
       config: sanitizeConfig(conn.config),
+      keysReady: conn.provider === 'ebics' && configHasKeys(conn.config),
       last_sync_at: conn.last_sync_at,
       last_status: conn.last_status,
       last_error: conn.last_error,

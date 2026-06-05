@@ -1,314 +1,191 @@
-# Bankabgleich (CAMT.053 bank reconciliation)
+# Bankabgleich (camt.053 bank reconciliation)
 
-> **Status: Phases 1–3 built (backend + UI) + Phase 5 auto-ingest
-> (architecture + working folder provider; EBICS provider pending). Phase 4
-> (partial-payment polish) pending.** This document is the implementation
-> plan and the record of the design decisions behind the build. See the
-> Phasing section for what's done.
+chohle's pitch is "I sent the invoice → I got paid," but marking an invoice
+paid used to be a manual click. This feature closes that loop: read a
+`camt.053` bank statement, match each incoming payment to an open invoice by
+its Swiss QR reference, and mark matched invoices paid — automatically.
 
-chohle's pitch is "I sent the invoice → I got paid," but today marking an
-invoice paid is a manual click. This feature closes that loop: import a
-`camt.053` bank statement, match incoming payments to open invoices by
-their Swiss QR reference, and mark the matched invoices paid
-automatically.
+Statements arrive two ways:
 
-## How the established tools (bexio) do it
+- **Manual upload** — drop a `camt.053` file exported from e-banking onto the
+  banking page.
+- **Connected bank** — a connection pulls statements on a schedule and feeds
+  them through the exact same pipeline (see [Automatic sync](#automatic-sync)).
 
-For context, this is bexio's workflow:
+## Deterministic matching
 
-1. **Two ingest paths** — connect the bank (nightly pull) or upload a
-   `camt.053` file from e-banking. Manual import accepts **only**
-   SPS-2022 (`camt.053.001.08`) and SPS-2021 (`camt.053.001.04`); newer
-   exports (e.g. Wise's `.001.10`) are rejected outright.
-2. **Automatic matching** by the structured QR/ISR reference, with
-   `EndToEndId` as a secondary key.
-3. **Suggestions, not silent writes** — payments are _suggested_ against
-   invoices; the user confirms with a click. This holds even for a clean
-   reference match: bexio never auto-books. Partial and collective
-   postings are handled as explicit "few clicks" cases.
-4. **Mark paid on confirm** using the booking/value date.
-5. **Unmatched → manual queue**.
-
-Sources: [bexio Banking](https://www.bexio.com/en-CH/banking),
-[bexio ISO 20022](https://www.bexio.com/en-CH/iso20022),
-[camt.053 structure (ValidateFin)](https://validatefin.com/en/blog/camt053-bank-statement).
-
-## The chohle advantage: deterministic matching
-
-bexio must match _fuzzily_ because it does not control how the reference
-was generated. chohle does. The QR reference is derived deterministically
-from `sender.iban + invoice.id`
-(`server/utils/invoicePdf.ts`, `server/api/invoices/[id]/qrbill.get.ts`):
+The QR reference chohle prints on every QR-bill is derived deterministically
+from `sender.iban + invoice.id` (`server/utils/qrReference.ts`, used by both
+`invoicePdf.ts` and `qrbill.get.ts` so they can never drift):
 
 - **QR-IBAN → QRR**: `String(id).padStart(26, '0') + checksum` (27 digits)
 - **regular IBAN → SCOR**: `RF + checksum + id`
 
-So matching is: **reverse the encoding → recover the exact invoice ID**.
-Any payment made by scanning chohle's own QR-bill matches deterministically
-— effectively 100 %. Fuzzy matching (amount + debtor) is only the
-_fallback_ for payments made without the reference.
-
-### Prerequisite refactor
-
-The reference is currently computed inline in two places
-(`invoicePdf.ts:91`, `qrbill.get.ts:76`). Extract it into a single
-`server/utils/qrReference.ts` exposing:
+So matching is just **reverse the encoding → recover the exact invoice id**.
+Any payment made by scanning chohle's own QR-bill matches with certainty.
+Amount/debtor fuzzy matching is only the fallback for payments made without
+the reference.
 
 ```ts
-export function buildReference(invoiceId: number, iban: string): string
-export function parseReference(ref: string): number | null // → invoice id, or null
+buildReference(invoiceId: number, iban: string): string
+parseReference(ref: string): number | null // → invoice id, or null
 ```
 
-Both the PDF generator and the matcher use it, so they can never drift.
-Unit-test the round-trip (`parse(build(id)) === id`) for both QRR and SCOR.
+The round-trip (`parseReference(buildReference(id)) === id`) is unit-tested for
+both QRR and SCOR in `test/qrReference.test.ts`.
 
-## Design decisions (locked)
+## Auto-mark on exact match
 
-- **Auto-mark on exact match — a deliberate divergence from bexio.** When
-  the reference resolves to an invoice _and_ the amount equals the
-  invoice's live total, the invoice flips to `paid` automatically on
-  import (booking date as `paid_at`). Partial and fuzzy matches still
-  queue for manual confirmation. Note bexio never auto-books — it
-  _suggests_ even on a clean reference match. We diverge because the
-  deterministic reference (see above) removes the ambiguity bexio's
-  confirm-step guards against. The residual risks that step would catch —
-  a customer reusing an old QR-bill, paying the wrong invoice, or a bad
-  parse yielding a collision — are accepted in v1 and revisited if they
-  show up in practice.
-- **Partials deferred (v1).** v1 handles exact and fuzzy _single-invoice_
-  matches. Partial payments and one-payment-many-invoices (collective
-  postings) only surface as suggestions to resolve by hand. No
-  balance-tracking column yet.
+When the reference resolves to an invoice **and** the amount equals the
+invoice's live total, the invoice flips to `paid` on import (booking date as
+`paid_at`). This is safe precisely because the reference is deterministic —
+there's no ambiguity to confirm away. Everything less certain (amount
+mismatch, no/garbled reference, not-yet-sent invoice) goes to a **review
+queue** for a one-click confirm instead.
+
+Partial payments and one-payment-many-invoices (collective postings) are
+surfaced as suggestions to resolve by hand; there's no balance-tracking column
+yet.
 
 ## Data model
 
-Two new migrations in `server/utils/migrate.ts`, following the append-only
-`NNNN_name` convention (next free is `0035`). New tables, so no `fkOff`.
+Three migrations (`server/utils/migrate.ts`), all new tables:
 
 ```
-0035_bank_imports
-  bank_imports
-    id            INTEGER PRIMARY KEY AUTOINCREMENT
-    filename      TEXT NOT NULL
-    iban          TEXT NOT NULL          -- statement account; validate == sender.iban
-    statement_id  TEXT                   -- camt <Stmt><Id>
-    from_date     TEXT
-    to_date       TEXT
-    tx_count      INTEGER NOT NULL DEFAULT 0
-    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
-
-0036_bank_transactions
-  bank_transactions
-    id            INTEGER PRIMARY KEY AUTOINCREMENT
-    import_id     INTEGER NOT NULL REFERENCES bank_imports(id) ON DELETE CASCADE
-    booking_date  TEXT NOT NULL          -- Ntry/BookgDt/Dt
-    value_date    TEXT                   -- Ntry/ValDt/Dt
-    amount_rappen INTEGER NOT NULL       -- always credit (CRDT) for our use
-    currency      TEXT NOT NULL DEFAULT 'CHF'
-    reference     TEXT                   -- CdtrRefInf/Ref (raw)
-    end_to_end_id TEXT
-    debtor_name   TEXT
-    acct_svcr_ref TEXT                   -- AcctSvcrRef, bank's unique tx id
-    dedupe_hash   TEXT NOT NULL          -- hash(acct_svcr_ref || booking_date || amount || reference)
-    status        TEXT NOT NULL DEFAULT 'unmatched'
-                    CHECK (status IN ('unmatched','suggested','matched','ignored'))
-    invoice_id    INTEGER REFERENCES invoices(id) ON DELETE SET NULL
-    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
-  CREATE UNIQUE INDEX idx_bank_tx_dedupe ON bank_transactions(dedupe_hash);
+0038_bank_imports        one row per imported statement (filename, iban,
+                         statement id, period, tx count)
+0039_bank_transactions   the incoming CRDT credits parsed from a statement;
+                         status unmatched|suggested|matched|ignored, invoice_id
+                         set once matched. UNIQUE dedupe_hash.
+0040_bank_connections    one connection per account: provider (folder|ebics),
+                         status, encrypted config, last-sync result. UNIQUE iban.
 ```
 
-The unique `dedupe_hash` makes re-importing an overlapping statement safe
-(camt.053 files overlap at period boundaries): insert with `INSERT OR IGNORE`.
+The unique `dedupe_hash` on `bank_transactions` makes re-importing an
+overlapping statement safe (camt.053 files overlap at period boundaries):
+rows are inserted with `INSERT OR IGNORE`. The migrations use
+`CREATE TABLE/INDEX IF NOT EXISTS` so they're safe on a database that already
+ran an earlier numbering of these tables.
 
 ## camt.053 parser — `server/utils/camt.ts`
 
-- Add **`fast-xml-parser`** to `package.json` (zero native deps; fits the
-  otherwise-pure stack alongside better-sqlite3). No XML parser exists today.
-- Parse `Document/BkToCstmrStmt/Stmt`: read `Acct/Id/IBAN`, statement `Id`,
-  `FrToDt`. For each `Ntry`:
-  - keep only `CdtDbtInd === 'CRDT'` (incoming)
-  - `Amt` → rappen (`Math.round(value * 100)`); guard `currency === 'CHF'`
-  - `BookgDt/Dt`, `ValDt/Dt`
-  - dive `NtryDtls/TxDtls` for `RmtInf/Strd/CdtrRefInf/Ref`,
-    `Refs/EndToEndId`, the debtor name, and `AcctSvcrRef`
-  - tolerate both `.001.04` and `.001.08`. Most field paths are stable
-    across the two, but **the debtor name is not**: `.04` carries it at
-    `RltdPties/Dbtr/Nm` while `.08` wraps the debtor in a party choice at
-    `RltdPties/Dbtr/Pty/Nm` — read both. `AcctSvcrRef` can sit at the entry
-    (`Ntry/AcctSvcrRef`) or transaction (`TxDtls/Refs/AcctSvcrRef`) level;
-    prefer the entry-level one. Also handle fast-xml-parser's
-    array-vs-single-object quirk.
-  - **reject any other version** with a clear error (matching bexio, which
-    refuses anything but v4/v8 — e.g. Wise's `.001.10`)
-- Returns a normalized `ParsedStatement`. Pure function → unit-test with
-  the existing vitest setup, using sample camt files as fixtures.
+Uses `fast-xml-parser` (no native deps). Parses
+`Document/BkToCstmrStmt/Stmt`: account IBAN, statement id, period; then each
+`Ntry`:
+
+- keep only `CdtDbtInd === 'CRDT'` (incoming); require `currency === 'CHF'`
+- amount → rappen (`Math.round(value * 100)`); booking + value dates
+- from `NtryDtls/TxDtls`: the structured reference
+  (`RmtInf/Strd/CdtrRefInf/Ref`), `EndToEndId`, debtor name, `AcctSvcrRef`
+
+Accepts **SPS-2022 (`camt.053.001.08`)** and **SPS-2021 (`camt.053.001.04`)**
+and rejects any other version with a clear error. The two differ in a few
+paths — notably the debtor name (`.04`: `RltdPties/Dbtr/Nm`; `.08`:
+`RltdPties/Dbtr/Pty/Nm`) — which the parser reads from both. Pure function,
+unit-tested against fixtures in `test/camt.test.ts`.
 
 ## Matching engine — `server/utils/reconcile.ts`
 
-Per parsed credit transaction, in order:
+Per parsed credit, in order:
 
-1. **Reference match (deterministic).** `parseReference(reference)` →
-   invoice id → load invoice (must not already be `paid`). If amount
-   equals the recomputed live total → **auto-confirm** → `matched`, invoice
-   marked paid.
-2. **Reference match, amount mismatch.** Same invoice, different amount →
-   **partial / overpayment**, status `suggested` with a delta flag.
-3. **Fuzzy fallback** (no / garbled reference). Open (`sent`) invoices
-   where `total_rappen === amount`, optionally debtor name ≈ customer
-   name → `suggested`.
+1. **Reference match.** `parseReference` → invoice id → load invoice (not
+   already paid). Amount equals the live total → **auto-confirm**: `matched`,
+   invoice marked paid (booking date as `paid_at`).
+2. **Reference match, amount differs** → `suggested` with a delta flag.
+3. **Fuzzy fallback** (no/garbled reference): open (`sent`) invoices where the
+   total equals the amount, debtor ≈ customer → `suggested`.
 4. **Nothing** → `unmatched`.
 
-Marking paid **reuses the existing transition** in
-`server/api/invoices/[id].put.ts:33-55` (sets `status='paid'`, `paid_at`,
-frozen `total_rappen` together), extended to accept the **booking date**
-as `paid_at` instead of today.
+Marking paid reuses the existing invoice transition (status `paid`, `paid_at`,
+frozen `total_rappen`), with the booking date as `paid_at`.
 
-## API endpoints (Nitro, matching existing style)
+## API & UI
 
 ```
-POST   /api/bank/import                        multipart camt.053 → parse, dedupe-insert, match, return summary
+POST   /api/bank/import                        multipart camt.053 → parse, dedupe, match, summary
 GET    /api/bank/transactions?status=suggested review queue
-POST   /api/bank/transactions/[id]/confirm     { invoice_id } → mark invoice paid (booking date), tx matched
-POST   /api/bank/transactions/[id]/ignore      → status ignored (fees, non-invoice income)
-GET    /api/bank/imports                        history
-DELETE /api/bank/imports/[id]                   cascade; block if it has confirmed matches
+POST   /api/bank/transactions/[id]/confirm     { invoice_id } → mark paid, tx matched
+POST   /api/bank/transactions/[id]/ignore      → ignored (fees, non-invoice income)
+GET    /api/bank/imports / DELETE [id]          history; delete blocked if it has confirmed matches
+GET/POST/DELETE /api/bank/connection            the bank connection (single, single-tenant)
+POST   /api/bank/connection/sync                force an immediate pull
+GET    /api/bank/connection/ini-letter          printable EBICS initialization letter
 ```
 
-## UI — `app/pages/banking.vue`
+`app/pages/banking.vue`: drag-drop upload, a post-import summary banner, the
+review queue (confirm / pick-another / ignore), collapsed auto-matched +
+ignored, and import history with guarded delete. Sidebar entry under
+**Finance**. Strings in de/en/fr/it.
 
-- Drag-drop upload, reusing the attachment-upload pattern from
-  `server/api/expenses/[id]/attachments.post.ts`.
-- Post-import summary banner: "12 transactions · 9 auto-matched ·
-  2 suggestions · 1 unmatched".
-- **Suggestions queue** — one card per transaction (amount, date, debtor,
-  the invoice it points at) with ✅ confirm / ✏️ pick-another /
-  🚫 ignore. This is the "confirm with a click" surface.
-- Auto-matched and ignored shown collapsed.
-- Add to the sidebar under **Finance**.
+The reconciliation core is **source-agnostic**: `reconcileStatement(db,
+statement, filename)` consumes a parsed statement and does all the
+matching/auto-pay regardless of how it arrived. Every ingest path is therefore
+purely additive — no change to the matcher, endpoints, or review queue.
 
-## Edge cases
+## Automatic sync
 
-- **Partial payments** — amount < total: v1 keeps the invoice `sent` and
-  records the tx as `matched` against it; no balance column yet.
-- **Overpayments / collective postings** — one tx, many invoices: out of
-  scope for v1; surface as a manual suggestion.
-- **Salary / non-invoice income** — credits that aren't invoices →
-  `ignored` (could later auto-route to `income_payments`).
-- **Re-import overlap** — covered by the `dedupe_hash` unique index.
-- **Wrong account** — reject the import if statement IBAN ≠ `sender.iban`.
+`server/utils/bankSync.ts` defines a pluggable `BankProvider`;
+`server/plugins/04.bank-sync.ts` walks active connections and hands whatever
+they fetch to the same `reconcileStatement`.
 
-## Phasing
+The job runs **once per hour during a morning window** — default 06:00–13:00
+**Europe/Zurich** — since banks post statements in the morning and the prod
+container runs UTC (so hours are read in an explicit zone, not server-local).
+It ticks every 10 min and runs at most once per (date, hour), so a missed tick
+still catches up. **Sync now** on the banking page forces an immediate pull.
 
-1. **Phase 1 — done.** `qrReference.ts` refactor + round-trip tests;
-   migrations `0035`/`0036`; `camt.ts` parser + fixture tests. (No UI;
-   fully testable.)
-2. **Phase 2 — done.** `reconcile.ts` matcher (incl. the fuzzy fallback)
-   - import/transactions/confirm/ignore/imports endpoints, with the matcher
-     and confirm/ignore/delete rules unit-tested. The suggestion _reason_
-     (`amount_mismatch` / `unsent` / `fuzzy`) is returned by `decideMatch`
-     but not persisted — the schema has no column for it; the UI can derive
-     it. Add a column in Phase 3/4 if that proves awkward.
-3. **Phase 3 — done.** `app/pages/banking.vue` (drag-drop import, summary
-   banner, review queue with confirm / pick-another / ignore, collapsed
-   auto-matched + ignored, import history with guarded delete) + sidebar
-   entry under Finance + de/en/fr/it strings. The suggestion _reason_ badge
-   is derived client-side from the data (no stored column), as planned.
-4. **Phase 4** — partial-payment polish (balance tracking, collective
-   postings).
-5. **Phase 5 — architecture + folder provider done; EBICS provider pending.**
-   Automatic nightly ingest so `camt.053` is pulled instead of uploaded by
-   hand. The whole pipeline is built and tested; see below.
+| Var                           | Default         | Meaning                         |
+| ----------------------------- | --------------- | ------------------------------- |
+| `CHOHLE_BANK_SYNC_START_HOUR` | `6`             | First hour of the window (0–23) |
+| `CHOHLE_BANK_SYNC_END_HOUR`   | `13`            | Last hour, inclusive            |
+| `CHOHLE_BANK_SYNC_TZ`         | `Europe/Zurich` | Zone the hours are read in      |
 
-## Phase 5: automatic bank connection (EBICS / bLink)
+### Providers
 
-A second ingest path alongside manual `camt.053` upload: a connection fetches
-statements on a schedule. The established tools offer this as a _direct bank
-connection_ (bexio via **bLink**, SIX Group's open-banking platform).
-
-### What's built
-
-- **`bank_connections`** (migration `0037`): one connection per account,
-  provider + encrypted `config` (reusing `secrets.ts`), last-sync status.
-- **`bankSync.ts`**: a pluggable `BankProvider` interface + `syncConnection`
-  /`runBankSync` that fetch statements and hand each to the same
-  `reconcileStatement` — so auto-match/suggest/dedupe behave exactly as on a
-  manual import. Unit-tested with a fake provider.
-- **`folder` provider (functional today)**: scans a watched directory for
-  `*.xml` (e.g. your bank drops `camt.053` onto an SFTP share mounted there),
-  imports each, and moves it to `processed/`. This is a real, working
-  auto-ingest with no bank protocol required.
-- **`ebics` provider (slot only)**: configurable, but fetch records a clear
-  "not yet implemented" — activation (keys + signed letter) needs a real
-  EBICS contract to build and verify, so it's the remaining follow-up.
-- **Scheduled job** `server/plugins/04.bank-sync.ts` (mirrors mail-sync), plus
-  connection endpoints (`GET/POST/DELETE /api/bank/connection`,
-  `POST /api/bank/connection/sync`) and a connection card + manage slideover
-  on `banking.vue`.
-
-  The job runs **once per hour during a morning window** — default 06:00–13:00
-  **Europe/Zurich** — since banks post statements in the morning and the prod
-  container runs UTC (so the hours are interpreted in an explicit zone, not
-  server-local). It ticks every 10 min and runs at most once per (date, hour),
-  so a missed tick still catches up. Overridable via env:
-
-  | Var | Default | Meaning |
-  | --- | --- | --- |
-  | `CHOHLE_BANK_SYNC_START_HOUR` | `6` | First hour of the window (0–23) |
-  | `CHOHLE_BANK_SYNC_END_HOUR` | `13` | Last hour, inclusive |
-  | `CHOHLE_BANK_SYNC_TZ` | `Europe/Zurich` | Zone the hours are read in |
-
-  A user can always force an immediate pull with **Sync now** on the banking
-  page (`POST /api/bank/connection/sync`).
+- **`folder` (works today).** Scans a watched directory for `*.xml` — e.g.
+  your bank drops `camt.053` onto an SFTP share mounted there — imports each,
+  and moves it to `processed/`. A real auto-ingest with no bank protocol.
+- **`ebics` (onboarding built; download pending a contract).** See below.
 
 > **Ops note:** auto-sync writes to SQLite from a background job. The DB must
 > live on a Docker **named volume**, not a macOS bind mount — SQLite on a
 > gRPC-FUSE/virtiofs bind mount corrupts (see `docker-compose.yml`,
 > `DATABASE_PATH=/app/dbdata/chohle.db`). Uploads stay on the `./data` bind.
 
-### Why this was cheap to add
+## EBICS
 
-The reconciliation core is **source-agnostic**. `reconcileStatement(db,
-statement, filename)` consumes a parsed `camt.053` and does all the
-matching/auto-pay — it does not care how the statement arrived. A bank
-connection is therefore a purely _additive ingest path_. No change to the
-matcher, the endpoints' confirm/ignore logic, or the UI's review queue.
+EBICS is a standardized bank protocol for fetching statements without manual
+file export. Setting it up has two halves; chohle builds the half that can be
+done (and verified) without a live bank contract, and structures the rest.
 
-### Why this is cheap to add later
+### Built — subscriber onboarding (`server/utils/ebics.ts`)
 
-The reconciliation core is **source-agnostic**. `reconcileStatement(db,
-statement, filename)` consumes a parsed `camt.053` and does all the
-matching/auto-pay — it does not care how the statement arrived. A bank
-connection is therefore a purely _additive ingest path_: fetch a `camt.053`
-on a schedule, hand it to the same `reconcileStatement`. No change to the
-matcher, the endpoints' confirm/ignore logic, or the UI's review queue.
+When you create an EBICS connection (version `H004`/`H005`, host URL, host ID,
+partner ID, user ID), chohle:
 
-### The two Swiss mechanisms (and their real cost)
+1. **Generates the three RSA-2048 key pairs** EBICS requires — A006
+   (bank-technical signature), E002 (encryption), X002 (authentication).
+2. **Stores them encrypted** inside the connection's `config` (same
+   `secrets.ts` key as mailbox credentials). Private keys are never returned to
+   the client — `sanitizeConfig` strips them and `GET /api/bank/connection`
+   exposes only a `keysReady` flag.
+3. **Renders the INI letter** (`GET /api/bank/connection/ini-letter`): a
+   printable page with the SHA-256 hashes of the three public keys. The user
+   prints it, signs it, and mails/uploads it to the bank to activate the
+   subscriber.
 
-- **EBICS** — a standardized bank protocol. **Code-only** to integrate (a
-  mature Node client exists: `node-ebics/node-ebics-client`), works with most
-  CH/EU banks, free from the bank. Cost is _onboarding friction_: each
-  customer requests EBICS from their bank, generates a key pair, and mails a
-  **signed initialization letter** (INI/HIA) — a multi-day, partly offline
-  step. We'd also own key storage/security and a nightly job.
-- **bLink (SIX)** — the slick "authorize like e-banking, no letters" UX bexio
-  uses. Cost is a **commercial partnership** with SIX (onboarding,
-  certification, fees, legal) — a business decision, not a sprint, and
-  limited to banks on bLink.
+Key generation, the public-key hash, and the letter are unit-tested in
+`test/ebics.test.ts`.
 
-Recommendation if/when we build it: **EBICS first** (no partnership needed),
-**bLink only if** a SIX partnership is justified. Either way, manual
-`camt.053` upload stays as the universal fallback — even bexio keeps it,
-because no connection covers every bank.
+### Pending — the live handshake (needs a contract)
 
-### Shape of the work (when scheduled)
+The activation exchange (INI/HIA to send the bank the public keys, HPB to
+download the bank's keys) and the signed + AES-encrypted C53/Z53 statement
+download require a real EBICS contract to build against and verify. Until a
+connection is activated, the `ebics` provider's sync records a clear "pending
+activation" message rather than silently doing nothing. The connection stays
+`pending` until that flow is implemented and the bank has activated the
+subscriber.
 
-- A per-account **connection mode** setting: `manual` (today's default) vs
-  `connected`. Surfaced in settings, not the banking page.
-- A `bank_connections` row holding the provider + (encrypted) credentials /
-  EBICS keys, reusing the `secrets.ts` encryption already used for mailbox
-  secrets.
-- A nightly scheduled task (same mechanism as the reminder/email-sync jobs)
-  that fetches the latest `camt.053` per connected account and calls
-  `reconcileStatement`. Auto-matched invoices flip to paid exactly as on a
-  manual import; suggestions land in the same review queue the owner already
-  knows. Re-fetch overlap is already safe via the `dedupe_hash` index.
+Manual `camt.053` upload remains the universal fallback — no connection
+mechanism covers every bank.

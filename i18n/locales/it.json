@@ -815,7 +815,7 @@
     "connProvider_ebics": "EBICS (protocollo bancario)",
     "connFolderDir": "Percorso cartella",
     "connFolderHint": "Percorso in cui la tua banca deposita i file camt.053 (es. un mount SFTP).",
-    "connEbicsNote": "L'attivazione EBICS arriverà a breve — puoi già configurare la connessione.",
+    "connEbicsNote": "Configura il tuo accesso EBICS. Le chiavi vengono generate al salvataggio.",
     "connEbicsHostUrl": "URL host EBICS",
     "connEbicsHostId": "ID host",
     "connEbicsPartnerId": "ID partner",
@@ -830,6 +830,10 @@
     "connSaveError": "Impossibile salvare la connessione",
     "connSyncDone": "{imported} estratti conto · {auto} abbinati automaticamente",
     "connSyncFail": "Sincronizzazione non riuscita",
-    "connDisconnected": "Disconnesso"
+    "connDisconnected": "Disconnesso",
+    "connEbicsVersion": "Versione EBICS",
+    "connEbicsActivation": "Attivazione",
+    "connEbicsActivationHint": "Chiavi generate. Stampa la lettera di inizializzazione, firmala e inviala alla tua banca per attivare il sottoscrittore. Il download degli estratti conto inizia dopo lattivazione da parte della banca.",
+    "connEbicsIniLetter": "Stampa lettera INI"
   }
 }

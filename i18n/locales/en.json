@@ -815,7 +815,7 @@
     "connProvider_ebics": "EBICS (bank protocol)",
     "connFolderDir": "Folder path",
     "connFolderHint": "Path where your bank drops camt.053 files (e.g. an SFTP mount).",
-    "connEbicsNote": "EBICS activation is coming soon — you can configure the connection now.",
+    "connEbicsNote": "Configure your EBICS access. Your keys are generated when you save.",
     "connEbicsHostUrl": "EBICS host URL",
     "connEbicsHostId": "Host ID",
     "connEbicsPartnerId": "Partner ID",
@@ -830,6 +830,10 @@
     "connSaveError": "Could not save the connection",
     "connSyncDone": "{imported} statements · {auto} auto-matched",
     "connSyncFail": "Sync failed",
-    "connDisconnected": "Disconnected"
+    "connDisconnected": "Disconnected",
+    "connEbicsVersion": "EBICS version",
+    "connEbicsActivation": "Activation",
+    "connEbicsActivationHint": "Keys generated. Print the initialization letter, sign it, and send it to your bank to activate the subscriber. Statement download starts once the bank activates you.",
+    "connEbicsIniLetter": "Print INI letter"
   }
 }

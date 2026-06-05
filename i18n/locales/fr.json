@@ -815,7 +815,7 @@
     "connProvider_ebics": "EBICS (protocole bancaire)",
     "connFolderDir": "Chemin du dossier",
     "connFolderHint": "Chemin où votre banque dépose les fichiers camt.053 (p. ex. un montage SFTP).",
-    "connEbicsNote": "L'activation EBICS arrive bientôt — vous pouvez déjà configurer la connexion.",
+    "connEbicsNote": "Configurez votre accès EBICS. Vos clés sont générées à l’enregistrement.",
     "connEbicsHostUrl": "URL de l'hôte EBICS",
     "connEbicsHostId": "ID de l'hôte",
     "connEbicsPartnerId": "ID partenaire",
@@ -830,6 +830,10 @@
     "connSaveError": "Impossible d'enregistrer la connexion",
     "connSyncDone": "{imported} relevés · {auto} rapprochés automatiquement",
     "connSyncFail": "Échec de la synchronisation",
-    "connDisconnected": "Déconnecté"
+    "connDisconnected": "Déconnecté",
+    "connEbicsVersion": "Version EBICS",
+    "connEbicsActivation": "Activation",
+    "connEbicsActivationHint": "Clés générées. Imprimez la lettre d’initialisation, signez-la et envoyez-la à votre banque pour activer l’abonné. Le téléchargement des relevés démarre une fois l’activation par la banque.",
+    "connEbicsIniLetter": "Imprimer la lettre INI"
   }
 }

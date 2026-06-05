@@ -108,8 +108,12 @@ export const folderProvider: BankProvider = {
 
 export const ebicsProvider: BankProvider = {
   async fetchStatements() {
+    // Onboarding (config + RSA keys + INI letter) is built; the live key
+    // exchange (INI/HIA/HPB) and signed/encrypted C53 download land once the
+    // bank has activated the subscriber from the signed letter — that part
+    // needs a real EBICS contract to build against. See docs.
     throw new BankProviderError(
-      'EBICS activation is not yet implemented. The connection can be configured; nightly fetch lands in a follow-up.'
+      'EBICS statement download is pending activation: generate keys, print the INI letter, sign it and send it to your bank. Live download lands once your EBICS contract is active.'
     )
   }
 }
@@ -196,13 +200,24 @@ export async function runBankSync(db: Database): Promise<void> {
 
 // --- helpers for the endpoints --------------------------------------------
 
-const SECRET_CONFIG_KEYS = ['userKeys', 'bankKeys', 'password', 'passphrase']
+const SECRET_CONFIG_KEYS = ['userKeys', 'bankKeys', 'keys', 'password', 'passphrase']
 
 export function getConnection(db: Database): BankConnectionRow | null {
   return (
     (db.prepare('SELECT * FROM bank_connections LIMIT 1').get() as BankConnectionRow | undefined) ??
     null
   )
+}
+
+/** Whether the connection already has generated EBICS keys (for the UI to show
+ * the INI-letter action) — without exposing the keys themselves. */
+export function configHasKeys(stored: string | null): boolean {
+  try {
+    const cfg = parseConfig(stored) as { keys?: { signature?: { privateKey?: string } } }
+    return Boolean(cfg.keys?.signature?.privateKey)
+  } catch {
+    return false
+  }
 }
 
 /** Decrypt a connection's config for display, with secret fields stripped. */
