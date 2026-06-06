@@ -120,7 +120,13 @@
     "docTitlePlaceholder": "e.g. Detailed description",
     "docContent": "Content",
     "docSaved": "Document saved",
-    "docTitleRequired": "Give the document a title"
+    "docTitleRequired": "Give the document a title",
+    "articlePlaceholder": "Your article",
+    "references": "References / examples",
+    "referencesHint": "Links to past work or examples, shown on the quote PDF.",
+    "refAdd": "Add link",
+    "refLabelPlaceholder": "Label (e.g. Website XY)",
+    "refUrlPlaceholder": "https://…"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -711,7 +717,8 @@
     "amount": "Amount",
     "sumInChf": "Total in CHF",
     "vatLine": "VAT {rate} % excl.",
-    "quoteAmountChf": "Quote amount CHF"
+    "quoteAmountChf": "Quote amount CHF",
+    "referencesTitle": "References"
   },
   "invoiceDoc": {
     "invoice": "Invoice",

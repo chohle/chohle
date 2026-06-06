@@ -42,6 +42,12 @@ export default defineEventHandler(async (event) => {
     .prepare('SELECT * FROM quote_items WHERE quote_id = ? ORDER BY position, id')
     .all(id) as ItemRow[]
 
+  const references = db
+    .prepare(
+      'SELECT id, label, url FROM quote_references WHERE quote_id = ? ORDER BY sort_order, id'
+    )
+    .all(id)
+
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
       | { vat_registered: number }
@@ -58,5 +64,5 @@ export default defineEventHandler(async (event) => {
     vat
   )
 
-  return { quote, items, totals, project, convertedInvoice }
+  return { quote, items, references, totals, project, convertedInvoice }
 })

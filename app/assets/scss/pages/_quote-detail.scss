@@ -145,4 +145,25 @@
   .qdoc-foot {
     padding-top: 12px;
   }
+
+  // Reference / example links.
+  .qref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .qref {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &__label {
+      flex: 0 0 220px;
+      min-width: 0;
+    }
+    &__url {
+      flex: 1;
+      min-width: 0;
+    }
+  }
 }

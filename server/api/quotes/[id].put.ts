@@ -67,9 +67,15 @@ export default defineEventHandler(async (event) => {
   const items = Array.isArray(b?.items) ? b.items : []
   const insert = db.prepare(
     `INSERT INTO quote_items
-       (quote_id, article_id, description, quantity, unit, unit_price_rappen,
+       (quote_id, article_id, article_name, description, quantity, unit, unit_price_rappen,
         discount_percent, mwst_percent, position)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  )
+
+  // Reference / example links: replaced wholesale, blank rows dropped.
+  const references = Array.isArray(b?.references) ? b.references : []
+  const insertRef = db.prepare(
+    `INSERT INTO quote_references (quote_id, label, url, sort_order) VALUES (?, ?, ?, ?)`
   )
 
   const vat = !!(
@@ -98,6 +104,7 @@ export default defineEventHandler(async (event) => {
       insert.run(
         id,
         normalizeArticleId(it?.articleId),
+        String(it?.articleName ?? ''),
         String(it?.description ?? ''),
         Number(it?.quantity) || 0,
         String(it?.unit ?? ''),
@@ -106,6 +113,13 @@ export default defineEventHandler(async (event) => {
         Number(it?.mwstPercent) || 0,
         index
       )
+    })
+
+    db.prepare('DELETE FROM quote_references WHERE quote_id = ?').run(id)
+    references.forEach((r: Record<string, unknown>, index: number) => {
+      const label = String(r?.label ?? '').trim()
+      const url = String(r?.url ?? '').trim()
+      if (label || url) insertRef.run(id, label, url, index)
     })
   })()
 

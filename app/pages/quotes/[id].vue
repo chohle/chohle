@@ -18,12 +18,18 @@ interface ProjectMini {
 }
 interface ItemRow {
   article_id: number | null
+  article_name: string
   description: string
   quantity: number
   unit: string
   unit_price_rappen: number
   discount_percent: number
   mwst_percent: number
+}
+interface RefRow {
+  id?: number
+  label: string
+  url: string
 }
 interface Article {
   id: number
@@ -41,6 +47,7 @@ const toast = useToast()
 const { data, refresh } = await useFetch<{
   quote: QuoteRow
   items: ItemRow[]
+  references: RefRow[]
   project: ProjectMini | null
   convertedInvoice: { id: number; number: string } | null
 }>(`/api/quotes/${id}`)
@@ -102,6 +109,7 @@ const header = reactive({
 
 interface EditRow {
   articleId: number | null
+  articleName: string
   description: string
   quantity: number
   unit: string
@@ -112,6 +120,7 @@ interface EditRow {
 const items = ref<EditRow[]>(
   data.value!.items.map((i) => ({
     articleId: i.article_id,
+    articleName: i.article_name ?? '',
     description: i.description,
     quantity: i.quantity,
     unit: i.unit,
@@ -120,20 +129,25 @@ const items = ref<EditRow[]>(
     mwstPercent: i.mwst_percent
   }))
 )
-const articleItems = computed(() => articles.value.map((a) => ({ label: a.name, value: a.id })))
+// Article names as native datalist suggestions for the free-text article field.
+const articleNames = computed(() => articles.value.map((a) => a.name))
 
-function onArticleSelect(row: EditRow, articleId: number | null) {
-  row.articleId = articleId
-  const a = articles.value.find((x) => x.id === articleId)
+// When the typed article name exactly matches a saved article, remember the id
+// and autofill unit/price/VAT — but only the fields the user hasn't filled, so
+// a free-typed line is never clobbered.
+function onArticleName(row: EditRow) {
+  const name = row.articleName.trim()
+  const a = articles.value.find((x) => x.name.toLowerCase() === name.toLowerCase())
+  row.articleId = a?.id ?? null
   if (!a) return
-  row.description = a.name
-  row.unit = a.unit
-  row.unitPrice = a.default_price_rappen / 100
-  row.mwstPercent = a.default_mwst
+  if (!row.unit) row.unit = a.unit
+  if (!row.unitPrice) row.unitPrice = a.default_price_rappen / 100
+  if (vat.value && (!row.mwstPercent || row.mwstPercent === 8.1)) row.mwstPercent = a.default_mwst
 }
 function addRow() {
   items.value.push({
     articleId: null,
+    articleName: '',
     description: '',
     quantity: 1,
     unit: '',
@@ -141,6 +155,15 @@ function addRow() {
     discountPercent: 0,
     mwstPercent: 8.1
   })
+}
+
+// --- reference / example links -----------------------------------------------
+const references = ref<RefRow[]>((data.value!.references ?? []).map((r) => ({ ...r })))
+function addRef() {
+  references.value.push({ label: '', url: '' })
+}
+function removeRef(i: number) {
+  references.value.splice(i, 1)
 }
 function removeRow(i: number) {
   items.value.splice(i, 1)
@@ -162,7 +185,7 @@ const saving = ref(false)
 const confirmDelete = ref(false)
 
 function snapshot() {
-  return JSON.stringify({ ...header, items: items.value })
+  return JSON.stringify({ ...header, items: items.value, references: references.value })
 }
 const baseline = ref(snapshot())
 const dirty = computed(() => snapshot() !== baseline.value)
@@ -198,7 +221,8 @@ async function save() {
       body: {
         ...header,
         validUntil: header.validUntil || null,
-        items: items.value
+        items: items.value,
+        references: references.value
       }
     })
     baseline.value = snapshot()
@@ -547,11 +571,12 @@ const isExpired = computed(
           <div class="c-amt right">{{ $t('common.amount') }}</div>
         </div>
         <div v-for="(row, i) in items" :key="i" class="line-row">
-          <USelect
-            :model-value="row.articleId ?? undefined"
-            :items="articleItems"
+          <UInput
+            v-model="row.articleName"
+            list="qd-article-names"
+            :placeholder="$t('quotes.articlePlaceholder')"
             class="w-full"
-            @update:model-value="onArticleSelect(row, $event)"
+            @change="onArticleName(row)"
           />
           <UInput v-model="row.description" class="w-full" />
           <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
@@ -577,6 +602,10 @@ const isExpired = computed(
             <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
           </button>
         </div>
+        <!-- Native suggestions for the free-text article field. -->
+        <datalist id="qd-article-names">
+          <option v-for="n in articleNames" :key="n" :value="n" />
+        </datalist>
       </div>
     </UiCard>
 
@@ -595,6 +624,39 @@ const isExpired = computed(
           <dd class="mono">CHF {{ chf(totals.totalRappen) }}</dd>
         </div>
       </dl>
+    </UiCard>
+
+    <UiSectionLabel>{{ $t('quotes.references') }}</UiSectionLabel>
+    <UiCard>
+      <p class="qdoc-intro note">{{ $t('quotes.referencesHint') }}</p>
+      <div v-if="references.length" class="qref-list">
+        <div v-for="(r, i) in references" :key="i" class="qref">
+          <UInput
+            v-model="r.label"
+            :placeholder="$t('quotes.refLabelPlaceholder')"
+            class="qref__label"
+          />
+          <UInput
+            v-model="r.url"
+            inputmode="url"
+            :placeholder="$t('quotes.refUrlPlaceholder')"
+            class="qref__url"
+          />
+          <button
+            type="button"
+            class="icon-btn"
+            :aria-label="$t('common.delete')"
+            @click="removeRef(i)"
+          >
+            <UIcon name="i-lucide-x" />
+          </button>
+        </div>
+      </div>
+      <div class="qdoc-foot">
+        <button class="ed-btn" type="button" @click="addRef">
+          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('quotes.refAdd') }}
+        </button>
+      </div>
     </UiCard>
 
     <UiSectionLabel>{{ $t('quotes.documents') }}</UiSectionLabel>

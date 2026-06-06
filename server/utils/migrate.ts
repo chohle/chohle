@@ -795,6 +795,28 @@ const migrations: Migration[] = [
       );
       CREATE INDEX idx_quote_documents_quote ON quote_documents (quote_id, sort_order);
     `
+  },
+  {
+    name: '0042_quote_item_article_name',
+    // Quotes allow a free-typed article name per line (not tied to the saved
+    // article catalog). article_id stays for autofill convenience but is no
+    // longer required.
+    up: `ALTER TABLE quote_items ADD COLUMN article_name TEXT NOT NULL DEFAULT '';`
+  },
+  {
+    name: '0043_quote_references',
+    // Reference / example links shown on a quote (e.g. links to past work),
+    // rendered into the quote PDF. Replaced wholesale on each quote save.
+    up: `
+      CREATE TABLE quote_references (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        label TEXT NOT NULL DEFAULT '',
+        url TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0
+      );
+      CREATE INDEX idx_quote_references_quote ON quote_references (quote_id, sort_order);
+    `
   }
 ]
 

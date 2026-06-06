@@ -19,6 +19,7 @@ interface QuoteRow {
   valid_until: string | null
 }
 interface ItemRow {
+  article_name: string
   description: string
   quantity: number
   unit: string
@@ -87,9 +88,12 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
     .get(quote.customer_id) as Party
   const items = db
     .prepare(
-      'SELECT description, quantity, unit, unit_price_rappen, discount_percent, mwst_percent FROM quote_items WHERE quote_id = ? ORDER BY position, id'
+      'SELECT article_name, description, quantity, unit, unit_price_rappen, discount_percent, mwst_percent FROM quote_items WHERE quote_id = ? ORDER BY position, id'
     )
     .all(id) as ItemRow[]
+  const references = db
+    .prepare('SELECT label, url FROM quote_references WHERE quote_id = ? ORDER BY sort_order, id')
+    .all(id) as Array<{ label: string; url: string }>
 
   const lang = customer?.language ?? 'en'
   const L = (catalogs[lang] ?? enLocale).quoteDoc
@@ -213,7 +217,6 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
   pdf.moveTo(50, y).lineTo(545, y).lineWidth(0.5).strokeColor('#000').stroke()
   y += 6
 
-  pdf.font('Helvetica')
   for (const i of items) {
     const amount = lineNetRappen({
       quantity: i.quantity,
@@ -221,8 +224,26 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
       discountPercent: i.discount_percent,
       mwstPercent: i.mwst_percent
     })
-    drawRow([i.description, String(i.quantity), i.unit, chf(i.unit_price_rappen), chf(amount)], y)
-    y += 18
+    const title = (i.article_name || '').trim()
+    if (title) {
+      // Article name (bold) carries the figures; the free description wraps
+      // underneath in grey.
+      pdf.font('Helvetica-Bold').fontSize(9).fillColor('#000')
+      drawRow([title, String(i.quantity), i.unit, chf(i.unit_price_rappen), chf(amount)], y)
+      y += 13
+      if (i.description?.trim()) {
+        pdf.font('Helvetica').fontSize(8.5).fillColor('#555')
+        pdf.text(i.description, cols[0]!.x, y, { width: cols[0]!.w + cols[1]!.w })
+        y = pdf.y + 6
+        pdf.fillColor('#000')
+      } else {
+        y += 5
+      }
+    } else {
+      pdf.font('Helvetica').fontSize(9).fillColor('#000')
+      drawRow([i.description, String(i.quantity), i.unit, chf(i.unit_price_rappen), chf(amount)], y)
+      y += 18
+    }
   }
 
   y += 6
@@ -239,6 +260,26 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
     totalRow(L.vatLine.replace('{rate}', String(r.rate)), chf(r.mwstRappen))
   }
   totalRow(L.quoteAmountChf, chf(totals.totalRappen), true)
+
+  // Reference / example links.
+  if (references.length) {
+    y += 18
+    pdf.font('Helvetica-Bold').fontSize(10).fillColor('#000').text(L.referencesTitle, 50, y)
+    y = pdf.y + 4
+    for (const r of references) {
+      const label = (r.label || '').trim()
+      const url = (r.url || '').trim()
+      pdf.font('Helvetica').fontSize(9)
+      if (label) {
+        pdf.fillColor('#000').text(`${label}: `, 50, y, { continued: true })
+      } else {
+        pdf.text('', 50, y, { continued: true })
+      }
+      pdf.fillColor('#3458d6').text(url, { link: url || undefined, underline: !!url })
+      y = pdf.y + 3
+    }
+    pdf.fillColor('#000')
+  }
 
   // Contact footer, centered near the page bottom (no QR-bill on quotes).
   const footerLine = [sender.phone, sender.email, sender.website, sender.mwst]

@@ -170,7 +170,13 @@
     "docTitlePlaceholder": "es. Descrizione dettagliata",
     "docContent": "Contenuto",
     "docSaved": "Documento salvato",
-    "docTitleRequired": "Assegna un titolo al documento"
+    "docTitleRequired": "Assegna un titolo al documento",
+    "articlePlaceholder": "Articolo personalizzato",
+    "references": "Riferimenti / esempi",
+    "referencesHint": "Link a lavori o esempi precedenti, mostrati nel PDF dell’offerta.",
+    "refAdd": "Aggiungi link",
+    "refLabelPlaceholder": "Etichetta (es. Sito XY)",
+    "refUrlPlaceholder": "https://…"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -711,7 +717,8 @@
     "amount": "Importo",
     "sumInChf": "Totale in CHF",
     "vatLine": "IVA {rate} % escl.",
-    "quoteAmountChf": "Importo offerta CHF"
+    "quoteAmountChf": "Importo offerta CHF",
+    "referencesTitle": "Riferimenti"
   },
   "invoiceDoc": {
     "invoice": "Fattura",

@@ -120,7 +120,13 @@
     "docTitlePlaceholder": "z. B. Detailbeschrieb",
     "docContent": "Inhalt",
     "docSaved": "Dokument gespeichert",
-    "docTitleRequired": "Geben Sie dem Dokument einen Titel"
+    "docTitleRequired": "Geben Sie dem Dokument einen Titel",
+    "articlePlaceholder": "Eigener Artikel",
+    "references": "Referenzen / Beispiele",
+    "referencesHint": "Links zu früheren Arbeiten oder Beispielen, erscheinen im Offert-PDF.",
+    "refAdd": "Link hinzufügen",
+    "refLabelPlaceholder": "Bezeichnung (z. B. Website XY)",
+    "refUrlPlaceholder": "https://…"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -711,7 +717,8 @@
     "amount": "Betrag",
     "sumInChf": "Summe in CHF",
     "vatLine": "MWST {rate} % zzgl.",
-    "quoteAmountChf": "Offertenbetrag CHF"
+    "quoteAmountChf": "Offertenbetrag CHF",
+    "referencesTitle": "Referenzen"
   },
   "invoiceDoc": {
     "invoice": "Rechnung",
