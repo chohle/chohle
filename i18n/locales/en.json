@@ -129,7 +129,10 @@
     "refUrlPlaceholder": "https://…",
     "docWrite": "Write",
     "docUpload": "Upload file",
-    "docUploadFailed": "Upload failed"
+    "docUploadFailed": "Upload failed",
+    "tabDetails": "Quote",
+    "tabReferences": "References",
+    "tabDocuments": "Documents"
   },
   "pipeline": {
     "title": "Pipeline",

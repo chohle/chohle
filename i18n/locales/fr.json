@@ -179,7 +179,10 @@
     "refUrlPlaceholder": "https://…",
     "docWrite": "Rédiger",
     "docUpload": "Téléverser un fichier",
-    "docUploadFailed": "Échec du téléversement"
+    "docUploadFailed": "Échec du téléversement",
+    "tabDetails": "Offre",
+    "tabReferences": "Références",
+    "tabDocuments": "Documents"
   },
   "pipeline": {
     "title": "Pipeline",

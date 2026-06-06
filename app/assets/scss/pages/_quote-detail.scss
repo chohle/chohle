@@ -92,9 +92,11 @@
     }
   }
 
+  &__tabs {
+    margin: 4px 0 8px;
+  }
+
   .foot {
-    position: sticky;
-    bottom: 0;
     display: flex;
     justify-content: flex-end;
     gap: 8px;

@@ -179,7 +179,10 @@
     "refUrlPlaceholder": "https://…",
     "docWrite": "Scrivi",
     "docUpload": "Carica file",
-    "docUploadFailed": "Caricamento non riuscito"
+    "docUploadFailed": "Caricamento non riuscito",
+    "tabDetails": "Offerta",
+    "tabReferences": "Riferimenti",
+    "tabDocuments": "Documenti"
   },
   "pipeline": {
     "title": "Pipeline",
