@@ -1,5 +1,6 @@
-// Render a single quote document to PDF for preview/download in the browser.
-import { quoteDocumentToPdf } from '~~/server/utils/documentPdf'
+// Preview/download a quote document: editor docs render to PDF, uploaded file
+// docs stream as-is with their original type.
+import { quoteDocumentAttachment } from '~~/server/utils/documentPdf'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -8,10 +9,10 @@ export default defineEventHandler(async (event) => {
   if (!Number.isInteger(quoteId) || !Number.isInteger(docId)) {
     throw createError({ statusCode: 400, statusMessage: 'invalid id' })
   }
-  const out = await quoteDocumentToPdf(useDb(), docId, quoteId)
+  const out = await quoteDocumentAttachment(useDb(), docId, quoteId)
   if (!out) throw createError({ statusCode: 404, statusMessage: 'document not found' })
 
-  setHeader(event, 'Content-Type', 'application/pdf')
+  setHeader(event, 'Content-Type', out.contentType)
   setHeader(event, 'Content-Disposition', `inline; filename="${out.filename}"`)
-  return out.buffer
+  return out.content
 })

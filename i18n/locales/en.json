@@ -126,7 +126,10 @@
     "referencesHint": "Links to past work or examples, shown on the quote PDF.",
     "refAdd": "Add link",
     "refLabelPlaceholder": "Label (e.g. Website XY)",
-    "refUrlPlaceholder": "https://…"
+    "refUrlPlaceholder": "https://…",
+    "docWrite": "Write",
+    "docUpload": "Upload file",
+    "docUploadFailed": "Upload failed"
   },
   "pipeline": {
     "title": "Pipeline",

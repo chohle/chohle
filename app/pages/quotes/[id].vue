@@ -370,6 +370,9 @@ interface QuoteDoc {
   id: number
   title: string
   content: Record<string, unknown>
+  kind: 'editor' | 'file'
+  file_name: string
+  mime: string
   attach: number
   updated_at: string
 }
@@ -378,6 +381,31 @@ const { data: docsData, refresh: refreshDocs } = await useFetch<{ documents: Quo
   { default: () => ({ documents: [] }) }
 )
 const documents = computed(() => docsData.value.documents)
+
+// Upload an existing file (PDF/DOCX/…) as a document.
+const docFileInput = ref<HTMLInputElement>()
+const docUploading = ref(false)
+async function onDocFile(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (docFileInput.value) docFileInput.value.value = ''
+  if (!file) return
+  docUploading.value = true
+  try {
+    const body = new FormData()
+    body.append('file', file)
+    await $fetch(`/api/quotes/${id}/documents/upload`, { method: 'POST', body })
+    await refreshDocs()
+    toast.add({ title: t('quotes.docSaved'), color: 'success' })
+  } catch (err) {
+    toast.add({
+      title: t('quotes.docUploadFailed'),
+      description: (err as { statusMessage?: string }).statusMessage,
+      color: 'error'
+    })
+  } finally {
+    docUploading.value = false
+  }
+}
 
 const docEditor = reactive<{
   open: boolean
@@ -664,8 +692,15 @@ const isExpired = computed(
       <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
       <ul v-if="documents.length" class="qdoc-list">
         <li v-for="d in documents" :key="d.id" class="qdoc">
-          <button type="button" class="qdoc__name" @click="openDoc(d)">
-            <UIcon name="i-lucide-file-text" class="size-3.5" />
+          <button
+            type="button"
+            class="qdoc__name"
+            @click="d.kind === 'file' ? previewDoc(d) : openDoc(d)"
+          >
+            <UIcon
+              :name="d.kind === 'file' ? 'i-lucide-paperclip' : 'i-lucide-file-text'"
+              class="size-3.5"
+            />
             {{ d.title }}
           </button>
           <UCheckbox
@@ -697,8 +732,28 @@ const isExpired = computed(
       </ul>
       <div class="qdoc-foot">
         <button class="ed-btn" type="button" @click="openNewDoc">
-          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('quotes.docNew') }}
+          <UIcon name="i-lucide-pen-line" class="size-3.5" /> {{ $t('quotes.docWrite') }}
         </button>
+        <button
+          class="ed-btn"
+          type="button"
+          :disabled="docUploading"
+          @click="docFileInput?.click()"
+        >
+          <UIcon
+            :name="docUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
+            class="size-3.5"
+            :class="{ 'animate-spin': docUploading }"
+          />
+          {{ $t('quotes.docUpload') }}
+        </button>
+        <input
+          ref="docFileInput"
+          type="file"
+          accept=".pdf,.docx,.doc,.odt,.rtf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.oasis.opendocument.text,application/rtf"
+          class="hidden"
+          @change="onDocFile"
+        />
       </div>
     </UiCard>
 

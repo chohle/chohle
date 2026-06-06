@@ -143,6 +143,9 @@
     }
   }
   .qdoc-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     padding-top: 12px;
   }
 

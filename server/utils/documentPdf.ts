@@ -260,21 +260,41 @@ function safeFilename(title: string): string {
   return `${base}.pdf`
 }
 
-// Load a quote document row + sender/logo and render it. Returns null when the
-// document doesn't exist. Shared by the preview endpoint and the email send.
-export async function quoteDocumentToPdf(
+interface DocRow {
+  title: string
+  content: string
+  kind: string
+  file_name: string
+  file_path: string
+  mime: string
+}
+
+// Resolve a quote document to an email attachment. Editor docs are rendered to
+// a branded PDF; uploaded file docs are returned as-is. Null when missing (or a
+// file doc whose stored file has vanished). Shared by the preview endpoint and
+// the email send.
+export async function quoteDocumentAttachment(
   db: Database,
   docId: number,
   quoteId?: number
-): Promise<{ filename: string; buffer: Buffer } | null> {
-  const row = quoteId
-    ? (db
-        .prepare('SELECT title, content FROM quote_documents WHERE id = ? AND quote_id = ?')
-        .get(docId, quoteId) as { title: string; content: string } | undefined)
-    : (db.prepare('SELECT title, content FROM quote_documents WHERE id = ?').get(docId) as
-        | { title: string; content: string }
-        | undefined)
+): Promise<{ filename: string; content: Buffer; contentType: string } | null> {
+  const sql =
+    'SELECT title, content, kind, file_name, file_path, mime FROM quote_documents WHERE id = ?' +
+    (quoteId ? ' AND quote_id = ?' : '')
+  const row = (quoteId ? db.prepare(sql).get(docId, quoteId) : db.prepare(sql).get(docId)) as
+    | DocRow
+    | undefined
   if (!row) return null
+
+  if (row.kind === 'file') {
+    const buf = await readUpload(row.file_path)
+    if (!buf) return null
+    return {
+      filename: row.file_name || 'Dokument',
+      content: buf,
+      contentType: row.mime || 'application/octet-stream'
+    }
+  }
 
   const sender = db.prepare('SELECT name, logo_path FROM sender WHERE id = 1').get() as
     | { name: string; logo_path: string | null }
@@ -293,5 +313,5 @@ export async function quoteDocumentToPdf(
     content,
     sender: { name: sender?.name || 'chohle', logo }
   })
-  return { filename: safeFilename(row.title), buffer }
+  return { filename: safeFilename(row.title), content: buffer, contentType: 'application/pdf' }
 }

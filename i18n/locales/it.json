@@ -176,7 +176,10 @@
     "referencesHint": "Link a lavori o esempi precedenti, mostrati nel PDF dell’offerta.",
     "refAdd": "Aggiungi link",
     "refLabelPlaceholder": "Etichetta (es. Sito XY)",
-    "refUrlPlaceholder": "https://…"
+    "refUrlPlaceholder": "https://…",
+    "docWrite": "Scrivi",
+    "docUpload": "Carica file",
+    "docUploadFailed": "Caricamento non riuscito"
   },
   "pipeline": {
     "title": "Pipeline",

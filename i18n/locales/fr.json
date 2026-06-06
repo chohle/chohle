@@ -176,7 +176,10 @@
     "referencesHint": "Liens vers des travaux ou exemples passés, affichés sur le PDF de l’offre.",
     "refAdd": "Ajouter un lien",
     "refLabelPlaceholder": "Libellé (p. ex. Site XY)",
-    "refUrlPlaceholder": "https://…"
+    "refUrlPlaceholder": "https://…",
+    "docWrite": "Rédiger",
+    "docUpload": "Téléverser un fichier",
+    "docUploadFailed": "Échec du téléversement"
   },
   "pipeline": {
     "title": "Pipeline",

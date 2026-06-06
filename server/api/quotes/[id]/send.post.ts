@@ -99,12 +99,12 @@ export default defineEventHandler(async (event) => {
     )
     .all(id) as Array<{ id: number }>
   for (const d of docRows) {
-    const out = await quoteDocumentToPdf(db, d.id, id)
+    const out = await quoteDocumentAttachment(db, d.id, id)
     if (out)
       attachments.push({
         filename: out.filename,
-        content: out.buffer,
-        contentType: 'application/pdf'
+        content: out.content,
+        contentType: out.contentType
       })
   }
 

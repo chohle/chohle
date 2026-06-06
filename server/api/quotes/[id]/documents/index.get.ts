@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   }
   const rows = useDb()
     .prepare(
-      `SELECT id, title, content, attach, sort_order, updated_at
+      `SELECT id, title, content, kind, file_name, mime, attach, sort_order, updated_at
        FROM quote_documents WHERE quote_id = ? ORDER BY sort_order, id`
     )
     .all(quoteId) as Array<{ content: string; [k: string]: unknown }>

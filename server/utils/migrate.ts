@@ -817,6 +817,17 @@ const migrations: Migration[] = [
       );
       CREATE INDEX idx_quote_references_quote ON quote_references (quote_id, sort_order);
     `
+  },
+  {
+    name: '0044_quote_document_files',
+    // A quote document is either editor-written (kind='editor', rendered from
+    // `content`) or an uploaded file (kind='file': PDF/DOCX/… attached as-is).
+    up: `
+      ALTER TABLE quote_documents ADD COLUMN kind TEXT NOT NULL DEFAULT 'editor';
+      ALTER TABLE quote_documents ADD COLUMN file_name TEXT NOT NULL DEFAULT '';
+      ALTER TABLE quote_documents ADD COLUMN file_path TEXT NOT NULL DEFAULT '';
+      ALTER TABLE quote_documents ADD COLUMN mime TEXT NOT NULL DEFAULT '';
+    `
   }
 ]
 
