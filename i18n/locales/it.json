@@ -834,6 +834,17 @@
     "connEbicsVersion": "Versione EBICS",
     "connEbicsActivation": "Attivazione",
     "connEbicsActivationHint": "Chiavi generate. Stampa la lettera di inizializzazione, firmala e inviala alla tua banca per attivare il sottoscrittore. Il download degli estratti conto inizia dopo lattivazione da parte della banca.",
-    "connEbicsIniLetter": "Stampa lettera INI"
+    "connEbicsIniLetter": "Stampa lettera INI",
+    "connIntro": "Scegli come gli estratti conto arrivano a chohle.",
+    "connRecommended": "Consigliato",
+    "connAdvanced": "Avanzato",
+    "connProviderFolderDesc": "Carica un camt.053 dall’e-banking o fallo recapitare in una cartella dalla tua banca. Pronto subito, senza contratto.",
+    "connProviderEbicsDesc": "Protocollo bancario diretto per il recupero completamente automatico. Richiede un contratto EBICS con la tua banca.",
+    "connFolderUploadHint": "Nessuna configurazione necessaria: puoi anche trascinare i file camt.053 direttamente in questa pagina.",
+    "connEbicsStep1": "Richiedi EBICS alla tua banca: riceverai host ID, partner ID e user ID.",
+    "connEbicsStep2": "Compila i campi e salva: chohle genera le tue chiavi.",
+    "connEbicsStep3": "Stampa la lettera INI, firmala e inviala alla tua banca.",
+    "connEbicsStep4": "Una volta attivato dalla banca, gli estratti vengono recuperati automaticamente.",
+    "connDocsHint": "Dettagli completi: docs/BANK_RECONCILIATION.md"
   }
 }

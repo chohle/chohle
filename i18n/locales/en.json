@@ -834,6 +834,17 @@
     "connEbicsVersion": "EBICS version",
     "connEbicsActivation": "Activation",
     "connEbicsActivationHint": "Keys generated. Print the initialization letter, sign it, and send it to your bank to activate the subscriber. Statement download starts once the bank activates you.",
-    "connEbicsIniLetter": "Print INI letter"
+    "connEbicsIniLetter": "Print INI letter",
+    "connIntro": "Choose how bank statements reach chohle.",
+    "connRecommended": "Recommended",
+    "connAdvanced": "Advanced",
+    "connProviderFolderDesc": "Upload a camt.053 from e-banking, or have your bank deliver it to a folder. Works right away — no contract.",
+    "connProviderEbicsDesc": "Direct bank protocol for fully automatic retrieval. Requires an EBICS contract with your bank.",
+    "connFolderUploadHint": "No setup needed: you can also drop camt.053 files directly on this page.",
+    "connEbicsStep1": "Request EBICS from your bank — you’ll receive the host ID, partner ID and user ID.",
+    "connEbicsStep2": "Fill in the fields and save — chohle generates your keys.",
+    "connEbicsStep3": "Print the INI letter, sign it, and send it to your bank.",
+    "connEbicsStep4": "Once the bank activates you, statements are retrieved automatically.",
+    "connDocsHint": "Full details: docs/BANK_RECONCILIATION.md"
   }
 }

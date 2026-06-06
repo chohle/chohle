@@ -569,17 +569,38 @@ function errMessage(err: unknown): string {
     >
       <template #body>
         <div class="flex flex-col gap-4">
-          <UFormField :label="$t('banking.connProvider')">
-            <USelect
-              v-model="connForm.provider"
-              :items="[
-                { label: $t('banking.connProvider_folder'), value: 'folder' },
-                { label: $t('banking.connProvider_ebics'), value: 'ebics' }
-              ]"
-              value-key="value"
-              class="w-full"
-            />
-          </UFormField>
+          <p class="conn__intro">{{ $t('banking.connIntro') }}</p>
+
+          <!-- Provider as two descriptive cards: folder/upload is the practical
+               default, EBICS is the advanced direct-protocol path. -->
+          <div class="prov-grid">
+            <button
+              type="button"
+              class="prov-card"
+              :class="{ 'is-active': connForm.provider === 'folder' }"
+              @click="connForm.provider = 'folder'"
+            >
+              <div class="prov-card__top">
+                <UIcon name="i-lucide-folder-down" class="prov-card__icon" />
+                <span class="prov-card__badge is-rec">{{ $t('banking.connRecommended') }}</span>
+              </div>
+              <div class="prov-card__name">{{ $t('banking.connProvider_folder') }}</div>
+              <div class="prov-card__desc">{{ $t('banking.connProviderFolderDesc') }}</div>
+            </button>
+            <button
+              type="button"
+              class="prov-card"
+              :class="{ 'is-active': connForm.provider === 'ebics' }"
+              @click="connForm.provider = 'ebics'"
+            >
+              <div class="prov-card__top">
+                <UIcon name="i-lucide-landmark" class="prov-card__icon" />
+                <span class="prov-card__badge">{{ $t('banking.connAdvanced') }}</span>
+              </div>
+              <div class="prov-card__name">{{ $t('banking.connProvider_ebics') }}</div>
+              <div class="prov-card__desc">{{ $t('banking.connProviderEbicsDesc') }}</div>
+            </button>
+          </div>
 
           <template v-if="connForm.provider === 'folder'">
             <UFormField
@@ -588,12 +609,19 @@ function errMessage(err: unknown): string {
             >
               <UInput v-model="connForm.dir" placeholder="data/bank-inbox" class="w-full" />
             </UFormField>
+            <div class="conn__hint">
+              <UIcon name="i-lucide-info" class="size-3.5" />
+              {{ $t('banking.connFolderUploadHint') }}
+            </div>
           </template>
 
           <template v-else>
-            <div class="conn__note">
-              <UIcon name="i-lucide-info" class="size-3.5" /> {{ $t('banking.connEbicsNote') }}
-            </div>
+            <ol class="conn__steps">
+              <li>{{ $t('banking.connEbicsStep1') }}</li>
+              <li>{{ $t('banking.connEbicsStep2') }}</li>
+              <li>{{ $t('banking.connEbicsStep3') }}</li>
+              <li>{{ $t('banking.connEbicsStep4') }}</li>
+            </ol>
             <UFormField :label="$t('banking.connEbicsVersion')">
               <USelect
                 v-model="connForm.version"
@@ -631,6 +659,10 @@ function errMessage(err: unknown): string {
                 {{ $t('banking.connEbicsIniLetter') }}
               </button>
             </div>
+
+            <p class="conn__docs">
+              <UIcon name="i-lucide-book-open" class="size-3" /> {{ $t('banking.connDocsHint') }}
+            </p>
           </template>
         </div>
       </template>

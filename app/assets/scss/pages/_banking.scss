@@ -93,6 +93,109 @@
       color: var(--ink-3, #71717a);
     }
   }
+
+  &__intro {
+    font-size: 0.85rem;
+    color: var(--ink-2, #52525b);
+  }
+
+  &__hint {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--ink-3, #71717a);
+  }
+
+  &__steps {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--ink-2, #52525b);
+
+    li::marker {
+      color: var(--ink-3, #a1a1aa);
+      font-weight: 600;
+    }
+  }
+
+  &__docs {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--ink-3, #a1a1aa);
+  }
+}
+
+// Provider chooser: two selectable cards (folder vs ebics).
+.prov-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+
+  @media (max-width: 28rem) {
+    grid-template-columns: 1fr;
+  }
+}
+.prov-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem;
+  text-align: left;
+  border: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+  border-radius: var(--radius, 10px);
+  background: var(--surface, transparent);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--ink-5, #d4d4d8);
+  }
+  &.is-active {
+    border-color: var(--accent, #6366f1);
+    box-shadow: inset 0 0 0 1px var(--accent, #6366f1);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  &__icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--ink-2, #52525b);
+  }
+  &__badge {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: var(--ink-6, #ededf0);
+    color: var(--ink-3, #71717a);
+
+    &.is-rec {
+      background: color-mix(in oklab, var(--success, #16a34a) 16%, transparent);
+      color: var(--success, #15803d);
+    }
+  }
+  &__name {
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  &__desc {
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--ink-3, #71717a);
+  }
 }
 
 .drop {

@@ -834,6 +834,17 @@
     "connEbicsVersion": "EBICS-Version",
     "connEbicsActivation": "Aktivierung",
     "connEbicsActivationHint": "Schlüssel erzeugt. Drucken Sie den Initialisierungsbrief, unterschreiben Sie ihn und senden Sie ihn an Ihre Bank, um den Teilnehmer zu aktivieren. Der Auszugsabruf startet, sobald die Bank Sie freigeschaltet hat.",
-    "connEbicsIniLetter": "INI-Brief drucken"
+    "connEbicsIniLetter": "INI-Brief drucken",
+    "connIntro": "Wählen Sie, wie Kontoauszüge zu chohle gelangen.",
+    "connRecommended": "Empfohlen",
+    "connAdvanced": "Fortgeschritten",
+    "connProviderFolderDesc": "camt.053 aus dem E-Banking hochladen oder von der Bank in einen Ordner liefern lassen. Sofort einsatzbereit – ohne Vertrag.",
+    "connProviderEbicsDesc": "Direktes Bankprotokoll für den vollautomatischen Abruf. Benötigt einen EBICS-Vertrag mit Ihrer Bank.",
+    "connFolderUploadHint": "Kein Setup nötig: Sie können camt.053-Dateien auch direkt auf dieser Seite hochladen.",
+    "connEbicsStep1": "EBICS bei Ihrer Bank anfragen – Sie erhalten Host-ID, Partner-ID und Benutzer-ID.",
+    "connEbicsStep2": "Felder ausfüllen und speichern – chohle erzeugt Ihre Schlüssel.",
+    "connEbicsStep3": "INI-Brief drucken, unterschreiben und an Ihre Bank senden.",
+    "connEbicsStep4": "Sobald die Bank Sie freischaltet, werden Auszüge automatisch abgerufen.",
+    "connDocsHint": "Alle Details: docs/BANK_RECONCILIATION.md"
   }
 }
