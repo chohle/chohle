@@ -159,7 +159,18 @@
     "noProject": "Nessun progetto collegato",
     "openInvoice": "Apri fattura",
     "convertFailed": "Impossibile convertire l'offerta",
-    "sendFailed": "Impossibile inviare l'offerta"
+    "sendFailed": "Impossibile inviare l'offerta",
+    "documents": "Documenti",
+    "documentsHint": "Scrivi un documento (lettera di accompagnamento, proposta dettagliata, …). Quelli allegati vengono inviati in PDF con l’e-mail dell’offerta.",
+    "docNew": "Nuovo documento",
+    "docEdit": "Modifica documento",
+    "docAttach": "Allega all’e-mail",
+    "docPreview": "Anteprima",
+    "docTitle": "Titolo",
+    "docTitlePlaceholder": "es. Descrizione dettagliata",
+    "docContent": "Contenuto",
+    "docSaved": "Documento salvato",
+    "docTitleRequired": "Assegna un titolo al documento"
   },
   "pipeline": {
     "title": "Pipeline",

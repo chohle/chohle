@@ -109,7 +109,18 @@
     "noProject": "Kein Projekt verknüpft",
     "openInvoice": "Rechnung öffnen",
     "convertFailed": "Offerte konnte nicht umgewandelt werden",
-    "sendFailed": "Offerte konnte nicht versendet werden"
+    "sendFailed": "Offerte konnte nicht versendet werden",
+    "documents": "Dokumente",
+    "documentsHint": "Schreiben Sie ein Dokument (Begleitschreiben, Detailbeschrieb, …). Angehängte werden als PDF mit der Offert-E-Mail versendet.",
+    "docNew": "Neues Dokument",
+    "docEdit": "Dokument bearbeiten",
+    "docAttach": "An E-Mail anhängen",
+    "docPreview": "Vorschau",
+    "docTitle": "Titel",
+    "docTitlePlaceholder": "z. B. Detailbeschrieb",
+    "docContent": "Inhalt",
+    "docSaved": "Dokument gespeichert",
+    "docTitleRequired": "Geben Sie dem Dokument einen Titel"
   },
   "pipeline": {
     "title": "Pipeline",

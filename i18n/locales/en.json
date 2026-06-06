@@ -109,7 +109,18 @@
     "noProject": "No project link",
     "openInvoice": "Open invoice",
     "convertFailed": "Could not convert the quote",
-    "sendFailed": "Could not send the quote"
+    "sendFailed": "Could not send the quote",
+    "documents": "Documents",
+    "documentsHint": "Write a document (cover letter, detailed proposal, …). Attached ones are sent as PDFs with the quote email.",
+    "docNew": "New document",
+    "docEdit": "Edit document",
+    "docAttach": "Attach to email",
+    "docPreview": "Preview",
+    "docTitle": "Title",
+    "docTitlePlaceholder": "e.g. Detailed description",
+    "docContent": "Content",
+    "docSaved": "Document saved",
+    "docTitleRequired": "Give the document a title"
   },
   "pipeline": {
     "title": "Pipeline",

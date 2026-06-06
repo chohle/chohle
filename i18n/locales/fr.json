@@ -159,7 +159,18 @@
     "noProject": "Aucun projet lié",
     "openInvoice": "Ouvrir la facture",
     "convertFailed": "Impossible de convertir le devis",
-    "sendFailed": "Impossible d'envoyer le devis"
+    "sendFailed": "Impossible d'envoyer le devis",
+    "documents": "Documents",
+    "documentsHint": "Rédigez un document (lettre d’accompagnement, proposition détaillée, …). Les documents joints sont envoyés en PDF avec l’e-mail de l’offre.",
+    "docNew": "Nouveau document",
+    "docEdit": "Modifier le document",
+    "docAttach": "Joindre à l’e-mail",
+    "docPreview": "Aperçu",
+    "docTitle": "Titre",
+    "docTitlePlaceholder": "p. ex. Description détaillée",
+    "docContent": "Contenu",
+    "docSaved": "Document enregistré",
+    "docTitleRequired": "Donnez un titre au document"
   },
   "pipeline": {
     "title": "Pipeline",

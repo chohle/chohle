@@ -339,6 +339,83 @@ async function sendQuote() {
   }
 }
 
+// --- attached documents ------------------------------------------------------
+// Rich documents written in-app, rendered to PDF and attached when the quote is
+// emailed (see server/utils/documentPdf.ts).
+interface QuoteDoc {
+  id: number
+  title: string
+  content: Record<string, unknown>
+  attach: number
+  updated_at: string
+}
+const { data: docsData, refresh: refreshDocs } = await useFetch<{ documents: QuoteDoc[] }>(
+  `/api/quotes/${id}/documents`,
+  { default: () => ({ documents: [] }) }
+)
+const documents = computed(() => docsData.value.documents)
+
+const docEditor = reactive<{
+  open: boolean
+  id: number | null
+  title: string
+  content: Record<string, unknown>
+  saving: boolean
+}>({ open: false, id: null, title: '', content: { type: 'doc', content: [] }, saving: false })
+
+function openNewDoc() {
+  docEditor.id = null
+  docEditor.title = ''
+  docEditor.content = { type: 'doc', content: [] }
+  docEditor.open = true
+}
+function openDoc(d: QuoteDoc) {
+  docEditor.id = d.id
+  docEditor.title = d.title
+  docEditor.content = d.content ?? { type: 'doc', content: [] }
+  docEditor.open = true
+}
+async function saveDoc() {
+  if (!docEditor.title.trim()) {
+    toast.add({ title: t('quotes.docTitleRequired'), color: 'error' })
+    return
+  }
+  docEditor.saving = true
+  try {
+    if (docEditor.id) {
+      await $fetch(`/api/quotes/${id}/documents/${docEditor.id}`, {
+        method: 'PUT',
+        body: { title: docEditor.title.trim(), content: docEditor.content }
+      })
+    } else {
+      const { id: newId } = await $fetch<{ id: number }>(`/api/quotes/${id}/documents`, {
+        method: 'POST',
+        body: { title: docEditor.title.trim() }
+      })
+      await $fetch(`/api/quotes/${id}/documents/${newId}`, {
+        method: 'PUT',
+        body: { content: docEditor.content }
+      })
+    }
+    await refreshDocs()
+    docEditor.open = false
+    toast.add({ title: t('quotes.docSaved'), color: 'success' })
+  } finally {
+    docEditor.saving = false
+  }
+}
+async function deleteDoc(d: QuoteDoc) {
+  await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'DELETE' })
+  await refreshDocs()
+}
+async function toggleAttach(d: QuoteDoc, value: boolean) {
+  await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'PUT', body: { attach: value } })
+  await refreshDocs()
+}
+function previewDoc(d: QuoteDoc) {
+  window.open(`/api/quotes/${id}/documents/${d.id}/pdf`, '_blank')
+}
+
 const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
   sales: 'sales',
   procurement: 'procurement'
@@ -520,6 +597,49 @@ const isExpired = computed(
       </dl>
     </UiCard>
 
+    <UiSectionLabel>{{ $t('quotes.documents') }}</UiSectionLabel>
+    <UiCard>
+      <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
+      <ul v-if="documents.length" class="qdoc-list">
+        <li v-for="d in documents" :key="d.id" class="qdoc">
+          <button type="button" class="qdoc__name" @click="openDoc(d)">
+            <UIcon name="i-lucide-file-text" class="size-3.5" />
+            {{ d.title }}
+          </button>
+          <UCheckbox
+            :model-value="!!d.attach"
+            :label="$t('quotes.docAttach')"
+            @update:model-value="toggleAttach(d, $event as boolean)"
+          />
+          <div class="qdoc__actions">
+            <button
+              class="icon-btn"
+              type="button"
+              :title="$t('quotes.docPreview')"
+              :aria-label="$t('quotes.docPreview')"
+              @click="previewDoc(d)"
+            >
+              <UIcon name="i-lucide-eye" />
+            </button>
+            <button
+              class="icon-btn"
+              type="button"
+              :title="$t('common.delete')"
+              :aria-label="$t('common.delete')"
+              @click="deleteDoc(d)"
+            >
+              <UIcon name="i-lucide-trash-2" />
+            </button>
+          </div>
+        </li>
+      </ul>
+      <div class="qdoc-foot">
+        <button class="ed-btn" type="button" @click="openNewDoc">
+          <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('quotes.docNew') }}
+        </button>
+      </div>
+    </UiCard>
+
     <div class="foot">
       <button class="ed-btn-ghost" :disabled="saving" @click="save">
         {{ $t('common.save') }}
@@ -663,5 +783,57 @@ const isExpired = computed(
         </button>
       </template>
     </UModal>
+
+    <USlideover
+      v-model:open="docEditor.open"
+      :title="docEditor.id ? $t('quotes.docEdit') : $t('quotes.docNew')"
+      :ui="{ content: 'max-w-full sm:max-w-3xl' }"
+    >
+      <template #body>
+        <div class="flex flex-col gap-4">
+          <UFormField :label="$t('quotes.docTitle')">
+            <UInput
+              v-model="docEditor.title"
+              :placeholder="$t('quotes.docTitlePlaceholder')"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField :label="$t('quotes.docContent')">
+            <ClientOnly>
+              <UEditor
+                v-model="docEditor.content"
+                content-type="json"
+                :extensions="emailEditorExtensions"
+                :handlers="emailEditorHandlers"
+                class="email-editor email-editor--tall"
+              >
+                <template #default="{ editor }">
+                  <UEditorToolbar
+                    :editor="editor"
+                    :items="emailEditorItems"
+                    class="email-editor__toolbar flex-wrap"
+                  >
+                    <template #link><EditorLinkPopover :editor="editor" /></template>
+                  </UEditorToolbar>
+                </template>
+              </UEditor>
+              <template #fallback>
+                <div class="email-editor email-editor--tall email-editor--fallback" />
+              </template>
+            </ClientOnly>
+          </UFormField>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" @click="docEditor.open = false">
+            {{ $t('common.cancel') }}
+          </button>
+          <button class="ed-btn-primary" :disabled="docEditor.saving" @click="saveDoc">
+            {{ $t('common.save') }}
+          </button>
+        </div>
+      </template>
+    </USlideover>
   </div>
 </template>

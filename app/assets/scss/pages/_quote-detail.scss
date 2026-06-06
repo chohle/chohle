@@ -108,4 +108,41 @@
     color: #b85a30;
     font-size: 13px;
   }
+
+  // Attached documents (rendered to PDF and sent with the quote email).
+  .qdoc-intro {
+    margin: 0 0 10px;
+  }
+  .qdoc-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .qdoc {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+
+    &__name {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+      &:hover {
+        color: var(--ink);
+        text-decoration: underline;
+      }
+    }
+    &__actions {
+      display: flex;
+      gap: 4px;
+    }
+  }
+  .qdoc-foot {
+    padding-top: 12px;
+  }
 }
