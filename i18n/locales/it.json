@@ -72,7 +72,7 @@
     "banking": "Riconciliazione bancaria"
   },
   "demo": {
-    "notice": "Demo — le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",
+    "notice": "Demo. Le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",
     "reset": "Reimposta demo"
   },
   "reminders": {
@@ -791,7 +791,7 @@
     "ignore": "Ignora",
     "confirmed": "Fattura segnata come pagata",
     "actionError": "Azione non riuscita",
-    "reasonFuzzy": "Incerto – nessun riferimento",
+    "reasonFuzzy": "Incerto, nessun riferimento",
     "reasonMismatch": "Importo diverso",
     "reasonUnsent": "Fattura non ancora inviata",
     "matchedTitle": "Abbinate automaticamente",
@@ -803,9 +803,9 @@
     "txCountCol": "Transazioni",
     "deleteImport": "Elimina importazione",
     "deleteBlocked": "Impossibile eliminare l'importazione",
-    "deleteBlockedHint": "{n} abbinamento/i confermato/i – non eliminabile",
+    "deleteBlockedHint": "{n} abbinamento/i confermato/i, non eliminabile",
     "connTitle": "Sincronizzazione automatica",
-    "connNone": "Nessuna banca collegata — importa gli estratti conto manualmente.",
+    "connNone": "Nessuna banca collegata. Importa gli estratti conto manualmente.",
     "connConnect": "Collega banca",
     "connManage": "Gestisci",
     "connSyncNow": "Sincronizza ora",

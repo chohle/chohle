@@ -72,7 +72,7 @@
     "banking": "Rapprochement bancaire"
   },
   "demo": {
-    "notice": "Démo — vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",
+    "notice": "Démo. Vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",
     "reset": "Réinitialiser la démo"
   },
   "reminders": {
@@ -791,7 +791,7 @@
     "ignore": "Ignorer",
     "confirmed": "Facture marquée payée",
     "actionError": "Échec de l'action",
-    "reasonFuzzy": "Incertain – sans référence",
+    "reasonFuzzy": "Incertain, sans référence",
     "reasonMismatch": "Montant différent",
     "reasonUnsent": "Facture pas encore envoyée",
     "matchedTitle": "Rapprochées automatiquement",
@@ -803,9 +803,9 @@
     "txCountCol": "Transactions",
     "deleteImport": "Supprimer l'importation",
     "deleteBlocked": "Impossible de supprimer l'importation",
-    "deleteBlockedHint": "{n} rapprochement(s) confirmé(s) – suppression impossible",
+    "deleteBlockedHint": "{n} rapprochement(s) confirmé(s), suppression impossible",
     "connTitle": "Synchronisation automatique",
-    "connNone": "Aucune banque connectée — importez les relevés manuellement.",
+    "connNone": "Aucune banque connectée. Importez les relevés manuellement.",
     "connConnect": "Connecter la banque",
     "connManage": "Gérer",
     "connSyncNow": "Synchroniser maintenant",
@@ -841,8 +841,8 @@
     "connProviderFolderDesc": "Téléversez un camt.053 depuis l’e-banking, ou faites-le déposer dans un dossier par votre banque. Fonctionne tout de suite, sans contrat.",
     "connProviderEbicsDesc": "Protocole bancaire direct pour une récupération entièrement automatique. Nécessite un contrat EBICS avec votre banque.",
     "connFolderUploadHint": "Aucune configuration requise : vous pouvez aussi déposer des fichiers camt.053 directement sur cette page.",
-    "connEbicsStep1": "Demandez EBICS à votre banque — vous recevrez l’ID hôte, l’ID partenaire et l’ID utilisateur.",
-    "connEbicsStep2": "Remplissez les champs et enregistrez — chohle génère vos clés.",
+    "connEbicsStep1": "Demandez EBICS à votre banque. Vous recevrez l’ID hôte, l’ID partenaire et l’ID utilisateur.",
+    "connEbicsStep2": "Remplissez les champs et enregistrez. chohle génère vos clés.",
     "connEbicsStep3": "Imprimez la lettre INI, signez-la et envoyez-la à votre banque.",
     "connEbicsStep4": "Une fois activé par la banque, les relevés sont récupérés automatiquement.",
     "connDocsHint": "Détails complets : docs/BANK_RECONCILIATION.md"

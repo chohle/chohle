@@ -22,7 +22,7 @@
     "banking": "Bankabgleich"
   },
   "demo": {
-    "notice": "Demo — Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
+    "notice": "Demo. Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
     "reset": "Demo zurücksetzen"
   },
   "reminders": {
@@ -791,7 +791,7 @@
     "ignore": "Ignorieren",
     "confirmed": "Rechnung als bezahlt markiert",
     "actionError": "Aktion fehlgeschlagen",
-    "reasonFuzzy": "Unsicher – keine Referenz",
+    "reasonFuzzy": "Unsicher, keine Referenz",
     "reasonMismatch": "Betrag weicht ab",
     "reasonUnsent": "Rechnung noch nicht versendet",
     "matchedTitle": "Automatisch abgeglichen",
@@ -803,9 +803,9 @@
     "txCountCol": "Transaktionen",
     "deleteImport": "Import löschen",
     "deleteBlocked": "Import kann nicht gelöscht werden",
-    "deleteBlockedHint": "{n} bestätigte Zuordnung(en) – nicht löschbar",
+    "deleteBlockedHint": "{n} bestätigte Zuordnung(en), nicht löschbar",
     "connTitle": "Automatischer Abgleich",
-    "connNone": "Kein Bankkonto verbunden – Auszüge manuell hochladen.",
+    "connNone": "Kein Bankkonto verbunden. Auszüge manuell hochladen.",
     "connConnect": "Bank verbinden",
     "connManage": "Verwalten",
     "connSyncNow": "Jetzt synchronisieren",
@@ -838,11 +838,11 @@
     "connIntro": "Wählen Sie, wie Kontoauszüge zu chohle gelangen.",
     "connRecommended": "Empfohlen",
     "connAdvanced": "Fortgeschritten",
-    "connProviderFolderDesc": "camt.053 aus dem E-Banking hochladen oder von der Bank in einen Ordner liefern lassen. Sofort einsatzbereit – ohne Vertrag.",
+    "connProviderFolderDesc": "camt.053 aus dem E-Banking hochladen oder von der Bank in einen Ordner liefern lassen. Sofort einsatzbereit, ohne Vertrag.",
     "connProviderEbicsDesc": "Direktes Bankprotokoll für den vollautomatischen Abruf. Benötigt einen EBICS-Vertrag mit Ihrer Bank.",
     "connFolderUploadHint": "Kein Setup nötig: Sie können camt.053-Dateien auch direkt auf dieser Seite hochladen.",
-    "connEbicsStep1": "EBICS bei Ihrer Bank anfragen – Sie erhalten Host-ID, Partner-ID und Benutzer-ID.",
-    "connEbicsStep2": "Felder ausfüllen und speichern – chohle erzeugt Ihre Schlüssel.",
+    "connEbicsStep1": "EBICS bei Ihrer Bank anfragen. Sie erhalten Host-ID, Partner-ID und Benutzer-ID.",
+    "connEbicsStep2": "Felder ausfüllen und speichern. chohle erzeugt Ihre Schlüssel.",
     "connEbicsStep3": "INI-Brief drucken, unterschreiben und an Ihre Bank senden.",
     "connEbicsStep4": "Sobald die Bank Sie freischaltet, werden Auszüge automatisch abgerufen.",
     "connDocsHint": "Alle Details: docs/BANK_RECONCILIATION.md"

@@ -22,7 +22,7 @@
     "banking": "Bank reconciliation"
   },
   "demo": {
-    "notice": "Demo — your changes stay private to your browser and reset when idle.",
+    "notice": "Demo. Your changes stay private to your browser and reset when idle.",
     "reset": "Reset demo"
   },
   "reminders": {
@@ -791,7 +791,7 @@
     "ignore": "Ignore",
     "confirmed": "Invoice marked paid",
     "actionError": "Action failed",
-    "reasonFuzzy": "Uncertain – no reference",
+    "reasonFuzzy": "Uncertain, no reference",
     "reasonMismatch": "Amount differs",
     "reasonUnsent": "Invoice not sent yet",
     "matchedTitle": "Auto-matched",
@@ -803,9 +803,9 @@
     "txCountCol": "Transactions",
     "deleteImport": "Delete import",
     "deleteBlocked": "Cannot delete import",
-    "deleteBlockedHint": "{n} confirmed match(es) – cannot delete",
+    "deleteBlockedHint": "{n} confirmed match(es), cannot delete",
     "connTitle": "Automatic sync",
-    "connNone": "No bank connected — upload statements manually.",
+    "connNone": "No bank connected. Upload statements manually.",
     "connConnect": "Connect bank",
     "connManage": "Manage",
     "connSyncNow": "Sync now",
@@ -838,11 +838,11 @@
     "connIntro": "Choose how bank statements reach chohle.",
     "connRecommended": "Recommended",
     "connAdvanced": "Advanced",
-    "connProviderFolderDesc": "Upload a camt.053 from e-banking, or have your bank deliver it to a folder. Works right away — no contract.",
+    "connProviderFolderDesc": "Upload a camt.053 from e-banking, or have your bank deliver it to a folder. Works right away, no contract.",
     "connProviderEbicsDesc": "Direct bank protocol for fully automatic retrieval. Requires an EBICS contract with your bank.",
     "connFolderUploadHint": "No setup needed: you can also drop camt.053 files directly on this page.",
-    "connEbicsStep1": "Request EBICS from your bank — you’ll receive the host ID, partner ID and user ID.",
-    "connEbicsStep2": "Fill in the fields and save — chohle generates your keys.",
+    "connEbicsStep1": "Request EBICS from your bank. You’ll receive the host ID, partner ID and user ID.",
+    "connEbicsStep2": "Fill in the fields and save. chohle generates your keys.",
     "connEbicsStep3": "Print the INI letter, sign it, and send it to your bank.",
     "connEbicsStep4": "Once the bank activates you, statements are retrieved automatically.",
     "connDocsHint": "Full details: docs/BANK_RECONCILIATION.md"
