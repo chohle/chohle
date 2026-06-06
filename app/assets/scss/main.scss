@@ -39,6 +39,8 @@
 @use "components/command-palette";
 @use "components/project-picker";
 @use "components/email-msg";
+@use "components/demo-banner";
+@use "components/email-preview";
 
 // Pages
 @use "pages/overview";
@@ -47,6 +49,8 @@
 @use "pages/invoices";
 @use "pages/invoice-detail";
 @use "pages/invoice-print";
+@use "pages/quotes";
+@use "pages/quote-detail";
 @use "pages/income";
 @use "pages/expenses";
 @use "pages/payments";
@@ -56,6 +60,7 @@
 @use "pages/deal-detail";
 @use "pages/conversations";
 @use "pages/triage";
+@use "pages/reminders";
 @use "pages/categories";
 @use "pages/billing";
 @use "pages/profile";

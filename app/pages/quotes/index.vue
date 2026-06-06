@@ -223,16 +223,3 @@ async function submitCreate() {
     </UModal>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.page-quotes__muted {
-  color: var(--ink-3);
-}
-.page-quotes__filter-row {
-  margin: 4px 0;
-}
-// Rows open the quote on click — pointer cursor so the hover reads as clickable.
-.page-quotes :deep(.ed-table tbody tr.row) {
-  cursor: pointer;
-}
-</style>
