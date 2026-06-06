@@ -257,6 +257,7 @@
     font-size: 0.75rem;
     color: var(--ink-3);
   }
+
   // Was :deep(.ui-card) in the scoped block; this partial is global so the
   // descendant selector reaches the card component's root directly.
   .ui-card {

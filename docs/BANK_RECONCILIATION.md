@@ -51,7 +51,7 @@ yet.
 
 Three migrations (`server/utils/migrate.ts`), all new tables:
 
-```
+```text
 0038_bank_imports        one row per imported statement (filename, iban,
                          statement id, period, tx count)
 0039_bank_transactions   the incoming CRDT credits parsed from a statement;
@@ -63,9 +63,7 @@ Three migrations (`server/utils/migrate.ts`), all new tables:
 
 The unique `dedupe_hash` on `bank_transactions` makes re-importing an
 overlapping statement safe (camt.053 files overlap at period boundaries):
-rows are inserted with `INSERT OR IGNORE`. The migrations use
-`CREATE TABLE/INDEX IF NOT EXISTS` so they're safe on a database that already
-ran an earlier numbering of these tables.
+rows are inserted with `INSERT OR IGNORE`.
 
 ## camt.053 parser — `server/utils/camt.ts`
 
@@ -101,7 +99,7 @@ frozen `total_rappen`), with the booking date as `paid_at`.
 
 ## API & UI
 
-```
+```text
 POST   /api/bank/import                        multipart camt.053 → parse, dedupe, match, summary
 GET    /api/bank/transactions?status=suggested review queue
 POST   /api/bank/transactions/[id]/confirm     { invoice_id } → mark paid, tx matched

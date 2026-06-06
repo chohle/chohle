@@ -707,10 +707,8 @@ const migrations: Migration[] = [
     // One row per imported camt.053 statement. The statement account (iban)
     // is validated against sender.iban at import time so a statement for the
     // wrong account is rejected before any transactions are stored.
-    // IF NOT EXISTS: an earlier feature branch shipped this table under a
-    // different migration name, so guard against the table already existing.
     up: `
-      CREATE TABLE IF NOT EXISTS bank_imports (
+      CREATE TABLE bank_imports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         filename TEXT NOT NULL,
         iban TEXT NOT NULL,
@@ -730,7 +728,7 @@ const migrations: Migration[] = [
     // INSERT OR IGNORE keyed on this hash. invoice_id is set once a credit is
     // matched (auto or confirmed) to the invoice it pays.
     up: `
-      CREATE TABLE IF NOT EXISTS bank_transactions (
+      CREATE TABLE bank_transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         import_id INTEGER NOT NULL REFERENCES bank_imports(id) ON DELETE CASCADE,
         booking_date TEXT NOT NULL,
@@ -747,10 +745,10 @@ const migrations: Migration[] = [
         invoice_id INTEGER REFERENCES invoices(id) ON DELETE SET NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_bank_tx_dedupe ON bank_transactions(dedupe_hash);
-      CREATE INDEX IF NOT EXISTS idx_bank_tx_import ON bank_transactions(import_id);
-      CREATE INDEX IF NOT EXISTS idx_bank_tx_status ON bank_transactions(status);
-      CREATE INDEX IF NOT EXISTS idx_bank_tx_invoice ON bank_transactions(invoice_id);
+      CREATE UNIQUE INDEX idx_bank_tx_dedupe ON bank_transactions(dedupe_hash);
+      CREATE INDEX idx_bank_tx_import ON bank_transactions(import_id);
+      CREATE INDEX idx_bank_tx_status ON bank_transactions(status);
+      CREATE INDEX idx_bank_tx_invoice ON bank_transactions(invoice_id);
     `
   },
   {
@@ -762,7 +760,7 @@ const migrations: Migration[] = [
     // and, later, keys) — encrypted with the same secrets.ts key as mailbox
     // credentials. Single-tenant: one connection per account (UNIQUE iban).
     up: `
-      CREATE TABLE IF NOT EXISTS bank_connections (
+      CREATE TABLE bank_connections (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         iban TEXT NOT NULL,
         provider TEXT NOT NULL CHECK (provider IN ('folder', 'ebics')),
@@ -775,7 +773,7 @@ const migrations: Migration[] = [
         last_summary TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_bank_conn_iban ON bank_connections(iban);
+      CREATE UNIQUE INDEX idx_bank_conn_iban ON bank_connections(iban);
     `
   }
 ]

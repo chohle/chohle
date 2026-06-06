@@ -12,8 +12,8 @@ function esc(s: string): string {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-export default defineEventHandler((event) => {
-  requireUserSession(event)
+export default defineEventHandler(async (event) => {
+  await requireUserSession(event)
 
   const conn = getConnection(useDb())
   if (!conn || conn.provider !== 'ebics') {
