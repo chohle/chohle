@@ -84,20 +84,31 @@ export default defineEventHandler(async (event) => {
     signatureHtml = sig?.content_html || undefined
   }
   const { html, text } = await buildBrandedEmail(sender, message, { signatureHtml })
-  await getMailer().sendMail({
-    from,
-    to: customer.email,
-    subject,
-    text,
-    html,
-    attachments: [
-      {
-        filename: `${quote.number || 'quote'}.pdf`,
-        content: pdf,
+
+  // Attach the quote PDF plus every document flagged attach=1, rendered to PDF.
+  const attachments = [
+    {
+      filename: `${quote.number || 'quote'}.pdf`,
+      content: pdf,
+      contentType: 'application/pdf'
+    }
+  ]
+  const docRows = db
+    .prepare(
+      'SELECT id FROM quote_documents WHERE quote_id = ? AND attach = 1 ORDER BY sort_order, id'
+    )
+    .all(id) as Array<{ id: number }>
+  for (const d of docRows) {
+    const out = await quoteDocumentToPdf(db, d.id, id)
+    if (out)
+      attachments.push({
+        filename: out.filename,
+        content: out.buffer,
         contentType: 'application/pdf'
-      }
-    ]
-  })
+      })
+  }
+
+  await getMailer().sendMail({ from, to: customer.email, subject, text, html, attachments })
 
   // Only promote draft -> sent. A resend from sent stays sent; a resend
   // from accepted preserves the accepted state (so the workflow isn't

@@ -775,6 +775,26 @@ const migrations: Migration[] = [
       );
       CREATE UNIQUE INDEX idx_bank_conn_iban ON bank_connections(iban);
     `
+  },
+  {
+    name: '0041_quote_documents',
+    // Free-form rich documents attached to a quote (cover letter, detailed
+    // proposal, scope, …) written in-app and rendered to PDF as email
+    // attachments. `content` is TipTap JSON; `attach` toggles whether it's
+    // included when the quote is emailed.
+    up: `
+      CREATE TABLE quote_documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        title TEXT NOT NULL DEFAULT '',
+        content TEXT NOT NULL DEFAULT '',
+        attach INTEGER NOT NULL DEFAULT 1,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX idx_quote_documents_quote ON quote_documents (quote_id, sort_order);
+    `
   }
 ]
 
