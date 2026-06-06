@@ -845,6 +845,9 @@
     "connEbicsStep2": "Compila i campi e salva: chohle genera le tue chiavi.",
     "connEbicsStep3": "Stampa la lettera INI, firmala e inviala alla tua banca.",
     "connEbicsStep4": "Una volta attivato dalla banca, gli estratti vengono recuperati automaticamente.",
-    "connDocsHint": "Dettagli completi: docs/BANK_RECONCILIATION.md"
+    "connDocsHint": "Dettagli completi: docs/BANK_RECONCILIATION.md",
+    "tabReview": "Da verificare",
+    "tabImports": "Importazioni",
+    "tabConfig": "Configurazione"
   }
 }

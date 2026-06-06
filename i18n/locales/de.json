@@ -845,6 +845,9 @@
     "connEbicsStep2": "Felder ausfüllen und speichern. chohle erzeugt Ihre Schlüssel.",
     "connEbicsStep3": "INI-Brief drucken, unterschreiben und an Ihre Bank senden.",
     "connEbicsStep4": "Sobald die Bank Sie freischaltet, werden Auszüge automatisch abgerufen.",
-    "connDocsHint": "Alle Details: docs/BANK_RECONCILIATION.md"
+    "connDocsHint": "Alle Details: docs/BANK_RECONCILIATION.md",
+    "tabReview": "Zu prüfen",
+    "tabImports": "Importe",
+    "tabConfig": "Konfiguration"
   }
 }

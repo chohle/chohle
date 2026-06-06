@@ -845,6 +845,9 @@
     "connEbicsStep2": "Fill in the fields and save. chohle generates your keys.",
     "connEbicsStep3": "Print the INI letter, sign it, and send it to your bank.",
     "connEbicsStep4": "Once the bank activates you, statements are retrieved automatically.",
-    "connDocsHint": "Full details: docs/BANK_RECONCILIATION.md"
+    "connDocsHint": "Full details: docs/BANK_RECONCILIATION.md",
+    "tabReview": "Review",
+    "tabImports": "Imports",
+    "tabConfig": "Configuration"
   }
 }

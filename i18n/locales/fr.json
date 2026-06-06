@@ -845,6 +845,9 @@
     "connEbicsStep2": "Remplissez les champs et enregistrez. chohle génère vos clés.",
     "connEbicsStep3": "Imprimez la lettre INI, signez-la et envoyez-la à votre banque.",
     "connEbicsStep4": "Une fois activé par la banque, les relevés sont récupérés automatiquement.",
-    "connDocsHint": "Détails complets : docs/BANK_RECONCILIATION.md"
+    "connDocsHint": "Détails complets : docs/BANK_RECONCILIATION.md",
+    "tabReview": "À vérifier",
+    "tabImports": "Importations",
+    "tabConfig": "Configuration"
   }
 }

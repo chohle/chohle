@@ -83,6 +83,20 @@ const queue = computed(() => [
 const matched = computed(() => transactions.value.filter((tx) => tx.status === 'matched'))
 const ignored = computed(() => transactions.value.filter((tx) => tx.status === 'ignored'))
 
+// Tabs keep the page calm: the review queue, the import history, and the
+// connection config are three separate surfaces instead of one long scroll.
+const tab = ref<'review' | 'imports' | 'config'>('review')
+const tabOptions = computed(() => [
+  {
+    value: 'review',
+    label: queue.value.length
+      ? `${t('banking.tabReview')} · ${queue.value.length}`
+      : t('banking.tabReview')
+  },
+  { value: 'imports', label: t('banking.tabImports') },
+  { value: 'config', label: t('banking.tabConfig') }
+])
+
 const openInvoices = computed(() => invoices.value.filter((i) => i.status === 'sent'))
 const invoiceItems = computed(() =>
   openInvoices.value.map((i) => ({
@@ -109,6 +123,9 @@ async function importFile(file: File) {
     lastSummary.value = res.summary
     toast.add({ title: t('banking.importDone'), color: 'success' })
     await Promise.all([refreshTx(), refreshImports()])
+    // Jump to the review tab so the freshly imported items (and the summary)
+    // are in view rather than hidden behind the Imports tab.
+    tab.value = 'review'
   } catch (err) {
     toast.add({
       title: t('banking.importError'),
@@ -314,8 +331,26 @@ function errMessage(err: unknown): string {
       </template>
     </UiPageHead>
 
-    <!-- connection (automatic sync) -->
-    <div class="conn">
+    <!-- Always present so the header Import button works from any tab. -->
+    <input
+      ref="fileInput"
+      type="file"
+      accept=".xml,application/xml,text/xml"
+      class="drop__file"
+      @change="onPick"
+    />
+
+    <div class="page-banking__tabs">
+      <UiSegmentedControl
+        :model-value="tab"
+        :options="tabOptions"
+        :aria-label="$t('nav.banking')"
+        @update:model-value="(v: string) => (tab = v as typeof tab)"
+      />
+    </div>
+
+    <!-- Configuration tab: the automatic-sync connection -->
+    <div v-if="tab === 'config'" class="conn">
       <div class="conn__icon">
         <UIcon :name="connection ? 'i-lucide-link' : 'i-lucide-link-2-off'" class="size-4" />
       </div>
@@ -364,8 +399,9 @@ function errMessage(err: unknown): string {
       </div>
     </div>
 
-    <!-- drop zone -->
+    <!-- Imports tab: drop zone (history is rendered further down) -->
     <div
+      v-if="tab === 'imports'"
       class="drop"
       :class="{ 'is-drag': dragging, 'is-busy': uploading }"
       @click="fileInput?.click()"
@@ -381,143 +417,142 @@ function errMessage(err: unknown): string {
       <span class="drop__hint">{{
         uploading ? $t('banking.importing') : $t('banking.dropHint')
       }}</span>
-      <input
-        ref="fileInput"
-        type="file"
-        accept=".xml,application/xml,text/xml"
-        class="drop__file"
-        @change="onPick"
-      />
     </div>
 
-    <!-- post-import summary banner -->
-    <div v-if="lastSummary" class="summary">
-      <UIcon name="i-lucide-check-check" class="size-4" />
-      <span>
-        {{
-          $t('banking.summary', {
-            total: lastSummary.total,
-            auto: lastSummary.autoMatched,
-            suggested: lastSummary.suggested,
-            unmatched: lastSummary.unmatched
-          })
-        }}
-        <template v-if="lastSummary.duplicates">
-          · {{ $t('banking.summaryDuplicates', { n: lastSummary.duplicates }) }}
-        </template>
-      </span>
-    </div>
+    <!-- Review tab -->
+    <template v-if="tab === 'review'">
+      <!-- post-import summary banner -->
+      <div v-if="lastSummary" class="summary">
+        <UIcon name="i-lucide-check-check" class="size-4" />
+        <span>
+          {{
+            $t('banking.summary', {
+              total: lastSummary.total,
+              auto: lastSummary.autoMatched,
+              suggested: lastSummary.suggested,
+              unmatched: lastSummary.unmatched
+            })
+          }}
+          <template v-if="lastSummary.duplicates">
+            · {{ $t('banking.summaryDuplicates', { n: lastSummary.duplicates }) }}
+          </template>
+        </span>
+      </div>
 
-    <!-- review queue -->
-    <UiSectionLabel>{{ $t('banking.queueTitle') }}</UiSectionLabel>
-    <UiCard>
-      <EmptyState
-        v-if="!queue.length"
-        :bordered="false"
-        icon="i-lucide-check-circle-2"
-        :title="$t('banking.queueEmptyTitle')"
-        :description="$t('banking.queueEmptyText')"
-      />
-      <ul v-else class="tx-list">
-        <li v-for="tx in queue" :key="tx.id" class="tx" :class="tx.status">
-          <div class="tx__amount mono">CHF {{ chf(tx.amount_rappen) }}</div>
-          <div class="tx__info">
-            <div class="tx__line">
-              <span class="tx__debtor">{{ tx.debtor_name || $t('banking.unknownDebtor') }}</span>
-              <span class="tx__date mono">{{ dateCh(tx.booking_date) }}</span>
-            </div>
-            <div class="tx__sub">
-              <span v-if="reasonFor(tx)" class="tx__reason">{{ reasonFor(tx) }}</span>
-              <span v-if="tx.reference" class="tx__ref mono">{{ tx.reference }}</span>
-            </div>
-          </div>
-          <div class="tx__match">
-            <USelect
-              :model-value="invoiceForTx(tx)"
-              :items="invoiceItems"
-              value-key="value"
-              :placeholder="$t('banking.pickInvoice')"
-              icon="i-lucide-file-text"
-              class="tx__select"
-              @update:model-value="setChosen(tx.id, $event)"
-            />
-          </div>
-          <div class="tx__actions">
-            <button class="icon-btn is-good" :title="$t('banking.confirm')" @click="confirm(tx)">
-              <UIcon name="i-lucide-check" />
-            </button>
-            <button class="icon-btn" :title="$t('banking.ignore')" @click="ignore(tx)">
-              <UIcon name="i-lucide-ban" />
-            </button>
-          </div>
-        </li>
-      </ul>
-    </UiCard>
-
-    <!-- auto-matched (collapsed) -->
-    <details v-if="matched.length" class="fold">
-      <summary class="fold__head">
-        <UIcon name="i-lucide-chevron-right" class="fold__chev" />
-        <span>{{ $t('banking.matchedTitle') }}</span>
-        <span class="fold__count mono">{{ matched.length }}</span>
-      </summary>
+      <!-- review queue -->
       <UiCard>
-        <table class="ed-table">
-          <thead>
-            <tr>
-              <th>{{ $t('common.date') }}</th>
-              <th>{{ $t('banking.debtor') }}</th>
-              <th>{{ $t('nav.invoices') }}</th>
-              <th class="right">{{ $t('common.amount') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tx in matched" :key="tx.id">
-              <td class="mono">{{ dateCh(tx.booking_date) }}</td>
-              <td>{{ tx.debtor_name || '—' }}</td>
-              <td>
-                <NuxtLink v-if="tx.invoice_id" :to="`/invoices/${tx.invoice_id}`" class="tx__link">
-                  {{ tx.invoice_number || `#${tx.invoice_id}` }}
-                  <span v-if="tx.customer_name" class="muted">· {{ tx.customer_name }}</span>
-                </NuxtLink>
-                <span v-else class="muted">—</span>
-              </td>
-              <td class="right mono">CHF {{ chf(tx.amount_rappen) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <EmptyState
+          v-if="!queue.length"
+          :bordered="false"
+          icon="i-lucide-check-circle-2"
+          :title="$t('banking.queueEmptyTitle')"
+          :description="$t('banking.queueEmptyText')"
+        />
+        <ul v-else class="tx-list">
+          <li v-for="tx in queue" :key="tx.id" class="tx" :class="tx.status">
+            <div class="tx__amount mono">CHF {{ chf(tx.amount_rappen) }}</div>
+            <div class="tx__info">
+              <div class="tx__line">
+                <span class="tx__debtor">{{ tx.debtor_name || $t('banking.unknownDebtor') }}</span>
+                <span class="tx__date mono">{{ dateCh(tx.booking_date) }}</span>
+              </div>
+              <div class="tx__sub">
+                <span v-if="reasonFor(tx)" class="tx__reason">{{ reasonFor(tx) }}</span>
+                <span v-if="tx.reference" class="tx__ref mono">{{ tx.reference }}</span>
+              </div>
+            </div>
+            <div class="tx__match">
+              <USelect
+                :model-value="invoiceForTx(tx)"
+                :items="invoiceItems"
+                value-key="value"
+                :placeholder="$t('banking.pickInvoice')"
+                icon="i-lucide-file-text"
+                class="tx__select"
+                @update:model-value="setChosen(tx.id, $event)"
+              />
+            </div>
+            <div class="tx__actions">
+              <button class="icon-btn is-good" :title="$t('banking.confirm')" @click="confirm(tx)">
+                <UIcon name="i-lucide-check" />
+              </button>
+              <button class="icon-btn" :title="$t('banking.ignore')" @click="ignore(tx)">
+                <UIcon name="i-lucide-ban" />
+              </button>
+            </div>
+          </li>
+        </ul>
       </UiCard>
-    </details>
 
-    <!-- ignored (collapsed) -->
-    <details v-if="ignored.length" class="fold">
-      <summary class="fold__head">
-        <UIcon name="i-lucide-chevron-right" class="fold__chev" />
-        <span>{{ $t('banking.ignoredTitle') }}</span>
-        <span class="fold__count mono">{{ ignored.length }}</span>
-      </summary>
-      <UiCard>
-        <table class="ed-table">
-          <thead>
-            <tr>
-              <th>{{ $t('common.date') }}</th>
-              <th>{{ $t('banking.debtor') }}</th>
-              <th class="right">{{ $t('common.amount') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tx in ignored" :key="tx.id">
-              <td class="mono">{{ dateCh(tx.booking_date) }}</td>
-              <td>{{ tx.debtor_name || '—' }}</td>
-              <td class="right mono">CHF {{ chf(tx.amount_rappen) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </UiCard>
-    </details>
+      <!-- auto-matched (collapsed) -->
+      <details v-if="matched.length" class="fold">
+        <summary class="fold__head">
+          <UIcon name="i-lucide-chevron-right" class="fold__chev" />
+          <span>{{ $t('banking.matchedTitle') }}</span>
+          <span class="fold__count mono">{{ matched.length }}</span>
+        </summary>
+        <UiCard>
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>{{ $t('common.date') }}</th>
+                <th>{{ $t('banking.debtor') }}</th>
+                <th>{{ $t('nav.invoices') }}</th>
+                <th class="right">{{ $t('common.amount') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tx in matched" :key="tx.id">
+                <td class="mono">{{ dateCh(tx.booking_date) }}</td>
+                <td>{{ tx.debtor_name || '—' }}</td>
+                <td>
+                  <NuxtLink
+                    v-if="tx.invoice_id"
+                    :to="`/invoices/${tx.invoice_id}`"
+                    class="tx__link"
+                  >
+                    {{ tx.invoice_number || `#${tx.invoice_id}` }}
+                    <span v-if="tx.customer_name" class="muted">· {{ tx.customer_name }}</span>
+                  </NuxtLink>
+                  <span v-else class="muted">—</span>
+                </td>
+                <td class="right mono">CHF {{ chf(tx.amount_rappen) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </UiCard>
+      </details>
 
-    <!-- import history -->
-    <template v-if="importData.imports.length">
+      <!-- ignored (collapsed) -->
+      <details v-if="ignored.length" class="fold">
+        <summary class="fold__head">
+          <UIcon name="i-lucide-chevron-right" class="fold__chev" />
+          <span>{{ $t('banking.ignoredTitle') }}</span>
+          <span class="fold__count mono">{{ ignored.length }}</span>
+        </summary>
+        <UiCard>
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>{{ $t('common.date') }}</th>
+                <th>{{ $t('banking.debtor') }}</th>
+                <th class="right">{{ $t('common.amount') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tx in ignored" :key="tx.id">
+                <td class="mono">{{ dateCh(tx.booking_date) }}</td>
+                <td>{{ tx.debtor_name || '—' }}</td>
+                <td class="right mono">CHF {{ chf(tx.amount_rappen) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </UiCard>
+      </details>
+    </template>
+
+    <!-- Imports tab: history -->
+    <template v-if="tab === 'imports' && importData.imports.length">
       <UiSectionLabel>{{ $t('banking.historyTitle') }}</UiSectionLabel>
       <UiCard>
         <table class="ed-table">
@@ -536,7 +571,7 @@ function errMessage(err: unknown): string {
               <td class="tx__file">{{ imp.filename }}</td>
               <td class="mono muted">
                 <template v-if="imp.from_date"
-                  >{{ dateCh(imp.from_date) }} – {{ dateCh(imp.to_date) }}</template
+                  >{{ dateCh(imp.from_date) }} → {{ dateCh(imp.to_date) }}</template
                 >
                 <template v-else>—</template>
               </td>
