@@ -473,10 +473,20 @@ function errMessage(err: unknown): string {
               />
             </div>
             <div class="tx__actions">
-              <button class="icon-btn is-good" :title="$t('banking.confirm')" @click="confirm(tx)">
+              <button
+                class="icon-btn is-good"
+                :title="$t('banking.confirm')"
+                :aria-label="$t('banking.confirm')"
+                @click="confirm(tx)"
+              >
                 <UIcon name="i-lucide-check" />
               </button>
-              <button class="icon-btn" :title="$t('banking.ignore')" @click="ignore(tx)">
+              <button
+                class="icon-btn"
+                :title="$t('banking.ignore')"
+                :aria-label="$t('banking.ignore')"
+                @click="ignore(tx)"
+              >
                 <UIcon name="i-lucide-ban" />
               </button>
             </div>
@@ -584,6 +594,7 @@ function errMessage(err: unknown): string {
                       ? $t('banking.deleteBlockedHint', { n: imp.matched_count })
                       : $t('banking.deleteImport')
                   "
+                  :aria-label="$t('banking.deleteImport')"
                   :disabled="imp.matched_count > 0"
                   @click="removeImport(imp)"
                 >
