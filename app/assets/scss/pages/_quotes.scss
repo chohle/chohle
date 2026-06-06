@@ -1,0 +1,14 @@
+.page-quotes {
+  &__muted {
+    color: var(--ink-3);
+  }
+  &__filter-row {
+    margin: 4px 0;
+  }
+
+  // Rows open the quote on click, so a pointer cursor makes the hover read as
+  // clickable. (Was :deep() in the scoped block; this partial is global.)
+  .ed-table tbody tr.row {
+    cursor: pointer;
+  }
+}

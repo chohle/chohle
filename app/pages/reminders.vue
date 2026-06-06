@@ -282,33 +282,3 @@ function levelLabel(level: 1 | 2 | 3 | null) {
     </UModal>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.level-pill {
-  display: inline-block;
-  padding: 2px 8px;
-  border: 1px solid var(--ink-3);
-  border-radius: 999px;
-  font-size: 11px;
-  color: var(--ink-2);
-}
-.preview-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 8px;
-
-  .eyebrow {
-    min-width: 80px;
-    color: var(--ink-3);
-  }
-}
-.preview-body {
-  margin-top: 16px;
-  padding: 16px;
-  border: 1px solid var(--rule);
-  background: var(--paper);
-  max-height: 50vh;
-  overflow-y: auto;
-}
-</style>

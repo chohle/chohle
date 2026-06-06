@@ -6,3 +6,12 @@
   border-bottom: 1px solid var(--border);
   padding: 12px 24px;
 }
+
+// Print page setup for the browser-printed invoice/quote (moved out of the
+// print.vue SFC). A4, no page margins so the document controls its own padding.
+@media print {
+  @page {
+    size: a4;
+    margin: 0;
+  }
+}

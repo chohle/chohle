@@ -29,25 +29,3 @@ onMounted(load)
     <iframe :srcdoc="html" class="email-preview__frame" title="Email preview" sandbox="" />
   </div>
 </template>
-
-<style scoped>
-.email-preview {
-  position: relative;
-}
-.email-preview__frame {
-  width: 100%;
-  height: 600px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: #fff;
-}
-.email-preview__loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink-3);
-  pointer-events: none;
-}
-</style>

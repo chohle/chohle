@@ -1,0 +1,111 @@
+.page-quote-detail {
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-3);
+    font-size: 12px;
+    margin-bottom: 12px;
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  &__sub {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+
+    .note {
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+    .warn {
+      color: #b85a30;
+    }
+  }
+  &__project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-2);
+    font-size: 12px;
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  .converted-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+  }
+
+  .lines-head,
+  .line-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 70px 60px 90px 70px 70px 130px;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 0;
+  }
+  .lines-head {
+    font-size: 11px;
+    color: var(--ink-3);
+    border-bottom: 1px solid var(--rule);
+  }
+  .line-row {
+    border-bottom: 1px solid var(--rule);
+  }
+  .amt {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .add-row {
+    padding-top: 8px;
+  }
+
+  .totals {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    .t-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .total {
+      padding-top: 6px;
+      border-top: 1px solid var(--rule);
+      font-weight: 600;
+    }
+  }
+
+  .foot {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 0;
+    margin-top: 16px;
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+  }
+
+  .warn {
+    color: #b85a30;
+    font-size: 13px;
+  }
+}

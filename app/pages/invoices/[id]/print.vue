@@ -227,12 +227,3 @@ function printPage() {
     </div>
   </div>
 </template>
-
-<style>
-@media print {
-  @page {
-    size: A4;
-    margin: 0;
-  }
-}
-</style>
