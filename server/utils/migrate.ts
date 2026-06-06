@@ -701,6 +701,80 @@ const migrations: Migration[] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
     `
+  },
+  {
+    name: '0038_bank_imports',
+    // One row per imported camt.053 statement. The statement account (iban)
+    // is validated against sender.iban at import time so a statement for the
+    // wrong account is rejected before any transactions are stored.
+    up: `
+      CREATE TABLE bank_imports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        filename TEXT NOT NULL,
+        iban TEXT NOT NULL,
+        statement_id TEXT,
+        from_date TEXT,
+        to_date TEXT,
+        tx_count INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+    `
+  },
+  {
+    name: '0039_bank_transactions',
+    // The incoming (CRDT) credit transactions parsed out of a statement. The
+    // unique dedupe_hash makes re-importing an overlapping statement safe:
+    // camt.053 files overlap at period boundaries, so inserts use
+    // INSERT OR IGNORE keyed on this hash. invoice_id is set once a credit is
+    // matched (auto or confirmed) to the invoice it pays.
+    up: `
+      CREATE TABLE bank_transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        import_id INTEGER NOT NULL REFERENCES bank_imports(id) ON DELETE CASCADE,
+        booking_date TEXT NOT NULL,
+        value_date TEXT,
+        amount_rappen INTEGER NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'CHF',
+        reference TEXT,
+        end_to_end_id TEXT,
+        debtor_name TEXT,
+        acct_svcr_ref TEXT,
+        dedupe_hash TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'unmatched'
+          CHECK (status IN ('unmatched', 'suggested', 'matched', 'ignored')),
+        invoice_id INTEGER REFERENCES invoices(id) ON DELETE SET NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE UNIQUE INDEX idx_bank_tx_dedupe ON bank_transactions(dedupe_hash);
+      CREATE INDEX idx_bank_tx_import ON bank_transactions(import_id);
+      CREATE INDEX idx_bank_tx_status ON bank_transactions(status);
+      CREATE INDEX idx_bank_tx_invoice ON bank_transactions(invoice_id);
+    `
+  },
+  {
+    name: '0040_bank_connections',
+    // An automatic ingest path that fetches camt.053 on a schedule, as an
+    // alternative to manual upload. Provider-agnostic: the scheduled job hands
+    // whatever it fetches to the same reconcileStatement. config holds the
+    // provider's parameters as encrypted JSON (folder dir; or EBICS host/IDs
+    // and, later, keys) — encrypted with the same secrets.ts key as mailbox
+    // credentials. Single-tenant: one connection per account (UNIQUE iban).
+    up: `
+      CREATE TABLE bank_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        iban TEXT NOT NULL,
+        provider TEXT NOT NULL CHECK (provider IN ('folder', 'ebics')),
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'active', 'disabled', 'error')),
+        config TEXT,
+        last_sync_at TEXT,
+        last_status TEXT CHECK (last_status IN ('ok', 'error')),
+        last_error TEXT,
+        last_summary TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE UNIQUE INDEX idx_bank_conn_iban ON bank_connections(iban);
+    `
   }
 ]
 

@@ -1,0 +1,369 @@
+.page-banking {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.conn {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+  border-radius: var(--radius, 10px);
+
+  &__icon {
+    color: var(--ink-3, #71717a);
+  }
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    color: var(--ink-2, #52525b);
+  }
+  &__status {
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    background: var(--ink-6, #ededf0);
+    color: var(--ink-2);
+
+    &.active {
+      background: color-mix(in oklab, var(--success, #16a34a) 16%, transparent);
+      color: var(--success, #15803d);
+    }
+    &.pending {
+      background: color-mix(in oklab, var(--warning, #d97706) 16%, transparent);
+      color: var(--warning, #b45309);
+    }
+    &.error {
+      background: color-mix(in oklab, var(--error, #dc2626) 16%, transparent);
+      color: var(--error, #b91c1c);
+    }
+  }
+  &__sync {
+    font-size: 0.72rem;
+    color: var(--ink-3);
+  }
+  &__err {
+    margin-top: 0.3rem;
+    font-size: 0.72rem;
+    color: var(--error, #b91c1c);
+  }
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  &__note {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius, 8px);
+    background: color-mix(in oklab, var(--warning, #d97706) 12%, transparent);
+    color: var(--warning, #b45309);
+    font-size: 0.78rem;
+  }
+
+  &__ini {
+    margin-top: 0.25rem;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+    border-radius: var(--radius, 10px);
+
+    &-head {
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    &-text {
+      margin: 0.25rem 0 0.6rem;
+      font-size: 0.78rem;
+      color: var(--ink-3, #71717a);
+    }
+  }
+
+  &__intro {
+    font-size: 0.85rem;
+    color: var(--ink-2, #52525b);
+  }
+
+  &__hint {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--ink-3, #71717a);
+  }
+
+  &__steps {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--ink-2, #52525b);
+
+    li::marker {
+      color: var(--ink-3, #a1a1aa);
+      font-weight: 600;
+    }
+  }
+
+  &__docs {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--ink-3, #a1a1aa);
+  }
+}
+
+// Provider chooser: two selectable cards (folder vs ebics).
+.prov-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+
+  @media (max-width: 28rem) {
+    grid-template-columns: 1fr;
+  }
+}
+.prov-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem;
+  text-align: left;
+  border: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+  border-radius: var(--radius, 10px);
+  background: var(--surface, transparent);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--ink-5, #d4d4d8);
+  }
+  &.is-active {
+    border-color: var(--accent, #6366f1);
+    box-shadow: inset 0 0 0 1px var(--accent, #6366f1);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  &__icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--ink-2, #52525b);
+  }
+  &__badge {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: var(--ink-6, #ededf0);
+    color: var(--ink-3, #71717a);
+
+    &.is-rec {
+      background: color-mix(in oklab, var(--success, #16a34a) 16%, transparent);
+      color: var(--success, #15803d);
+    }
+  }
+  &__name {
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  &__desc {
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--ink-3, #71717a);
+  }
+}
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.75rem;
+  border: 1.5px dashed var(--border, var(--ink-5, #d4d4d8));
+  border-radius: var(--radius-lg, 12px);
+  background: var(--surface-2, transparent);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+
+  &.is-drag {
+    border-color: var(--accent, #6366f1);
+    background: color-mix(in oklab, var(--accent, #6366f1) 8%, transparent);
+  }
+  &.is-busy {
+    cursor: progress;
+    opacity: 0.7;
+  }
+  &__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--ink-3, #71717a);
+  }
+  &__hint {
+    font-size: 0.85rem;
+    color: var(--ink-2, #52525b);
+  }
+  &__file {
+    display: none;
+  }
+}
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius, 10px);
+  background: color-mix(in oklab, var(--success, #16a34a) 12%, transparent);
+  color: var(--success-ink, var(--success, #15803d));
+  font-size: 0.85rem;
+}
+
+.tx-list {
+  display: flex;
+  flex-direction: column;
+}
+.tx {
+  display: grid;
+  grid-template-columns: auto 1fr minmax(0, 18rem) auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.25rem;
+
+  & + .tx {
+    border-top: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+  }
+  &.unmatched .tx__amount {
+    color: var(--ink-1);
+  }
+  &__amount {
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  &__line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  &__debtor {
+    font-size: 0.9rem;
+  }
+  &__date {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+  &__sub {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.15rem;
+  }
+  &__reason {
+    font-size: 0.7rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--warning, #d97706) 15%, transparent);
+    color: var(--warning-ink, var(--warning, #b45309));
+  }
+  &__ref {
+    font-size: 0.7rem;
+    color: var(--ink-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__select {
+    width: 100%;
+  }
+  &__actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+  &__file {
+    max-width: 18rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__link {
+    color: var(--accent, #6366f1);
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+.icon-btn.is-good:hover {
+  color: var(--success, #16a34a);
+}
+
+.fold {
+  border: 1px solid var(--border-subtle, var(--ink-6, #ededf0));
+  border-radius: var(--radius, 10px);
+  padding: 0 0.75rem;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+  &__chev {
+    transition: transform 0.15s;
+  }
+  &[open] &__chev {
+    transform: rotate(90deg);
+  }
+  &__count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  // Was :deep(.ui-card) in the scoped block; this partial is global so the
+  // descendant selector reaches the card component's root directly.
+  .ui-card {
+    margin-bottom: 0.75rem;
+  }
+}

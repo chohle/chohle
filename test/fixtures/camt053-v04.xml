@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.04">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>MSG-04-001</MsgId>
+      <CreDtTm>2026-02-01T03:00:00</CreDtTm>
+    </GrpHdr>
+    <Stmt>
+      <Id>STMT-2026-04</Id>
+      <Acct>
+        <Id><IBAN>CH4431999123000889012</IBAN></Id>
+        <Ccy>CHF</Ccy>
+      </Acct>
+      <FrToDt>
+        <FrDtTm>2026-01-01T00:00:00</FrDtTm>
+        <ToDtTm>2026-01-31T23:59:59</ToDtTm>
+      </FrToDt>
+      <!-- In .04 the debtor name sits directly under Dbtr (no Pty wrapper). -->
+      <Ntry>
+        <Amt Ccy="CHF">1200.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <BookgDt><Dt>2026-01-10</Dt></BookgDt>
+        <ValDt><Dt>2026-01-10</Dt></ValDt>
+        <AcctSvcrRef>ACCT-REF-04-1</AcctSvcrRef>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>E2E-04-1</EndToEndId></Refs>
+            <RmtInf>
+              <Strd>
+                <CdtrRefInf><Ref>210000000003139471430009017</Ref></CdtrRefInf>
+              </Strd>
+            </RmtInf>
+            <RltdPties><Dbtr><Nm>Alte Firma GmbH</Nm></Dbtr></RltdPties>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>
