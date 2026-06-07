@@ -667,8 +667,8 @@ const isExpired = computed(
         <span class="qfold__opt">{{ $t('common.optional') }}</span>
         <span v-if="references.length" class="qfold__count mono">{{ references.length }}</span>
       </button>
-      <div class="qfold__wrap">
-        <div class="qfold__body">
+      <Transition name="qfold">
+        <div v-show="refsOpen" class="qfold__body">
           <UiCard>
             <p class="qdoc-intro note">{{ $t('quotes.referencesHint') }}</p>
             <div v-if="references.length" class="qref-list">
@@ -701,7 +701,7 @@ const isExpired = computed(
             </div>
           </UiCard>
         </div>
-      </div>
+      </Transition>
     </div>
 
     <div class="qfold" :class="{ 'is-open': docsOpen }">
@@ -711,8 +711,8 @@ const isExpired = computed(
         <span class="qfold__opt">{{ $t('common.optional') }}</span>
         <span v-if="documents.length" class="qfold__count mono">{{ documents.length }}</span>
       </button>
-      <div class="qfold__wrap">
-        <div class="qfold__body">
+      <Transition name="qfold">
+        <div v-show="docsOpen" class="qfold__body">
           <UiCard>
             <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
             <ul v-if="documents.length" class="qdoc-list">
@@ -782,7 +782,7 @@ const isExpired = computed(
             </div>
           </UiCard>
         </div>
-      </div>
+      </Transition>
     </div>
 
     <div class="foot">

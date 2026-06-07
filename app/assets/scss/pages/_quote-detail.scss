@@ -92,9 +92,10 @@
     }
   }
 
-  // Optional sections (References, Documents): a clickable header toggles a
-  // smooth height animation via the grid-template-rows 0fr→1fr trick. The open
-  // state is a ref the user controls, so collapsing actually sticks.
+  // Optional sections (References, Documents): a clickable header toggles the
+  // body via v-show (display: a dead-simple, always-reliable show/hide), with a
+  // short fade/slide from the Vue <Transition name="qfold">. No height-animation
+  // guesswork, so it can't get stuck half-open.
   .qfold {
     margin-top: 8px;
     border-top: 1px solid var(--rule);
@@ -138,18 +139,22 @@
       color: var(--ink-3);
     }
 
-    // The animated wrapper: collapsed = 0fr (zero height), open = 1fr.
-    &__wrap {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.25s ease;
-    }
-    &.is-open &__wrap {
-      grid-template-rows: 1fr;
-    }
     &__body {
-      overflow: hidden;
+      padding-bottom: 4px;
     }
+  }
+
+  // Fade + slide for the optional sections' show/hide (Vue <Transition>).
+  .qfold-enter-active,
+  .qfold-leave-active {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+  .qfold-enter-from,
+  .qfold-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 
   .foot {
