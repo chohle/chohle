@@ -892,17 +892,43 @@
     "suggest1": "Elenca i miei clienti",
     "suggest2": "Crea un cliente: Müller Bau, Zurigo",
     "suggest3": "Fattura Café Zentral 8h di consulenza a 150",
-    "newCustomer": "Nuovo cliente",
-    "newInvoice": "Nuova fattura (bozza)",
     "approve": "Conferma",
     "cancel": "Annulla",
     "approved": "Confermato",
     "cancelled": "Annullato",
-    "createdCustomer": "Cliente {name} creato.",
-    "createdInvoice": "Bozza di fattura #{id} creata, assegna un numero nelle fatture.",
     "done": "Fatto.",
     "commitFailed": "Impossibile applicare le modifiche.",
     "unavailable": "L'assistente non è attivato",
-    "disabledHint": "Imposta CHOHLE_ASSISTANT=true e punta NUXT_LLM_BASE_URL a un LLM locale per attivarlo. Vedi docs/ASSISTANT.md."
+    "disabledHint": "Imposta CHOHLE_ASSISTANT=true e punta NUXT_LLM_BASE_URL a un LLM locale per attivarlo. Vedi docs/ASSISTANT.md.",
+    "create": {
+      "customer": "Nuovo cliente",
+      "invoice": "Nuova fattura (bozza)",
+      "quote": "Nuova offerta (bozza)",
+      "article": "Nuovo articolo",
+      "signature": "Nuova firma",
+      "expense": "Registra spesa",
+      "income": "Nuova fonte di reddito"
+    },
+    "edit": {
+      "customer": "Modifica cliente",
+      "invoice": "Modifica fattura",
+      "quote": "Modifica offerta",
+      "article": "Modifica articolo",
+      "signature": "Modifica firma"
+    },
+    "kind": {
+      "customer": "cliente",
+      "invoice": "fattura",
+      "quote": "offerta",
+      "article": "articolo",
+      "signature": "firma",
+      "expense": "spesa",
+      "income": "fonte di reddito",
+      "project": "progetto"
+    },
+    "before": "Prima",
+    "after": "Dopo",
+    "createdItem": "{kind} {label} creato.",
+    "updatedItem": "{kind} {label} aggiornato."
   }
 }

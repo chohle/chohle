@@ -1,12 +1,27 @@
 <script setup lang="ts">
 interface ProposedAction {
-  type: 'create_customer' | 'create_invoice'
+  type: string
   [k: string]: unknown
 }
+type ProposalKind =
+  | 'customer'
+  | 'invoice'
+  | 'quote'
+  | 'article'
+  | 'signature'
+  | 'expense'
+  | 'income'
 interface Proposal {
-  kind: 'customer' | 'invoice'
+  kind: ProposalKind
+  mode: 'create' | 'edit'
   summary: string[]
+  before?: string[]
   action: ProposedAction
+}
+interface CommitRef {
+  kind: string
+  id: number
+  label: string
 }
 interface Turn {
   role: 'user' | 'assistant'
@@ -70,18 +85,19 @@ async function approve(turn: Turn) {
   if (!turn.proposals || turn.state !== 'pending') return
   turn.state = 'approved'
   try {
-    const result = await $fetch<{
-      customers: { id: number; name: string }[]
-      invoices: { id: number; title: string; totalRappen: number }[]
-    }>('/api/assistant/commit', {
-      method: 'POST',
-      body: { actions: turn.proposals.map((p) => p.action) }
-    })
+    const result = await $fetch<{ created: CommitRef[]; updated: CommitRef[] }>(
+      '/api/assistant/commit',
+      { method: 'POST', body: { actions: turn.proposals.map((p) => p.action) } }
+    )
     const parts: string[] = []
-    for (const c of result.customers) parts.push(t('assistant.createdCustomer', { name: c.name }))
-    for (const i of result.invoices) {
-      parts.push(t('assistant.createdInvoice', { id: i.id }))
-    }
+    for (const r of result.created)
+      parts.push(
+        t('assistant.createdItem', { kind: t(`assistant.kind.${r.kind}`), label: r.label })
+      )
+    for (const r of result.updated)
+      parts.push(
+        t('assistant.updatedItem', { kind: t(`assistant.kind.${r.kind}`), label: r.label })
+      )
     turns.value.push({ role: 'assistant', content: parts.join(' ') || t('assistant.done') })
   } catch {
     turn.state = 'pending'
@@ -93,6 +109,19 @@ async function approve(turn: Turn) {
 
 function cancel(turn: Turn) {
   if (turn.state === 'pending') turn.state = 'cancelled'
+}
+
+const KIND_ICONS: Record<ProposalKind, string> = {
+  customer: 'i-lucide-user-plus',
+  invoice: 'i-lucide-file-text',
+  quote: 'i-lucide-file-pen',
+  article: 'i-lucide-package',
+  signature: 'i-lucide-signature',
+  expense: 'i-lucide-receipt',
+  income: 'i-lucide-banknote'
+}
+function kindIcon(kind: ProposalKind) {
+  return KIND_ICONS[kind] ?? 'i-lucide-sparkles'
 }
 
 const suggestions = computed(() => [
@@ -148,19 +177,26 @@ function useSuggestion(s: string) {
           </div>
           <div v-if="turn.content" class="asst-msg__bubble">{{ turn.content }}</div>
 
-          <!-- Approval cards for proposed creations -->
+          <!-- Approval cards for proposed creates / edits -->
           <div v-if="turn.proposals" class="asst-proposals">
             <div v-for="(p, pi) in turn.proposals" :key="pi" class="asst-card">
               <div class="asst-card__head">
-                <UIcon
-                  :name="p.kind === 'invoice' ? 'i-lucide-file-text' : 'i-lucide-user-plus'"
-                  class="size-4"
-                />
-                <span>{{
-                  p.kind === 'invoice' ? $t('assistant.newInvoice') : $t('assistant.newCustomer')
-                }}</span>
+                <UIcon :name="kindIcon(p.kind)" class="size-4" />
+                <span>{{ $t(`assistant.${p.mode}.${p.kind}`) }}</span>
               </div>
-              <ul class="asst-card__lines">
+              <!-- Edit: show before -> after so the user can double check. -->
+              <div v-if="p.before" class="asst-diff">
+                <div class="asst-diff__col">
+                  <span class="asst-diff__label mono">{{ $t('assistant.before') }}</span>
+                  <span v-for="(b, bi) in p.before" :key="bi">{{ b }}</span>
+                </div>
+                <UIcon name="i-lucide-arrow-right" class="asst-diff__arrow size-4" />
+                <div class="asst-diff__col">
+                  <span class="asst-diff__label mono">{{ $t('assistant.after') }}</span>
+                  <span v-for="(a, ai) in p.summary" :key="ai">{{ a }}</span>
+                </div>
+              </div>
+              <ul v-else class="asst-card__lines">
                 <li v-for="(line, li) in p.summary" :key="li">{{ line }}</li>
               </ul>
             </div>

@@ -150,6 +150,32 @@
       color: var(--ink);
     }
   }
+  .asst-diff {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--ink);
+
+    &__col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    &__label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+    }
+    &__arrow {
+      flex: none;
+      color: var(--ink-3);
+    }
+  }
+
   .asst-actions {
     display: flex;
     gap: 8px;

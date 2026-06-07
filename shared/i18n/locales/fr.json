@@ -892,17 +892,43 @@
     "suggest1": "Liste mes clients",
     "suggest2": "Crée un client : Müller Bau, Zurich",
     "suggest3": "Facture Café Zentral 8h de conseil à 150",
-    "newCustomer": "Nouveau client",
-    "newInvoice": "Nouvelle facture (brouillon)",
     "approve": "Valider",
     "cancel": "Annuler",
     "approved": "Validé",
     "cancelled": "Annulé",
-    "createdCustomer": "Client {name} créé.",
-    "createdInvoice": "Brouillon de facture #{id} créé, attribue un numéro dans les factures.",
     "done": "Terminé.",
     "commitFailed": "Impossible d'appliquer les changements.",
     "unavailable": "L'assistant n'est pas activé",
-    "disabledHint": "Mets CHOHLE_ASSISTANT=true et pointe NUXT_LLM_BASE_URL vers un LLM local pour l'activer. Voir docs/ASSISTANT.md."
+    "disabledHint": "Mets CHOHLE_ASSISTANT=true et pointe NUXT_LLM_BASE_URL vers un LLM local pour l'activer. Voir docs/ASSISTANT.md.",
+    "create": {
+      "customer": "Nouveau client",
+      "invoice": "Nouvelle facture (brouillon)",
+      "quote": "Nouveau devis (brouillon)",
+      "article": "Nouvel article",
+      "signature": "Nouvelle signature",
+      "expense": "Saisir une dépense",
+      "income": "Nouvelle source de revenu"
+    },
+    "edit": {
+      "customer": "Modifier le client",
+      "invoice": "Modifier la facture",
+      "quote": "Modifier le devis",
+      "article": "Modifier l'article",
+      "signature": "Modifier la signature"
+    },
+    "kind": {
+      "customer": "client",
+      "invoice": "facture",
+      "quote": "devis",
+      "article": "article",
+      "signature": "signature",
+      "expense": "dépense",
+      "income": "source de revenu",
+      "project": "projet"
+    },
+    "before": "Avant",
+    "after": "Après",
+    "createdItem": "{kind} {label} créé.",
+    "updatedItem": "{kind} {label} mis à jour."
   }
 }
