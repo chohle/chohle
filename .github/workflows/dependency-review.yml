@@ -12,9 +12,9 @@ jobs:
     name: Review new dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/dependency-review-action@v4
+      - uses: actions/dependency-review-action@v5
         with:
           # Block PRs that pull in moderate+ severity vulnerabilities
           fail-on-severity: moderate
