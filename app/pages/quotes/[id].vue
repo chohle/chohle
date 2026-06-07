@@ -407,25 +407,6 @@ async function onDocFile(e: Event) {
   }
 }
 
-// Tabs keep the editor calm: the quote details, the reference links, and the
-// documents are three surfaces instead of one long scroll.
-const tab = ref<'details' | 'references' | 'documents'>('details')
-const tabOptions = computed(() => [
-  { value: 'details', label: t('quotes.tabDetails') },
-  {
-    value: 'references',
-    label: references.value.length
-      ? `${t('quotes.tabReferences')} · ${references.value.length}`
-      : t('quotes.tabReferences')
-  },
-  {
-    value: 'documents',
-    label: documents.value.length
-      ? `${t('quotes.tabDocuments')} · ${documents.value.length}`
-      : t('quotes.tabDocuments')
-  }
-])
-
 const docEditor = reactive<{
   open: boolean
   id: number | null
@@ -571,120 +552,115 @@ const isExpired = computed(
       </NuxtLink>
     </div>
 
-    <div class="page-quote-detail__tabs">
-      <UiSegmentedControl
-        :model-value="tab"
-        :options="tabOptions"
-        :aria-label="$t('nav.quotes')"
-        @update:model-value="(v: string) => (tab = v as typeof tab)"
-      />
-    </div>
+    <UiCard>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <UFormField :label="$t('common.title')" class="sm:col-span-2">
+          <UInput v-model="header.title" class="w-full" />
+        </UFormField>
+        <UFormField :label="$t('quotes.number')">
+          <UInput v-model="header.number" class="w-full" />
+        </UFormField>
+        <UFormField :label="$t('invoices.projectCol')">
+          <USelect v-model="header.projectId" :items="projectOptions" class="w-full" />
+        </UFormField>
+        <UFormField :label="$t('quotes.issueDate')">
+          <UiDatePicker v-model="header.issueDate" />
+        </UFormField>
+        <UFormField :label="$t('quotes.validUntil')">
+          <UiDatePicker v-model="header.validUntil" />
+        </UFormField>
+      </div>
+    </UiCard>
 
-    <template v-if="tab === 'details'">
-      <UiCard>
-        <div class="grid gap-4 sm:grid-cols-2">
-          <UFormField :label="$t('common.title')" class="sm:col-span-2">
-            <UInput v-model="header.title" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('quotes.number')">
-            <UInput v-model="header.number" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('invoices.projectCol')">
-            <USelect v-model="header.projectId" :items="projectOptions" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('quotes.issueDate')">
-            <UiDatePicker v-model="header.issueDate" />
-          </UFormField>
-          <UFormField :label="$t('quotes.validUntil')">
-            <UiDatePicker v-model="header.validUntil" />
-          </UFormField>
+    <UiSectionLabel>{{ $t('invoices.lineItems') }}</UiSectionLabel>
+    <UiCard>
+      <EmptyState
+        v-if="!items.length"
+        :bordered="false"
+        icon="i-lucide-list"
+        :title="$t('invoices.noLinesTitle')"
+        :description="$t('invoices.noLinesText')"
+      >
+        <template #action>
+          <button class="ed-btn" type="button" @click="addRow">
+            <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
+          </button>
+        </template>
+      </EmptyState>
+      <div v-else>
+        <div class="lines-head mono">
+          <div class="c-art">{{ $t('invoices.article') }}</div>
+          <div class="c-desc">{{ $t('invoices.description') }}</div>
+          <div class="c-qty">{{ $t('invoices.qty') }}</div>
+          <div class="c-unit">{{ $t('articles.colUnit') }}</div>
+          <div class="c-price">{{ $t('articles.colPrice') }}</div>
+          <div class="c-disc">{{ $t('invoices.discPct') }}</div>
+          <div v-if="vat" class="c-vat">{{ $t('invoices.vatPct') }}</div>
+          <div class="c-amt right">{{ $t('common.amount') }}</div>
         </div>
-      </UiCard>
-
-      <UiSectionLabel>{{ $t('invoices.lineItems') }}</UiSectionLabel>
-      <UiCard>
-        <EmptyState
-          v-if="!items.length"
-          :bordered="false"
-          icon="i-lucide-list"
-          :title="$t('invoices.noLinesTitle')"
-          :description="$t('invoices.noLinesText')"
-        >
-          <template #action>
-            <button class="ed-btn" type="button" @click="addRow">
-              <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
-            </button>
-          </template>
-        </EmptyState>
-        <div v-else>
-          <div class="lines-head mono">
-            <div class="c-art">{{ $t('invoices.article') }}</div>
-            <div class="c-desc">{{ $t('invoices.description') }}</div>
-            <div class="c-qty">{{ $t('invoices.qty') }}</div>
-            <div class="c-unit">{{ $t('articles.colUnit') }}</div>
-            <div class="c-price">{{ $t('articles.colPrice') }}</div>
-            <div class="c-disc">{{ $t('invoices.discPct') }}</div>
-            <div v-if="vat" class="c-vat">{{ $t('invoices.vatPct') }}</div>
-            <div class="c-amt right">{{ $t('common.amount') }}</div>
-          </div>
-          <div v-for="(row, i) in items" :key="i" class="line-row">
-            <UInput
-              v-model="row.articleName"
-              list="qd-article-names"
-              :placeholder="$t('quotes.articlePlaceholder')"
-              class="w-full"
-              @change="onArticleName(row)"
-            />
-            <UInput v-model="row.description" class="w-full" />
-            <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
-            <UInput v-model="row.unit" class="w-full" />
-            <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
-            <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
-            <UInput
-              v-if="vat"
-              v-model.number="row.mwstPercent"
-              type="number"
-              step="0.1"
-              class="w-full"
-            />
-            <div class="amt mono">
-              <span>CHF {{ chf(lineAmount(row)) }}</span>
-              <button type="button" class="icon-btn" @click="removeRow(i)">
-                <UIcon name="i-lucide-x" />
-              </button>
-            </div>
-          </div>
-          <div class="add-row">
-            <button class="ed-btn-ghost" type="button" @click="addRow">
-              <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
+        <div v-for="(row, i) in items" :key="i" class="line-row">
+          <UInput
+            v-model="row.articleName"
+            list="qd-article-names"
+            :placeholder="$t('quotes.articlePlaceholder')"
+            class="w-full"
+            @change="onArticleName(row)"
+          />
+          <UInput v-model="row.description" class="w-full" />
+          <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
+          <UInput v-model="row.unit" class="w-full" />
+          <UInput v-model.number="row.unitPrice" type="number" step="0.05" class="w-full" />
+          <UInput v-model.number="row.discountPercent" type="number" step="0.1" class="w-full" />
+          <UInput
+            v-if="vat"
+            v-model.number="row.mwstPercent"
+            type="number"
+            step="0.1"
+            class="w-full"
+          />
+          <div class="amt mono">
+            <span>CHF {{ chf(lineAmount(row)) }}</span>
+            <button type="button" class="icon-btn" @click="removeRow(i)">
+              <UIcon name="i-lucide-x" />
             </button>
           </div>
-          <!-- Native suggestions for the free-text article field. -->
-          <datalist id="qd-article-names">
-            <option v-for="n in articleNames" :key="n" :value="n" />
-          </datalist>
         </div>
-      </UiCard>
+        <div class="add-row">
+          <button class="ed-btn-ghost" type="button" @click="addRow">
+            <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
+          </button>
+        </div>
+        <!-- Native suggestions for the free-text article field. -->
+        <datalist id="qd-article-names">
+          <option v-for="n in articleNames" :key="n" :value="n" />
+        </datalist>
+      </div>
+    </UiCard>
 
-      <UiCard class="mt-4">
-        <dl class="totals">
-          <div v-if="vat" class="t-row">
-            <dt class="eyebrow">{{ $t('invoices.netto') }}</dt>
-            <dd class="mono">CHF {{ chf(totals.nettoRappen) }}</dd>
-          </div>
-          <div v-for="r in totals.mwstByRate" :key="r.rate" class="t-row">
-            <dt class="eyebrow">{{ $t('common.vat') }} {{ r.rate }}%</dt>
-            <dd class="mono">CHF {{ chf(r.mwstRappen) }}</dd>
-          </div>
-          <div class="t-row total">
-            <dt class="eyebrow">{{ $t('common.total') }}</dt>
-            <dd class="mono">CHF {{ chf(totals.totalRappen) }}</dd>
-          </div>
-        </dl>
-      </UiCard>
-    </template>
+    <UiCard class="mt-4">
+      <dl class="totals">
+        <div v-if="vat" class="t-row">
+          <dt class="eyebrow">{{ $t('invoices.netto') }}</dt>
+          <dd class="mono">CHF {{ chf(totals.nettoRappen) }}</dd>
+        </div>
+        <div v-for="r in totals.mwstByRate" :key="r.rate" class="t-row">
+          <dt class="eyebrow">{{ $t('common.vat') }} {{ r.rate }}%</dt>
+          <dd class="mono">CHF {{ chf(r.mwstRappen) }}</dd>
+        </div>
+        <div class="t-row total">
+          <dt class="eyebrow">{{ $t('common.total') }}</dt>
+          <dd class="mono">CHF {{ chf(totals.totalRappen) }}</dd>
+        </div>
+      </dl>
+    </UiCard>
 
-    <template v-if="tab === 'references'">
+    <details class="qfold" :open="references.length > 0">
+      <summary class="qfold__head">
+        <UIcon name="i-lucide-chevron-right" class="qfold__chev" />
+        <span class="qfold__title">{{ $t('quotes.references') }}</span>
+        <span class="qfold__opt">{{ $t('common.optional') }}</span>
+        <span v-if="references.length" class="qfold__count mono">{{ references.length }}</span>
+      </summary>
       <UiCard>
         <p class="qdoc-intro note">{{ $t('quotes.referencesHint') }}</p>
         <div v-if="references.length" class="qref-list">
@@ -716,9 +692,15 @@ const isExpired = computed(
           </button>
         </div>
       </UiCard>
-    </template>
+    </details>
 
-    <template v-if="tab === 'documents'">
+    <details class="qfold" :open="documents.length > 0">
+      <summary class="qfold__head">
+        <UIcon name="i-lucide-chevron-right" class="qfold__chev" />
+        <span class="qfold__title">{{ $t('quotes.documents') }}</span>
+        <span class="qfold__opt">{{ $t('common.optional') }}</span>
+        <span v-if="documents.length" class="qfold__count mono">{{ documents.length }}</span>
+      </summary>
       <UiCard>
         <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
         <ul v-if="documents.length" class="qdoc-list">
@@ -787,7 +769,7 @@ const isExpired = computed(
           />
         </div>
       </UiCard>
-    </template>
+    </details>
 
     <div class="foot">
       <button class="ed-btn-ghost" :disabled="saving" @click="save">

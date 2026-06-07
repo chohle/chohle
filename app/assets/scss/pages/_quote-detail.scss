@@ -92,8 +92,46 @@
     }
   }
 
-  &__tabs {
-    margin: 4px 0 8px;
+  // Optional collapsible sections (References, Documents) — open when they have
+  // content, collapsed (and clearly labelled optional) when empty.
+  .qfold {
+    margin-top: 8px;
+    border-top: 1px solid var(--rule);
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 2px;
+      cursor: pointer;
+      list-style: none;
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+    &__chev {
+      color: var(--ink-3);
+      transition: transform 0.15s;
+    }
+    &[open] &__chev {
+      transform: rotate(90deg);
+    }
+    &__title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    &__opt {
+      font-size: 11px;
+      color: var(--ink-3);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      padding: 0 8px;
+    }
+    &__count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--ink-3);
+    }
   }
 
   .foot {

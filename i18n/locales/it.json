@@ -778,7 +778,8 @@
     "vat": "IVA",
     "username": "Nome utente",
     "password": "Password",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "optional": "Facoltativo"
   },
   "triage": {
     "title": "Triage",

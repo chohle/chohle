@@ -778,7 +778,8 @@
     "vat": "VAT",
     "username": "Username",
     "password": "Password",
-    "delete": "Delete"
+    "delete": "Delete",
+    "optional": "Optional"
   },
   "triage": {
     "title": "Triage",

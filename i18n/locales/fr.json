@@ -778,7 +778,8 @@
     "vat": "TVA",
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "optional": "Facultatif"
   },
   "triage": {
     "title": "Triage",

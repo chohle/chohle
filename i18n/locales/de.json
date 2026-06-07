@@ -778,7 +778,8 @@
     "vat": "MWST",
     "username": "Benutzername",
     "password": "Passwort",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "optional": "Optional"
   },
   "triage": {
     "title": "Triage",
