@@ -9,18 +9,35 @@ It is **off by default**. Turn it on only if you want it.
 
 ## What it can and cannot do
 
-- **Read**: list/search customers, invoices and articles, and a small overview.
-- **Create, with your approval**: customers and invoices (drafts). Every create
-  is shown as a card in the chat with **Approve / Cancel** — nothing is written
-  until you approve.
-- **It can never edit or delete anything.** There is no update or delete tool in
-  the registry, so destructive actions are impossible by construction, not just
-  discouraged. The only write path re-validates everything and only inserts.
+- **Read**: customers, invoices, quotes, articles, signatures, expenses,
+  categories, and a small overview.
+- **Create, with your approval**: customers, invoices, quotes, articles,
+  signatures, expenses, income sources.
+- **Edit, with your approval**: customers, invoices, quotes, articles,
+  signatures. An edit shows a **before → after** card so you can double check,
+  and it can only change fields — never remove a record.
+- **It can never delete anything, and never send email.** There is no delete tool
+  and no send tool in the registry, so those are impossible by construction.
+  Every write is shown as an **Approve / Cancel** card; nothing happens until you
+  approve, and the commit re-validates everything.
 
-Created invoices are **drafts with no number** (same as the normal flow); you
-assign the number later on the invoices page. Because an invoice needs a project,
-the assistant attaches it to an existing project or creates a simple sales
-project for the customer.
+| Entity | Read | Create | Edit |
+| ------------- | :--: | :----: | :--: |
+| Customer      | ✓ | ✓ | ✓ |
+| Invoice       | ✓ | ✓ | ✓ |
+| Quote         | ✓ | ✓ | ✓ |
+| Article       | ✓ | ✓ | ✓ |
+| Signature     | ✓ | ✓ | ✓ |
+| Expense       | ✓ | ✓ |   |
+| Income source |   | ✓ |   |
+
+Created invoices and quotes are **drafts with no number** (same as the normal
+flow); you assign the number later. Because an invoice needs a project, the
+assistant attaches it to an existing project or creates a simple sales project
+for the customer (quotes do not require a project).
+
+The registry is ~25 tools. Capable models pick the right one reliably; very small
+models (e.g. a 3B) may occasionally mis-pick on complex multi-step requests.
 
 ## Enabling it
 
