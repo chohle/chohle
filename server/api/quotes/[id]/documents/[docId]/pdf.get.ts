@@ -1,6 +1,7 @@
 // Preview/download a quote document: editor docs render to PDF, uploaded file
 // docs stream as-is with their original type.
 import { quoteDocumentAttachment } from '~~/server/utils/documentPdf'
+import { contentDisposition } from '~~/server/utils/uploads'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -13,6 +14,8 @@ export default defineEventHandler(async (event) => {
   if (!out) throw createError({ statusCode: 404, statusMessage: 'document not found' })
 
   setHeader(event, 'Content-Type', out.contentType)
-  setHeader(event, 'Content-Disposition', `inline; filename="${out.filename}"`)
+  // Build the disposition through the sanitizer so a crafted filename can't
+  // inject additional response headers.
+  setHeader(event, 'Content-Disposition', contentDisposition(out.filename, 'inline'))
   return out.content
 })

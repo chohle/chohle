@@ -86,6 +86,31 @@ export async function saveImageUpload(
   return storedName
 }
 
+// Strip characters a filename must never carry into storage or an HTTP header:
+// CR/LF and control chars (header injection), plus quotes/backslashes. Collapses
+// whitespace and falls back to a default when nothing usable is left.
+export function sanitizeFilename(name: string | null | undefined, fallback = 'Dokument'): string {
+  const cleaned = (name ?? '')
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001f\u007f"\\]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return cleaned || fallback
+}
+
+// Build a header-injection-safe Content-Disposition value. The quoted filename
+// is reduced to plain ASCII; a filename* (RFC 5987) carries the full UTF-8 name
+// for clients that support it.
+export function contentDisposition(
+  filename: string,
+  type: 'inline' | 'attachment' = 'attachment'
+): string {
+  const base = sanitizeFilename(filename, 'file')
+  // eslint-disable-next-line no-control-regex
+  const ascii = base.replace(/[^\x20-\x7e]/g, '_') || 'file'
+  return `${type}; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(base)}`
+}
+
 const MAX_DOC_BYTES = 25 * 1024 * 1024
 
 // Save an uploaded document (PDF/DOCX/…) to the private uploads dir. Returns the
@@ -107,7 +132,9 @@ export async function saveDocumentUpload(
   }
   const storedName = `${randomUUID()}${extname(file.filename!)}`
   await writeFile(join(uploadsDir(), storedName), file.data)
-  return { storedName, originalName: basename(file.filename!), mime }
+  // Sanitize the client-supplied name now so the stored value (used later as the
+  // email attachment name and in Content-Disposition) can't carry control chars.
+  return { storedName, originalName: sanitizeFilename(basename(file.filename!)), mime }
 }
 
 // Read a stored upload into a buffer for embedding (e.g. the sender logo in the

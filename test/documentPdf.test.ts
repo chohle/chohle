@@ -79,6 +79,21 @@ describe('document pdf', () => {
   })
 })
 
+describe('filename sanitization (Content-Disposition injection)', () => {
+  it('strips CR/LF, control chars and quotes from filenames', async () => {
+    const { sanitizeFilename, contentDisposition } = await import('../server/utils/uploads')
+    expect(sanitizeFilename('clean.pdf')).toBe('clean.pdf')
+    expect(sanitizeFilename('a\r\nSet-Cookie: x.pdf')).toBe('a Set-Cookie: x.pdf')
+    expect(sanitizeFilename('he"llo".pdf')).toBe('he llo .pdf')
+    expect(sanitizeFilename('')).toBe('Dokument')
+
+    const cd = contentDisposition('evil"\r\nX-Injected: 1.pdf', 'inline')
+    expect(cd).not.toMatch(/[\r\n]/)
+    expect(cd.startsWith('inline; filename="')).toBe(true)
+    expect(cd).toContain("filename*=UTF-8''")
+  })
+})
+
 describe('safeHref', () => {
   it('keeps http(s) and mailto, drops everything else', () => {
     expect(safeHref('https://x.ch')).toBe('https://x.ch')
