@@ -70,7 +70,8 @@
     "system": "Système",
     "triage": "Triage",
     "banking": "Rapprochement bancaire",
-    "assistant": "Assistant"
+    "assistant": "Assistant",
+    "assistantSection": "IA"
   },
   "demo": {
     "notice": "Démo. Vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",

@@ -20,7 +20,8 @@
     "system": "System",
     "triage": "Triage",
     "banking": "Bankabgleich",
-    "assistant": "Assistent"
+    "assistant": "Assistent",
+    "assistantSection": "KI"
   },
   "demo": {
     "notice": "Demo. Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",

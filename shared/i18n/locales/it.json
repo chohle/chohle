@@ -70,7 +70,8 @@
     "system": "Sistema",
     "triage": "Triage",
     "banking": "Riconciliazione bancaria",
-    "assistant": "Assistente"
+    "assistant": "Assistente",
+    "assistantSection": "IA"
   },
   "demo": {
     "notice": "Demo. Le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",

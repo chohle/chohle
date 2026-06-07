@@ -20,7 +20,8 @@
     "system": "System",
     "triage": "Triage",
     "banking": "Bank reconciliation",
-    "assistant": "Assistant"
+    "assistant": "Assistant",
+    "assistantSection": "AI"
   },
   "demo": {
     "notice": "Demo. Your changes stay private to your browser and reset when idle.",

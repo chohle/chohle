@@ -53,9 +53,6 @@ const sections = computed<Section[]>(() => [
     label: 'Workspace',
     items: [
       { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
-      ...(assistantEnabled.value
-        ? [{ label: t('nav.assistant'), icon: 'i-lucide-sparkles', to: '/assistant' }]
-        : []),
       { label: t('nav.customers'), icon: 'i-lucide-users', to: '/customers' },
       { label: t('nav.quotes'), icon: 'i-lucide-file-pen', to: '/quotes' },
       { label: t('nav.invoices'), icon: 'i-lucide-file-text', to: '/invoices' },
@@ -88,7 +85,16 @@ const sections = computed<Section[]>(() => [
       { label: t('nav.reminders'), icon: 'i-lucide-bell', to: '/reminders' },
       { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' }
     ]
-  }
+  },
+  // The assistant is its own section, shown only when enabled for this instance.
+  ...(assistantEnabled.value
+    ? [
+        {
+          label: t('nav.assistantSection'),
+          items: [{ label: t('nav.assistant'), icon: 'i-lucide-sparkles', to: '/assistant' }]
+        }
+      ]
+    : [])
 ])
 
 function isActive(to: string) {
