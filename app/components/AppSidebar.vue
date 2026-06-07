@@ -45,11 +45,17 @@ function isGroup(e: Entry): e is Group {
   return 'children' in e
 }
 
+// The assistant link only appears when the assistant is enabled for this instance.
+const assistantEnabled = computed(() => !!useRuntimeConfig().public.assistantEnabled)
+
 const sections = computed<Section[]>(() => [
   {
     label: 'Workspace',
     items: [
       { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
+      ...(assistantEnabled.value
+        ? [{ label: t('nav.assistant'), icon: 'i-lucide-sparkles', to: '/assistant' }]
+        : []),
       { label: t('nav.customers'), icon: 'i-lucide-users', to: '/customers' },
       { label: t('nav.quotes'), icon: 'i-lucide-file-pen', to: '/quotes' },
       { label: t('nav.invoices'), icon: 'i-lucide-file-text', to: '/invoices' },

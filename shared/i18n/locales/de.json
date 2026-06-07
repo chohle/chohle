@@ -19,7 +19,8 @@
     "finance": "Finanzen",
     "system": "System",
     "triage": "Triage",
-    "banking": "Bankabgleich"
+    "banking": "Bankabgleich",
+    "assistant": "Assistent"
   },
   "demo": {
     "notice": "Demo. Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
@@ -876,5 +877,32 @@
     "tabReview": "Zu prüfen",
     "tabImports": "Importe",
     "tabConfig": "Konfiguration"
+  },
+  "assistant": {
+    "title": "Assistent",
+    "subtitle": "Lies deine Daten und entwirf Kunden und Rechnungen. Du bestätigst jede Änderung.",
+    "name": "Assistent",
+    "you": "Du",
+    "placeholder": "Bitte mich, einen Kunden oder eine Rechnung zu erstellen...",
+    "send": "Senden",
+    "thinking": "Denkt nach...",
+    "reviewProposal": "Prüfe die vorgeschlagenen Änderungen unten und bestätige sie.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuch es erneut.",
+    "emptyState": "Frag mich etwas nach, oder lass mich einen Kunden oder eine Rechnung entwerfen.",
+    "suggest1": "Zeig meine Kunden",
+    "suggest2": "Erstelle einen Kunden: Müller Bau, Zürich",
+    "suggest3": "Rechne Café Zentral 8 Std. Beratung à 150",
+    "newCustomer": "Neuer Kunde",
+    "newInvoice": "Neue Rechnung (Entwurf)",
+    "approve": "Bestätigen",
+    "cancel": "Abbrechen",
+    "approved": "Bestätigt",
+    "cancelled": "Abgebrochen",
+    "createdCustomer": "Kunde {name} erstellt.",
+    "createdInvoice": "Rechnungsentwurf #{id} erstellt, vergib eine Nummer in den Rechnungen.",
+    "done": "Erledigt.",
+    "commitFailed": "Die Änderungen konnten nicht angewendet werden.",
+    "unavailable": "Der Assistent ist nicht aktiviert",
+    "disabledHint": "Setze CHOHLE_ASSISTANT=true und richte NUXT_LLM_BASE_URL auf ein lokales LLM, um ihn zu aktivieren. Siehe docs/ASSISTANT.md."
   }
 }

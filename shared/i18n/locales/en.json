@@ -19,7 +19,8 @@
     "finance": "Finance",
     "system": "System",
     "triage": "Triage",
-    "banking": "Bank reconciliation"
+    "banking": "Bank reconciliation",
+    "assistant": "Assistant"
   },
   "demo": {
     "notice": "Demo. Your changes stay private to your browser and reset when idle.",
@@ -876,5 +877,32 @@
     "tabReview": "Review",
     "tabImports": "Imports",
     "tabConfig": "Configuration"
+  },
+  "assistant": {
+    "title": "Assistant",
+    "subtitle": "Read your data and draft customers and invoices. You approve every change.",
+    "name": "Assistant",
+    "you": "You",
+    "placeholder": "Ask me to create a customer or an invoice...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "reviewProposal": "Review the proposed changes below and approve to apply them.",
+    "error": "Something went wrong. Please try again.",
+    "emptyState": "Ask me to look something up, or to draft a new customer or invoice.",
+    "suggest1": "List my customers",
+    "suggest2": "Create a customer: Müller Bau, Zürich",
+    "suggest3": "Invoice Café Zentral 8h consulting at 150",
+    "newCustomer": "New customer",
+    "newInvoice": "New invoice (draft)",
+    "approve": "Approve",
+    "cancel": "Cancel",
+    "approved": "Approved",
+    "cancelled": "Cancelled",
+    "createdCustomer": "Created customer {name}.",
+    "createdInvoice": "Created invoice draft #{id}, assign a number in the invoices page.",
+    "done": "Done.",
+    "commitFailed": "Could not apply the changes.",
+    "unavailable": "The assistant is not enabled",
+    "disabledHint": "Set CHOHLE_ASSISTANT=true and point NUXT_LLM_BASE_URL at a local LLM to turn it on. See docs/ASSISTANT.md."
   }
 }

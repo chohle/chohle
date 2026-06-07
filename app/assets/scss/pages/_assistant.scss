@@ -1,0 +1,175 @@
+.page-assistant {
+  display: flex;
+  flex-direction: column;
+  // Fill the viewport below the page head so the input pins to the bottom.
+  height: calc(100vh - 120px);
+
+  &__sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    .note {
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+  }
+
+  .asst-disabled {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px 18px;
+    margin-top: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+
+    &__title {
+      font-weight: 600;
+      margin: 0 0 2px;
+    }
+    .note {
+      font-size: 13px;
+      color: var(--ink-3);
+      margin: 0;
+    }
+  }
+
+  .asst-thread {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 16px 2px;
+  }
+
+  .asst-empty {
+    margin: auto;
+    max-width: 460px;
+    text-align: center;
+    color: var(--ink-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .asst-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    &__chip {
+      font-size: 12.5px;
+      color: var(--ink-2);
+      padding: 6px 12px;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      cursor: pointer;
+      background: none;
+      &:hover {
+        color: var(--ink);
+        border-color: var(--ink-3);
+      }
+    }
+  }
+
+  .asst-msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+
+    &.is-user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    &.is-assistant {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    &__meta {
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-bottom: 4px;
+    }
+    &__bubble {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    &.is-user &__bubble {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    &.is-assistant &__bubble {
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+    }
+  }
+
+  .asst-thinking {
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  .asst-proposals {
+    align-self: stretch;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .asst-card {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    background: var(--paper);
+    padding: 10px 14px;
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-2);
+      margin-bottom: 6px;
+    }
+    &__lines {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 13.5px;
+      color: var(--ink);
+    }
+  }
+  .asst-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .asst-state {
+    font-size: 12px;
+    color: var(--ink-2);
+    margin: 2px 0 0;
+  }
+
+  .asst-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px 0 4px;
+    border-top: 1px solid var(--rule);
+    background: var(--paper);
+
+    &__field {
+      flex: 1;
+    }
+  }
+}
