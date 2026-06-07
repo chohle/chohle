@@ -1,0 +1,56 @@
+// Update a document: title, content (TipTap JSON), and/or the attach toggle.
+interface Body {
+  title?: string
+  content?: unknown
+  attach?: boolean
+}
+
+// A persisted document only ever holds a TipTap "doc" node, so reject anything
+// that isn't shaped like one before storing it — otherwise a malformed body
+// would be saved and then blow up later when we render it to PDF.
+function isTipTapDoc(v: unknown): v is { type: 'doc'; content?: unknown[] } {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    (v as { type?: unknown }).type === 'doc' &&
+    (!('content' in v) || Array.isArray((v as { content?: unknown }).content))
+  )
+}
+
+export default defineEventHandler(async (event) => {
+  await requireUserSession(event)
+  const quoteId = Number(getRouterParam(event, 'id'))
+  const docId = Number(getRouterParam(event, 'docId'))
+  if (!Number.isInteger(quoteId) || quoteId <= 0 || !Number.isInteger(docId) || docId <= 0) {
+    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
+  }
+  const db = useDb()
+  const row = db
+    .prepare('SELECT id FROM quote_documents WHERE id = ? AND quote_id = ?')
+    .get(docId, quoteId)
+  if (!row) throw createError({ statusCode: 404, statusMessage: 'document not found' })
+
+  const body = (await readBody<Body>(event)) ?? {}
+  const sets: string[] = []
+  const vals: unknown[] = []
+  if (typeof body.title === 'string') {
+    sets.push('title = ?')
+    vals.push(body.title.trim() || 'Dokument')
+  }
+  if (body.content !== undefined) {
+    if (!isTipTapDoc(body.content)) {
+      throw createError({ statusCode: 400, statusMessage: 'invalid document content' })
+    }
+    sets.push('content = ?')
+    vals.push(JSON.stringify(body.content))
+  }
+  if (typeof body.attach === 'boolean') {
+    sets.push('attach = ?')
+    vals.push(body.attach ? 1 : 0)
+  }
+  if (!sets.length) return { ok: true }
+  sets.push("updated_at = datetime('now')")
+  vals.push(docId)
+  db.prepare(`UPDATE quote_documents SET ${sets.join(', ')} WHERE id = ?`).run(...vals)
+  return { ok: true }
+})

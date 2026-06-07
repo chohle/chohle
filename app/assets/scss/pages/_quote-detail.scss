@@ -92,9 +92,72 @@
     }
   }
 
+  // Optional sections (References, Documents): a clickable header toggles the
+  // body via v-show (display: a dead-simple, always-reliable show/hide), with a
+  // short fade/slide from the Vue <Transition name="qfold">. No height-animation
+  // guesswork, so it can't get stuck half-open.
+  .qfold {
+    margin-top: 8px;
+    border-top: 1px solid var(--rule);
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 2px;
+      background: none;
+      border: 0;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover .qfold__title {
+        color: var(--ink);
+      }
+    }
+    &__chev {
+      color: var(--ink-3);
+      transition: transform 0.2s ease;
+    }
+    &.is-open &__chev {
+      transform: rotate(90deg);
+    }
+    &__title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    &__opt {
+      font-size: 11px;
+      color: var(--ink-3);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      padding: 0 8px;
+    }
+    &__count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+
+    &__body {
+      padding-bottom: 4px;
+    }
+  }
+
+  // Fade + slide for the optional sections' show/hide (Vue <Transition>).
+  .qfold-enter-active,
+  .qfold-leave-active {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+  .qfold-enter-from,
+  .qfold-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
   .foot {
-    position: sticky;
-    bottom: 0;
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -107,5 +170,66 @@
   .warn {
     color: #b85a30;
     font-size: 13px;
+  }
+
+  // Attached documents (rendered to PDF and sent with the quote email).
+  .qdoc-intro {
+    margin: 0 0 10px;
+  }
+  .qdoc-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .qdoc {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+
+    &__name {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+      &:hover {
+        color: var(--ink);
+        text-decoration: underline;
+      }
+    }
+    &__actions {
+      display: flex;
+      gap: 4px;
+    }
+  }
+  .qdoc-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  // Reference / example links.
+  .qref-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .qref {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &__label {
+      flex: 0 0 220px;
+      min-width: 0;
+    }
+    &__url {
+      flex: 1;
+      min-width: 0;
+    }
   }
 }

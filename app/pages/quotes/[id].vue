@@ -18,12 +18,18 @@ interface ProjectMini {
 }
 interface ItemRow {
   article_id: number | null
+  article_name: string
   description: string
   quantity: number
   unit: string
   unit_price_rappen: number
   discount_percent: number
   mwst_percent: number
+}
+interface RefRow {
+  id?: number
+  label: string
+  url: string
 }
 interface Article {
   id: number
@@ -41,6 +47,7 @@ const toast = useToast()
 const { data, refresh } = await useFetch<{
   quote: QuoteRow
   items: ItemRow[]
+  references: RefRow[]
   project: ProjectMini | null
   convertedInvoice: { id: number; number: string } | null
 }>(`/api/quotes/${id}`)
@@ -102,6 +109,7 @@ const header = reactive({
 
 interface EditRow {
   articleId: number | null
+  articleName: string
   description: string
   quantity: number
   unit: string
@@ -112,6 +120,7 @@ interface EditRow {
 const items = ref<EditRow[]>(
   data.value!.items.map((i) => ({
     articleId: i.article_id,
+    articleName: i.article_name ?? '',
     description: i.description,
     quantity: i.quantity,
     unit: i.unit,
@@ -120,20 +129,25 @@ const items = ref<EditRow[]>(
     mwstPercent: i.mwst_percent
   }))
 )
-const articleItems = computed(() => articles.value.map((a) => ({ label: a.name, value: a.id })))
+// Article names as native datalist suggestions for the free-text article field.
+const articleNames = computed(() => articles.value.map((a) => a.name))
 
-function onArticleSelect(row: EditRow, articleId: number | null) {
-  row.articleId = articleId
-  const a = articles.value.find((x) => x.id === articleId)
+// When the typed article name exactly matches a saved article, remember the id
+// and autofill unit/price/VAT — but only the fields the user hasn't filled, so
+// a free-typed line is never clobbered.
+function onArticleName(row: EditRow) {
+  const name = row.articleName.trim()
+  const a = articles.value.find((x) => x.name.toLowerCase() === name.toLowerCase())
+  row.articleId = a?.id ?? null
   if (!a) return
-  row.description = a.name
-  row.unit = a.unit
-  row.unitPrice = a.default_price_rappen / 100
-  row.mwstPercent = a.default_mwst
+  if (!row.unit) row.unit = a.unit
+  if (!row.unitPrice) row.unitPrice = a.default_price_rappen / 100
+  if (vat.value && (!row.mwstPercent || row.mwstPercent === 8.1)) row.mwstPercent = a.default_mwst
 }
 function addRow() {
   items.value.push({
     articleId: null,
+    articleName: '',
     description: '',
     quantity: 1,
     unit: '',
@@ -141,6 +155,15 @@ function addRow() {
     discountPercent: 0,
     mwstPercent: 8.1
   })
+}
+
+// --- reference / example links -----------------------------------------------
+const references = ref<RefRow[]>((data.value!.references ?? []).map((r) => ({ ...r })))
+function addRef() {
+  references.value.push({ label: '', url: '' })
+}
+function removeRef(i: number) {
+  references.value.splice(i, 1)
 }
 function removeRow(i: number) {
   items.value.splice(i, 1)
@@ -162,7 +185,7 @@ const saving = ref(false)
 const confirmDelete = ref(false)
 
 function snapshot() {
-  return JSON.stringify({ ...header, items: items.value })
+  return JSON.stringify({ ...header, items: items.value, references: references.value })
 }
 const baseline = ref(snapshot())
 const dirty = computed(() => snapshot() !== baseline.value)
@@ -198,11 +221,14 @@ async function save() {
       body: {
         ...header,
         validUntil: header.validUntil || null,
-        items: items.value
+        items: items.value,
+        references: references.value
       }
     })
     baseline.value = snapshot()
     toast.add({ title: t('quotes.savedToast'), color: 'success' })
+  } catch {
+    toast.add({ title: t('quotes.saveFailed'), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -339,6 +365,128 @@ async function sendQuote() {
   }
 }
 
+// --- attached documents ------------------------------------------------------
+// Rich documents written in-app, rendered to PDF and attached when the quote is
+// emailed (see server/utils/documentPdf.ts).
+interface QuoteDoc {
+  id: number
+  title: string
+  content: Record<string, unknown>
+  kind: 'editor' | 'file'
+  file_name: string
+  mime: string
+  attach: number
+  updated_at: string
+}
+const { data: docsData, refresh: refreshDocs } = await useFetch<{ documents: QuoteDoc[] }>(
+  `/api/quotes/${id}/documents`,
+  { default: () => ({ documents: [] }) }
+)
+const documents = computed(() => docsData.value.documents)
+
+// Upload an existing file (PDF/DOCX/…) as a document.
+const docFileInput = ref<HTMLInputElement>()
+const docUploading = ref(false)
+async function onDocFile(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (docFileInput.value) docFileInput.value.value = ''
+  if (!file) return
+  docUploading.value = true
+  try {
+    const body = new FormData()
+    body.append('file', file)
+    await $fetch(`/api/quotes/${id}/documents/upload`, { method: 'POST', body })
+    await refreshDocs()
+    toast.add({ title: t('quotes.docSaved'), color: 'success' })
+  } catch (err) {
+    toast.add({
+      title: t('quotes.docUploadFailed'),
+      description: (err as { statusMessage?: string }).statusMessage,
+      color: 'error'
+    })
+  } finally {
+    docUploading.value = false
+  }
+}
+
+// Open/closed state for the optional sections — a plain ref the user controls
+// (NOT bound to content length, which would fight a manual collapse). Start
+// open when there's already something in the section.
+const refsOpen = ref(references.value.length > 0)
+const docsOpen = ref(documents.value.length > 0)
+
+const docEditor = reactive<{
+  open: boolean
+  id: number | null
+  title: string
+  content: Record<string, unknown>
+  saving: boolean
+}>({ open: false, id: null, title: '', content: { type: 'doc', content: [] }, saving: false })
+
+function openNewDoc() {
+  docEditor.id = null
+  docEditor.title = ''
+  docEditor.content = { type: 'doc', content: [] }
+  docEditor.open = true
+}
+function openDoc(d: QuoteDoc) {
+  docEditor.id = d.id
+  docEditor.title = d.title
+  docEditor.content = d.content ?? { type: 'doc', content: [] }
+  docEditor.open = true
+}
+async function saveDoc() {
+  if (!docEditor.title.trim()) {
+    toast.add({ title: t('quotes.docTitleRequired'), color: 'error' })
+    return
+  }
+  docEditor.saving = true
+  try {
+    if (docEditor.id) {
+      await $fetch(`/api/quotes/${id}/documents/${docEditor.id}`, {
+        method: 'PUT',
+        body: { title: docEditor.title.trim(), content: docEditor.content }
+      })
+    } else {
+      const { id: newId } = await $fetch<{ id: number }>(`/api/quotes/${id}/documents`, {
+        method: 'POST',
+        body: { title: docEditor.title.trim() }
+      })
+      await $fetch(`/api/quotes/${id}/documents/${newId}`, {
+        method: 'PUT',
+        body: { content: docEditor.content }
+      })
+    }
+    await refreshDocs()
+    docEditor.open = false
+    toast.add({ title: t('quotes.docSaved'), color: 'success' })
+  } catch {
+    toast.add({ title: t('quotes.docActionFailed'), color: 'error' })
+  } finally {
+    docEditor.saving = false
+  }
+}
+async function deleteDoc(d: QuoteDoc) {
+  try {
+    await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'DELETE' })
+    await refreshDocs()
+  } catch {
+    toast.add({ title: t('quotes.docActionFailed'), color: 'error' })
+  }
+}
+async function toggleAttach(d: QuoteDoc, value: boolean) {
+  try {
+    await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'PUT', body: { attach: value } })
+    await refreshDocs()
+  } catch {
+    toast.add({ title: t('quotes.docActionFailed'), color: 'error' })
+    await refreshDocs() // re-sync the checkbox to the server's truth
+  }
+}
+function previewDoc(d: QuoteDoc) {
+  window.open(`/api/quotes/${id}/documents/${d.id}/pdf`, '_blank')
+}
+
 const DIR_TO_SLUG: Record<'sales' | 'procurement', string> = {
   sales: 'sales',
   procurement: 'procurement'
@@ -470,11 +618,12 @@ const isExpired = computed(
           <div class="c-amt right">{{ $t('common.amount') }}</div>
         </div>
         <div v-for="(row, i) in items" :key="i" class="line-row">
-          <USelect
-            :model-value="row.articleId ?? undefined"
-            :items="articleItems"
+          <UInput
+            v-model="row.articleName"
+            list="qd-article-names"
+            :placeholder="$t('quotes.articlePlaceholder')"
             class="w-full"
-            @update:model-value="onArticleSelect(row, $event)"
+            @change="onArticleName(row)"
           />
           <UInput v-model="row.description" class="w-full" />
           <UInput v-model.number="row.quantity" type="number" step="0.01" class="w-full" />
@@ -500,6 +649,10 @@ const isExpired = computed(
             <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('invoices.addLine') }}
           </button>
         </div>
+        <!-- Native suggestions for the free-text article field. -->
+        <datalist id="qd-article-names">
+          <option v-for="n in articleNames" :key="n" :value="n" />
+        </datalist>
       </div>
     </UiCard>
 
@@ -519,6 +672,131 @@ const isExpired = computed(
         </div>
       </dl>
     </UiCard>
+
+    <div class="qfold" :class="{ 'is-open': refsOpen }">
+      <button type="button" class="qfold__head" @click="refsOpen = !refsOpen">
+        <UIcon name="i-lucide-chevron-right" class="qfold__chev" />
+        <span class="qfold__title">{{ $t('quotes.references') }}</span>
+        <span class="qfold__opt">{{ $t('common.optional') }}</span>
+        <span v-if="references.length" class="qfold__count mono">{{ references.length }}</span>
+      </button>
+      <Transition name="qfold">
+        <div v-show="refsOpen" class="qfold__body">
+          <UiCard>
+            <p class="qdoc-intro note">{{ $t('quotes.referencesHint') }}</p>
+            <div v-if="references.length" class="qref-list">
+              <div v-for="(r, i) in references" :key="i" class="qref">
+                <UInput
+                  v-model="r.label"
+                  :placeholder="$t('quotes.refLabelPlaceholder')"
+                  class="qref__label"
+                />
+                <UInput
+                  v-model="r.url"
+                  inputmode="url"
+                  :placeholder="$t('quotes.refUrlPlaceholder')"
+                  class="qref__url"
+                />
+                <button
+                  type="button"
+                  class="icon-btn"
+                  :aria-label="$t('common.delete')"
+                  @click="removeRef(i)"
+                >
+                  <UIcon name="i-lucide-x" />
+                </button>
+              </div>
+            </div>
+            <div class="qdoc-foot">
+              <button class="ed-btn" type="button" @click="addRef">
+                <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('quotes.refAdd') }}
+              </button>
+            </div>
+          </UiCard>
+        </div>
+      </Transition>
+    </div>
+
+    <div class="qfold" :class="{ 'is-open': docsOpen }">
+      <button type="button" class="qfold__head" @click="docsOpen = !docsOpen">
+        <UIcon name="i-lucide-chevron-right" class="qfold__chev" />
+        <span class="qfold__title">{{ $t('quotes.documents') }}</span>
+        <span class="qfold__opt">{{ $t('common.optional') }}</span>
+        <span v-if="documents.length" class="qfold__count mono">{{ documents.length }}</span>
+      </button>
+      <Transition name="qfold">
+        <div v-show="docsOpen" class="qfold__body">
+          <UiCard>
+            <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
+            <ul v-if="documents.length" class="qdoc-list">
+              <li v-for="d in documents" :key="d.id" class="qdoc">
+                <button
+                  type="button"
+                  class="qdoc__name"
+                  @click="d.kind === 'file' ? previewDoc(d) : openDoc(d)"
+                >
+                  <UIcon
+                    :name="d.kind === 'file' ? 'i-lucide-paperclip' : 'i-lucide-file-text'"
+                    class="size-3.5"
+                  />
+                  {{ d.title }}
+                </button>
+                <UCheckbox
+                  :model-value="!!d.attach"
+                  :label="$t('quotes.docAttach')"
+                  @update:model-value="toggleAttach(d, $event as boolean)"
+                />
+                <div class="qdoc__actions">
+                  <button
+                    class="icon-btn"
+                    type="button"
+                    :title="$t('quotes.docPreview')"
+                    :aria-label="$t('quotes.docPreview')"
+                    @click="previewDoc(d)"
+                  >
+                    <UIcon name="i-lucide-eye" />
+                  </button>
+                  <button
+                    class="icon-btn"
+                    type="button"
+                    :title="$t('common.delete')"
+                    :aria-label="$t('common.delete')"
+                    @click="deleteDoc(d)"
+                  >
+                    <UIcon name="i-lucide-trash-2" />
+                  </button>
+                </div>
+              </li>
+            </ul>
+            <div class="qdoc-foot">
+              <button class="ed-btn" type="button" @click="openNewDoc">
+                <UIcon name="i-lucide-pen-line" class="size-3.5" /> {{ $t('quotes.docWrite') }}
+              </button>
+              <button
+                class="ed-btn"
+                type="button"
+                :disabled="docUploading"
+                @click="docFileInput?.click()"
+              >
+                <UIcon
+                  :name="docUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
+                  class="size-3.5"
+                  :class="{ 'animate-spin': docUploading }"
+                />
+                {{ $t('quotes.docUpload') }}
+              </button>
+              <input
+                ref="docFileInput"
+                type="file"
+                accept=".pdf,.docx,.doc,.odt,.rtf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.oasis.opendocument.text,application/rtf"
+                class="hidden"
+                @change="onDocFile"
+              />
+            </div>
+          </UiCard>
+        </div>
+      </Transition>
+    </div>
 
     <div class="foot">
       <button class="ed-btn-ghost" :disabled="saving" @click="save">
@@ -663,5 +941,57 @@ const isExpired = computed(
         </button>
       </template>
     </UModal>
+
+    <USlideover
+      v-model:open="docEditor.open"
+      :title="docEditor.id ? $t('quotes.docEdit') : $t('quotes.docNew')"
+      :ui="{ content: 'max-w-full sm:max-w-3xl' }"
+    >
+      <template #body>
+        <div class="flex flex-col gap-4">
+          <UFormField :label="$t('quotes.docTitle')">
+            <UInput
+              v-model="docEditor.title"
+              :placeholder="$t('quotes.docTitlePlaceholder')"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField :label="$t('quotes.docContent')">
+            <ClientOnly>
+              <UEditor
+                v-model="docEditor.content"
+                content-type="json"
+                :extensions="emailEditorExtensions"
+                :handlers="emailEditorHandlers"
+                class="email-editor email-editor--tall"
+              >
+                <template #default="{ editor }">
+                  <UEditorToolbar
+                    :editor="editor"
+                    :items="emailEditorItems"
+                    class="email-editor__toolbar flex-wrap"
+                  >
+                    <template #link><EditorLinkPopover :editor="editor" /></template>
+                  </UEditorToolbar>
+                </template>
+              </UEditor>
+              <template #fallback>
+                <div class="email-editor email-editor--tall email-editor--fallback" />
+              </template>
+            </ClientOnly>
+          </UFormField>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <button class="ed-btn-ghost" @click="docEditor.open = false">
+            {{ $t('common.cancel') }}
+          </button>
+          <button class="ed-btn-primary" :disabled="docEditor.saving" @click="saveDoc">
+            {{ $t('common.save') }}
+          </button>
+        </div>
+      </template>
+    </USlideover>
   </div>
 </template>

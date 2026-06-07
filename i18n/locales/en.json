@@ -109,7 +109,32 @@
     "noProject": "No project link",
     "openInvoice": "Open invoice",
     "convertFailed": "Could not convert the quote",
-    "sendFailed": "Could not send the quote"
+    "sendFailed": "Could not send the quote",
+    "documents": "Documents",
+    "documentsHint": "Write a document (cover letter, detailed proposal, …). Attached ones are sent as PDFs with the quote email.",
+    "docNew": "New document",
+    "docEdit": "Edit document",
+    "docAttach": "Attach to email",
+    "docPreview": "Preview",
+    "docTitle": "Title",
+    "docTitlePlaceholder": "e.g. Detailed description",
+    "docContent": "Content",
+    "docSaved": "Document saved",
+    "docTitleRequired": "Give the document a title",
+    "articlePlaceholder": "Your article",
+    "references": "References / examples",
+    "referencesHint": "Links to past work or examples, shown on the quote PDF.",
+    "refAdd": "Add link",
+    "refLabelPlaceholder": "Label (e.g. Website XY)",
+    "refUrlPlaceholder": "https://…",
+    "docWrite": "Write",
+    "docUpload": "Upload file",
+    "docUploadFailed": "Upload failed",
+    "saveFailed": "Could not save the quote",
+    "docActionFailed": "Could not update the document",
+    "tabDetails": "Quote",
+    "tabReferences": "References",
+    "tabDocuments": "Documents"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -700,7 +725,8 @@
     "amount": "Amount",
     "sumInChf": "Total in CHF",
     "vatLine": "VAT {rate} % excl.",
-    "quoteAmountChf": "Quote amount CHF"
+    "quoteAmountChf": "Quote amount CHF",
+    "referencesTitle": "References"
   },
   "invoiceDoc": {
     "invoice": "Invoice",
@@ -754,7 +780,8 @@
     "vat": "VAT",
     "username": "Username",
     "password": "Password",
-    "delete": "Delete"
+    "delete": "Delete",
+    "optional": "Optional"
   },
   "triage": {
     "title": "Triage",

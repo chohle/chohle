@@ -159,7 +159,32 @@
     "noProject": "Nessun progetto collegato",
     "openInvoice": "Apri fattura",
     "convertFailed": "Impossibile convertire l'offerta",
-    "sendFailed": "Impossibile inviare l'offerta"
+    "sendFailed": "Impossibile inviare l'offerta",
+    "documents": "Documenti",
+    "documentsHint": "Scrivi un documento (lettera di accompagnamento, proposta dettagliata, …). Quelli allegati vengono inviati in PDF con l’e-mail dell’offerta.",
+    "docNew": "Nuovo documento",
+    "docEdit": "Modifica documento",
+    "docAttach": "Allega all’e-mail",
+    "docPreview": "Anteprima",
+    "docTitle": "Titolo",
+    "docTitlePlaceholder": "es. Descrizione dettagliata",
+    "docContent": "Contenuto",
+    "docSaved": "Documento salvato",
+    "docTitleRequired": "Assegna un titolo al documento",
+    "articlePlaceholder": "Articolo personalizzato",
+    "references": "Riferimenti / esempi",
+    "referencesHint": "Link a lavori o esempi precedenti, mostrati nel PDF dell’offerta.",
+    "refAdd": "Aggiungi link",
+    "refLabelPlaceholder": "Etichetta (es. Sito XY)",
+    "refUrlPlaceholder": "https://…",
+    "docWrite": "Scrivi",
+    "docUpload": "Carica file",
+    "docUploadFailed": "Caricamento non riuscito",
+    "saveFailed": "Impossibile salvare l'offerta",
+    "docActionFailed": "Impossibile aggiornare il documento",
+    "tabDetails": "Offerta",
+    "tabReferences": "Riferimenti",
+    "tabDocuments": "Documenti"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -700,7 +725,8 @@
     "amount": "Importo",
     "sumInChf": "Totale in CHF",
     "vatLine": "IVA {rate} % escl.",
-    "quoteAmountChf": "Importo offerta CHF"
+    "quoteAmountChf": "Importo offerta CHF",
+    "referencesTitle": "Riferimenti"
   },
   "invoiceDoc": {
     "invoice": "Fattura",
@@ -754,7 +780,8 @@
     "vat": "IVA",
     "username": "Nome utente",
     "password": "Password",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "optional": "Facoltativo"
   },
   "triage": {
     "title": "Triage",

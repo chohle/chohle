@@ -18,9 +18,12 @@ useHead({ title: () => props.docTitle ?? props.title })
       <h1 class="page-head__title">
         <slot name="title">{{ title }}</slot>
       </h1>
-      <p v-if="subtitle || $slots.subtitle" class="page-head__sub">
+      <!-- A div, not a p: subtitle slots can contain block content (chips,
+           links, flex rows). A <div> inside a <p> is invalid HTML — the browser
+           hoists it out, which breaks SSR hydration. -->
+      <div v-if="subtitle || $slots.subtitle" class="page-head__sub">
         <slot name="subtitle">{{ subtitle }}</slot>
-      </p>
+      </div>
     </div>
     <div v-if="$slots.actions" class="page-head__actions">
       <slot name="actions" />

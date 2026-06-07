@@ -775,6 +775,90 @@ const migrations: Migration[] = [
       );
       CREATE UNIQUE INDEX idx_bank_conn_iban ON bank_connections(iban);
     `
+  },
+  {
+    name: '0041_quote_documents',
+    // Free-form rich documents attached to a quote (cover letter, detailed
+    // proposal, scope, …) written in-app and rendered to PDF as email
+    // attachments. `content` is TipTap JSON; `attach` toggles whether it's
+    // included when the quote is emailed.
+    up: `
+      CREATE TABLE quote_documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        title TEXT NOT NULL DEFAULT '',
+        content TEXT NOT NULL DEFAULT '',
+        attach INTEGER NOT NULL DEFAULT 1,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX idx_quote_documents_quote ON quote_documents (quote_id, sort_order);
+    `
+  },
+  {
+    name: '0042_quote_item_article_name',
+    // Quotes allow a free-typed article name per line (not tied to the saved
+    // article catalog). article_id stays for autofill convenience but is no
+    // longer required.
+    up: `ALTER TABLE quote_items ADD COLUMN article_name TEXT NOT NULL DEFAULT '';`
+  },
+  {
+    name: '0043_quote_references',
+    // Reference / example links shown on a quote (e.g. links to past work),
+    // rendered into the quote PDF. Replaced wholesale on each quote save.
+    up: `
+      CREATE TABLE quote_references (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        label TEXT NOT NULL DEFAULT '',
+        url TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0
+      );
+      CREATE INDEX idx_quote_references_quote ON quote_references (quote_id, sort_order);
+    `
+  },
+  {
+    name: '0044_quote_document_files',
+    // A quote document is either editor-written (kind='editor', rendered from
+    // `content`) or an uploaded file (kind='file': PDF/DOCX/… attached as-is).
+    up: `
+      ALTER TABLE quote_documents ADD COLUMN kind TEXT NOT NULL DEFAULT 'editor';
+      ALTER TABLE quote_documents ADD COLUMN file_name TEXT NOT NULL DEFAULT '';
+      ALTER TABLE quote_documents ADD COLUMN file_path TEXT NOT NULL DEFAULT '';
+      ALTER TABLE quote_documents ADD COLUMN mime TEXT NOT NULL DEFAULT '';
+    `
+  },
+  {
+    name: '0045_quote_documents_checks',
+    // Lock the two discriminator columns to their valid values at the DB level
+    // (defence in depth — the app already only writes these). SQLite can't add
+    // a CHECK to an existing column, so rebuild the table and copy the rows.
+    up: `
+      CREATE TABLE quote_documents_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        title TEXT NOT NULL DEFAULT '',
+        content TEXT NOT NULL DEFAULT '',
+        attach INTEGER NOT NULL DEFAULT 1 CHECK (attach IN (0, 1)),
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        kind TEXT NOT NULL DEFAULT 'editor' CHECK (kind IN ('editor', 'file')),
+        file_name TEXT NOT NULL DEFAULT '',
+        file_path TEXT NOT NULL DEFAULT '',
+        mime TEXT NOT NULL DEFAULT ''
+      );
+      INSERT INTO quote_documents_new
+        (id, quote_id, title, content, attach, sort_order, created_at, updated_at,
+         kind, file_name, file_path, mime)
+        SELECT id, quote_id, title, content, attach, sort_order, created_at, updated_at,
+         kind, file_name, file_path, mime
+        FROM quote_documents;
+      DROP TABLE quote_documents;
+      ALTER TABLE quote_documents_new RENAME TO quote_documents;
+      CREATE INDEX idx_quote_documents_quote ON quote_documents (quote_id, sort_order);
+    `
   }
 ]
 

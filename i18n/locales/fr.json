@@ -159,7 +159,32 @@
     "noProject": "Aucun projet lié",
     "openInvoice": "Ouvrir la facture",
     "convertFailed": "Impossible de convertir le devis",
-    "sendFailed": "Impossible d'envoyer le devis"
+    "sendFailed": "Impossible d'envoyer le devis",
+    "documents": "Documents",
+    "documentsHint": "Rédigez un document (lettre d’accompagnement, proposition détaillée, …). Les documents joints sont envoyés en PDF avec l’e-mail de l’offre.",
+    "docNew": "Nouveau document",
+    "docEdit": "Modifier le document",
+    "docAttach": "Joindre à l’e-mail",
+    "docPreview": "Aperçu",
+    "docTitle": "Titre",
+    "docTitlePlaceholder": "p. ex. Description détaillée",
+    "docContent": "Contenu",
+    "docSaved": "Document enregistré",
+    "docTitleRequired": "Donnez un titre au document",
+    "articlePlaceholder": "Votre article",
+    "references": "Références / exemples",
+    "referencesHint": "Liens vers des travaux ou exemples passés, affichés sur le PDF de l’offre.",
+    "refAdd": "Ajouter un lien",
+    "refLabelPlaceholder": "Libellé (p. ex. Site XY)",
+    "refUrlPlaceholder": "https://…",
+    "docWrite": "Rédiger",
+    "docUpload": "Téléverser un fichier",
+    "docUploadFailed": "Échec du téléversement",
+    "saveFailed": "Le devis n'a pas pu être enregistré",
+    "docActionFailed": "Le document n'a pas pu être mis à jour",
+    "tabDetails": "Offre",
+    "tabReferences": "Références",
+    "tabDocuments": "Documents"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -700,7 +725,8 @@
     "amount": "Montant",
     "sumInChf": "Total en CHF",
     "vatLine": "TVA {rate} % en sus",
-    "quoteAmountChf": "Montant du devis CHF"
+    "quoteAmountChf": "Montant du devis CHF",
+    "referencesTitle": "Références"
   },
   "invoiceDoc": {
     "invoice": "Facture",
@@ -754,7 +780,8 @@
     "vat": "TVA",
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "optional": "Facultatif"
   },
   "triage": {
     "title": "Triage",

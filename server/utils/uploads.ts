@@ -32,13 +32,28 @@ export const ALLOWED_RECEIPT_TYPES = [
 // from the app's own origin. Raster formats cover the logo use case.
 export const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif']
 
+// Document files a user can attach to a quote alongside editor-written ones —
+// for when Word/Google-Docs layouts can't be reproduced in the in-app editor.
+export const ALLOWED_DOC_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
+  'application/msword', // doc
+  'application/vnd.oasis.opendocument.text', // odt
+  'application/rtf',
+  'text/rtf'
+]
+
 const CONTENT_TYPES: Record<string, string> = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.gif': 'image/gif',
-  '.pdf': 'application/pdf'
+  '.pdf': 'application/pdf',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.doc': 'application/msword',
+  '.odt': 'application/vnd.oasis.opendocument.text',
+  '.rtf': 'application/rtf'
 }
 
 // The 8-byte PNG signature. Used to confirm a file claiming to be a PNG really
@@ -69,6 +84,57 @@ export async function saveImageUpload(
   const storedName = `${randomUUID()}${extname(file.filename!)}`
   await writeFile(join(uploadsDir(), storedName), file.data)
   return storedName
+}
+
+// Strip characters a filename must never carry into storage or an HTTP header:
+// CR/LF and control chars (header injection), plus quotes/backslashes. Collapses
+// whitespace and falls back to a default when nothing usable is left.
+export function sanitizeFilename(name: string | null | undefined, fallback = 'Dokument'): string {
+  const cleaned = (name ?? '')
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001f\u007f"\\]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return cleaned || fallback
+}
+
+// Build a header-injection-safe Content-Disposition value. The quoted filename
+// is reduced to plain ASCII; a filename* (RFC 5987) carries the full UTF-8 name
+// for clients that support it.
+export function contentDisposition(
+  filename: string,
+  type: 'inline' | 'attachment' = 'attachment'
+): string {
+  const base = sanitizeFilename(filename, 'file')
+  // eslint-disable-next-line no-control-regex
+  const ascii = base.replace(/[^\x20-\x7e]/g, '_') || 'file'
+  return `${type}; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(base)}`
+}
+
+const MAX_DOC_BYTES = 25 * 1024 * 1024
+
+// Save an uploaded document (PDF/DOCX/…) to the private uploads dir. Returns the
+// stored name, the original filename (for the email attachment), and the mime.
+export async function saveDocumentUpload(
+  event: H3Event
+): Promise<{ storedName: string; originalName: string; mime: string }> {
+  const parts = await readMultipartFormData(event)
+  const file = (parts ?? []).find((p) => p.filename && p.data?.length)
+  if (!file) {
+    throw createError({ statusCode: 400, statusMessage: 'No file' })
+  }
+  const mime = file.type ?? ''
+  if (!ALLOWED_DOC_TYPES.includes(mime)) {
+    throw createError({ statusCode: 415, statusMessage: `Unsupported document type: ${mime}` })
+  }
+  if (file.data.length > MAX_DOC_BYTES) {
+    throw createError({ statusCode: 413, statusMessage: 'Document too large (max 25 MB)' })
+  }
+  const storedName = `${randomUUID()}${extname(file.filename!)}`
+  await writeFile(join(uploadsDir(), storedName), file.data)
+  // Sanitize the client-supplied name now so the stored value (used later as the
+  // email attachment name and in Content-Disposition) can't carry control chars.
+  return { storedName, originalName: sanitizeFilename(basename(file.filename!)), mime }
 }
 
 // Read a stored upload into a buffer for embedding (e.g. the sender logo in the
