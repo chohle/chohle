@@ -407,6 +407,12 @@ async function onDocFile(e: Event) {
   }
 }
 
+// Open/closed state for the optional sections — a plain ref the user controls
+// (NOT bound to content length, which would fight a manual collapse). Start
+// open when there's already something in the section.
+const refsOpen = ref(references.value.length > 0)
+const docsOpen = ref(documents.value.length > 0)
+
 const docEditor = reactive<{
   open: boolean
   id: number | null
@@ -654,122 +660,130 @@ const isExpired = computed(
       </dl>
     </UiCard>
 
-    <details class="qfold" :open="references.length > 0">
-      <summary class="qfold__head">
+    <div class="qfold" :class="{ 'is-open': refsOpen }">
+      <button type="button" class="qfold__head" @click="refsOpen = !refsOpen">
         <UIcon name="i-lucide-chevron-right" class="qfold__chev" />
         <span class="qfold__title">{{ $t('quotes.references') }}</span>
         <span class="qfold__opt">{{ $t('common.optional') }}</span>
         <span v-if="references.length" class="qfold__count mono">{{ references.length }}</span>
-      </summary>
-      <UiCard>
-        <p class="qdoc-intro note">{{ $t('quotes.referencesHint') }}</p>
-        <div v-if="references.length" class="qref-list">
-          <div v-for="(r, i) in references" :key="i" class="qref">
-            <UInput
-              v-model="r.label"
-              :placeholder="$t('quotes.refLabelPlaceholder')"
-              class="qref__label"
-            />
-            <UInput
-              v-model="r.url"
-              inputmode="url"
-              :placeholder="$t('quotes.refUrlPlaceholder')"
-              class="qref__url"
-            />
-            <button
-              type="button"
-              class="icon-btn"
-              :aria-label="$t('common.delete')"
-              @click="removeRef(i)"
-            >
-              <UIcon name="i-lucide-x" />
-            </button>
-          </div>
+      </button>
+      <div class="qfold__wrap">
+        <div class="qfold__body">
+          <UiCard>
+            <p class="qdoc-intro note">{{ $t('quotes.referencesHint') }}</p>
+            <div v-if="references.length" class="qref-list">
+              <div v-for="(r, i) in references" :key="i" class="qref">
+                <UInput
+                  v-model="r.label"
+                  :placeholder="$t('quotes.refLabelPlaceholder')"
+                  class="qref__label"
+                />
+                <UInput
+                  v-model="r.url"
+                  inputmode="url"
+                  :placeholder="$t('quotes.refUrlPlaceholder')"
+                  class="qref__url"
+                />
+                <button
+                  type="button"
+                  class="icon-btn"
+                  :aria-label="$t('common.delete')"
+                  @click="removeRef(i)"
+                >
+                  <UIcon name="i-lucide-x" />
+                </button>
+              </div>
+            </div>
+            <div class="qdoc-foot">
+              <button class="ed-btn" type="button" @click="addRef">
+                <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('quotes.refAdd') }}
+              </button>
+            </div>
+          </UiCard>
         </div>
-        <div class="qdoc-foot">
-          <button class="ed-btn" type="button" @click="addRef">
-            <UIcon name="i-lucide-plus" class="size-3.5" /> {{ $t('quotes.refAdd') }}
-          </button>
-        </div>
-      </UiCard>
-    </details>
+      </div>
+    </div>
 
-    <details class="qfold" :open="documents.length > 0">
-      <summary class="qfold__head">
+    <div class="qfold" :class="{ 'is-open': docsOpen }">
+      <button type="button" class="qfold__head" @click="docsOpen = !docsOpen">
         <UIcon name="i-lucide-chevron-right" class="qfold__chev" />
         <span class="qfold__title">{{ $t('quotes.documents') }}</span>
         <span class="qfold__opt">{{ $t('common.optional') }}</span>
         <span v-if="documents.length" class="qfold__count mono">{{ documents.length }}</span>
-      </summary>
-      <UiCard>
-        <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
-        <ul v-if="documents.length" class="qdoc-list">
-          <li v-for="d in documents" :key="d.id" class="qdoc">
-            <button
-              type="button"
-              class="qdoc__name"
-              @click="d.kind === 'file' ? previewDoc(d) : openDoc(d)"
-            >
-              <UIcon
-                :name="d.kind === 'file' ? 'i-lucide-paperclip' : 'i-lucide-file-text'"
-                class="size-3.5"
+      </button>
+      <div class="qfold__wrap">
+        <div class="qfold__body">
+          <UiCard>
+            <p class="qdoc-intro note">{{ $t('quotes.documentsHint') }}</p>
+            <ul v-if="documents.length" class="qdoc-list">
+              <li v-for="d in documents" :key="d.id" class="qdoc">
+                <button
+                  type="button"
+                  class="qdoc__name"
+                  @click="d.kind === 'file' ? previewDoc(d) : openDoc(d)"
+                >
+                  <UIcon
+                    :name="d.kind === 'file' ? 'i-lucide-paperclip' : 'i-lucide-file-text'"
+                    class="size-3.5"
+                  />
+                  {{ d.title }}
+                </button>
+                <UCheckbox
+                  :model-value="!!d.attach"
+                  :label="$t('quotes.docAttach')"
+                  @update:model-value="toggleAttach(d, $event as boolean)"
+                />
+                <div class="qdoc__actions">
+                  <button
+                    class="icon-btn"
+                    type="button"
+                    :title="$t('quotes.docPreview')"
+                    :aria-label="$t('quotes.docPreview')"
+                    @click="previewDoc(d)"
+                  >
+                    <UIcon name="i-lucide-eye" />
+                  </button>
+                  <button
+                    class="icon-btn"
+                    type="button"
+                    :title="$t('common.delete')"
+                    :aria-label="$t('common.delete')"
+                    @click="deleteDoc(d)"
+                  >
+                    <UIcon name="i-lucide-trash-2" />
+                  </button>
+                </div>
+              </li>
+            </ul>
+            <div class="qdoc-foot">
+              <button class="ed-btn" type="button" @click="openNewDoc">
+                <UIcon name="i-lucide-pen-line" class="size-3.5" /> {{ $t('quotes.docWrite') }}
+              </button>
+              <button
+                class="ed-btn"
+                type="button"
+                :disabled="docUploading"
+                @click="docFileInput?.click()"
+              >
+                <UIcon
+                  :name="docUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
+                  class="size-3.5"
+                  :class="{ 'animate-spin': docUploading }"
+                />
+                {{ $t('quotes.docUpload') }}
+              </button>
+              <input
+                ref="docFileInput"
+                type="file"
+                accept=".pdf,.docx,.doc,.odt,.rtf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.oasis.opendocument.text,application/rtf"
+                class="hidden"
+                @change="onDocFile"
               />
-              {{ d.title }}
-            </button>
-            <UCheckbox
-              :model-value="!!d.attach"
-              :label="$t('quotes.docAttach')"
-              @update:model-value="toggleAttach(d, $event as boolean)"
-            />
-            <div class="qdoc__actions">
-              <button
-                class="icon-btn"
-                type="button"
-                :title="$t('quotes.docPreview')"
-                :aria-label="$t('quotes.docPreview')"
-                @click="previewDoc(d)"
-              >
-                <UIcon name="i-lucide-eye" />
-              </button>
-              <button
-                class="icon-btn"
-                type="button"
-                :title="$t('common.delete')"
-                :aria-label="$t('common.delete')"
-                @click="deleteDoc(d)"
-              >
-                <UIcon name="i-lucide-trash-2" />
-              </button>
             </div>
-          </li>
-        </ul>
-        <div class="qdoc-foot">
-          <button class="ed-btn" type="button" @click="openNewDoc">
-            <UIcon name="i-lucide-pen-line" class="size-3.5" /> {{ $t('quotes.docWrite') }}
-          </button>
-          <button
-            class="ed-btn"
-            type="button"
-            :disabled="docUploading"
-            @click="docFileInput?.click()"
-          >
-            <UIcon
-              :name="docUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
-              class="size-3.5"
-              :class="{ 'animate-spin': docUploading }"
-            />
-            {{ $t('quotes.docUpload') }}
-          </button>
-          <input
-            ref="docFileInput"
-            type="file"
-            accept=".pdf,.docx,.doc,.odt,.rtf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.oasis.opendocument.text,application/rtf"
-            class="hidden"
-            @change="onDocFile"
-          />
+          </UiCard>
         </div>
-      </UiCard>
-    </details>
+      </div>
+    </div>
 
     <div class="foot">
       <button class="ed-btn-ghost" :disabled="saving" @click="save">
