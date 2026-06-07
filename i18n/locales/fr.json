@@ -180,6 +180,8 @@
     "docWrite": "Rédiger",
     "docUpload": "Téléverser un fichier",
     "docUploadFailed": "Échec du téléversement",
+    "saveFailed": "Le devis n'a pas pu être enregistré",
+    "docActionFailed": "Le document n'a pas pu être mis à jour",
     "tabDetails": "Offre",
     "tabReferences": "Références",
     "tabDocuments": "Documents"

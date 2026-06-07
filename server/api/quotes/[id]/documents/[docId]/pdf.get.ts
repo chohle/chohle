@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   await requireUserSession(event)
   const quoteId = Number(getRouterParam(event, 'id'))
   const docId = Number(getRouterParam(event, 'docId'))
-  if (!Number.isInteger(quoteId) || !Number.isInteger(docId)) {
+  if (!Number.isInteger(quoteId) || quoteId <= 0 || !Number.isInteger(docId) || docId <= 0) {
     throw createError({ statusCode: 400, statusMessage: 'invalid id' })
   }
   const out = await quoteDocumentAttachment(useDb(), docId, quoteId)

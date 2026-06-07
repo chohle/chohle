@@ -828,6 +828,37 @@ const migrations: Migration[] = [
       ALTER TABLE quote_documents ADD COLUMN file_path TEXT NOT NULL DEFAULT '';
       ALTER TABLE quote_documents ADD COLUMN mime TEXT NOT NULL DEFAULT '';
     `
+  },
+  {
+    name: '0045_quote_documents_checks',
+    // Lock the two discriminator columns to their valid values at the DB level
+    // (defence in depth — the app already only writes these). SQLite can't add
+    // a CHECK to an existing column, so rebuild the table and copy the rows.
+    up: `
+      CREATE TABLE quote_documents_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+        title TEXT NOT NULL DEFAULT '',
+        content TEXT NOT NULL DEFAULT '',
+        attach INTEGER NOT NULL DEFAULT 1 CHECK (attach IN (0, 1)),
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+        kind TEXT NOT NULL DEFAULT 'editor' CHECK (kind IN ('editor', 'file')),
+        file_name TEXT NOT NULL DEFAULT '',
+        file_path TEXT NOT NULL DEFAULT '',
+        mime TEXT NOT NULL DEFAULT ''
+      );
+      INSERT INTO quote_documents_new
+        (id, quote_id, title, content, attach, sort_order, created_at, updated_at,
+         kind, file_name, file_path, mime)
+        SELECT id, quote_id, title, content, attach, sort_order, created_at, updated_at,
+         kind, file_name, file_path, mime
+        FROM quote_documents;
+      DROP TABLE quote_documents;
+      ALTER TABLE quote_documents_new RENAME TO quote_documents;
+      CREATE INDEX idx_quote_documents_quote ON quote_documents (quote_id, sort_order);
+    `
   }
 ]
 

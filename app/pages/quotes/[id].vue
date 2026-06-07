@@ -227,6 +227,8 @@ async function save() {
     })
     baseline.value = snapshot()
     toast.add({ title: t('quotes.savedToast'), color: 'success' })
+  } catch {
+    toast.add({ title: t('quotes.saveFailed'), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -458,17 +460,28 @@ async function saveDoc() {
     await refreshDocs()
     docEditor.open = false
     toast.add({ title: t('quotes.docSaved'), color: 'success' })
+  } catch {
+    toast.add({ title: t('quotes.docActionFailed'), color: 'error' })
   } finally {
     docEditor.saving = false
   }
 }
 async function deleteDoc(d: QuoteDoc) {
-  await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'DELETE' })
-  await refreshDocs()
+  try {
+    await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'DELETE' })
+    await refreshDocs()
+  } catch {
+    toast.add({ title: t('quotes.docActionFailed'), color: 'error' })
+  }
 }
 async function toggleAttach(d: QuoteDoc, value: boolean) {
-  await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'PUT', body: { attach: value } })
-  await refreshDocs()
+  try {
+    await $fetch(`/api/quotes/${id}/documents/${d.id}`, { method: 'PUT', body: { attach: value } })
+    await refreshDocs()
+  } catch {
+    toast.add({ title: t('quotes.docActionFailed'), color: 'error' })
+    await refreshDocs() // re-sync the checkbox to the server's truth
+  }
 }
 function previewDoc(d: QuoteDoc) {
   window.open(`/api/quotes/${id}/documents/${d.id}/pdf`, '_blank')

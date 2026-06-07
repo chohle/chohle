@@ -130,6 +130,8 @@
     "docWrite": "Write",
     "docUpload": "Upload file",
     "docUploadFailed": "Upload failed",
+    "saveFailed": "Could not save the quote",
+    "docActionFailed": "Could not update the document",
     "tabDetails": "Quote",
     "tabReferences": "References",
     "tabDocuments": "Documents"

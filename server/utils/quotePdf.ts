@@ -4,6 +4,7 @@ import deLocale from '../../i18n/locales/de.json'
 import frLocale from '../../i18n/locales/fr.json'
 import itLocale from '../../i18n/locales/it.json'
 import { readUpload } from './uploads'
+import { safeHref } from './documentPdf'
 
 // Quote (Offerte / Devis / Offerta) PDF. Near twin of invoicePdf.ts
 // minus the Swiss QR-bill: quotes aren't payment instruments, so the
@@ -269,13 +270,18 @@ export async function generateQuotePdf(id: number): Promise<Buffer> {
     for (const r of references) {
       const label = (r.label || '').trim()
       const url = (r.url || '').trim()
+      // Only make http(s)/mailto URLs clickable; anything else prints as plain
+      // text so a javascript:/data: URL can't end up as a live PDF link.
+      const link = safeHref(url)
       pdf.font('Helvetica').fontSize(9)
       if (label) {
         pdf.fillColor('#000').text(`${label}: `, 50, y, { continued: true })
       } else {
         pdf.text('', 50, y, { continued: true })
       }
-      pdf.fillColor('#3458d6').text(url, { link: url || undefined, underline: !!url })
+      pdf
+        .fillColor(link ? '#3458d6' : '#000')
+        .text(url, { link: link ?? undefined, underline: !!link })
       y = pdf.y + 3
     }
     pdf.fillColor('#000')

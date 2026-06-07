@@ -5,11 +5,23 @@ interface Body {
   attach?: boolean
 }
 
+// A persisted document only ever holds a TipTap "doc" node, so reject anything
+// that isn't shaped like one before storing it — otherwise a malformed body
+// would be saved and then blow up later when we render it to PDF.
+function isTipTapDoc(v: unknown): v is { type: 'doc'; content?: unknown[] } {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    (v as { type?: unknown }).type === 'doc' &&
+    (!('content' in v) || Array.isArray((v as { content?: unknown }).content))
+  )
+}
+
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
   const quoteId = Number(getRouterParam(event, 'id'))
   const docId = Number(getRouterParam(event, 'docId'))
-  if (!Number.isInteger(quoteId) || !Number.isInteger(docId)) {
+  if (!Number.isInteger(quoteId) || quoteId <= 0 || !Number.isInteger(docId) || docId <= 0) {
     throw createError({ statusCode: 400, statusMessage: 'invalid id' })
   }
   const db = useDb()
@@ -18,7 +30,7 @@ export default defineEventHandler(async (event) => {
     .get(docId, quoteId)
   if (!row) throw createError({ statusCode: 404, statusMessage: 'document not found' })
 
-  const body = await readBody<Body>(event)
+  const body = (await readBody<Body>(event)) ?? {}
   const sets: string[] = []
   const vals: unknown[] = []
   if (typeof body.title === 'string') {
@@ -26,6 +38,9 @@ export default defineEventHandler(async (event) => {
     vals.push(body.title.trim() || 'Dokument')
   }
   if (body.content !== undefined) {
+    if (!isTipTapDoc(body.content)) {
+      throw createError({ statusCode: 400, statusMessage: 'invalid document content' })
+    }
     sets.push('content = ?')
     vals.push(JSON.stringify(body.content))
   }

@@ -42,14 +42,22 @@ export interface DocSender {
 const PAGE = { margin: 50, width: 595.28, height: 841.89 } // A4 in pt
 const CONTENT_W = PAGE.width - PAGE.margin * 2
 
+// True if the inline run carries the given TipTap mark (bold, italic, …).
 function hasMark(marks: TipTapMark[] | undefined, type: string): boolean {
   return !!marks?.some((m) => m.type === type)
 }
+// Only emit http(s)/mailto links into the PDF. A user-authored document could
+// carry a javascript:/data: href; keep those out of the generated file.
+export function safeHref(href: unknown): string | null {
+  if (typeof href !== 'string') return null
+  return /^(https?:|mailto:)/i.test(href.trim()) ? href.trim() : null
+}
 function linkHref(marks: TipTapMark[] | undefined): string | null {
   const m = marks?.find((x) => x.type === 'link')
-  const href = m?.attrs?.href
-  return typeof href === 'string' ? href : null
+  return safeHref(m?.attrs?.href)
 }
+// Pick the pdfkit font for an inline run from its marks (code wins; otherwise
+// bold/italic combine into the matching Helvetica variant).
 function fontFor(marks: TipTapMark[] | undefined): string {
   if (hasMark(marks, 'code')) return F.mono
   const b = hasMark(marks, 'bold')
@@ -108,6 +116,9 @@ function listItemText(item: TipTapNode): TipTapNode[] {
   return para?.content ?? []
 }
 
+// Render one block-level TipTap node (heading, paragraph, list, quote, image,
+// rule, …) to the pdfkit document. Recurses for container nodes. `indent`
+// offsets the left margin for nested content (blockquotes).
 function renderNode(pdf: PDFKit.PDFDocument, node: TipTapNode, indent = 0) {
   const x = PAGE.margin + indent
   const align = (node.attrs?.textAlign as string) || 'left'
@@ -278,10 +289,13 @@ export async function quoteDocumentAttachment(
   docId: number,
   quoteId?: number
 ): Promise<{ filename: string; content: Buffer; contentType: string } | null> {
+  // quoteId === 0 is never a real id, but guard on `undefined` (not falsiness)
+  // so a caller that *does* pass 0 still gets the quote scoping, not a bypass.
+  const scoped = quoteId !== undefined
   const sql =
     'SELECT title, content, kind, file_name, file_path, mime FROM quote_documents WHERE id = ?' +
-    (quoteId ? ' AND quote_id = ?' : '')
-  const row = (quoteId ? db.prepare(sql).get(docId, quoteId) : db.prepare(sql).get(docId)) as
+    (scoped ? ' AND quote_id = ?' : '')
+  const row = (scoped ? db.prepare(sql).get(docId, quoteId) : db.prepare(sql).get(docId)) as
     | DocRow
     | undefined
   if (!row) return null

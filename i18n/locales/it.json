@@ -180,6 +180,8 @@
     "docWrite": "Scrivi",
     "docUpload": "Carica file",
     "docUploadFailed": "Caricamento non riuscito",
+    "saveFailed": "Impossibile salvare l'offerta",
+    "docActionFailed": "Impossibile aggiornare il documento",
     "tabDetails": "Offerta",
     "tabReferences": "Riferimenti",
     "tabDocuments": "Documenti"
