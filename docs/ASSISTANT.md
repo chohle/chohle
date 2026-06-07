@@ -21,15 +21,15 @@ It is **off by default**. Turn it on only if you want it.
   Every write is shown as an **Approve / Cancel** card; nothing happens until you
   approve, and the commit re-validates everything.
 
-| Entity | Read | Create | Edit |
+| Entity        | Read | Create | Edit |
 | ------------- | :--: | :----: | :--: |
-| Customer      | ✓ | ✓ | ✓ |
-| Invoice       | ✓ | ✓ | ✓ |
-| Quote         | ✓ | ✓ | ✓ |
-| Article       | ✓ | ✓ | ✓ |
-| Signature     | ✓ | ✓ | ✓ |
-| Expense       | ✓ | ✓ |   |
-| Income source |   | ✓ |   |
+| Customer      |  ✓   |   ✓    |  ✓   |
+| Invoice       |  ✓   |   ✓    |  ✓   |
+| Quote         |  ✓   |   ✓    |  ✓   |
+| Article       |  ✓   |   ✓    |  ✓   |
+| Signature     |  ✓   |   ✓    |  ✓   |
+| Expense       |  ✓   |   ✓    |      |
+| Income source |      |   ✓    |      |
 
 Created invoices and quotes are **drafts with no number** (same as the normal
 flow); you assign the number later. Because an invoice needs a project, the
@@ -103,9 +103,14 @@ small; keep the assistant off there.
   which validate and preview; they never write. Writes happen only after you
   click Approve, through a single endpoint that re-validates and runs one atomic
   transaction.
-- **No delete/update tools exist**, so the assistant cannot alter or remove data.
+- **No delete tool and no send tool exist**, so the assistant can neither remove
+  data nor email customers. Edits change fields only and can never remove a record.
 - **Disabled in demo mode** and blocked for demo visitors.
 - **Audited**: every committed batch is recorded in the `assistant_audit` table.
+
+Chats are saved (the `assistant_conversations` table) so your history is there
+when you come back; use **New chat** to start a fresh one or the trash icon to
+delete one.
 
 ## How it works (internals)
 

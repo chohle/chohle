@@ -34,6 +34,14 @@ export function assistantConfig(): AssistantConfig {
   }
 }
 
+// Gate shared by every assistant endpoint: enabled, and never in the demo.
+export function assertAssistantEnabled(): void {
+  if (isDemo()) throw createError({ statusCode: 403, statusMessage: 'Disabled in the demo' })
+  if (!assistantConfig().enabled) {
+    throw createError({ statusCode: 404, statusMessage: 'Assistant is not enabled' })
+  }
+}
+
 const REQUEST_TIMEOUT_MS = 120_000
 
 interface CompletionResponse {

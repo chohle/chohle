@@ -930,6 +930,8 @@
     "before": "Avant",
     "after": "Après",
     "createdItem": "{kind} {label} créé.",
-    "updatedItem": "{kind} {label} mis à jour."
+    "updatedItem": "{kind} {label} mis à jour.",
+    "newChat": "Nouveau chat",
+    "untitled": "Nouvelle conversation"
   }
 }

@@ -930,6 +930,8 @@
     "before": "Before",
     "after": "After",
     "createdItem": "Created {kind} {label}.",
-    "updatedItem": "Updated {kind} {label}."
+    "updatedItem": "Updated {kind} {label}.",
+    "newChat": "New chat",
+    "untitled": "New conversation"
   }
 }

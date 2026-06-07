@@ -3,7 +3,7 @@
 // NEVER writes — proposals are returned for the user to approve, then committed
 // separately via /api/assistant/commit.
 import {
-  assistantConfig,
+  assertAssistantEnabled,
   chatCompletion,
   parseToolArgs,
   SYSTEM_PROMPT,
@@ -43,10 +43,7 @@ function sanitizeHistory(input: unknown): ChatMessage[] {
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  if (isDemo()) throw createError({ statusCode: 403, statusMessage: 'Disabled in the demo' })
-  if (!assistantConfig().enabled) {
-    throw createError({ statusCode: 404, statusMessage: 'Assistant is not enabled' })
-  }
+  assertAssistantEnabled()
 
   const body = await readBody<{ messages?: unknown }>(event)
   const history = sanitizeHistory(body?.messages)

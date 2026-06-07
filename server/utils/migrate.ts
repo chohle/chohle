@@ -876,6 +876,21 @@ const migrations: Migration[] = [
         status TEXT NOT NULL DEFAULT 'committed' CHECK (status IN ('committed', 'failed'))
       );
     `
+  },
+  {
+    name: '0047_assistant_conversations',
+    // Saved assistant chat history. `turns` is the JSON array of chat turns the
+    // UI renders (role/content + any proposal cards), so a reload restores the
+    // conversation exactly. Single-user app, so no owner column.
+    up: `
+      CREATE TABLE assistant_conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL DEFAULT '',
+        turns TEXT NOT NULL DEFAULT '[]',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+    `
   }
 ]
 
