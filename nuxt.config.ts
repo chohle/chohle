@@ -70,8 +70,20 @@ export default defineNuxtConfig({
       // Set NUXT_SMTP_SECURE=true/false only to override that default.
       secure: ''
     },
+    // Optional local-LLM assistant. Off unless CHOHLE_ASSISTANT=true (boolean
+    // read here, like CHOHLE_DEMO, so a stray NUXT_ env string can't flip it).
+    // It speaks the OpenAI-compatible protocol, so NUXT_LLM_BASE_URL can point
+    // at Ollama, LM Studio, llama.cpp, vLLM, or any hosted endpoint.
+    assistant: {
+      enabled: process.env.CHOHLE_ASSISTANT === 'true',
+      baseUrl: process.env.NUXT_LLM_BASE_URL || 'http://ollama:11434/v1',
+      model: process.env.NUXT_LLM_MODEL || 'qwen2.5:7b',
+      apiKey: process.env.NUXT_LLM_API_KEY || ''
+    },
     public: {
-      demo: process.env.CHOHLE_DEMO === 'true'
+      demo: process.env.CHOHLE_DEMO === 'true',
+      // Lets the sidebar show the Assistant link only when it's enabled.
+      assistantEnabled: process.env.CHOHLE_ASSISTANT === 'true'
     }
   },
   // Bind-mounted source on macOS doesn't emit fs events; poll inside Docker.

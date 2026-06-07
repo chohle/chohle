@@ -84,6 +84,7 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 | [Bank reconciliation](docs/BANK_RECONCILIATION.md) | camt.053 import + auto-match payments (folder / EBICS)  |
 | [Hosting](docs/HOSTING.md)                         | _Optional_ — putting it online (VPS + Docker + Caddy)   |
 | [Demo mode](docs/DEMO_MODE.md)                     | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`) |
+| [AI assistant](docs/ASSISTANT.md)                  | _Optional_ — local LLM that drafts customers/invoices   |
 | [Commit convention](docs/COMMIT_CONVENTION.md)     | Commit message format                                   |
 
 ## Contributing

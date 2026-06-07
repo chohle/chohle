@@ -45,7 +45,21 @@ services:
     depends_on:
       - app
 
+  # Optional local LLM for the in-app assistant. Only starts with the `llm`
+  # profile: `docker compose -f docker-compose.prod.yml --profile llm up -d`.
+  # Pull a model once (`... exec ollama ollama pull qwen2.5:7b`) and set
+  # CHOHLE_ASSISTANT=true in .env. Needs real RAM (an 8B model wants ~8 GB); on
+  # a small box use a 3B model or point NUXT_LLM_BASE_URL at an external
+  # endpoint. The app reaches it at http://ollama:11434/v1.
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [llm]
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+
 volumes:
   appdata:
   caddy_data:
   caddy_config:
+  ollama_data:

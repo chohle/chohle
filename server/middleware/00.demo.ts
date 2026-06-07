@@ -30,6 +30,9 @@ function reachesExternalService(path: string): boolean {
     path === '/api/auth/imap/connect' ||
     path.startsWith('/api/auth/gmail/') ||
     path.startsWith('/api/auth/outlook/') ||
+    // The assistant drives an external LLM; never let a public demo visitor
+    // reach it (and it could create records).
+    path.startsWith('/api/assistant/') ||
     /^\/api\/mailboxes\/\d+\/sync$/.test(path)
   )
 }
