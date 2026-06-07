@@ -2,10 +2,10 @@ import PDFDocument from 'pdfkit'
 import { SwissQRBill } from 'swissqrbill/pdf'
 import { buildReference } from './qrReference'
 import { readUpload } from './uploads'
-import enLocale from '../../i18n/locales/en.json'
-import deLocale from '../../i18n/locales/de.json'
-import frLocale from '../../i18n/locales/fr.json'
-import itLocale from '../../i18n/locales/it.json'
+import enLocale from '../../shared/i18n/locales/en.json'
+import deLocale from '../../shared/i18n/locales/de.json'
+import frLocale from '../../shared/i18n/locales/fr.json'
+import itLocale from '../../shared/i18n/locales/it.json'
 
 interface InvoiceRow {
   customer_id: number

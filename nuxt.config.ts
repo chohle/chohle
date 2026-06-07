@@ -14,6 +14,10 @@ export default defineNuxtConfig({
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'en',
+    // Locales live in shared/ so they're colocated with other client/server
+    // shared code. restructureDir points the module at shared/i18n; langDir is
+    // resolved relative to it (shared/i18n/locales).
+    restructureDir: 'shared/i18n',
     langDir: 'locales',
     // Locale is a stored preference, not browser-sniffed; default stays English.
     detectBrowserLanguage: false,
