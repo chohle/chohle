@@ -23,9 +23,10 @@ const { t } = useI18n()
 const now = new Date()
 const year = ref(now.getFullYear())
 
-const { data } = await useFetch<Summary>(() => `/api/tax-export/summary?year=${year.value}`, {
-  default: () => null as unknown as Summary
-})
+const { data, refresh } = await useFetch<Summary>(
+  () => `/api/tax-export/summary?year=${year.value}`,
+  { default: () => null as unknown as Summary }
+)
 
 // If the chosen year has no data, fall back to the most recent year that does.
 watchEffect(() => {
@@ -46,6 +47,32 @@ function fmtDate(iso: string) {
 
 function download() {
   window.location.href = `/api/tax-export/${year.value}`
+}
+
+// Attach a receipt to a missing expense right here; refresh removes it from the
+// list and unlocks the download once everything has a Beleg.
+const fileInput = ref<HTMLInputElement>()
+const uploadTarget = ref<number | null>(null)
+const uploading = ref(false)
+function addReceipt(id: number) {
+  uploadTarget.value = id
+  fileInput.value?.click()
+}
+async function onReceipt(e: Event) {
+  const files = (e.target as HTMLInputElement).files
+  const id = uploadTarget.value
+  if (fileInput.value) fileInput.value.value = ''
+  if (!files?.length || !id) return
+  const fd = new FormData()
+  for (const f of files) fd.append('files', f)
+  uploading.value = true
+  try {
+    await $fetch(`/api/expenses/${id}/attachments`, { method: 'POST', body: fd })
+    await refresh()
+  } finally {
+    uploading.value = false
+    uploadTarget.value = null
+  }
 }
 </script>
 
@@ -128,8 +155,24 @@ function download() {
               <span class="mono note">{{ fmtDate(m.date) }}</span>
               <span class="tax-missing__name">{{ m.vendor || m.title }}</span>
               <span class="mono">CHF {{ chf(m.grossRappen) }}</span>
+              <button
+                type="button"
+                class="tax-missing__add"
+                :disabled="uploading"
+                @click="addReceipt(m.id)"
+              >
+                <UIcon name="i-lucide-upload" class="size-3" /> {{ $t('taxExport.addReceipt') }}
+              </button>
             </li>
           </ul>
+          <input
+            ref="fileInput"
+            type="file"
+            multiple
+            accept="application/pdf,image/*"
+            class="hidden"
+            @change="onReceipt"
+          />
         </div>
 
         <div class="tax-actions">

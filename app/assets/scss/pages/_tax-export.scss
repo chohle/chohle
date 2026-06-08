@@ -134,7 +134,7 @@
 
       li {
         display: grid;
-        grid-template-columns: 90px 1fr auto;
+        grid-template-columns: 90px 1fr auto auto;
         gap: 12px;
         align-items: center;
         padding: 5px 9px;
@@ -147,6 +147,26 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    &__add {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 3px 9px;
+      border: 1px dashed var(--rule);
+      border-radius: 999px;
+      background: none;
+      color: var(--ink-2);
+      cursor: pointer;
+      &:hover:not(:disabled) {
+        border-color: var(--ink-3);
+        color: var(--ink);
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: progress;
+      }
     }
   }
 
