@@ -958,6 +958,7 @@
     "expenseVatHint": "Für die Vorsteuer im Steuerexport. 0 lassen, wenn unklar.",
     "fixReceipts": "Belege ergänzen",
     "blockedHint": "Erst alle Belege ergänzen, dann exportieren.",
-    "addReceipt": "Beleg"
+    "addReceipt": "Beleg",
+    "receiptsSection": "Belege"
   }
 }

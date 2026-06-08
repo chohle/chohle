@@ -958,6 +958,7 @@
     "expenseVatHint": "Pour l'impôt préalable dans l'export. Laissez 0 si incertain.",
     "fixReceipts": "Ajouter les justificatifs",
     "blockedHint": "Ajoutez tous les justificatifs avant d'exporter.",
-    "addReceipt": "Justificatif"
+    "addReceipt": "Justificatif",
+    "receiptsSection": "Justificatifs"
   }
 }

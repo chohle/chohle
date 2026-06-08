@@ -958,6 +958,7 @@
     "expenseVatHint": "For the tax export input VAT (Vorsteuer). Leave 0 if unsure.",
     "fixReceipts": "Add the missing receipts",
     "blockedHint": "Add all receipts before exporting.",
-    "addReceipt": "Receipt"
+    "addReceipt": "Receipt",
+    "receiptsSection": "Receipts"
   }
 }

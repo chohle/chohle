@@ -102,47 +102,53 @@ async function onReceipt(e: Event) {
         </button>
       </div>
 
-      <UiCard class="tax-summary">
-        <div class="tax-grid">
-          <div class="tax-stat">
-            <span class="tax-stat__label">{{ $t('taxExport.income') }}</span>
-            <span class="tax-stat__value mono">CHF {{ chf(data.income.totalRappen) }}</span>
-            <span class="tax-stat__hint note">
-              {{ $t('taxExport.invoices') }} {{ chf(data.income.invoiceRappen) }} ·
-              {{ $t('taxExport.salary') }} {{ chf(data.income.salaryRappen) }}
-            </span>
-          </div>
-          <div class="tax-stat">
-            <span class="tax-stat__label">{{ $t('taxExport.expenses') }}</span>
-            <span class="tax-stat__value mono">CHF {{ chf(data.expenseRappen) }}</span>
-            <span class="tax-stat__hint note"
-              >{{ data.expenseCount }} {{ $t('taxExport.bookings') }}</span
-            >
-          </div>
-          <div class="tax-stat">
-            <span class="tax-stat__label">{{ $t('taxExport.net') }}</span>
-            <span class="tax-stat__value mono" :class="{ 'is-neg': data.netRappen < 0 }">
-              CHF {{ chf(data.netRappen) }}
-            </span>
-            <span class="tax-stat__hint note">{{ $t('taxExport.netHint') }}</span>
-          </div>
-        </div>
+      <UiKpiRow>
+        <UiKpiCell
+          :label="$t('taxExport.income')"
+          currency="CHF"
+          :value="chf(data.income.totalRappen)"
+          :delta="`${$t('taxExport.invoices')} ${chf(data.income.invoiceRappen)}  ·  ${$t('taxExport.salary')} ${chf(data.income.salaryRappen)}`"
+        />
+        <UiKpiCell
+          :label="$t('taxExport.expenses')"
+          currency="CHF"
+          :value="chf(data.expenseRappen)"
+          inverted
+          :delta="`${data.expenseCount} ${$t('taxExport.bookings')}`"
+        />
+        <UiKpiCell
+          :label="$t('taxExport.net')"
+          currency="CHF"
+          :value="chf(data.netRappen)"
+          :delta="$t('taxExport.netHint')"
+        />
+      </UiKpiRow>
 
-        <div v-if="data.vat.registered" class="tax-vat">
-          <span class="tax-vat__title">{{ $t('taxExport.vat') }}</span>
-          <span class="mono note">
-            {{ $t('taxExport.vatOutput') }} {{ chf(data.vat.outputRappen) }} ·
-            {{ $t('taxExport.vatInput') }} {{ chf(data.vat.inputRappen) }} ·
-            {{ $t('taxExport.vatNet') }} {{ chf(data.vat.netVatRappen) }}
-          </span>
+      <div v-if="data.vat.registered" class="tax-vat">
+        <span class="tax-vat__title eyebrow">{{ $t('taxExport.vat') }}</span>
+        <div class="tax-vat__items">
+          <span
+            ><span class="note">{{ $t('taxExport.vatOutput') }}</span> CHF
+            {{ chf(data.vat.outputRappen) }}</span
+          >
+          <span
+            ><span class="note">{{ $t('taxExport.vatInput') }}</span> CHF
+            {{ chf(data.vat.inputRappen) }}</span
+          >
+          <span class="tax-vat__net"
+            ><span class="note">{{ $t('taxExport.vatNet') }}</span> CHF
+            {{ chf(data.vat.netVatRappen) }}</span
+          >
         </div>
+      </div>
 
-        <!-- Receipts: complete vs the list of expenses still missing one -->
-        <div v-if="!data.missingReceipts" class="tax-receipts">
-          <UIcon name="i-lucide-check" class="tax-ok size-4" />
+      <UiSectionLabel>{{ $t('taxExport.receiptsSection') }}</UiSectionLabel>
+      <UiCard>
+        <div v-if="!data.missingReceipts" class="tax-done">
+          <UIcon name="i-lucide-circle-check-big" class="tax-ok size-5" />
           <span>{{ $t('taxExport.allReceipts', { n: data.receiptCount }) }}</span>
         </div>
-        <div v-else class="tax-missing">
+        <template v-else>
           <div class="tax-missing__head">
             <UIcon name="i-lucide-triangle-alert" class="tax-warn size-4" />
             <span class="tax-warn">{{ $t('taxExport.missing', { n: data.missingReceipts }) }}</span>
@@ -173,22 +179,22 @@ async function onReceipt(e: Event) {
             class="hidden"
             @change="onReceipt"
           />
-        </div>
-
-        <div class="tax-actions">
-          <button
-            class="ed-btn"
-            type="button"
-            :disabled="data.missingReceipts > 0"
-            @click="download"
-          >
-            <UIcon name="i-lucide-download" class="size-3.5" /> {{ $t('taxExport.download') }}
-          </button>
-          <span class="note">
-            {{ data.missingReceipts ? $t('taxExport.blockedHint') : $t('taxExport.bundleHint') }}
-          </span>
-        </div>
+        </template>
       </UiCard>
+
+      <div class="tax-download">
+        <button
+          class="ed-btn-primary"
+          type="button"
+          :disabled="data.missingReceipts > 0"
+          @click="download"
+        >
+          <UIcon name="i-lucide-download" class="size-3.5" /> {{ $t('taxExport.download') }}
+        </button>
+        <span class="note">
+          {{ data.missingReceipts ? $t('taxExport.blockedHint') : $t('taxExport.bundleHint') }}
+        </span>
+      </div>
     </template>
   </div>
 </template>
