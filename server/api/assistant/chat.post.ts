@@ -19,6 +19,7 @@ import {
 
 const MAX_ITERATIONS = 6
 
+/** Extract a short message from a thrown error (h3 statusMessage or message). */
 function errorMessage(e: unknown): string {
   if (e && typeof e === 'object') {
     const o = e as { statusMessage?: string; message?: string }
@@ -27,8 +28,10 @@ function errorMessage(e: unknown): string {
   return 'error'
 }
 
-// Keep only plain user/assistant text from the client; tool messages and
-// tool_calls are server-internal and must not be injectable from the browser.
+/**
+ * Keep only plain user/assistant text from the client; tool messages and
+ * tool_calls are server-internal and must not be injectable from the browser.
+ */
 function sanitizeHistory(input: unknown): ChatMessage[] {
   if (!Array.isArray(input)) return []
   return input

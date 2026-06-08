@@ -4,9 +4,11 @@
 import { assertAssistantEnabled } from '~~/server/utils/assistant/llm'
 import { commitActions, type ProposedAction } from '~~/server/utils/assistant/commit'
 
-// Don't duplicate customer contact details into the audit log; the action shape
-// (types, names, amounts) is enough to know what was done. Names/titles stay so
-// the trail is still meaningful.
+/*
+ * Don't duplicate customer contact details into the audit log; the action shape
+ * (types, names, amounts) is enough to know what was done. Names/titles stay so
+ * the trail is still meaningful.
+ */
 const SENSITIVE = new Set([
   'email',
   'phone',
@@ -25,6 +27,7 @@ const SENSITIVE = new Set([
   'hrNumber',
   'hr_number'
 ])
+/** Deep-clone a value, replacing any sensitive field's value with "[redacted]". */
 function redact(v: unknown): unknown {
   if (Array.isArray(v)) return v.map(redact)
   if (v && typeof v === 'object') {

@@ -21,12 +21,14 @@ export interface Proposal {
   action: ProposedAction
 }
 
+/** Format an amount in Rappen as a Swiss-formatted CHF string (e.g. 1'296.00). */
 function chf(rappen: number): string {
   return (rappen / 100).toLocaleString('de-CH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })
 }
+/** Whether the (single) sender is VAT-registered; drives MWST in totals. */
 function senderVat(): boolean {
   return !!(
     useDb().prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
@@ -34,10 +36,13 @@ function senderVat(): boolean {
       | undefined
   )?.vat_registered
 }
+/**
+ * Normalize raw model line items into ProposedLine[]. Clamps money/quantity to
+ * sane ranges so a bad model output can't produce a negative invoice
+ * (quantity/price >= 0, discount within 0-100%).
+ */
 function parseLines(raw: unknown): ProposedLine[] {
   const arr = Array.isArray(raw) ? (raw as Record<string, unknown>[]) : []
-  // Clamp money/quantity to sane ranges so a bad model output can't produce a
-  // negative invoice (quantity/price >= 0, discount within 0-100%).
   return arr.map((l) => ({
     description: String(l?.description ?? '').trim(),
     quantity: Math.max(0, Number(l?.quantity) || 0),
@@ -49,6 +54,7 @@ function parseLines(raw: unknown): ProposedLine[] {
     articleName: String(l?.articleName ?? '').trim() || undefined
   }))
 }
+/** Total (in Rappen) of the proposed lines, using the sender's VAT setting. */
 function linesTotalRappen(lines: ProposedLine[]): number {
   return computeInvoiceTotals(
     lines.map((l) => ({
@@ -60,6 +66,7 @@ function linesTotalRappen(lines: ProposedLine[]): number {
     senderVat()
   ).totalRappen
 }
+/** Two short card lines summarizing an item set: the count and the total CHF. */
 function lineSummary(count: number, totalRappen: number): string[] {
   return [`${count} ${count === 1 ? 'line' : 'lines'}`, `CHF ${chf(totalRappen)}`]
 }
@@ -299,7 +306,7 @@ export const PROPOSE_TOOLS: OpenAITool[] = [
   )
 ]
 
-// Helper to build an OpenAI function tool definition tersely.
+/** Build an OpenAI function-tool definition tersely from name/description/props. */
 function fn(
   name: string,
   description: string,
@@ -319,6 +326,7 @@ function fn(
 export const ALL_TOOLS: OpenAITool[] = [...READ_TOOLS, ...PROPOSE_TOOLS]
 
 const PROPOSE_NAMES = new Set(PROPOSE_TOOLS.map((t) => t.function.name))
+/** True if a tool name is a propose_* (write-intent) tool rather than a read tool. */
 export function isProposeTool(name: string): boolean {
   return PROPOSE_NAMES.has(name)
 }
@@ -327,6 +335,7 @@ export function isProposeTool(name: string): boolean {
 // READ tool execution.
 // ---------------------------------------------------------------------------
 
+/** Execute a read tool by name against the db and return its result object. */
 export function runReadTool(name: string, args: Record<string, unknown>): unknown {
   const db = useDb()
   const limit = Math.min(Math.max(Number(args.limit) || 20, 1), 50)
@@ -482,6 +491,7 @@ export function runReadTool(name: string, args: Record<string, unknown>): unknow
 // PROPOSE tool handling: validate + build a Proposal. No writes.
 // ---------------------------------------------------------------------------
 
+/** Validate a propose_* tool call and build its approval Proposal. Never writes. */
 export function buildProposal(name: string, args: Record<string, unknown>): Proposal {
   const db = useDb()
 

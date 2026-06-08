@@ -63,22 +63,24 @@ onMounted(async () => {
   }
 })
 
+/** Scroll the chat thread to the latest message. */
 async function scrollToBottom() {
   await nextTick()
   threadEl.value?.scrollTo({ top: threadEl.value.scrollHeight, behavior: 'smooth' })
 }
 
+/** The plain user/assistant text history the model needs as context. */
 function history() {
   return turns.value.map((m) => ({ role: m.role, content: m.content }))
 }
 
-// Title a conversation from its first user message.
+/** Title a conversation from its first user message. */
 function deriveTitle(): string {
   const first = turns.value.find((m) => m.role === 'user')?.content?.trim()
   return first ? first.slice(0, 60) : t('assistant.untitled')
 }
 
-// Make sure there's a row to save into; create one lazily on first message.
+/** Make sure there's a row to save into; create one lazily on first message. */
 async function ensureConversation(): Promise<number> {
   if (activeId.value) return activeId.value
   const { id } = await $fetch<{ id: number }>('/api/assistant/conversations', { method: 'POST' })
@@ -87,6 +89,7 @@ async function ensureConversation(): Promise<number> {
   return id
 }
 
+/** Persist the current turns + title to the active conversation (autosave). */
 async function saveConversation() {
   if (!activeId.value) return
   const title = deriveTitle()
@@ -107,6 +110,7 @@ async function saveConversation() {
   }
 }
 
+/** Send the typed message: append it, call the assistant, render the reply. */
 async function send() {
   const text = input.value.trim()
   if (!text || sending.value) return
@@ -136,6 +140,7 @@ async function send() {
   }
 }
 
+/** Commit the turn's proposed actions, then append a confirmation message. */
 async function approve(turn: Turn) {
   if (!turn.proposals || turn.state !== 'pending') return
   turn.state = 'approved'
@@ -163,6 +168,7 @@ async function approve(turn: Turn) {
   }
 }
 
+/** Dismiss the turn's pending proposals without committing. */
 async function cancel(turn: Turn) {
   if (turn.state === 'pending') {
     turn.state = 'cancelled'
@@ -170,12 +176,14 @@ async function cancel(turn: Turn) {
   }
 }
 
+/** Start a fresh, unsaved conversation. */
 function newChat() {
   activeId.value = null
   turns.value = []
   input.value = ''
 }
 
+/** Load a saved conversation's turns into the view. */
 async function openConversation(id: number) {
   if (sending.value) return
   try {
@@ -188,6 +196,7 @@ async function openConversation(id: number) {
   }
 }
 
+/** Delete a saved conversation and fall back to the next (or a new chat). */
 async function deleteConversation(id: number) {
   try {
     await $fetch(`/api/assistant/conversations/${id}`, { method: 'DELETE' })
@@ -210,6 +219,7 @@ const KIND_ICONS: Record<ProposalKind, string> = {
   expense: 'i-lucide-receipt',
   income: 'i-lucide-banknote'
 }
+/** Lucide icon name for a proposal kind (customer/invoice/quote/…). */
 function kindIcon(kind: ProposalKind) {
   return KIND_ICONS[kind] ?? 'i-lucide-sparkles'
 }
@@ -219,6 +229,7 @@ const suggestions = computed(() => [
   t('assistant.suggest2'),
   t('assistant.suggest3')
 ])
+/** Prefill the input with a suggested prompt. */
 function useSuggestion(s: string) {
   input.value = s
 }

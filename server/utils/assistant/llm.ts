@@ -24,6 +24,7 @@ interface AssistantConfig {
   apiKey: string
 }
 
+/** Read the assistant runtime config (enabled, base URL, model, api key). */
 export function assistantConfig(): AssistantConfig {
   const c = useRuntimeConfig().assistant as Partial<AssistantConfig> | undefined
   return {
@@ -34,7 +35,7 @@ export function assistantConfig(): AssistantConfig {
   }
 }
 
-// Gate shared by every assistant endpoint: enabled, and never in the demo.
+/** Gate shared by every assistant endpoint: enabled, and never in the demo. */
 export function assertAssistantEnabled(): void {
   if (isDemo()) throw createError({ statusCode: 403, statusMessage: 'Disabled in the demo' })
   if (!assistantConfig().enabled) {
@@ -48,9 +49,11 @@ interface CompletionResponse {
   choices?: { message?: ChatMessage }[]
 }
 
-// One round-trip to the model. Returns the assistant message (which may carry
-// tool_calls). Throws a 502 on transport/parse failure so the endpoint can
-// surface a clean "assistant unavailable".
+/**
+ * One round-trip to the model. Returns the assistant message (which may carry
+ * tool_calls). Throws a 502 on transport/parse failure so the endpoint can
+ * surface a clean "assistant unavailable".
+ */
 export async function chatCompletion(
   messages: ChatMessage[],
   tools: OpenAITool[]
@@ -83,9 +86,11 @@ export async function chatCompletion(
   return message
 }
 
-// Tool-call arguments arrive as a JSON string; small models sometimes wrap them
-// in prose or emit nothing. Parse defensively so a bad payload becomes a
-// recoverable tool error rather than crashing the loop.
+/**
+ * Tool-call arguments arrive as a JSON string; small models sometimes wrap them
+ * in prose or emit nothing. Parse defensively so a bad payload becomes a
+ * recoverable tool error rather than crashing the loop.
+ */
 export function parseToolArgs(raw: string | undefined): Record<string, unknown> {
   if (!raw || !raw.trim()) return {}
   try {

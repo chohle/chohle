@@ -116,12 +116,13 @@ export interface CommitResult {
   updated: CommitRef[]
 }
 
+/** Today's date as a YYYY-MM-DD string. */
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
 }
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
-// Normalize a proposed line into the totals shape (Rappen) used everywhere.
+/** Normalize a proposed line into the totals shape (Rappen) used everywhere. */
 function lineForTotals(l: ProposedLine) {
   return {
     quantity: Number(l?.quantity) || 0,
@@ -131,8 +132,11 @@ function lineForTotals(l: ProposedLine) {
   }
 }
 
-// Run every approved action in one transaction: any failure rolls the whole
-// batch back. No async work inside the transaction (better-sqlite3).
+/**
+ * Run every approved action in one transaction: any failure rolls the whole
+ * batch back. Only creates/edits (never deletes), and re-validates every
+ * payload. No async work inside the transaction (better-sqlite3).
+ */
 export function commitActions(db: Database, actions: ProposedAction[]): CommitResult {
   if (!Array.isArray(actions) || actions.length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'No actions to commit' })
@@ -151,6 +155,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
       result.updated.push({ kind, id, label })
 
     // --- shared helpers -----------------------------------------------------
+    /** Validate + insert a customer, recording it in the result. Returns id+name. */
     const insertCustomer = (raw: Raw): { id: number; name: string } => {
       const c = parseCustomer(raw)
       const placeholders = CUSTOMER_COLUMNS.map(() => '?').join(', ')
@@ -162,6 +167,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
       return { id, name: c.name }
     }
 
+    /** Resolve a customer for an invoice/quote: existing id, or new (deduped by name). */
     const resolveCustomerId = (a: { customerId?: number; newCustomer?: Raw }): number => {
       if (a.newCustomer) {
         // Don't create a duplicate: reuse an existing customer with the same name.
@@ -184,6 +190,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
       return id
     }
 
+    /** Insert invoice line items and return the computed total (Rappen). */
     const insertInvoiceItems = (invoiceId: number, lines: ProposedLine[]) => {
       const stmt = db.prepare(
         `INSERT INTO invoice_items
@@ -209,6 +216,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
       return computeInvoiceTotals(totals, vat).totalRappen
     }
 
+    /** Insert quote line items (incl. free-text article_name) and return the total. */
     const insertQuoteItems = (quoteId: number, lines: ProposedLine[]) => {
       const stmt = db.prepare(
         `INSERT INTO quote_items
@@ -235,6 +243,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
       return computeInvoiceTotals(totals, vat).totalRappen
     }
 
+    /** Insert a quote's reference links, skipping blank rows. */
     const insertQuoteRefs = (quoteId: number, refs: ProposedRef[] | undefined) => {
       const stmt = db.prepare(
         'INSERT INTO quote_references (quote_id, label, url, sort_order) VALUES (?, ?, ?, ?)'
@@ -601,9 +610,11 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
   return run()
 }
 
-// Map a current customers row (snake_case) onto the camelCase keys parseCustomer
-// expects, then overlay the proposed changes (camelCase). Lets an edit specify
-// only the fields it wants to change while the rest stay as they are.
+/**
+ * Map a current customers row (snake_case) onto the camelCase keys parseCustomer
+ * expects, then overlay the proposed changes (camelCase). Lets an edit specify
+ * only the fields it wants to change while the rest stay as they are.
+ */
 function mergeCustomer(row: Record<string, unknown>, changes: Raw): Raw {
   const base: Raw = {
     type: row.type,
