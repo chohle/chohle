@@ -44,11 +44,6 @@ function fmtDate(iso: string) {
   return d ? `${d}.${m}.${y}` : iso
 }
 
-// Don't hand out an incomplete bundle: the download is gated while receipts are
-// missing, with an explicit "export anyway" opt-out. Reset it when the year changes.
-const exportAnyway = ref(false)
-watch(year, () => (exportAnyway.value = false))
-
 function download() {
   window.location.href = `/api/tax-export/${year.value}`
 }
@@ -141,16 +136,14 @@ function download() {
           <button
             class="ed-btn"
             type="button"
-            :disabled="data.missingReceipts > 0 && !exportAnyway"
+            :disabled="data.missingReceipts > 0"
             @click="download"
           >
             <UIcon name="i-lucide-download" class="size-3.5" /> {{ $t('taxExport.download') }}
           </button>
-          <label v-if="data.missingReceipts" class="tax-anyway">
-            <input v-model="exportAnyway" type="checkbox" />
-            {{ $t('taxExport.exportAnyway') }}
-          </label>
-          <span v-else class="note">{{ $t('taxExport.bundleHint') }}</span>
+          <span class="note">
+            {{ data.missingReceipts ? $t('taxExport.blockedHint') : $t('taxExport.bundleHint') }}
+          </span>
         </div>
       </UiCard>
     </template>

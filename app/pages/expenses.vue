@@ -106,8 +106,29 @@ const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
 
+// Receipts in the form: existing ones (when editing) plus files picked now that
+// get uploaded when the expense is saved (so you can attach a Beleg on create).
+const fileInput = ref<HTMLInputElement>()
+const pendingFiles = ref<File[]>([])
+const editAttachments = ref<{ id: number; filename: string }[]>([])
+function pickFiles(e: Event) {
+  const fl = (e.target as HTMLInputElement).files
+  if (fl) pendingFiles.value.push(...Array.from(fl))
+  if (fileInput.value) fileInput.value.value = ''
+}
+function removePending(i: number) {
+  pendingFiles.value.splice(i, 1)
+}
+async function removeAttachment(id: number) {
+  await $fetch(`/api/attachments/${id}`, { method: 'DELETE' })
+  editAttachments.value = editAttachments.value.filter((a) => a.id !== id)
+  await refresh()
+}
+
 function openCreate() {
   Object.assign(form, blank())
+  pendingFiles.value = []
+  editAttachments.value = []
   open.value = true
 }
 function openEdit(e: Expense) {
@@ -121,6 +142,8 @@ function openEdit(e: Expense) {
     notes: e.notes ?? '',
     vatRate: e.vat_rate ?? 0
   })
+  pendingFiles.value = []
+  editAttachments.value = e.attachments ?? []
   open.value = true
 }
 
@@ -136,8 +159,15 @@ async function save() {
   saving.value = true
   try {
     const { id, ...body } = form
+    let expenseId = id
     if (id) await $fetch(`/api/expenses/${id}`, { method: 'PUT', body })
-    else await $fetch('/api/expenses', { method: 'POST', body })
+    else expenseId = (await $fetch<{ id: number }>('/api/expenses', { method: 'POST', body })).id
+    // Upload any receipts picked in the form to the (new or existing) expense.
+    if (expenseId && pendingFiles.value.length) {
+      const fd = new FormData()
+      for (const f of pendingFiles.value) fd.append('files', f)
+      await $fetch(`/api/expenses/${expenseId}/attachments`, { method: 'POST', body: fd })
+    }
     open.value = false
     await refresh()
   } finally {
@@ -347,6 +377,40 @@ function chf(rappen: number) {
           </UFormField>
           <UFormField :label="$t('common.notes')" class="sm:col-span-2">
             <UTextarea v-model="form.notes" :rows="3" autoresize class="w-full" />
+          </UFormField>
+          <UFormField :label="$t('expenses.receipts')" class="sm:col-span-2">
+            <div class="rec">
+              <span v-for="a in editAttachments" :key="a.id" class="rec__chip mono">
+                <a :href="`/api/attachments/${a.id}`" target="_blank" class="rec__link">
+                  <UIcon name="i-lucide-paperclip" class="size-3" />
+                  <span class="rec__fname">{{ a.filename }}</span>
+                </a>
+                <button type="button" class="rec__rm" @click="removeAttachment(a.id)">
+                  <UIcon name="i-lucide-x" class="size-3" />
+                </button>
+              </span>
+              <span v-for="(f, i) in pendingFiles" :key="`p${i}`" class="rec__chip mono">
+                <span class="rec__link">
+                  <UIcon name="i-lucide-file-plus" class="size-3" />
+                  <span class="rec__fname">{{ f.name }}</span>
+                </span>
+                <button type="button" class="rec__rm" @click="removePending(i)">
+                  <UIcon name="i-lucide-x" class="size-3" />
+                </button>
+              </span>
+              <button type="button" class="rec__up" @click="fileInput?.click()">
+                <UIcon name="i-lucide-upload" class="size-3" />
+                <span>{{ $t('expenses.receipt') }}</span>
+              </button>
+              <input
+                ref="fileInput"
+                type="file"
+                multiple
+                accept="application/pdf,image/*"
+                class="rec__file"
+                @change="pickFiles"
+              />
+            </div>
           </UFormField>
         </UForm>
       </template>

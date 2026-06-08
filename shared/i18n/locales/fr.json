@@ -957,6 +957,6 @@
     "expenseVat": "TVA %",
     "expenseVatHint": "Pour l'impôt préalable dans l'export. Laissez 0 si incertain.",
     "fixReceipts": "Ajouter les justificatifs",
-    "exportAnyway": "Exporter quand même (justificatifs manquants)"
+    "blockedHint": "Ajoutez tous les justificatifs avant d'exporter."
   }
 }

@@ -957,6 +957,6 @@
     "expenseVat": "IVA %",
     "expenseVatHint": "Per l'IVA a credito nell'esportazione. Lascia 0 se incerto.",
     "fixReceipts": "Aggiungi le ricevute",
-    "exportAnyway": "Esporta comunque (ricevute mancanti)"
+    "blockedHint": "Aggiungi tutte le ricevute prima di esportare."
   }
 }

@@ -957,6 +957,6 @@
     "expenseVat": "MWST %",
     "expenseVatHint": "Für die Vorsteuer im Steuerexport. 0 lassen, wenn unklar.",
     "fixReceipts": "Belege ergänzen",
-    "exportAnyway": "Trotzdem exportieren (Belege fehlen)"
+    "blockedHint": "Erst alle Belege ergänzen, dann exportieren."
   }
 }
