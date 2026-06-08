@@ -859,6 +859,38 @@ const migrations: Migration[] = [
       ALTER TABLE quote_documents_new RENAME TO quote_documents;
       CREATE INDEX idx_quote_documents_quote ON quote_documents (quote_id, sort_order);
     `
+  },
+  {
+    name: '0046_assistant_audit',
+    // Audit trail for the optional LLM assistant: one row per approved-and-
+    // committed batch of creations (customers/invoices). The assistant can only
+    // ever create (never delete), and every write is logged here.
+    up: `
+      CREATE TABLE assistant_audit (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        username TEXT,
+        prompt TEXT,
+        proposed_actions TEXT NOT NULL,
+        result TEXT,
+        status TEXT NOT NULL DEFAULT 'committed' CHECK (status IN ('committed', 'failed'))
+      );
+    `
+  },
+  {
+    name: '0047_assistant_conversations',
+    // Saved assistant chat history. `turns` is the JSON array of chat turns the
+    // UI renders (role/content + any proposal cards), so a reload restores the
+    // conversation exactly. Single-user app, so no owner column.
+    up: `
+      CREATE TABLE assistant_conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL DEFAULT '',
+        turns TEXT NOT NULL DEFAULT '[]',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+    `
   }
 ]
 

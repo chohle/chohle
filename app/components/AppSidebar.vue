@@ -45,6 +45,9 @@ function isGroup(e: Entry): e is Group {
   return 'children' in e
 }
 
+// The assistant link only appears when the assistant is enabled for this instance.
+const assistantEnabled = computed(() => !!useRuntimeConfig().public.assistantEnabled)
+
 const sections = computed<Section[]>(() => [
   {
     label: 'Workspace',
@@ -82,7 +85,16 @@ const sections = computed<Section[]>(() => [
       { label: t('nav.reminders'), icon: 'i-lucide-bell', to: '/reminders' },
       { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' }
     ]
-  }
+  },
+  // The assistant is its own section, shown only when enabled for this instance.
+  ...(assistantEnabled.value
+    ? [
+        {
+          label: t('nav.assistantSection'),
+          items: [{ label: t('nav.assistant'), icon: 'i-lucide-sparkles', to: '/assistant' }]
+        }
+      ]
+    : [])
 ])
 
 function isActive(to: string) {

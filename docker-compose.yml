@@ -44,6 +44,21 @@ services:
     environment:
       - MP_MAX_MESSAGES=500
 
+  # Optional local LLM for the in-app assistant. Only starts with the `llm`
+  # profile, so a normal `docker compose up` ignores it entirely:
+  #   docker compose --profile llm up
+  #   docker compose exec ollama ollama pull qwen2.5:7b   # once
+  # Then set CHOHLE_ASSISTANT=true in .env. The app reaches it at
+  # http://ollama:11434/v1 over the compose network.
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [llm]
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - '11434:11434'
+
 volumes:
   node_modules:
   dbdata:
+  ollama_data:

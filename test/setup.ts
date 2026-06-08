@@ -4,6 +4,11 @@
 // undefined-function crash.
 
 import { vi } from 'vitest'
+import { createError } from 'h3'
+
+// Several server utils call h3's `createError` as a Nitro auto-import. Provide
+// it globally so they behave the same under vitest (no Nuxt runtime here).
+vi.stubGlobal('createError', createError)
 
 // Default: any unmocked $fetch call throws. Individual tests override
 // with `vi.stubGlobal('$fetch', ...)`.

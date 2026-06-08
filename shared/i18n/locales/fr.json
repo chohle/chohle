@@ -69,7 +69,9 @@
     "finance": "Finances",
     "system": "Système",
     "triage": "Triage",
-    "banking": "Rapprochement bancaire"
+    "banking": "Rapprochement bancaire",
+    "assistant": "Assistant",
+    "assistantSection": "IA"
   },
   "demo": {
     "notice": "Démo. Vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",
@@ -876,5 +878,60 @@
     "tabReview": "À vérifier",
     "tabImports": "Importations",
     "tabConfig": "Configuration"
+  },
+  "assistant": {
+    "title": "Assistant",
+    "subtitle": "Consulte tes données et prépare des clients et des factures. Tu valides chaque changement.",
+    "name": "Assistant",
+    "you": "Toi",
+    "placeholder": "Demande-moi de créer un client ou une facture...",
+    "send": "Envoyer",
+    "thinking": "Réflexion...",
+    "reviewProposal": "Vérifie les changements proposés ci-dessous et valide-les.",
+    "error": "Une erreur est survenue. Réessaie.",
+    "emptyState": "Demande-moi une information, ou de préparer un nouveau client ou une facture.",
+    "suggest1": "Liste mes clients",
+    "suggest2": "Crée un client : Müller Bau, Zurich",
+    "suggest3": "Facture Café Zentral 8h de conseil à 150",
+    "approve": "Valider",
+    "cancel": "Annuler",
+    "approved": "Validé",
+    "cancelled": "Annulé",
+    "done": "Terminé.",
+    "commitFailed": "Impossible d'appliquer les changements.",
+    "unavailable": "L'assistant n'est pas activé",
+    "disabledHint": "Mets CHOHLE_ASSISTANT=true et pointe NUXT_LLM_BASE_URL vers un LLM local pour l'activer. Voir docs/ASSISTANT.md.",
+    "create": {
+      "customer": "Nouveau client",
+      "invoice": "Nouvelle facture (brouillon)",
+      "quote": "Nouveau devis (brouillon)",
+      "article": "Nouvel article",
+      "signature": "Nouvelle signature",
+      "expense": "Saisir une dépense",
+      "income": "Nouvelle source de revenu"
+    },
+    "edit": {
+      "customer": "Modifier le client",
+      "invoice": "Modifier la facture",
+      "quote": "Modifier le devis",
+      "article": "Modifier l'article",
+      "signature": "Modifier la signature"
+    },
+    "kind": {
+      "customer": "client",
+      "invoice": "facture",
+      "quote": "devis",
+      "article": "article",
+      "signature": "signature",
+      "expense": "dépense",
+      "income": "source de revenu",
+      "project": "projet"
+    },
+    "before": "Avant",
+    "after": "Après",
+    "createdItem": "{kind} {label} créé.",
+    "updatedItem": "{kind} {label} mis à jour.",
+    "newChat": "Nouveau chat",
+    "untitled": "Nouvelle conversation"
   }
 }

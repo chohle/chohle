@@ -69,7 +69,9 @@
     "finance": "Finanze",
     "system": "Sistema",
     "triage": "Triage",
-    "banking": "Riconciliazione bancaria"
+    "banking": "Riconciliazione bancaria",
+    "assistant": "Assistente",
+    "assistantSection": "IA"
   },
   "demo": {
     "notice": "Demo. Le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",
@@ -876,5 +878,60 @@
     "tabReview": "Da verificare",
     "tabImports": "Importazioni",
     "tabConfig": "Configurazione"
+  },
+  "assistant": {
+    "title": "Assistente",
+    "subtitle": "Leggi i tuoi dati e prepara clienti e fatture. Confermi tu ogni modifica.",
+    "name": "Assistente",
+    "you": "Tu",
+    "placeholder": "Chiedimi di creare un cliente o una fattura...",
+    "send": "Invia",
+    "thinking": "Sto pensando...",
+    "reviewProposal": "Controlla le modifiche proposte qui sotto e confermale.",
+    "error": "Qualcosa è andato storto. Riprova.",
+    "emptyState": "Chiedimi un'informazione, o di preparare un nuovo cliente o una fattura.",
+    "suggest1": "Elenca i miei clienti",
+    "suggest2": "Crea un cliente: Müller Bau, Zurigo",
+    "suggest3": "Fattura Café Zentral 8h di consulenza a 150",
+    "approve": "Conferma",
+    "cancel": "Annulla",
+    "approved": "Confermato",
+    "cancelled": "Annullato",
+    "done": "Fatto.",
+    "commitFailed": "Impossibile applicare le modifiche.",
+    "unavailable": "L'assistente non è attivato",
+    "disabledHint": "Imposta CHOHLE_ASSISTANT=true e punta NUXT_LLM_BASE_URL a un LLM locale per attivarlo. Vedi docs/ASSISTANT.md.",
+    "create": {
+      "customer": "Nuovo cliente",
+      "invoice": "Nuova fattura (bozza)",
+      "quote": "Nuova offerta (bozza)",
+      "article": "Nuovo articolo",
+      "signature": "Nuova firma",
+      "expense": "Registra spesa",
+      "income": "Nuova fonte di reddito"
+    },
+    "edit": {
+      "customer": "Modifica cliente",
+      "invoice": "Modifica fattura",
+      "quote": "Modifica offerta",
+      "article": "Modifica articolo",
+      "signature": "Modifica firma"
+    },
+    "kind": {
+      "customer": "cliente",
+      "invoice": "fattura",
+      "quote": "offerta",
+      "article": "articolo",
+      "signature": "firma",
+      "expense": "spesa",
+      "income": "fonte di reddito",
+      "project": "progetto"
+    },
+    "before": "Prima",
+    "after": "Dopo",
+    "createdItem": "{kind} {label} creato.",
+    "updatedItem": "{kind} {label} aggiornato.",
+    "newChat": "Nuova chat",
+    "untitled": "Nuova conversazione"
   }
 }

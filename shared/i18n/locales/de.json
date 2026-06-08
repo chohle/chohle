@@ -19,7 +19,9 @@
     "finance": "Finanzen",
     "system": "System",
     "triage": "Triage",
-    "banking": "Bankabgleich"
+    "banking": "Bankabgleich",
+    "assistant": "Assistent",
+    "assistantSection": "KI"
   },
   "demo": {
     "notice": "Demo. Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
@@ -876,5 +878,60 @@
     "tabReview": "Zu prüfen",
     "tabImports": "Importe",
     "tabConfig": "Konfiguration"
+  },
+  "assistant": {
+    "title": "Assistent",
+    "subtitle": "Lies deine Daten und entwirf Kunden und Rechnungen. Du bestätigst jede Änderung.",
+    "name": "Assistent",
+    "you": "Du",
+    "placeholder": "Bitte mich, einen Kunden oder eine Rechnung zu erstellen...",
+    "send": "Senden",
+    "thinking": "Denkt nach...",
+    "reviewProposal": "Prüfe die vorgeschlagenen Änderungen unten und bestätige sie.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuch es erneut.",
+    "emptyState": "Frag mich etwas nach, oder lass mich einen Kunden oder eine Rechnung entwerfen.",
+    "suggest1": "Zeig meine Kunden",
+    "suggest2": "Erstelle einen Kunden: Müller Bau, Zürich",
+    "suggest3": "Rechne Café Zentral 8 Std. Beratung à 150",
+    "approve": "Bestätigen",
+    "cancel": "Abbrechen",
+    "approved": "Bestätigt",
+    "cancelled": "Abgebrochen",
+    "done": "Erledigt.",
+    "commitFailed": "Die Änderungen konnten nicht angewendet werden.",
+    "unavailable": "Der Assistent ist nicht aktiviert",
+    "disabledHint": "Setze CHOHLE_ASSISTANT=true und richte NUXT_LLM_BASE_URL auf ein lokales LLM, um ihn zu aktivieren. Siehe docs/ASSISTANT.md.",
+    "create": {
+      "customer": "Neuer Kunde",
+      "invoice": "Neue Rechnung (Entwurf)",
+      "quote": "Neue Offerte (Entwurf)",
+      "article": "Neuer Artikel",
+      "signature": "Neue Signatur",
+      "expense": "Ausgabe erfassen",
+      "income": "Neue Einnahmequelle"
+    },
+    "edit": {
+      "customer": "Kunde bearbeiten",
+      "invoice": "Rechnung bearbeiten",
+      "quote": "Offerte bearbeiten",
+      "article": "Artikel bearbeiten",
+      "signature": "Signatur bearbeiten"
+    },
+    "kind": {
+      "customer": "Kunde",
+      "invoice": "Rechnung",
+      "quote": "Offerte",
+      "article": "Artikel",
+      "signature": "Signatur",
+      "expense": "Ausgabe",
+      "income": "Einnahmequelle",
+      "project": "Projekt"
+    },
+    "before": "Vorher",
+    "after": "Nachher",
+    "createdItem": "{kind} {label} erstellt.",
+    "updatedItem": "{kind} {label} aktualisiert.",
+    "newChat": "Neuer Chat",
+    "untitled": "Neue Unterhaltung"
   }
 }
