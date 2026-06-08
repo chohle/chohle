@@ -93,6 +93,29 @@ describe('assistant commit — create', () => {
     ).toMatchObject({ is_default: 1 })
   })
 
+  it('reuses an existing customer instead of duplicating on a new-customer invoice', () => {
+    const existing = Number(
+      db.prepare("INSERT INTO customers (type, name) VALUES ('company','ACME AG')").run()
+        .lastInsertRowid
+    )
+    const res = commitActions(db, [
+      {
+        type: 'create_invoice',
+        newCustomer: { name: 'acme ag' }, // same name, different case
+        lines: [{ description: 'Work', quantity: 1, unitPriceChf: 100 }]
+      }
+    ])
+    // No new customer created, and the invoice points at the existing one.
+    expect(res.created.some((r) => r.kind === 'customer')).toBe(false)
+    expect(count("SELECT COUNT(*) AS n FROM customers WHERE name = 'ACME AG' COLLATE NOCASE")).toBe(
+      1
+    )
+    const inv = res.created.find((r) => r.kind === 'invoice')!
+    expect(db.prepare('SELECT customer_id FROM invoices WHERE id = ?').get(inv.id)).toMatchObject({
+      customer_id: existing
+    })
+  })
+
   it('logs an expense and resolves the category by name', () => {
     const catId = Number(
       db

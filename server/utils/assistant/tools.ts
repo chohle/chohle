@@ -36,12 +36,14 @@ function senderVat(): boolean {
 }
 function parseLines(raw: unknown): ProposedLine[] {
   const arr = Array.isArray(raw) ? (raw as Record<string, unknown>[]) : []
+  // Clamp money/quantity to sane ranges so a bad model output can't produce a
+  // negative invoice (quantity/price >= 0, discount within 0-100%).
   return arr.map((l) => ({
     description: String(l?.description ?? '').trim(),
-    quantity: Number(l?.quantity) || 0,
-    unitPriceChf: Number(l?.unitPriceChf) || 0,
+    quantity: Math.max(0, Number(l?.quantity) || 0),
+    unitPriceChf: Math.max(0, Number(l?.unitPriceChf) || 0),
     unit: String(l?.unit ?? '').trim() || undefined,
-    discountPercent: Number(l?.discountPercent) || 0,
+    discountPercent: Math.min(100, Math.max(0, Number(l?.discountPercent) || 0)),
     mwstPercent: Number.isFinite(Number(l?.mwstPercent)) ? Number(l?.mwstPercent) : 8.1,
     articleId: Number.isInteger(Number(l?.articleId)) ? Number(l?.articleId) : null,
     articleName: String(l?.articleName ?? '').trim() || undefined
@@ -515,7 +517,21 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
       let newCustomer: Record<string, unknown> | undefined
       if (args.newCustomer && typeof args.newCustomer === 'object') {
         newCustomer = args.newCustomer as Record<string, unknown>
-        customerLabel = String(newCustomer.name ?? '').trim() || 'New customer'
+        const nm = String(newCustomer.name ?? '').trim()
+        // Don't create a duplicate: if a customer with this exact name already
+        // exists, bill the existing one instead of a brand-new customer.
+        const existing = nm
+          ? (db.prepare('SELECT id, name FROM customers WHERE name = ? COLLATE NOCASE').get(nm) as
+              | { id: number; name: string }
+              | undefined)
+          : undefined
+        if (existing) {
+          customerId = existing.id
+          customerLabel = existing.name
+          newCustomer = undefined
+        } else {
+          customerLabel = nm || 'New customer'
+        }
       } else if (Number.isInteger(Number(args.customerId))) {
         customerId = Number(args.customerId)
         const row = db.prepare('SELECT name FROM customers WHERE id = ?').get(customerId) as
@@ -579,8 +595,11 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
     case 'propose_article': {
       const aName = String(args.name ?? '').trim()
       const price = Number(args.price)
-      if (!aName || !Number.isFinite(price)) {
-        throw createError({ statusCode: 400, statusMessage: 'Article needs a name and price' })
+      if (!aName || !Number.isFinite(price) || price < 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Article needs a name and a price >= 0'
+        })
       }
       const mwst = Number.isFinite(Number(args.mwst)) ? Number(args.mwst) : 8.1
       return {
@@ -636,8 +655,11 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
     case 'propose_income': {
       const company = String(args.company ?? '').trim()
       const salary = Number(args.salary)
-      if (!company || !Number.isFinite(salary)) {
-        throw createError({ statusCode: 400, statusMessage: 'Income needs a company and salary' })
+      if (!company || !Number.isFinite(salary) || salary <= 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Income needs a company and a salary > 0'
+        })
       }
       return {
         kind: 'income',

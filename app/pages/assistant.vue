@@ -272,7 +272,7 @@ function useSuggestion(s: string) {
       </aside>
 
       <section class="asst-main">
-        <div ref="threadEl" class="asst-thread">
+        <div ref="threadEl" class="asst-thread" role="log" aria-live="polite">
           <div v-if="!turns.length" class="asst-empty">
             <UIcon name="i-lucide-sparkles" class="size-6" />
             <p>{{ $t('assistant.emptyState') }}</p>
@@ -346,6 +346,7 @@ function useSuggestion(s: string) {
           <UInput
             v-model="input"
             :placeholder="$t('assistant.placeholder')"
+            :aria-label="$t('assistant.placeholder')"
             :disabled="sending"
             autocomplete="off"
             class="asst-input__field"

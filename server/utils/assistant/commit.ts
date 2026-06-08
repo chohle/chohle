@@ -163,7 +163,16 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
     }
 
     const resolveCustomerId = (a: { customerId?: number; newCustomer?: Raw }): number => {
-      if (a.newCustomer) return insertCustomer(a.newCustomer).id
+      if (a.newCustomer) {
+        // Don't create a duplicate: reuse an existing customer with the same name.
+        const nm = String((a.newCustomer as Raw).name ?? '').trim()
+        const existing = nm
+          ? (db.prepare('SELECT id FROM customers WHERE name = ? COLLATE NOCASE').get(nm) as
+              | { id: number }
+              | undefined)
+          : undefined
+        return existing ? existing.id : insertCustomer(a.newCustomer).id
+      }
       const id = Number(a.customerId)
       if (
         !Number.isInteger(id) ||
@@ -524,6 +533,12 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
             action.dueDate && DATE_RE.test(action.dueDate) ? action.dueDate : cur.due_date
           let totalSnapshot: number | null = null
           if (Array.isArray(action.lines)) {
+            if (action.lines.length === 0) {
+              throw createError({
+                statusCode: 400,
+                statusMessage: 'Invoice needs at least one line'
+              })
+            }
             db.prepare('DELETE FROM invoice_items WHERE invoice_id = ?').run(id)
             const total = insertInvoiceItems(id, action.lines)
             totalSnapshot = cur.status === 'paid' ? total : null
@@ -554,6 +569,9 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
               ? action.validUntil
               : cur.valid_until
           if (Array.isArray(action.lines)) {
+            if (action.lines.length === 0) {
+              throw createError({ statusCode: 400, statusMessage: 'Quote needs at least one line' })
+            }
             db.prepare('DELETE FROM quote_items WHERE quote_id = ?').run(id)
             const total = insertQuoteItems(id, action.lines)
             db.prepare('UPDATE quotes SET total_rappen = ? WHERE id = ?').run(total, id)
