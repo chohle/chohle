@@ -891,6 +891,12 @@ const migrations: Migration[] = [
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
     `
+  },
+  {
+    name: '0048_expense_vat_rate',
+    // Optional VAT rate (%) per expense so the tax export can compute input VAT
+    // (Vorsteuer). 0 = not specified -> contributes no input VAT.
+    up: 'ALTER TABLE expenses ADD COLUMN vat_rate REAL NOT NULL DEFAULT 0'
   }
 ]
 

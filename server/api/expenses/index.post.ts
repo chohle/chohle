@@ -4,10 +4,10 @@ export default defineEventHandler(async (event) => {
   const e = parseExpense(await readBody(event))
   const { lastInsertRowid } = useDb()
     .prepare(
-      `INSERT INTO expenses (title, amount_rappen, currency, date, category_id, vendor, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO expenses (title, amount_rappen, currency, date, category_id, vendor, notes, vat_rate)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(e.title, e.amountRappen, e.currency, e.date, e.categoryId, e.vendor, e.notes)
+    .run(e.title, e.amountRappen, e.currency, e.date, e.categoryId, e.vendor, e.notes, e.vatRate)
 
   return { id: lastInsertRowid }
 })

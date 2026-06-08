@@ -6,6 +6,7 @@ export interface ExpenseInput {
   categoryId: number | null
   vendor: string | null
   notes: string | null
+  vatRate: number
 }
 
 export function parseExpense(body: Record<string, unknown>): ExpenseInput {
@@ -16,6 +17,9 @@ export function parseExpense(body: Record<string, unknown>): ExpenseInput {
   const categoryId = body?.categoryId ? Number(body.categoryId) : null
   const vendor = String(body?.vendor ?? '').trim() || null
   const notes = String(body?.notes ?? '').trim() || null
+  // Optional VAT rate (%) for the tax export's input-VAT figure; 0 when unset.
+  const rate = Number(body?.vatRate)
+  const vatRate = Number.isFinite(rate) && rate >= 0 && rate <= 100 ? rate : 0
 
   if (
     !title ||
@@ -33,6 +37,7 @@ export function parseExpense(body: Record<string, unknown>): ExpenseInput {
     date: String(date),
     categoryId,
     vendor,
-    notes
+    notes,
+    vatRate
   }
 }
