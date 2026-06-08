@@ -955,6 +955,8 @@
     "download": "Download ZIP",
     "bundleHint": "P&L report (PDF), CSV journal and all receipts.",
     "expenseVat": "VAT %",
-    "expenseVatHint": "For the tax export input VAT (Vorsteuer). Leave 0 if unsure."
+    "expenseVatHint": "For the tax export input VAT (Vorsteuer). Leave 0 if unsure.",
+    "fixReceipts": "Add the missing receipts",
+    "exportAnyway": "Export anyway (receipts missing)"
   }
 }

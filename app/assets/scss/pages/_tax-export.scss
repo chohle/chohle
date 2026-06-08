@@ -28,7 +28,7 @@
     }
     &.is-active {
       background: var(--ink);
-      color: var(--paper);
+      color: var(--bg);
       border-color: var(--ink);
     }
   }
@@ -99,11 +99,70 @@
     color: #2f855a;
   }
 
+  .tax-missing {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    &__link {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--ink-2);
+      text-decoration: underline;
+      &:hover {
+        color: var(--ink);
+      }
+    }
+    &__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+
+      li {
+        display: grid;
+        grid-template-columns: 90px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 5px 9px;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-sm);
+      }
+    }
+    &__name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
   .tax-actions {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+  }
+  .tax-anyway {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    cursor: pointer;
   }
 
   .note {

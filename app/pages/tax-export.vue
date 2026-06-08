@@ -8,6 +8,7 @@ interface Summary {
   expenseCount: number
   receiptCount: number
   missingReceipts: number
+  missing: { id: number; date: string; vendor: string; title: string; grossRappen: number }[]
   byCategory: { name: string; totalRappen: number }[]
   vat: {
     registered: boolean
@@ -20,17 +21,16 @@ interface Summary {
 
 const { t } = useI18n()
 const now = new Date()
-const year = ref(now.getFullYear() - 1) // default to the last completed year
+const year = ref(now.getFullYear())
 
 const { data } = await useFetch<Summary>(() => `/api/tax-export/summary?year=${year.value}`, {
   default: () => null as unknown as Summary
 })
 
-// Keep the picker in sync with whatever the server resolved (e.g. first run).
+// If the chosen year has no data, fall back to the most recent year that does.
 watchEffect(() => {
-  if (data.value?.year && !data.value.years.includes(year.value) && data.value.years.length) {
-    year.value = data.value.year
-  }
+  const years = data.value?.years ?? []
+  if (years.length && !years.includes(year.value)) year.value = years[0]!
 })
 
 function chf(rappen: number) {
@@ -39,6 +39,16 @@ function chf(rappen: number) {
     maximumFractionDigits: 2
   })
 }
+function fmtDate(iso: string) {
+  const [y, m, d] = (iso || '').split('-')
+  return d ? `${d}.${m}.${y}` : iso
+}
+
+// Don't hand out an incomplete bundle: the download is gated while receipts are
+// missing, with an explicit "export anyway" opt-out. Reset it when the year changes.
+const exportAnyway = ref(false)
+watch(year, () => (exportAnyway.value = false))
+
 function download() {
   window.location.href = `/api/tax-export/${year.value}`
 }
@@ -105,23 +115,42 @@ function download() {
           </span>
         </div>
 
-        <div class="tax-receipts">
-          <UIcon
-            :name="data.missingReceipts ? 'i-lucide-triangle-alert' : 'i-lucide-check'"
-            class="size-4"
-            :class="data.missingReceipts ? 'tax-warn' : 'tax-ok'"
-          />
-          <span v-if="data.missingReceipts" class="tax-warn">
-            {{ $t('taxExport.missing', { n: data.missingReceipts }) }}
-          </span>
-          <span v-else>{{ $t('taxExport.allReceipts', { n: data.receiptCount }) }}</span>
+        <!-- Receipts: complete vs the list of expenses still missing one -->
+        <div v-if="!data.missingReceipts" class="tax-receipts">
+          <UIcon name="i-lucide-check" class="tax-ok size-4" />
+          <span>{{ $t('taxExport.allReceipts', { n: data.receiptCount }) }}</span>
+        </div>
+        <div v-else class="tax-missing">
+          <div class="tax-missing__head">
+            <UIcon name="i-lucide-triangle-alert" class="tax-warn size-4" />
+            <span class="tax-warn">{{ $t('taxExport.missing', { n: data.missingReceipts }) }}</span>
+            <NuxtLink to="/expenses" class="tax-missing__link">
+              {{ $t('taxExport.fixReceipts') }}
+            </NuxtLink>
+          </div>
+          <ul class="tax-missing__list">
+            <li v-for="m in data.missing" :key="m.id">
+              <span class="mono note">{{ fmtDate(m.date) }}</span>
+              <span class="tax-missing__name">{{ m.vendor || m.title }}</span>
+              <span class="mono">CHF {{ chf(m.grossRappen) }}</span>
+            </li>
+          </ul>
         </div>
 
         <div class="tax-actions">
-          <button class="ed-btn" type="button" @click="download">
+          <button
+            class="ed-btn"
+            type="button"
+            :disabled="data.missingReceipts > 0 && !exportAnyway"
+            @click="download"
+          >
             <UIcon name="i-lucide-download" class="size-3.5" /> {{ $t('taxExport.download') }}
           </button>
-          <span class="note">{{ $t('taxExport.bundleHint') }}</span>
+          <label v-if="data.missingReceipts" class="tax-anyway">
+            <input v-model="exportAnyway" type="checkbox" />
+            {{ $t('taxExport.exportAnyway') }}
+          </label>
+          <span v-else class="note">{{ $t('taxExport.bundleHint') }}</span>
         </div>
       </UiCard>
     </template>

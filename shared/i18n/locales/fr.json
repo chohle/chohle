@@ -955,6 +955,8 @@
     "download": "Télécharger le ZIP",
     "bundleHint": "Compte de résultat (PDF), journal CSV et tous les justificatifs.",
     "expenseVat": "TVA %",
-    "expenseVatHint": "Pour l'impôt préalable dans l'export. Laissez 0 si incertain."
+    "expenseVatHint": "Pour l'impôt préalable dans l'export. Laissez 0 si incertain.",
+    "fixReceipts": "Ajouter les justificatifs",
+    "exportAnyway": "Exporter quand même (justificatifs manquants)"
   }
 }

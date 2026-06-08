@@ -955,6 +955,8 @@
     "download": "Scarica ZIP",
     "bundleHint": "Conto economico (PDF), giornale CSV e tutte le ricevute.",
     "expenseVat": "IVA %",
-    "expenseVatHint": "Per l'IVA a credito nell'esportazione. Lascia 0 se incerto."
+    "expenseVatHint": "Per l'IVA a credito nell'esportazione. Lascia 0 se incerto.",
+    "fixReceipts": "Aggiungi le ricevute",
+    "exportAnyway": "Esporta comunque (ricevute mancanti)"
   }
 }

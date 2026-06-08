@@ -955,6 +955,8 @@
     "download": "ZIP herunterladen",
     "bundleHint": "Erfolgsrechnung (PDF), CSV-Journal und alle Belege.",
     "expenseVat": "MWST %",
-    "expenseVatHint": "Für die Vorsteuer im Steuerexport. 0 lassen, wenn unklar."
+    "expenseVatHint": "Für die Vorsteuer im Steuerexport. 0 lassen, wenn unklar.",
+    "fixReceipts": "Belege ergänzen",
+    "exportAnyway": "Trotzdem exportieren (Belege fehlen)"
   }
 }
