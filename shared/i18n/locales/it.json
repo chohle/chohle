@@ -71,7 +71,8 @@
     "triage": "Triage",
     "banking": "Riconciliazione bancaria",
     "assistant": "Assistente",
-    "assistantSection": "IA"
+    "assistantSection": "IA",
+    "taxExport": "Esportazione fiscale"
   },
   "demo": {
     "notice": "Demo. Le tue modifiche restano private nel tuo browser e si azzerano dopo inattività.",
@@ -933,5 +934,27 @@
     "updatedItem": "{kind} {label} aggiornato.",
     "newChat": "Nuova chat",
     "untitled": "Nuova conversazione"
+  },
+  "taxExport": {
+    "title": "Esportazione fiscale",
+    "subtitle": "Scarica il pacchetto di fine anno per la dichiarazione: conto economico, tutte le ricevute e un giornale per il tuo fiduciario.",
+    "noData": "Ancora nessuna spesa o fattura pagata.",
+    "income": "Ricavi",
+    "expenses": "Costi",
+    "net": "Risultato",
+    "netHint": "Ricavi meno costi",
+    "invoices": "Fatture",
+    "salary": "Stipendio",
+    "bookings": "registrazioni",
+    "vat": "IVA",
+    "vatOutput": "IVA a debito",
+    "vatInput": "IVA a credito",
+    "vatNet": "Saldo",
+    "missing": "{n} spesa/e senza ricevuta",
+    "allReceipts": "Tutte le {n} ricevute presenti",
+    "download": "Scarica ZIP",
+    "bundleHint": "Conto economico (PDF), giornale CSV e tutte le ricevute.",
+    "expenseVat": "IVA %",
+    "expenseVatHint": "Per l'IVA a credito nell'esportazione. Lascia 0 se incerto."
   }
 }

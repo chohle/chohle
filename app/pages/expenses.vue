@@ -19,6 +19,7 @@ interface Expense {
   category_name: string | null
   category_color: string | null
   category_icon: string | null
+  vat_rate: number
   attachments: { id: number; filename: string }[]
 }
 
@@ -30,6 +31,11 @@ const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
   default: () => []
 })
 const { data: categories } = await useFetch<Category[]>('/api/categories', { default: () => [] })
+// VAT % field only matters for VAT-registered businesses (drives the tax export).
+const { data: sender } = await useFetch<{ vat_registered?: number }>('/api/sender', {
+  default: () => ({})
+})
+const vatRegistered = computed(() => !!sender.value?.vat_registered)
 
 const expenseCategories = computed(() => categories.value.filter((c) => c.type === 'expense'))
 const categoryItems = computed(() => [
@@ -92,7 +98,8 @@ function blank() {
     date: today,
     categoryId: null as number | null,
     vendor: '',
-    notes: ''
+    notes: '',
+    vatRate: 0 as number
   }
 }
 const form = reactive(blank())
@@ -111,7 +118,8 @@ function openEdit(e: Expense) {
     date: e.date,
     categoryId: e.category_id,
     vendor: e.vendor ?? '',
-    notes: e.notes ?? ''
+    notes: e.notes ?? '',
+    vatRate: e.vat_rate ?? 0
   })
   open.value = true
 }
@@ -322,6 +330,20 @@ function chf(rappen: number) {
           </UFormField>
           <UFormField :label="$t('common.vendor')">
             <UInput v-model="form.vendor" class="w-full" />
+          </UFormField>
+          <UFormField
+            v-if="vatRegistered"
+            :label="$t('taxExport.expenseVat')"
+            :help="$t('taxExport.expenseVatHint')"
+          >
+            <UInput
+              v-model.number="form.vatRate"
+              type="number"
+              step="0.1"
+              min="0"
+              max="100"
+              class="w-full"
+            />
           </UFormField>
           <UFormField :label="$t('common.notes')" class="sm:col-span-2">
             <UTextarea v-model="form.notes" :rows="3" autoresize class="w-full" />

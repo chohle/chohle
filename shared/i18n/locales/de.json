@@ -21,7 +21,8 @@
     "triage": "Triage",
     "banking": "Bankabgleich",
     "assistant": "Assistent",
-    "assistantSection": "KI"
+    "assistantSection": "KI",
+    "taxExport": "Steuerexport"
   },
   "demo": {
     "notice": "Demo. Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
@@ -933,5 +934,27 @@
     "updatedItem": "{kind} {label} aktualisiert.",
     "newChat": "Neuer Chat",
     "untitled": "Neue Unterhaltung"
+  },
+  "taxExport": {
+    "title": "Steuerexport",
+    "subtitle": "Lade das Jahrespaket für die Steuererklärung: Erfolgsrechnung, alle Belege und ein Journal für deinen Treuhänder.",
+    "noData": "Noch keine Aufwände oder bezahlten Rechnungen.",
+    "income": "Ertrag",
+    "expenses": "Aufwand",
+    "net": "Ergebnis",
+    "netHint": "Ertrag minus Aufwand",
+    "invoices": "Rechnungen",
+    "salary": "Lohn",
+    "bookings": "Buchungen",
+    "vat": "MWST",
+    "vatOutput": "Umsatzsteuer",
+    "vatInput": "Vorsteuer",
+    "vatNet": "Saldo",
+    "missing": "{n} Aufwand/Aufwände ohne Beleg",
+    "allReceipts": "Alle {n} Belege vorhanden",
+    "download": "ZIP herunterladen",
+    "bundleHint": "Erfolgsrechnung (PDF), CSV-Journal und alle Belege.",
+    "expenseVat": "MWST %",
+    "expenseVatHint": "Für die Vorsteuer im Steuerexport. 0 lassen, wenn unklar."
   }
 }

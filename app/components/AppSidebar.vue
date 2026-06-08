@@ -83,7 +83,8 @@ const sections = computed<Section[]>(() => [
       { label: t('nav.payments'), icon: 'i-lucide-wallet', to: '/payments' },
       { label: t('nav.banking'), icon: 'i-lucide-landmark', to: '/banking' },
       { label: t('nav.reminders'), icon: 'i-lucide-bell', to: '/reminders' },
-      { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' }
+      { label: t('nav.categories'), icon: 'i-lucide-tags', to: '/categories' },
+      { label: t('nav.taxExport'), icon: 'i-lucide-file-down', to: '/tax-export' }
     ]
   },
   // The assistant is its own section, shown only when enabled for this instance.
