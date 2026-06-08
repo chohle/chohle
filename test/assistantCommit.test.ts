@@ -130,14 +130,15 @@ describe('assistant commit — create', () => {
         title: 'Adobe',
         amount: 65,
         date: '2026-06-01',
-        categoryName: 'Software'
+        categoryName: 'Software',
+        vatRate: 8.1
       }
     ])
     expect(
       db
-        .prepare('SELECT amount_rappen, category_id FROM expenses WHERE id = ?')
+        .prepare('SELECT amount_rappen, category_id, vat_rate FROM expenses WHERE id = ?')
         .get(res.created[0]!.id)
-    ).toMatchObject({ amount_rappen: 6500, category_id: catId })
+    ).toMatchObject({ amount_rappen: 6500, category_id: catId, vat_rate: 8.1 })
   })
 })
 

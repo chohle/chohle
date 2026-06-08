@@ -221,14 +221,15 @@ export const PROPOSE_TOOLS: OpenAITool[] = [
   ),
   fn(
     'propose_expense',
-    'Propose logging an expense (user must approve). amount in CHF, date YYYY-MM-DD. Use categoryName to tag it.',
+    'Propose logging an expense (user must approve). amount in CHF (gross, incl. VAT), date YYYY-MM-DD. Use categoryName to tag it; set vatRate (e.g. 8.1) to record input VAT for the tax export.',
     {
       title: { type: 'string' },
       amount: { type: 'number' },
       date: { type: 'string' },
       categoryName: { type: 'string' },
       vendor: { type: 'string' },
-      notes: { type: 'string' }
+      notes: { type: 'string' },
+      vatRate: { type: 'number', description: 'VAT % on this expense, e.g. 8.1; 0 if none' }
     },
     ['title', 'amount', 'date']
   ),
@@ -651,8 +652,11 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
         throw createError({ statusCode: 400, statusMessage: 'Expense needs a title and amount' })
       }
       const cat = String(args.categoryName ?? '').trim()
+      const rate = Number(args.vatRate)
+      const vatRate = Number.isFinite(rate) && rate >= 0 && rate <= 100 ? rate : 0
       const summary = [title, `CHF ${chf(Math.round(amount * 100))}`, date]
       if (cat) summary.push(cat)
+      if (vatRate) summary.push(`${vatRate}% MWST`)
       return {
         kind: 'expense',
         mode: 'create',
@@ -664,7 +668,8 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
           date,
           categoryName: cat || undefined,
           vendor: String(args.vendor ?? '').trim() || undefined,
-          notes: String(args.notes ?? '').trim() || undefined
+          notes: String(args.notes ?? '').trim() || undefined,
+          vatRate: vatRate || undefined
         }
       }
     }
