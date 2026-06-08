@@ -183,7 +183,7 @@
     }
     &.is-user &__bubble {
       background: var(--ink);
-      color: var(--paper);
+      color: var(--bg);
     }
     &.is-assistant &__bubble {
       background: var(--surface-2);
@@ -207,7 +207,7 @@
   .asst-card {
     border: 1px solid var(--rule);
     border-radius: var(--radius-sm);
-    background: var(--paper);
+    background: var(--bg);
     padding: 10px 14px;
 
     &__head {
@@ -272,7 +272,7 @@
     gap: 8px;
     padding: 12px 0 4px;
     border-top: 1px solid var(--rule);
-    background: var(--paper);
+    background: var(--bg);
 
     &__field {
       flex: 1;
