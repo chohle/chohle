@@ -36,10 +36,16 @@ function senderVat(): boolean {
       | undefined
   )?.vat_registered
 }
+/** A VAT rate as a sane percentage (0-100); falls back to 8.1 when out of range. */
+function clampMwst(v: unknown): number {
+  const n = Number(v)
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : 8.1
+}
+
 /**
  * Normalize raw model line items into ProposedLine[]. Clamps money/quantity to
  * sane ranges so a bad model output can't produce a negative invoice
- * (quantity/price >= 0, discount within 0-100%).
+ * (quantity/price >= 0, discount within 0-100%, VAT within 0-100%).
  */
 function parseLines(raw: unknown): ProposedLine[] {
   const arr = Array.isArray(raw) ? (raw as Record<string, unknown>[]) : []
@@ -49,7 +55,7 @@ function parseLines(raw: unknown): ProposedLine[] {
     unitPriceChf: Math.max(0, Number(l?.unitPriceChf) || 0),
     unit: String(l?.unit ?? '').trim() || undefined,
     discountPercent: Math.min(100, Math.max(0, Number(l?.discountPercent) || 0)),
-    mwstPercent: Number.isFinite(Number(l?.mwstPercent)) ? Number(l?.mwstPercent) : 8.1,
+    mwstPercent: clampMwst(l?.mwstPercent),
     articleId: Number.isInteger(Number(l?.articleId)) ? Number(l?.articleId) : null,
     articleName: String(l?.articleName ?? '').trim() || undefined
   }))
@@ -528,19 +534,20 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
       if (args.newCustomer && typeof args.newCustomer === 'object') {
         newCustomer = args.newCustomer as Record<string, unknown>
         const nm = String(newCustomer.name ?? '').trim()
+        if (!nm) {
+          throw createError({ statusCode: 400, statusMessage: 'New customer needs a name' })
+        }
         // Don't create a duplicate: if a customer with this exact name already
         // exists, bill the existing one instead of a brand-new customer.
-        const existing = nm
-          ? (db.prepare('SELECT id, name FROM customers WHERE name = ? COLLATE NOCASE').get(nm) as
-              | { id: number; name: string }
-              | undefined)
-          : undefined
+        const existing = db
+          .prepare('SELECT id, name FROM customers WHERE name = ? COLLATE NOCASE')
+          .get(nm) as { id: number; name: string } | undefined
         if (existing) {
           customerId = existing.id
           customerLabel = existing.name
           newCustomer = undefined
         } else {
-          customerLabel = nm || 'New customer'
+          customerLabel = nm
         }
       } else if (Number.isInteger(Number(args.customerId))) {
         customerId = Number(args.customerId)
@@ -665,11 +672,21 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
     case 'propose_income': {
       const company = String(args.company ?? '').trim()
       const salary = Number(args.salary)
+      const payoutDay = Number(args.payoutDay)
+      const canton = String(args.canton ?? '')
+        .trim()
+        .toUpperCase()
       if (!company || !Number.isFinite(salary) || salary <= 0) {
         throw createError({
           statusCode: 400,
           statusMessage: 'Income needs a company and a salary > 0'
         })
+      }
+      if (!Number.isInteger(payoutDay) || payoutDay < 1 || payoutDay > 31) {
+        throw createError({ statusCode: 400, statusMessage: 'payoutDay must be 1-31' })
+      }
+      if (!/^[A-Z]{2}$/.test(canton)) {
+        throw createError({ statusCode: 400, statusMessage: 'canton must be a 2-letter code' })
       }
       return {
         kind: 'income',
@@ -680,8 +697,8 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
           company,
           jobTitle: String(args.jobTitle ?? '').trim() || undefined,
           salary,
-          payoutDay: Number(args.payoutDay),
-          canton: String(args.canton ?? '').trim(),
+          payoutDay,
+          canton,
           payoutRule: String(args.payoutRule ?? 'earlier')
         }
       }

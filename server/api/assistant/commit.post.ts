@@ -52,7 +52,9 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const username = (session.user as { username?: string })?.username ?? null
-  const prompt = typeof body?.prompt === 'string' ? body.prompt.slice(0, 2000) : null
+  // The raw prompt is free-text and could carry PII/secrets; record only that
+  // one was present, not its content. The redacted actions capture what was done.
+  const auditPrompt = typeof body?.prompt === 'string' && body.prompt.trim() ? '[redacted]' : null
   const redacted = JSON.stringify(redact(actions))
 
   try {
@@ -60,7 +62,7 @@ export default defineEventHandler(async (event) => {
     db.prepare(
       `INSERT INTO assistant_audit (username, prompt, proposed_actions, result, status)
        VALUES (?, ?, ?, ?, 'committed')`
-    ).run(username, prompt, redacted, JSON.stringify(result))
+    ).run(username, auditPrompt, redacted, JSON.stringify(result))
     return result
   } catch (err) {
     // Best-effort failure record (the data transaction already rolled back).
@@ -68,7 +70,7 @@ export default defineEventHandler(async (event) => {
       db.prepare(
         `INSERT INTO assistant_audit (username, prompt, proposed_actions, status)
          VALUES (?, ?, ?, 'failed')`
-      ).run(username, prompt, redacted)
+      ).run(username, auditPrompt, redacted)
     } catch {
       /* ignore audit write failure */
     }

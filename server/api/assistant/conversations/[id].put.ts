@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'turns must be an array' })
   }
   const turnsJson = JSON.stringify(body.turns)
-  if (turnsJson.length > MAX_TURNS_BYTES) {
+  if (Buffer.byteLength(turnsJson, 'utf8') > MAX_TURNS_BYTES) {
     throw createError({ statusCode: 413, statusMessage: 'Conversation too large' })
   }
   const title = String(body?.title ?? '').slice(0, 200)
