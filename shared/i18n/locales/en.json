@@ -493,7 +493,8 @@
     "noBreakdownText": "Log expenses to see the breakdown.",
     "thisMonth": "This month",
     "saveFailed": "Could not save the expense",
-    "receiptFailed": "Could not remove the receipt"
+    "receiptFailed": "Could not remove the receipt",
+    "attachmentsSaveFailed": "Expense saved, but the receipts could not be uploaded"
   },
   "income": {
     "subtitle": "Salary and jobs with Swiss pay-date calculation.",
@@ -752,7 +753,8 @@
   "validation": {
     "required": "This field must be filled",
     "email": "Please enter a valid email address",
-    "positive": "Must be greater than 0"
+    "positive": "Must be greater than 0",
+    "percent": "Must be between 0 and 100"
   },
   "common": {
     "close": "Close",
@@ -786,7 +788,8 @@
     "username": "Username",
     "password": "Password",
     "delete": "Delete",
-    "optional": "Optional"
+    "optional": "Optional",
+    "retry": "Retry"
   },
   "triage": {
     "title": "Triage",
@@ -962,6 +965,8 @@
     "blockedHint": "Add all receipts before exporting.",
     "addReceipt": "Receipt",
     "receiptsSection": "Receipts",
-    "uploadFailed": "Could not upload the receipt"
+    "uploadFailed": "Could not upload the receipt",
+    "loadError": "Could not load the tax summary",
+    "yearLabel": "Tax year"
   }
 }

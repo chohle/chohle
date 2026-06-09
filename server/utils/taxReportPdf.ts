@@ -27,7 +27,10 @@ export function renderTaxReportPdf(report: TaxReport, logo: Buffer | null): Prom
   const pdf = new PDFDocument({ size: 'A4', margin: PAGE.margin })
   const chunks: Buffer[] = []
   pdf.on('data', (c: Buffer) => chunks.push(c))
-  const done = new Promise<Buffer>((resolve) => pdf.on('end', () => resolve(Buffer.concat(chunks))))
+  const done = new Promise<Buffer>((resolve, reject) => {
+    pdf.on('end', () => resolve(Buffer.concat(chunks)))
+    pdf.on('error', reject)
+  })
 
   // A right-aligned money cell at the current line.
   const moneyRow = (label: string, rappen: number, bold = false) => {
@@ -68,7 +71,7 @@ export function renderTaxReportPdf(report: TaxReport, logo: Buffer | null): Prom
       .font('Helvetica-Bold')
       .fontSize(16)
       .fillColor('#111')
-      .text(report.sender.name || 'chohle', PAGE.margin, 54)
+      .text(report.sender.name, PAGE.margin, 54)
   }
 
   pdf.y = 110

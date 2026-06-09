@@ -493,7 +493,8 @@
     "noBreakdownText": "Registra spese per vedere la suddivisione.",
     "thisMonth": "Questo mese",
     "saveFailed": "Impossibile salvare la spesa",
-    "receiptFailed": "Impossibile rimuovere la ricevuta"
+    "receiptFailed": "Impossibile rimuovere la ricevuta",
+    "attachmentsSaveFailed": "Spesa salvata, ma le ricevute non sono state caricate"
   },
   "income": {
     "subtitle": "Stipendi e lavori con calcolo della data di pagamento svizzera.",
@@ -752,7 +753,8 @@
   "validation": {
     "required": "Questo campo deve essere compilato",
     "email": "Inserisci un indirizzo email valido",
-    "positive": "Deve essere maggiore di 0"
+    "positive": "Deve essere maggiore di 0",
+    "percent": "Deve essere tra 0 e 100"
   },
   "common": {
     "close": "Chiudi",
@@ -786,7 +788,8 @@
     "username": "Nome utente",
     "password": "Password",
     "delete": "Elimina",
-    "optional": "Facoltativo"
+    "optional": "Facoltativo",
+    "retry": "Riprova"
   },
   "triage": {
     "title": "Triage",
@@ -962,6 +965,8 @@
     "blockedHint": "Aggiungi tutte le ricevute prima di esportare.",
     "addReceipt": "Ricevuta",
     "receiptsSection": "Ricevute",
-    "uploadFailed": "Impossibile caricare la ricevuta"
+    "uploadFailed": "Impossibile caricare la ricevuta",
+    "loadError": "Impossibile caricare il riepilogo fiscale",
+    "yearLabel": "Anno fiscale"
   }
 }

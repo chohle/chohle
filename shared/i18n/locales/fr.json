@@ -493,7 +493,8 @@
     "noBreakdownText": "Saisissez des dépenses pour voir la répartition.",
     "thisMonth": "Ce mois",
     "saveFailed": "Impossible d'enregistrer la dépense",
-    "receiptFailed": "Impossible de supprimer le justificatif"
+    "receiptFailed": "Impossible de supprimer le justificatif",
+    "attachmentsSaveFailed": "Dépense enregistrée, mais les justificatifs n'ont pas pu être téléversés"
   },
   "income": {
     "subtitle": "Salaires et emplois avec calcul de la date de paie suisse.",
@@ -752,7 +753,8 @@
   "validation": {
     "required": "Ce champ doit être rempli",
     "email": "Veuillez saisir une adresse e-mail valide",
-    "positive": "Doit être supérieur à 0"
+    "positive": "Doit être supérieur à 0",
+    "percent": "Doit être entre 0 et 100"
   },
   "common": {
     "close": "Fermer",
@@ -786,7 +788,8 @@
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
     "delete": "Supprimer",
-    "optional": "Facultatif"
+    "optional": "Facultatif",
+    "retry": "Réessayer"
   },
   "triage": {
     "title": "Triage",
@@ -962,6 +965,8 @@
     "blockedHint": "Ajoutez tous les justificatifs avant d'exporter.",
     "addReceipt": "Justificatif",
     "receiptsSection": "Justificatifs",
-    "uploadFailed": "Impossible de téléverser le justificatif"
+    "uploadFailed": "Impossible de téléverser le justificatif",
+    "loadError": "Impossible de charger le récapitulatif fiscal",
+    "yearLabel": "Année fiscale"
   }
 }

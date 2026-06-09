@@ -163,31 +163,41 @@ function validate(state: typeof form) {
   if (!state.title.trim()) errors.push({ name: 'title', message: t('validation.required') })
   if (state.amount == null) errors.push({ name: 'amount', message: t('validation.required') })
   else if (state.amount <= 0) errors.push({ name: 'amount', message: t('validation.positive') })
+  if (state.vatRate < 0 || state.vatRate > 100)
+    errors.push({ name: 'vatRate', message: t('validation.percent') })
   return errors
 }
 /** Create or update the expense, then upload any receipts picked in the form. */
 async function save() {
   saving.value = true
   try {
-    if (form.id) {
-      await $fetch(`/api/expenses/${form.id}`, { method: 'PUT', body: { ...form } })
-    } else {
-      const { id, ...body } = form
-      // Remember the new id so a retry (e.g. if the receipt upload fails) updates
-      // the same expense instead of creating a duplicate.
-      form.id = (await $fetch<{ id: number }>('/api/expenses', { method: 'POST', body })).id
+    // 1) Save the expense itself. On failure, keep the form open to retry.
+    try {
+      if (form.id) {
+        await $fetch(`/api/expenses/${form.id}`, { method: 'PUT', body: { ...form } })
+      } else {
+        const { id, ...body } = form
+        // Remember the new id so a retry doesn't create a duplicate expense.
+        form.id = (await $fetch<{ id: number }>('/api/expenses', { method: 'POST', body })).id
+      }
+    } catch {
+      toast.add({ title: t('expenses.saveFailed'), color: 'error' })
+      return
     }
-    // Upload any receipts picked in the form to the (new or existing) expense.
+    // 2) Upload receipts. The expense is already saved, so a failure here is a
+    // distinct (non-fatal) error — we still close and refresh.
     if (form.id && pendingFiles.value.length) {
-      const fd = new FormData()
-      for (const f of pendingFiles.value) fd.append('files', f)
-      await $fetch(`/api/expenses/${form.id}/attachments`, { method: 'POST', body: fd })
-      pendingFiles.value = []
+      try {
+        const fd = new FormData()
+        for (const f of pendingFiles.value) fd.append('files', f)
+        await $fetch(`/api/expenses/${form.id}/attachments`, { method: 'POST', body: fd })
+        pendingFiles.value = []
+      } catch {
+        toast.add({ title: t('expenses.attachmentsSaveFailed'), color: 'error' })
+      }
     }
     open.value = false
     await refresh()
-  } catch {
-    toast.add({ title: t('expenses.saveFailed'), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -381,6 +391,7 @@ function chf(rappen: number) {
           </UFormField>
           <UFormField
             v-if="vatRegistered"
+            name="vatRate"
             :label="$t('taxExport.expenseVat')"
             :help="$t('taxExport.expenseVatHint')"
           >
@@ -403,7 +414,13 @@ function chf(rappen: number) {
                   <UIcon name="i-lucide-paperclip" class="size-3" />
                   <span class="rec__fname">{{ a.filename }}</span>
                 </a>
-                <button type="button" class="rec__rm" @click="removeAttachment(a.id)">
+                <button
+                  type="button"
+                  class="rec__rm"
+                  :aria-label="`${$t('common.delete')}: ${a.filename}`"
+                  :title="`${$t('common.delete')}: ${a.filename}`"
+                  @click="removeAttachment(a.id)"
+                >
                   <UIcon name="i-lucide-x" class="size-3" />
                 </button>
               </span>
@@ -412,7 +429,13 @@ function chf(rappen: number) {
                   <UIcon name="i-lucide-file-plus" class="size-3" />
                   <span class="rec__fname">{{ f.name }}</span>
                 </span>
-                <button type="button" class="rec__rm" @click="removePending(i)">
+                <button
+                  type="button"
+                  class="rec__rm"
+                  :aria-label="`${$t('common.delete')}: ${f.name}`"
+                  :title="`${$t('common.delete')}: ${f.name}`"
+                  @click="removePending(i)"
+                >
                   <UIcon name="i-lucide-x" class="size-3" />
                 </button>
               </span>

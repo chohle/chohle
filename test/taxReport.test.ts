@@ -2,7 +2,7 @@
 // (a paid invoice + a salary payment) and two expenses (one with VAT + a receipt,
 // one without), and checks the Erfolgsrechnung totals, the VAT summary, the
 // missing-receipt detection, and the ZIP contents.
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import Database from 'better-sqlite3'
@@ -108,6 +108,13 @@ describe('buildTaxReport', () => {
   it('ignores another year', () => {
     expect(buildTaxReport(db, 2023).income.totalRappen).toBe(0)
     expect(buildTaxReport(db, 2023).expenses.totalRappen).toBe(0)
+  })
+
+  it('treats an expense whose receipt file is gone as missing', () => {
+    // The attachment row exists but its file vanished from disk.
+    rmSync(join(process.env.UPLOADS_PATH!, 'receipt1.jpg'))
+    const r = buildTaxReport(db, 2024)
+    expect(r.missingReceipts).toHaveLength(2) // Toner (file gone) + Kaffee (none)
   })
 })
 

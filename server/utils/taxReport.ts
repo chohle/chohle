@@ -5,8 +5,11 @@
 //
 // Cash basis: invoices by paid_at, salary by income_payments.month, expenses by
 // date. All amounts in Rappen.
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import type { Database } from 'better-sqlite3'
 import { computeInvoiceTotals, round5 } from '../../shared/utils/invoice'
+import { uploadsDir } from './uploads'
 
 export interface TaxReportAttachment {
   id: number
@@ -136,8 +139,13 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
        WHERE substr(e.date, 1, 4) = ?`
     )
     .all(y) as { id: number; expenseId: number; filename: string; storedName: string }[]
+  const dir = uploadsDir()
   const attByExpense = new Map<number, TaxReportAttachment[]>()
   for (const a of attRows) {
+    // An attachment row whose file is gone is not a usable receipt — skip it so
+    // the expense is correctly flagged as missing rather than silently dropped
+    // from the bundle later.
+    if (!existsSync(join(dir, a.storedName))) continue
     const list = attByExpense.get(a.expenseId) ?? []
     list.push({ id: a.id, filename: a.filename, storedName: a.storedName })
     attByExpense.set(a.expenseId, list)

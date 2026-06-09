@@ -24,7 +24,7 @@ const toast = useToast()
 const now = new Date()
 const year = ref(now.getFullYear())
 
-const { data, refresh } = await useFetch<Summary>(
+const { data, refresh, error } = await useFetch<Summary>(
   () => `/api/tax-export/summary?year=${year.value}`,
   { default: () => null as unknown as Summary }
 )
@@ -92,18 +92,25 @@ async function onReceipt(e: Event) {
       </template>
     </UiPageHead>
 
-    <div v-if="!data || !data.years.length" class="tax-empty note">
+    <div v-if="error" class="tax-error">
+      <UIcon name="i-lucide-triangle-alert" class="tax-warn size-4" />
+      <span class="tax-warn">{{ $t('taxExport.loadError') }}</span>
+      <button class="ed-btn" type="button" @click="refresh()">{{ $t('common.retry') }}</button>
+    </div>
+
+    <div v-else-if="!data || !data.years.length" class="tax-empty note">
       {{ $t('taxExport.noData') }}
     </div>
 
     <template v-else>
-      <div class="tax-years">
+      <div class="tax-years" role="group" :aria-label="$t('taxExport.yearLabel')">
         <button
           v-for="y in data.years"
           :key="y"
           type="button"
           class="tax-year"
           :class="{ 'is-active': y === year }"
+          :aria-pressed="y === year"
           @click="year = y"
         >
           {{ y }}
