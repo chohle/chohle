@@ -19,10 +19,12 @@ interface Expense {
   category_name: string | null
   category_color: string | null
   category_icon: string | null
+  vat_rate: number
   attachments: { id: number; filename: string }[]
 }
 
 const { t } = useI18n()
+const toast = useToast()
 const month = ref(new Date().toISOString().slice(0, 7))
 
 const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
@@ -30,6 +32,11 @@ const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
   default: () => []
 })
 const { data: categories } = await useFetch<Category[]>('/api/categories', { default: () => [] })
+// VAT % field only matters for VAT-registered businesses (drives the tax export).
+const { data: sender } = await useFetch<{ vat_registered?: number }>('/api/sender', {
+  default: () => ({})
+})
+const vatRegistered = computed(() => !!sender.value?.vat_registered)
 
 const expenseCategories = computed(() => categories.value.filter((c) => c.type === 'expense'))
 const categoryItems = computed(() => [
@@ -92,17 +99,48 @@ function blank() {
     date: today,
     categoryId: null as number | null,
     vendor: '',
-    notes: ''
+    notes: '',
+    vatRate: 0 as number
   }
 }
 const form = reactive(blank())
 const open = ref(false)
 const saving = ref(false)
 
+// Receipts in the form: existing ones (when editing) plus files picked now that
+// get uploaded when the expense is saved (so you can attach a Beleg on create).
+const fileInput = ref<HTMLInputElement>()
+const pendingFiles = ref<File[]>([])
+const editAttachments = ref<{ id: number; filename: string }[]>([])
+/** Add the chosen files to the pending list (uploaded when the expense saves). */
+function pickFiles(e: Event) {
+  const fl = (e.target as HTMLInputElement).files
+  if (fl) pendingFiles.value.push(...Array.from(fl))
+  if (fileInput.value) fileInput.value.value = ''
+}
+/** Drop a not-yet-uploaded file from the pending list. */
+function removePending(i: number) {
+  pendingFiles.value.splice(i, 1)
+}
+/** Delete an existing receipt (edit mode); only updates the UI on success. */
+async function removeAttachment(id: number) {
+  try {
+    await $fetch(`/api/attachments/${id}`, { method: 'DELETE' })
+    editAttachments.value = editAttachments.value.filter((a) => a.id !== id)
+    await refresh()
+  } catch {
+    toast.add({ title: t('expenses.receiptFailed'), color: 'error' })
+  }
+}
+
+/** Open the form to add a new expense. */
 function openCreate() {
   Object.assign(form, blank())
+  pendingFiles.value = []
+  editAttachments.value = []
   open.value = true
 }
+/** Open the form to edit an existing expense, preloading its receipts. */
 function openEdit(e: Expense) {
   Object.assign(form, {
     id: e.id,
@@ -111,8 +149,11 @@ function openEdit(e: Expense) {
     date: e.date,
     categoryId: e.category_id,
     vendor: e.vendor ?? '',
-    notes: e.notes ?? ''
+    notes: e.notes ?? '',
+    vatRate: e.vat_rate ?? 0
   })
+  pendingFiles.value = []
+  editAttachments.value = e.attachments ?? []
   open.value = true
 }
 
@@ -122,14 +163,39 @@ function validate(state: typeof form) {
   if (!state.title.trim()) errors.push({ name: 'title', message: t('validation.required') })
   if (state.amount == null) errors.push({ name: 'amount', message: t('validation.required') })
   else if (state.amount <= 0) errors.push({ name: 'amount', message: t('validation.positive') })
+  if (state.vatRate < 0 || state.vatRate > 100)
+    errors.push({ name: 'vatRate', message: t('validation.percent') })
   return errors
 }
+/** Create or update the expense, then upload any receipts picked in the form. */
 async function save() {
   saving.value = true
   try {
-    const { id, ...body } = form
-    if (id) await $fetch(`/api/expenses/${id}`, { method: 'PUT', body })
-    else await $fetch('/api/expenses', { method: 'POST', body })
+    // 1) Save the expense itself. On failure, keep the form open to retry.
+    try {
+      if (form.id) {
+        await $fetch(`/api/expenses/${form.id}`, { method: 'PUT', body: { ...form } })
+      } else {
+        const { id, ...body } = form
+        // Remember the new id so a retry doesn't create a duplicate expense.
+        form.id = (await $fetch<{ id: number }>('/api/expenses', { method: 'POST', body })).id
+      }
+    } catch {
+      toast.add({ title: t('expenses.saveFailed'), color: 'error' })
+      return
+    }
+    // 2) Upload receipts. The expense is already saved, so a failure here is a
+    // distinct (non-fatal) error — we still close and refresh.
+    if (form.id && pendingFiles.value.length) {
+      try {
+        const fd = new FormData()
+        for (const f of pendingFiles.value) fd.append('files', f)
+        await $fetch(`/api/expenses/${form.id}/attachments`, { method: 'POST', body: fd })
+        pendingFiles.value = []
+      } catch {
+        toast.add({ title: t('expenses.attachmentsSaveFailed'), color: 'error' })
+      }
+    }
     open.value = false
     await refresh()
   } finally {
@@ -323,8 +389,69 @@ function chf(rappen: number) {
           <UFormField :label="$t('common.vendor')">
             <UInput v-model="form.vendor" class="w-full" />
           </UFormField>
+          <UFormField
+            v-if="vatRegistered"
+            name="vatRate"
+            :label="$t('taxExport.expenseVat')"
+            :help="$t('taxExport.expenseVatHint')"
+          >
+            <UInput
+              v-model.number="form.vatRate"
+              type="number"
+              step="0.1"
+              min="0"
+              max="100"
+              class="w-full"
+            />
+          </UFormField>
           <UFormField :label="$t('common.notes')" class="sm:col-span-2">
             <UTextarea v-model="form.notes" :rows="3" autoresize class="w-full" />
+          </UFormField>
+          <UFormField :label="$t('expenses.receipts')" class="sm:col-span-2">
+            <div class="rec">
+              <span v-for="a in editAttachments" :key="a.id" class="rec__chip mono">
+                <a :href="`/api/attachments/${a.id}`" target="_blank" class="rec__link">
+                  <UIcon name="i-lucide-paperclip" class="size-3" />
+                  <span class="rec__fname">{{ a.filename }}</span>
+                </a>
+                <button
+                  type="button"
+                  class="rec__rm"
+                  :aria-label="`${$t('common.delete')}: ${a.filename}`"
+                  :title="`${$t('common.delete')}: ${a.filename}`"
+                  @click="removeAttachment(a.id)"
+                >
+                  <UIcon name="i-lucide-x" class="size-3" />
+                </button>
+              </span>
+              <span v-for="(f, i) in pendingFiles" :key="`p${i}`" class="rec__chip mono">
+                <span class="rec__link">
+                  <UIcon name="i-lucide-file-plus" class="size-3" />
+                  <span class="rec__fname">{{ f.name }}</span>
+                </span>
+                <button
+                  type="button"
+                  class="rec__rm"
+                  :aria-label="`${$t('common.delete')}: ${f.name}`"
+                  :title="`${$t('common.delete')}: ${f.name}`"
+                  @click="removePending(i)"
+                >
+                  <UIcon name="i-lucide-x" class="size-3" />
+                </button>
+              </span>
+              <button type="button" class="rec__up" @click="fileInput?.click()">
+                <UIcon name="i-lucide-upload" class="size-3" />
+                <span>{{ $t('expenses.receipt') }}</span>
+              </button>
+              <input
+                ref="fileInput"
+                type="file"
+                multiple
+                accept="application/pdf,image/*"
+                class="rec__file"
+                @change="pickFiles"
+              />
+            </div>
           </UFormField>
         </UForm>
       </template>

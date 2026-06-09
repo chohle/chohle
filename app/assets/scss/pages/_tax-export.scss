@@ -1,0 +1,164 @@
+.page-tax-export {
+  &__sub {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .tax-empty {
+    margin-top: 16px;
+    font-size: 13px;
+  }
+  .tax-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+
+  .tax-years {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .tax-year {
+    font-size: 13px;
+    padding: 6px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: none;
+    color: var(--ink-2);
+    cursor: pointer;
+    &:hover {
+      color: var(--ink);
+    }
+    &.is-active {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+  }
+
+  // VAT strip below the KPI row.
+  .tax-vat {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+
+    &__title {
+      color: var(--ink-3);
+    }
+    &__items {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    &__net {
+      font-weight: 600;
+    }
+    .note {
+      margin-right: 4px;
+    }
+  }
+
+  .tax-done {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .tax-missing {
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    &__link {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--ink-2);
+      text-decoration: underline;
+      &:hover {
+        color: var(--ink);
+      }
+    }
+    &__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+
+      li {
+        display: grid;
+        grid-template-columns: 88px 1fr auto auto;
+        gap: 12px;
+        align-items: center;
+        padding: 7px 10px;
+        background: var(--surface-2);
+        border-radius: var(--radius-sm);
+      }
+    }
+    &__name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    &__add {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--ink-2);
+      cursor: pointer;
+      &:hover:not(:disabled) {
+        border-color: var(--ink-3);
+        color: var(--ink);
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: progress;
+      }
+    }
+  }
+
+  .tax-warn {
+    color: var(--warn);
+  }
+  .tax-ok {
+    color: var(--ok);
+  }
+
+  .tax-download {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .note {
+    color: var(--ink-3);
+  }
+}

@@ -43,6 +43,11 @@
     background-color 0.12s ease,
     color 0.12s ease,
     transform 0.08s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .ed-btn-primary {
@@ -50,12 +55,8 @@
   color: var(--accent-ink);
   border-color: var(--ink);
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-1px);
-  }
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 }
 
@@ -64,7 +65,7 @@
   color: var(--ink);
   border-color: var(--border-strong);
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--surface-3);
     border-color: var(--ink);
   }
@@ -75,7 +76,7 @@
   color: var(--ink-2);
   border-color: transparent;
 
-  &:hover {
+  &:hover:not(:disabled) {
     color: var(--ink);
     background: var(--surface-2);
   }

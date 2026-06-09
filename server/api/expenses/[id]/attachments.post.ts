@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { writeFile } from 'node:fs/promises'
-import { extname, join } from 'node:path'
+import { join } from 'node:path'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -29,20 +29,27 @@ export default defineEventHandler(async (event) => {
 
   const saved = []
   for (const file of files) {
-    const type = file.type || 'application/octet-stream'
-    if (!ALLOWED_RECEIPT_TYPES.includes(type)) {
-      throw createError({ statusCode: 415, statusMessage: `Unsupported type: ${type}` })
+    if (file.data.length > MAX_RECEIPT_BYTES) {
+      throw createError({ statusCode: 413, statusMessage: 'Receipt too large (max 20 MB)' })
     }
-    const storedName = `${randomUUID()}${extname(file.filename!)}`
+    // Trust the file's magic bytes, not the client-declared MIME, and derive the
+    // stored extension + mime from that. Sanitize the original name so it's safe
+    // to echo back in Content-Disposition later.
+    const detected = detectReceiptType(file.data)
+    if (!detected) {
+      throw createError({ statusCode: 415, statusMessage: 'Unsupported receipt type' })
+    }
+    const original = sanitizeFilename(file.filename, 'Beleg')
+    const storedName = `${randomUUID()}${detected.ext}`
     await writeFile(join(dir, storedName), file.data)
     const { lastInsertRowid } = insert.run(
       expenseId,
-      file.filename,
+      original,
       storedName,
-      type,
+      detected.mime,
       file.data.length
     )
-    saved.push({ id: lastInsertRowid, filename: file.filename })
+    saved.push({ id: lastInsertRowid, filename: original })
   }
 
   return { saved }

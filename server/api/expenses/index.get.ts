@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
   const { month } = getQuery(event)
   const select = `
-    SELECT e.id, e.title, e.amount_rappen, e.currency, e.date, e.vendor, e.notes,
+    SELECT e.id, e.title, e.amount_rappen, e.currency, e.date, e.vendor, e.notes, e.vat_rate,
            e.category_id, c.name AS category_name, c.color AS category_color,
            c.icon AS category_icon,
            (SELECT json_group_array(json_object('id', a.id, 'filename', a.filename))

@@ -10,10 +10,20 @@ export default defineEventHandler(async (event) => {
   const { changes } = useDb()
     .prepare(
       `UPDATE expenses
-       SET title = ?, amount_rappen = ?, currency = ?, date = ?, category_id = ?, vendor = ?, notes = ?
+       SET title = ?, amount_rappen = ?, currency = ?, date = ?, category_id = ?, vendor = ?, notes = ?, vat_rate = ?
        WHERE id = ?`
     )
-    .run(e.title, e.amountRappen, e.currency, e.date, e.categoryId, e.vendor, e.notes, id)
+    .run(
+      e.title,
+      e.amountRappen,
+      e.currency,
+      e.date,
+      e.categoryId,
+      e.vendor,
+      e.notes,
+      e.vatRate,
+      id
+    )
 
   if (changes === 0) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })

@@ -63,6 +63,7 @@ export type ProposedAction =
       categoryId?: number
       vendor?: string
       notes?: string
+      vatRate?: number
     }
   | {
       type: 'create_income'
@@ -418,16 +419,25 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
             date: action.date,
             categoryId,
             vendor: action.vendor,
-            notes: action.notes
+            notes: action.notes,
+            vatRate: action.vatRate
           })
           const id = Number(
             db
               .prepare(
-                `INSERT INTO expenses (title, amount_rappen, currency, date, category_id, vendor, notes)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)`
+                `INSERT INTO expenses (title, amount_rappen, currency, date, category_id, vendor, notes, vat_rate)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
               )
-              .run(e.title, e.amountRappen, e.currency, e.date, e.categoryId, e.vendor, e.notes)
-              .lastInsertRowid
+              .run(
+                e.title,
+                e.amountRappen,
+                e.currency,
+                e.date,
+                e.categoryId,
+                e.vendor,
+                e.notes,
+                e.vatRate
+              ).lastInsertRowid
           )
           created('expense', id, e.title)
           break

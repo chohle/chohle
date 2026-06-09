@@ -71,7 +71,8 @@
     "triage": "Triage",
     "banking": "Rapprochement bancaire",
     "assistant": "Assistant",
-    "assistantSection": "IA"
+    "assistantSection": "IA",
+    "taxExport": "Export fiscal"
   },
   "demo": {
     "notice": "Démo. Vos modifications restent privées dans votre navigateur et sont réinitialisées après inactivité.",
@@ -490,7 +491,10 @@
     "recent": "Dépenses récentes",
     "noBreakdownTitle": "Aucune donnée",
     "noBreakdownText": "Saisissez des dépenses pour voir la répartition.",
-    "thisMonth": "Ce mois"
+    "thisMonth": "Ce mois",
+    "saveFailed": "Impossible d'enregistrer la dépense",
+    "receiptFailed": "Impossible de supprimer le justificatif",
+    "attachmentsSaveFailed": "Dépense enregistrée, mais les justificatifs n'ont pas pu être téléversés"
   },
   "income": {
     "subtitle": "Salaires et emplois avec calcul de la date de paie suisse.",
@@ -749,7 +753,8 @@
   "validation": {
     "required": "Ce champ doit être rempli",
     "email": "Veuillez saisir une adresse e-mail valide",
-    "positive": "Doit être supérieur à 0"
+    "positive": "Doit être supérieur à 0",
+    "percent": "Doit être entre 0 et 100"
   },
   "common": {
     "close": "Fermer",
@@ -783,7 +788,8 @@
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
     "delete": "Supprimer",
-    "optional": "Facultatif"
+    "optional": "Facultatif",
+    "retry": "Réessayer"
   },
   "triage": {
     "title": "Triage",
@@ -933,5 +939,34 @@
     "updatedItem": "{kind} {label} mis à jour.",
     "newChat": "Nouveau chat",
     "untitled": "Nouvelle conversation"
+  },
+  "taxExport": {
+    "title": "Export fiscal",
+    "subtitle": "Téléchargez le paquet de fin d'année pour la déclaration: compte de résultat, tous les justificatifs et un journal pour votre fiduciaire.",
+    "noData": "Pas encore de dépenses ou de factures payées.",
+    "income": "Produits",
+    "expenses": "Charges",
+    "net": "Résultat",
+    "netHint": "Produits moins charges",
+    "invoices": "Factures",
+    "salary": "Salaire",
+    "bookings": "écritures",
+    "vat": "TVA",
+    "vatOutput": "TVA collectée",
+    "vatInput": "Impôt préalable",
+    "vatNet": "Solde",
+    "missing": "{n} dépense(s) sans justificatif",
+    "allReceipts": "Tous les {n} justificatifs présents",
+    "download": "Télécharger le ZIP",
+    "bundleHint": "Compte de résultat (PDF), journal CSV et tous les justificatifs.",
+    "expenseVat": "TVA %",
+    "expenseVatHint": "Pour l'impôt préalable dans l'export. Laissez 0 si incertain.",
+    "fixReceipts": "Ajouter les justificatifs",
+    "blockedHint": "Ajoutez tous les justificatifs avant d'exporter.",
+    "addReceipt": "Justificatif",
+    "receiptsSection": "Justificatifs",
+    "uploadFailed": "Impossible de téléverser le justificatif",
+    "loadError": "Impossible de charger le récapitulatif fiscal",
+    "yearLabel": "Année fiscale"
   }
 }

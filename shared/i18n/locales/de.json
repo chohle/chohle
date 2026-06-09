@@ -21,7 +21,8 @@
     "triage": "Triage",
     "banking": "Bankabgleich",
     "assistant": "Assistent",
-    "assistantSection": "KI"
+    "assistantSection": "KI",
+    "taxExport": "Steuerexport"
   },
   "demo": {
     "notice": "Demo. Ihre Änderungen bleiben in Ihrem Browser privat und werden bei Inaktivität zurückgesetzt.",
@@ -490,7 +491,10 @@
     "recent": "Letzte Ausgaben",
     "noBreakdownTitle": "Keine Daten",
     "noBreakdownText": "Erfasse Ausgaben, um die Aufschlüsselung zu sehen.",
-    "thisMonth": "Diesen Monat"
+    "thisMonth": "Diesen Monat",
+    "saveFailed": "Die Ausgabe konnte nicht gespeichert werden",
+    "receiptFailed": "Der Beleg konnte nicht entfernt werden",
+    "attachmentsSaveFailed": "Ausgabe gespeichert, aber die Belege konnten nicht hochgeladen werden"
   },
   "income": {
     "subtitle": "Gehalt und Jobs mit Schweizer Auszahlungsdatum-Berechnung.",
@@ -749,7 +753,8 @@
   "validation": {
     "required": "Dieses Feld muss ausgefüllt werden",
     "email": "Bitte eine gültige E-Mail-Adresse eingeben",
-    "positive": "Muss grösser als 0 sein"
+    "positive": "Muss grösser als 0 sein",
+    "percent": "Muss zwischen 0 und 100 liegen"
   },
   "common": {
     "close": "Schließen",
@@ -783,7 +788,8 @@
     "username": "Benutzername",
     "password": "Passwort",
     "delete": "Löschen",
-    "optional": "Optional"
+    "optional": "Optional",
+    "retry": "Erneut versuchen"
   },
   "triage": {
     "title": "Triage",
@@ -933,5 +939,34 @@
     "updatedItem": "{kind} {label} aktualisiert.",
     "newChat": "Neuer Chat",
     "untitled": "Neue Unterhaltung"
+  },
+  "taxExport": {
+    "title": "Steuerexport",
+    "subtitle": "Lade das Jahrespaket für die Steuererklärung: Erfolgsrechnung, alle Belege und ein Journal für deinen Treuhänder.",
+    "noData": "Noch keine Aufwände oder bezahlten Rechnungen.",
+    "income": "Ertrag",
+    "expenses": "Aufwand",
+    "net": "Ergebnis",
+    "netHint": "Ertrag minus Aufwand",
+    "invoices": "Rechnungen",
+    "salary": "Lohn",
+    "bookings": "Buchungen",
+    "vat": "MWST",
+    "vatOutput": "Umsatzsteuer",
+    "vatInput": "Vorsteuer",
+    "vatNet": "Saldo",
+    "missing": "{n} Aufwand/Aufwände ohne Beleg",
+    "allReceipts": "Alle {n} Belege vorhanden",
+    "download": "ZIP herunterladen",
+    "bundleHint": "Erfolgsrechnung (PDF), CSV-Journal und alle Belege.",
+    "expenseVat": "MWST %",
+    "expenseVatHint": "Für die Vorsteuer im Steuerexport. 0 lassen, wenn unklar.",
+    "fixReceipts": "Belege ergänzen",
+    "blockedHint": "Erst alle Belege ergänzen, dann exportieren.",
+    "addReceipt": "Beleg",
+    "receiptsSection": "Belege",
+    "uploadFailed": "Der Beleg konnte nicht hochgeladen werden",
+    "loadError": "Die Steuerübersicht konnte nicht geladen werden",
+    "yearLabel": "Steuerjahr"
   }
 }

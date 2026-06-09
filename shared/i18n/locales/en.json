@@ -21,7 +21,8 @@
     "triage": "Triage",
     "banking": "Bank reconciliation",
     "assistant": "Assistant",
-    "assistantSection": "AI"
+    "assistantSection": "AI",
+    "taxExport": "Tax export"
   },
   "demo": {
     "notice": "Demo. Your changes stay private to your browser and reset when idle.",
@@ -490,7 +491,10 @@
     "recent": "Recent expenses",
     "noBreakdownTitle": "No data",
     "noBreakdownText": "Log expenses to see the breakdown.",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "saveFailed": "Could not save the expense",
+    "receiptFailed": "Could not remove the receipt",
+    "attachmentsSaveFailed": "Expense saved, but the receipts could not be uploaded"
   },
   "income": {
     "subtitle": "Salary and jobs with Swiss pay-date calculation.",
@@ -749,7 +753,8 @@
   "validation": {
     "required": "This field must be filled",
     "email": "Please enter a valid email address",
-    "positive": "Must be greater than 0"
+    "positive": "Must be greater than 0",
+    "percent": "Must be between 0 and 100"
   },
   "common": {
     "close": "Close",
@@ -783,7 +788,8 @@
     "username": "Username",
     "password": "Password",
     "delete": "Delete",
-    "optional": "Optional"
+    "optional": "Optional",
+    "retry": "Retry"
   },
   "triage": {
     "title": "Triage",
@@ -933,5 +939,34 @@
     "updatedItem": "Updated {kind} {label}.",
     "newChat": "New chat",
     "untitled": "New conversation"
+  },
+  "taxExport": {
+    "title": "Tax export",
+    "subtitle": "Download the year-end package for your tax return: profit and loss, all receipts, and a journal for your Treuhänder.",
+    "noData": "No expenses or paid invoices yet.",
+    "income": "Income",
+    "expenses": "Expenses",
+    "net": "Net result",
+    "netHint": "Income minus expenses",
+    "invoices": "Invoices",
+    "salary": "Salary",
+    "bookings": "bookings",
+    "vat": "VAT (MWST)",
+    "vatOutput": "Output",
+    "vatInput": "Input",
+    "vatNet": "Balance",
+    "missing": "{n} expense(s) are missing a receipt",
+    "allReceipts": "All {n} receipt(s) attached",
+    "download": "Download ZIP",
+    "bundleHint": "P&L report (PDF), CSV journal and all receipts.",
+    "expenseVat": "VAT %",
+    "expenseVatHint": "For the tax export input VAT (Vorsteuer). Leave 0 if unsure.",
+    "fixReceipts": "Add the missing receipts",
+    "blockedHint": "Add all receipts before exporting.",
+    "addReceipt": "Receipt",
+    "receiptsSection": "Receipts",
+    "uploadFailed": "Could not upload the receipt",
+    "loadError": "Could not load the tax summary",
+    "yearLabel": "Tax year"
   }
 }

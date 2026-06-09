@@ -74,18 +74,19 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 
 ## Documentation
 
-| Doc                                                | What's inside                                           |
-| -------------------------------------------------- | ------------------------------------------------------- |
-| [Development](docs/DEVELOPMENT.md)                 | Local setup, environment, database, project structure   |
-| [Reminders](docs/REMINDERS.md)                     | Staged overdue-payment reminders                        |
-| [Quotes](docs/QUOTES.md)                           | Offers and convert-to-invoice                           |
-| [Mail sync](docs/MAIL_SYNC.md)                     | Connecting an inbox (IMAP / Gmail / Outlook)            |
-| [Sending email](docs/SENDING_EMAIL.md)             | SMTP setup for outbound (invoices, quotes, replies)     |
-| [Bank reconciliation](docs/BANK_RECONCILIATION.md) | camt.053 import + auto-match payments (folder / EBICS)  |
-| [Hosting](docs/HOSTING.md)                         | _Optional_ — putting it online (VPS + Docker + Caddy)   |
-| [Demo mode](docs/DEMO_MODE.md)                     | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`) |
-| [AI assistant](docs/ASSISTANT.md)                  | _Optional_ — local LLM that drafts customers/invoices   |
-| [Commit convention](docs/COMMIT_CONVENTION.md)     | Commit message format                                   |
+| Doc                                                | What's inside                                             |
+| -------------------------------------------------- | --------------------------------------------------------- |
+| [Development](docs/DEVELOPMENT.md)                 | Local setup, environment, database, project structure     |
+| [Reminders](docs/REMINDERS.md)                     | Staged overdue-payment reminders                          |
+| [Quotes](docs/QUOTES.md)                           | Offers and convert-to-invoice                             |
+| [Mail sync](docs/MAIL_SYNC.md)                     | Connecting an inbox (IMAP / Gmail / Outlook)              |
+| [Sending email](docs/SENDING_EMAIL.md)             | SMTP setup for outbound (invoices, quotes, replies)       |
+| [Bank reconciliation](docs/BANK_RECONCILIATION.md) | camt.053 import + auto-match payments (folder / EBICS)    |
+| [Tax export](docs/TAX_EXPORT.md)                   | Year-end ZIP: Erfolgsrechnung + receipts + Treuhänder CSV |
+| [Hosting](docs/HOSTING.md)                         | _Optional_ — putting it online (VPS + Docker + Caddy)     |
+| [Demo mode](docs/DEMO_MODE.md)                     | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`)   |
+| [AI assistant](docs/ASSISTANT.md)                  | _Optional_ — local LLM that drafts customers/invoices     |
+| [Commit convention](docs/COMMIT_CONVENTION.md)     | Commit message format                                     |
 
 ## Contributing
 
