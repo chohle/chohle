@@ -137,10 +137,10 @@
   }
 
   .tax-warn {
-    color: #b85a30;
+    color: var(--warn);
   }
   .tax-ok {
-    color: #2f855a;
+    color: var(--ok);
   }
 
   .tax-download {

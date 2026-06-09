@@ -24,6 +24,7 @@ interface Expense {
 }
 
 const { t } = useI18n()
+const toast = useToast()
 const month = ref(new Date().toISOString().slice(0, 7))
 
 const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
@@ -111,26 +112,35 @@ const saving = ref(false)
 const fileInput = ref<HTMLInputElement>()
 const pendingFiles = ref<File[]>([])
 const editAttachments = ref<{ id: number; filename: string }[]>([])
+/** Add the chosen files to the pending list (uploaded when the expense saves). */
 function pickFiles(e: Event) {
   const fl = (e.target as HTMLInputElement).files
   if (fl) pendingFiles.value.push(...Array.from(fl))
   if (fileInput.value) fileInput.value.value = ''
 }
+/** Drop a not-yet-uploaded file from the pending list. */
 function removePending(i: number) {
   pendingFiles.value.splice(i, 1)
 }
+/** Delete an existing receipt (edit mode); only updates the UI on success. */
 async function removeAttachment(id: number) {
-  await $fetch(`/api/attachments/${id}`, { method: 'DELETE' })
-  editAttachments.value = editAttachments.value.filter((a) => a.id !== id)
-  await refresh()
+  try {
+    await $fetch(`/api/attachments/${id}`, { method: 'DELETE' })
+    editAttachments.value = editAttachments.value.filter((a) => a.id !== id)
+    await refresh()
+  } catch {
+    toast.add({ title: t('expenses.receiptFailed'), color: 'error' })
+  }
 }
 
+/** Open the form to add a new expense. */
 function openCreate() {
   Object.assign(form, blank())
   pendingFiles.value = []
   editAttachments.value = []
   open.value = true
 }
+/** Open the form to edit an existing expense, preloading its receipts. */
 function openEdit(e: Expense) {
   Object.assign(form, {
     id: e.id,
@@ -155,21 +165,29 @@ function validate(state: typeof form) {
   else if (state.amount <= 0) errors.push({ name: 'amount', message: t('validation.positive') })
   return errors
 }
+/** Create or update the expense, then upload any receipts picked in the form. */
 async function save() {
   saving.value = true
   try {
-    const { id, ...body } = form
-    let expenseId = id
-    if (id) await $fetch(`/api/expenses/${id}`, { method: 'PUT', body })
-    else expenseId = (await $fetch<{ id: number }>('/api/expenses', { method: 'POST', body })).id
+    if (form.id) {
+      await $fetch(`/api/expenses/${form.id}`, { method: 'PUT', body: { ...form } })
+    } else {
+      const { id, ...body } = form
+      // Remember the new id so a retry (e.g. if the receipt upload fails) updates
+      // the same expense instead of creating a duplicate.
+      form.id = (await $fetch<{ id: number }>('/api/expenses', { method: 'POST', body })).id
+    }
     // Upload any receipts picked in the form to the (new or existing) expense.
-    if (expenseId && pendingFiles.value.length) {
+    if (form.id && pendingFiles.value.length) {
       const fd = new FormData()
       for (const f of pendingFiles.value) fd.append('files', f)
-      await $fetch(`/api/expenses/${expenseId}/attachments`, { method: 'POST', body: fd })
+      await $fetch(`/api/expenses/${form.id}/attachments`, { method: 'POST', body: fd })
+      pendingFiles.value = []
     }
     open.value = false
     await refresh()
+  } catch {
+    toast.add({ title: t('expenses.saveFailed'), color: 'error' })
   } finally {
     saving.value = false
   }

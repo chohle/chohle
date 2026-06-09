@@ -491,7 +491,9 @@
     "recent": "Spese recenti",
     "noBreakdownTitle": "Nessun dato",
     "noBreakdownText": "Registra spese per vedere la suddivisione.",
-    "thisMonth": "Questo mese"
+    "thisMonth": "Questo mese",
+    "saveFailed": "Impossibile salvare la spesa",
+    "receiptFailed": "Impossibile rimuovere la ricevuta"
   },
   "income": {
     "subtitle": "Stipendi e lavori con calcolo della data di pagamento svizzera.",
@@ -959,6 +961,7 @@
     "fixReceipts": "Aggiungi le ricevute",
     "blockedHint": "Aggiungi tutte le ricevute prima di esportare.",
     "addReceipt": "Ricevuta",
-    "receiptsSection": "Ricevute"
+    "receiptsSection": "Ricevute",
+    "uploadFailed": "Impossibile caricare la ricevuta"
   }
 }

@@ -6,7 +6,7 @@ principle "keine Buchung ohne Beleg" (no booking without a receipt). Open
 
 ## What's in the ZIP
 
-```
+```text
 Steuerexport-<year>.pdf     Erfolgsrechnung (income vs expenses), MWST summary,
                             expense journal, and a "missing receipts" list.
 buchungen-<year>.csv        The journal (expenses + income) for the Treuhänder.

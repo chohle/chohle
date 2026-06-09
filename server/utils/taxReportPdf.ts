@@ -9,12 +9,14 @@ const PAGE = { width: 595.28, height: 841.89, margin: 50 }
 const RIGHT = PAGE.width - PAGE.margin // 545
 const BOTTOM = PAGE.height - PAGE.margin // ~792
 
+/** Format Rappen as a Swiss-formatted CHF amount (e.g. 1'296.00). */
 function chf(rappen: number): string {
   return (rappen / 100).toLocaleString('de-CH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })
 }
+/** Format an ISO date (YYYY-MM-DD) as Swiss dd.mm.yyyy. */
 function dateFmt(iso: string): string {
   const [y, m, d] = (iso || '').split('-')
   return d ? `${d}.${m}.${y}` : iso

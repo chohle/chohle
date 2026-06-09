@@ -491,7 +491,9 @@
     "recent": "Recent expenses",
     "noBreakdownTitle": "No data",
     "noBreakdownText": "Log expenses to see the breakdown.",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "saveFailed": "Could not save the expense",
+    "receiptFailed": "Could not remove the receipt"
   },
   "income": {
     "subtitle": "Salary and jobs with Swiss pay-date calculation.",
@@ -959,6 +961,7 @@
     "fixReceipts": "Add the missing receipts",
     "blockedHint": "Add all receipts before exporting.",
     "addReceipt": "Receipt",
-    "receiptsSection": "Receipts"
+    "receiptsSection": "Receipts",
+    "uploadFailed": "Could not upload the receipt"
   }
 }

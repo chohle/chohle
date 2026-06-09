@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
   }
 
   setHeader(event, 'Content-Type', row.mime_type)
-  setHeader(event, 'Content-Disposition', `inline; filename="${row.filename}"`)
+  setHeader(event, 'X-Content-Type-Options', 'nosniff')
+  setHeader(event, 'Content-Disposition', contentDisposition(row.filename, 'inline'))
   return sendStream(event, createReadStream(path))
 })

@@ -61,6 +61,36 @@ const CONTENT_TYPES: Record<string, string> = {
 // broken where we embed it (e.g. the invoice logo in the printed PDF).
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 
+// Cap on a single receipt upload so a huge file can't fill the disk.
+export const MAX_RECEIPT_BYTES = 20 * 1024 * 1024
+
+// Sniff a receipt's real type from its magic bytes, ignoring the client-declared
+// MIME (which can't be trusted). Returns the mime, or null if it isn't one of
+// the allowed receipt formats. Also yields the canonical extension to store.
+export function detectReceiptType(buf: Buffer): { mime: string; ext: string } | null {
+  const b = buf
+  if (b.length >= 4 && b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46) {
+    return { mime: 'application/pdf', ext: '.pdf' } // %PDF
+  }
+  if (b.length >= 8 && b.subarray(0, 8).equals(PNG_SIGNATURE)) {
+    return { mime: 'image/png', ext: '.png' }
+  }
+  if (b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) {
+    return { mime: 'image/jpeg', ext: '.jpg' }
+  }
+  if (b.length >= 6 && b.subarray(0, 3).toString('latin1') === 'GIF') {
+    return { mime: 'image/gif', ext: '.gif' }
+  }
+  if (
+    b.length >= 12 &&
+    b.subarray(0, 4).toString('latin1') === 'RIFF' &&
+    b.subarray(8, 12).toString('latin1') === 'WEBP'
+  ) {
+    return { mime: 'image/webp', ext: '.webp' }
+  }
+  return null
+}
+
 // Reads a single uploaded image from a multipart request, stores it, returns
 // the name. Pass `allowedTypes` to narrow the accepted formats — e.g. the
 // company logo is PNG-only so it reproduces cleanly (with transparency) in the

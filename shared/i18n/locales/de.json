@@ -491,7 +491,9 @@
     "recent": "Letzte Ausgaben",
     "noBreakdownTitle": "Keine Daten",
     "noBreakdownText": "Erfasse Ausgaben, um die Aufschlüsselung zu sehen.",
-    "thisMonth": "Diesen Monat"
+    "thisMonth": "Diesen Monat",
+    "saveFailed": "Die Ausgabe konnte nicht gespeichert werden",
+    "receiptFailed": "Der Beleg konnte nicht entfernt werden"
   },
   "income": {
     "subtitle": "Gehalt und Jobs mit Schweizer Auszahlungsdatum-Berechnung.",
@@ -959,6 +961,7 @@
     "fixReceipts": "Belege ergänzen",
     "blockedHint": "Erst alle Belege ergänzen, dann exportieren.",
     "addReceipt": "Beleg",
-    "receiptsSection": "Belege"
+    "receiptsSection": "Belege",
+    "uploadFailed": "Der Beleg konnte nicht hochgeladen werden"
   }
 }

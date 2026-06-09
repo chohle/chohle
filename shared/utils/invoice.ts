@@ -19,7 +19,7 @@ export interface InvoiceTotals {
 }
 
 // Swiss 5-Rappen (Rappenrundung): round to the nearest 0.05 CHF.
-function round5(rappen: number): number {
+export function round5(rappen: number): number {
   return Math.round(rappen / 5) * 5
 }
 

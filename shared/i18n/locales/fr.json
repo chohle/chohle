@@ -491,7 +491,9 @@
     "recent": "Dépenses récentes",
     "noBreakdownTitle": "Aucune donnée",
     "noBreakdownText": "Saisissez des dépenses pour voir la répartition.",
-    "thisMonth": "Ce mois"
+    "thisMonth": "Ce mois",
+    "saveFailed": "Impossible d'enregistrer la dépense",
+    "receiptFailed": "Impossible de supprimer le justificatif"
   },
   "income": {
     "subtitle": "Salaires et emplois avec calcul de la date de paie suisse.",
@@ -959,6 +961,7 @@
     "fixReceipts": "Ajouter les justificatifs",
     "blockedHint": "Ajoutez tous les justificatifs avant d'exporter.",
     "addReceipt": "Justificatif",
-    "receiptsSection": "Justificatifs"
+    "receiptsSection": "Justificatifs",
+    "uploadFailed": "Impossible de téléverser le justificatif"
   }
 }

@@ -17,6 +17,8 @@
   --ink-4: #bcbcb8;
   --accent: #0a0a0a;
   --accent-ink: #ffffff;
+  --warn: #b85a30;
+  --ok: #2f855a;
 }
 
 :root[data-theme="dark"] {
@@ -33,6 +35,8 @@
   --ink-4: #4a4a4a;
   --accent: #fafaf9;
   --accent-ink: #0a0a0a;
+  --warn: #d98a5f;
+  --ok: #5cae8a;
 }
 
 :root {

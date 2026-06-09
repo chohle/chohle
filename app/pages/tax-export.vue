@@ -20,6 +20,7 @@ interface Summary {
 }
 
 const { t } = useI18n()
+const toast = useToast()
 const now = new Date()
 const year = ref(now.getFullYear())
 
@@ -34,17 +35,20 @@ watchEffect(() => {
   if (years.length && !years.includes(year.value)) year.value = years[0]!
 })
 
+/** Format Rappen as a Swiss-formatted CHF amount. */
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })
 }
+/** Format an ISO date as Swiss dd.mm.yyyy. */
 function fmtDate(iso: string) {
   const [y, m, d] = (iso || '').split('-')
   return d ? `${d}.${m}.${y}` : iso
 }
 
+/** Trigger the ZIP download for the selected year. */
 function download() {
   window.location.href = `/api/tax-export/${year.value}`
 }
@@ -54,10 +58,12 @@ function download() {
 const fileInput = ref<HTMLInputElement>()
 const uploadTarget = ref<number | null>(null)
 const uploading = ref(false)
+/** Open the file picker for a specific missing expense. */
 function addReceipt(id: number) {
   uploadTarget.value = id
   fileInput.value?.click()
 }
+/** Upload the picked receipt(s) to the targeted expense and refresh the list. */
 async function onReceipt(e: Event) {
   const files = (e.target as HTMLInputElement).files
   const id = uploadTarget.value
@@ -69,6 +75,8 @@ async function onReceipt(e: Event) {
   try {
     await $fetch(`/api/expenses/${id}/attachments`, { method: 'POST', body: fd })
     await refresh()
+  } catch {
+    toast.add({ title: t('taxExport.uploadFailed'), color: 'error' })
   } finally {
     uploading.value = false
     uploadTarget.value = null

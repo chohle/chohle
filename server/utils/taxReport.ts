@@ -6,7 +6,7 @@
 // Cash basis: invoices by paid_at, salary by income_payments.month, expenses by
 // date. All amounts in Rappen.
 import type { Database } from 'better-sqlite3'
-import { computeInvoiceTotals } from '../../shared/utils/invoice'
+import { computeInvoiceTotals, round5 } from '../../shared/utils/invoice'
 
 export interface TaxReportAttachment {
   id: number
@@ -65,9 +65,10 @@ export interface TaxReport {
   }[]
 }
 
-/** Input VAT (Vorsteuer) contained in a gross amount at the given rate. */
+/** Input VAT (Vorsteuer) contained in a gross amount at the given rate.
+ *  Rounded to 5 Rappen, consistent with the rest of the CHF money math. */
 function inputVat(grossRappen: number, rate: number): number {
-  return rate > 0 ? Math.round((grossRappen * rate) / (100 + rate)) : 0
+  return rate > 0 ? round5((grossRappen * rate) / (100 + rate)) : 0
 }
 
 /** Build the full tax-year report object for a 4-digit year. */
