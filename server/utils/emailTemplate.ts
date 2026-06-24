@@ -40,15 +40,19 @@ export function htmlToText(html: string): string {
     prev = text
     text = text.replace(/<[^>]+>/g, '')
   } while (text !== prev)
-  return text
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&middot;/g, '·')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  return (
+    text
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&middot;/g, '·')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      // Unescape &amp; last so e.g. "&amp;lt;" decodes to the literal "&lt;",
+      // not "<" (avoids double-unescaping; CodeQL js/double-escaping).
+      .replace(/&amp;/g, '&')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  )
 }
 
 // Absolute URL of the sender logo, or null when no base URL / no logo is set.
