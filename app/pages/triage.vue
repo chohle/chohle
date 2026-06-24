@@ -27,9 +27,12 @@ const { t } = useI18n()
 const toast = useToast()
 const { count: triageCount, refresh: refreshCount } = useTriageCount()
 
-const { data, refresh } = await useFetch<{ rows: TriageRow[]; count: number }>('/api/triage', {
-  default: () => ({ rows: [], count: 0 })
-})
+const { data, refresh, error } = await useFetch<{ rows: TriageRow[]; count: number }>(
+  '/api/triage',
+  {
+    default: () => ({ rows: [], count: 0 })
+  }
+)
 useHead({ title: () => t('triage.title') })
 
 // Keep the sidebar badge in lockstep with what the page is showing.
@@ -115,8 +118,9 @@ function onPicked(projectId: number) {
       :subtitle="$t('triage.subtitle')"
     />
 
+    <FetchError v-if="error" @retry="refresh()" />
     <EmptyState
-      v-if="!data.rows.length"
+      v-else-if="!data.rows.length"
       icon="i-lucide-inbox"
       :title="$t('triage.emptyTitle')"
       :description="$t('triage.emptyText')"

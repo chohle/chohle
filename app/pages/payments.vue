@@ -16,7 +16,7 @@ interface Payload {
 
 const { locale } = useI18n()
 const year = ref(new Date().getFullYear())
-const { data } = await useFetch<Payload>('/api/payments', { query: { year } })
+const { data, error, refresh } = await useFetch<Payload>('/api/payments', { query: { year } })
 
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
@@ -85,8 +85,9 @@ const salaryTotal = computed(() =>
     <UiSectionLabel>{{ $t('payments.allReceipts') }}</UiSectionLabel>
 
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!data || !data.rows.length"
+        v-else-if="!data || !data.rows.length"
         :bordered="false"
         icon="i-lucide-banknote"
         :title="$t('payments.emptyTitle')"

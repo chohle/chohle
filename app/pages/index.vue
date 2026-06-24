@@ -29,8 +29,22 @@ const { user } = useUserSession()
 const username = computed(() => user.value?.username ?? 'there')
 const month = ref(new Date().toISOString().slice(0, 7))
 const year = ref(new Date().getFullYear())
-const { data } = await useFetch<Summary>('/api/summary', { query: { month } })
-const { data: yearData } = await useFetch<YearSummary>('/api/summary/year', { query: { year } })
+const {
+  data,
+  error: summaryError,
+  refresh: refreshSummary
+} = await useFetch<Summary>('/api/summary', { query: { month } })
+const {
+  data: yearData,
+  error: yearError,
+  refresh: refreshYear
+} = await useFetch<YearSummary>('/api/summary/year', { query: { year } })
+
+const loadError = computed(() => summaryError.value || yearError.value)
+function reloadAll() {
+  refreshSummary()
+  refreshYear()
+}
 
 function chf(rappen: number) {
   return (rappen / 100).toLocaleString('de-CH', {
@@ -89,7 +103,8 @@ const greeting = useState('dashboard-greeting', () => {
 </script>
 
 <template>
-  <div v-if="data" class="page-overview">
+  <FetchError v-if="loadError" @retry="reloadAll()" />
+  <div v-else-if="data" class="page-overview">
     <UiPageHead
       :crumb="`${$t('nav.workspace')} / ${$t('nav.dashboard')}`"
       :title="`${greeting}, ${username}.`"

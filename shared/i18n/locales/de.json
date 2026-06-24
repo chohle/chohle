@@ -789,7 +789,9 @@
     "password": "Passwort",
     "delete": "Löschen",
     "optional": "Optional",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "loadErrorTitle": "Konnte nicht geladen werden",
+    "loadErrorText": "Beim Laden ist ein Fehler aufgetreten. Bitte versuch es erneut."
   },
   "triage": {
     "title": "Triage",
@@ -966,7 +968,6 @@
     "addReceipt": "Beleg",
     "receiptsSection": "Belege",
     "uploadFailed": "Der Beleg konnte nicht hochgeladen werden",
-    "loadError": "Die Steuerübersicht konnte nicht geladen werden",
     "yearLabel": "Steuerjahr"
   }
 }

@@ -10,7 +10,11 @@ interface CustomerRow {
 }
 
 const { t, locale } = useI18n()
-const { data: customers, refresh } = await useFetch<CustomerRow[]>('/api/customers', {
+const {
+  data: customers,
+  refresh,
+  error
+} = await useFetch<CustomerRow[]>('/api/customers', {
   default: () => []
 })
 
@@ -180,8 +184,9 @@ async function remove(id: number) {
     </UiPageHead>
 
     <UiCard :flush="true">
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!customers.length"
+        v-else-if="!customers.length"
         icon="i-lucide-users"
         :title="$t('customers.emptyTitle')"
         :description="$t('customers.emptyText')"

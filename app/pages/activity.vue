@@ -18,7 +18,7 @@ interface ActivityPayload {
 }
 
 const { t, locale } = useI18n()
-const { data } = await useFetch<ActivityPayload>('/api/activity')
+const { data, error, refresh } = await useFetch<ActivityPayload>('/api/activity')
 
 const KIND_ICON: Record<Kind, string> = {
   paid: 'i-lucide-check',
@@ -161,7 +161,8 @@ function go(link: string | undefined) {
 </script>
 
 <template>
-  <div v-if="data" class="page-activity">
+  <FetchError v-if="error" @retry="refresh()" />
+  <div v-else-if="data" class="page-activity">
     <UiPageHead
       :crumb="`${$t('nav.workspace')} / ${$t('nav.activity')}`"
       :title="$t('activity.title')"

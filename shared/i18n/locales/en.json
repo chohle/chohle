@@ -789,7 +789,9 @@
     "password": "Password",
     "delete": "Delete",
     "optional": "Optional",
-    "retry": "Retry"
+    "retry": "Retry",
+    "loadErrorTitle": "Couldn't load",
+    "loadErrorText": "Something went wrong while loading. Please try again."
   },
   "triage": {
     "title": "Triage",
@@ -966,7 +968,6 @@
     "addReceipt": "Receipt",
     "receiptsSection": "Receipts",
     "uploadFailed": "Could not upload the receipt",
-    "loadError": "Could not load the tax summary",
     "yearLabel": "Tax year"
   }
 }

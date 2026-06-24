@@ -789,7 +789,9 @@
     "password": "Password",
     "delete": "Elimina",
     "optional": "Facoltativo",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "loadErrorTitle": "Caricamento non riuscito",
+    "loadErrorText": "Si è verificato un errore durante il caricamento. Riprova."
   },
   "triage": {
     "title": "Triage",
@@ -966,7 +968,6 @@
     "addReceipt": "Ricevuta",
     "receiptsSection": "Ricevute",
     "uploadFailed": "Impossibile caricare la ricevuta",
-    "loadError": "Impossibile caricare il riepilogo fiscale",
     "yearLabel": "Anno fiscale"
   }
 }

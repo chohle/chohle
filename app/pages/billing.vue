@@ -19,9 +19,9 @@ interface Sender {
 }
 
 const { t } = useI18n()
-const { data, refresh } = await useFetch<Sender>('/api/sender')
+const { data, refresh, error } = await useFetch<Sender>('/api/sender')
 const toast = useToast()
-const d = data.value!
+const d = data.value ?? ({} as Sender)
 
 const logoSrc = computed(() =>
   data.value?.logo_path ? `/api/sender/logo?v=${data.value.logo_path}` : null
@@ -92,7 +92,9 @@ async function save() {
     />
 
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <UForm
+        v-else
         :state="form"
         :validate="validate"
         :validate-on="['input', 'blur']"
