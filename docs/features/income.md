@@ -19,15 +19,15 @@ month, and a received / pending chip you can toggle.
 
 Each source is a row in `income_sources` with:
 
-| Column         | Meaning                                                |
-| -------------- | ------------------------------------------------------ |
-| `company`      | employer or client name (required)                     |
-| `job_title`    | optional sub-label                                     |
-| `salary_rappen`| amount in Rappen (the form takes CHF, ×100 on save)    |
-| `currency`     | defaults to `CHF`                                       |
-| `payout_day`   | nominal day of month, 1-31                              |
-| `canton`       | one of the 26 cantons; picks the holiday calendar      |
-| `payout_rule`  | `earlier` \| `later` \| `none` (the shift direction)   |
+| Column          | Meaning                                              |
+| --------------- | ---------------------------------------------------- |
+| `company`       | employer or client name (required)                   |
+| `job_title`     | optional sub-label                                   |
+| `salary_rappen` | amount in Rappen (the form takes CHF, ×100 on save)  |
+| `currency`      | defaults to `CHF`                                    |
+| `payout_day`    | nominal day of month, 1-31                           |
+| `canton`        | one of the 26 cantons; picks the holiday calendar    |
+| `payout_rule`   | `earlier` \| `later` \| `none` (the shift direction) |
 
 There is no separate "salary vs client income" type. Any source is
 just a recurring monthly amount; the form defaults to payout day `25`,
@@ -56,7 +56,7 @@ nominal date and resolves it:
    - `earlier` steps back one day at a time (`step = -1`)
    - `later` steps forward (`step = +1`)
    - it keeps stepping **while** the new day is still a weekend or
-     holiday, so it walks across a holiday *and* an adjacent weekend in
+     holiday, so it walks across a holiday _and_ an adjacent weekend in
      one go.
 4. **Result**: `{ date, reason }`. `reason` is the original conflict
    name (`'Weekend'` / the holiday) when a shift happened, else `null`.

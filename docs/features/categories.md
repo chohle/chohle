@@ -67,7 +67,7 @@ All four endpoints call `requireUserSession`.
 
 - Migration `0002_categories` creates the `categories` table;
   `0003_expenses` adds `category_id INTEGER REFERENCES categories(id)
-  ON DELETE SET NULL`.
+ON DELETE SET NULL`.
 - Endpoints: `server/api/categories/index.get.ts`,
   `index.post.ts`, `[id].put.ts`, `[id].delete.ts`; validation in
   `server/utils/category.ts` (`parseCategory`).

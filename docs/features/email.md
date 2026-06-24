@@ -102,11 +102,11 @@ the branded template.
 Mailboxes live in the `mailboxes` table; `provider` is one of
 `gmail`, `outlook`, `imap` (enforced by a CHECK constraint).
 
-| Provider  | Auth                              | Driver                          |
-| --------- | --------------------------------- | ------------------------------- |
+| Provider  | Auth                                   | Driver                        |
+| --------- | -------------------------------------- | ----------------------------- |
 | `gmail`   | Google OAuth (tokens stored encrypted) | `server/utils/gmailSync.ts`   |
-| `outlook` | Microsoft Graph OAuth             | `server/utils/outlookSync.ts`   |
-| `imap`    | host / user / encrypted password  | `server/utils/imapSync.ts`      |
+| `outlook` | Microsoft Graph OAuth                  | `server/utils/outlookSync.ts` |
+| `imap`    | host / user / encrypted password       | `server/utils/imapSync.ts`    |
 
 Each driver fetches a bounded recent window (capped at 200 messages
 per run), dedups against already-handled Message-IDs

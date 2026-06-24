@@ -24,10 +24,10 @@ A month-scoped overview. The `MonthSelect` in the header drives the
 - **Net hero**: `net = income − expenses` for the month, with a
   sparkline of `max(0, income − expenses)` across the trend, and a
   "% vs last month" delta against the previous trend entry.
-- **Sub-strip KPIs**: *From customers* (`invoiceIncome`, falling back
-  to total `income`), *Expected* (sum of all `income_sources` salaries,
+- **Sub-strip KPIs**: _From customers_ (`invoiceIncome`, falling back
+  to total `income`), _Expected_ (sum of all `income_sources` salaries,
   showing `outstanding` = unpaid expected salary as its delta), and
-  *Expenses out* (`expenses`).
+  _Expenses out_ (`expenses`).
 - **Income** here = salary (`income_payments` for the month) **plus**
   invoice revenue. Invoice revenue is the `total_rappen` frozen on each
   invoice when it was marked paid, attributed by `paid_at` month, so
@@ -56,13 +56,13 @@ and `**bold**`/`*italic*` inline markup rendered via `UiRichText`.
 
 The five event kinds (`activity.get.ts`):
 
-| Kind      | Icon          | Source / when                                                         |
-| --------- | ------------- | --------------------------------------------------------------------- |
-| `sent`    | `send`        | Every `sent`/`paid` invoice, dated `issue_date` (paid invoices were sent first). |
-| `paid`    | `check`       | Paid invoice, dated `paid_at`.                                        |
-| `overdue` | `bell`        | `sent` invoice whose `due_date` is before today, dated the due date.  |
-| `expense` | `receipt`     | Each expense, dated `e.date`, with vendor and `*category*`.           |
-| `salary`  | `coins`       | Each `income_payments` row, dated `p.date`, with company.             |
+| Kind      | Icon      | Source / when                                                                    |
+| --------- | --------- | -------------------------------------------------------------------------------- |
+| `sent`    | `send`    | Every `sent`/`paid` invoice, dated `issue_date` (paid invoices were sent first). |
+| `paid`    | `check`   | Paid invoice, dated `paid_at`.                                                   |
+| `overdue` | `bell`    | `sent` invoice whose `due_date` is before today, dated the due date.             |
+| `expense` | `receipt` | Each expense, dated `e.date`, with vendor and `*category*`.                      |
+| `salary`  | `coins`   | Each `income_payments` row, dated `p.date`, with company.                        |
 
 Invoice and salary `paid`/`sent` rows link to `/invoices/<id>`;
 expense and salary rows have no link.
@@ -101,7 +101,7 @@ Rows are merged and sorted newest-first by `date`. The page (`payments.vue`)
 groups them by `YYYY-MM` month with a per-month subtotal, and the KPI row
 shows the year **Total**, **From invoices**, and **From salary** splits.
 
-> Note: this view is about *received* money, not outstanding debt.
+> Note: this view is about _received_ money, not outstanding debt.
 > Open/unpaid invoices and the dunning workflow live on the
 > [Invoices](invoices.md) and [Reminders](reminders.md) pages.
 

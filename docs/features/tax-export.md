@@ -44,13 +44,13 @@ business records and receipts for **10 years**.
 
 ## Internals
 
-| File                                   | Role                                                  |
-| -------------------------------------- | ----------------------------------------------------- |
+| File                                   | Role                                                 |
+| -------------------------------------- | ---------------------------------------------------- |
 | `server/utils/taxReport.ts`            | `buildTaxReport(db, year)`: gathers the year's data. |
-| `server/utils/taxReportPdf.ts`         | Renders the Erfolgsrechnung PDF (pdfkit).             |
-| `server/utils/taxExportZip.ts`         | Bundles PDF + CSV + receipts (fflate).                |
-| `server/api/tax-export/summary.get.ts` | JSON preview for the page.                            |
-| `server/api/tax-export/[year].get.ts`  | Streams the ZIP.                                      |
-| `app/pages/tax-export.vue`             | The page.                                             |
+| `server/utils/taxReportPdf.ts`         | Renders the Erfolgsrechnung PDF (pdfkit).            |
+| `server/utils/taxExportZip.ts`         | Bundles PDF + CSV + receipts (fflate).               |
+| `server/api/tax-export/summary.get.ts` | JSON preview for the page.                           |
+| `server/api/tax-export/[year].get.ts`  | Streams the ZIP.                                     |
+| `app/pages/tax-export.vue`             | The page.                                            |
 
 Migration `0048` adds the optional `expenses.vat_rate` column.

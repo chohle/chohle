@@ -8,30 +8,30 @@ rounding, cantonal public holidays, and the QR-bill are first-class, not afterth
 
 ## Money in and out
 
-| Feature                                        | What it does                                                          |
-| ---------------------------------------------- | -------------------------------------------------------------------- |
-| [Expenses](expenses.md)                        | Receipt uploads, categories, filters, optional per-expense Vorsteuer |
-| [Income](income.md)                            | Salary and client income with automatic Swiss pay-date calculation   |
-| [Bank reconciliation](bank-reconciliation.md)  | camt.053 import + auto-match by QR-reference (folder / EBICS)         |
+| Feature                                       | What it does                                                         |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| [Expenses](expenses.md)                       | Receipt uploads, categories, filters, optional per-expense Vorsteuer |
+| [Income](income.md)                           | Salary and client income with automatic Swiss pay-date calculation   |
+| [Bank reconciliation](bank-reconciliation.md) | camt.053 import + auto-match by QR-reference (folder / EBICS)        |
 
 ## Billing
 
-| Feature                       | What it does                                                       |
-| ----------------------------- | ----------------------------------------------------------------- |
-| [Customers](customers.md)     | Per-customer rates, payment terms, and document language          |
-| [Articles](articles.md)       | Reusable invoice/quote line items, global or per-customer         |
-| [Quotes](quotes.md)           | Offerten you convert to an invoice in one click                   |
-| [Invoices](invoices.md)       | Correct MWST, 5-Rappen rounding, print-ready PDF, Swiss QR-bill   |
-| [Reminders](reminders.md)     | Staged overdue-payment reminders (1st, 2nd, final notice)         |
+| Feature                   | What it does                                                    |
+| ------------------------- | --------------------------------------------------------------- |
+| [Customers](customers.md) | Per-customer rates, payment terms, and document language        |
+| [Articles](articles.md)   | Reusable invoice/quote line items, global or per-customer       |
+| [Quotes](quotes.md)       | Offerten you convert to an invoice in one click                 |
+| [Invoices](invoices.md)   | Correct MWST, 5-Rappen rounding, print-ready PDF, Swiss QR-bill |
+| [Reminders](reminders.md) | Staged overdue-payment reminders (1st, 2nd, final notice)       |
 
 ## Projects, mail, and money tracking
 
-| Feature                                  | What it does                                                  |
-| ---------------------------------------- | ------------------------------------------------------------ |
-| [Projects & pipeline](projects.md)       | Track sales (Vertrieb) and procurement (Einkauf) across stages |
-| [Email](email.md)                        | Per-project conversations + a triage queue for inbound mail  |
-| [Email signatures](signatures.md)        | Reusable rich-HTML signatures with embedded images           |
-| [Dashboard & overviews](dashboard.md)    | Income vs expenses, net, 6-month trend, activity, payments   |
+| Feature                               | What it does                                                   |
+| ------------------------------------- | -------------------------------------------------------------- |
+| [Projects & pipeline](projects.md)    | Track sales (Vertrieb) and procurement (Einkauf) across stages |
+| [Email](email.md)                     | Per-project conversations + a triage queue for inbound mail    |
+| [Email signatures](signatures.md)     | Reusable rich-HTML signatures with embedded images             |
+| [Dashboard & overviews](dashboard.md) | Income vs expenses, net, 6-month trend, activity, payments     |
 
 ## Year-end and setup
 

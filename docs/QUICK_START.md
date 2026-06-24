@@ -47,11 +47,11 @@ cp .env.example .env
 
 Now open `.env` in an editor and set three values before first launch:
 
-| Variable                | Set it to                                                              |
-| ----------------------- | --------------------------------------------------------------------- |
-| `NUXT_ADMIN_USERNAME`   | The login name for the single owner account (e.g. your name).         |
-| `NUXT_ADMIN_PASSWORD`   | A password you choose. This is your login; don't leave `change-me`.   |
-| `NUXT_SESSION_PASSWORD` | A random string, **32+ characters**. It seals your session cookie.    |
+| Variable                | Set it to                                                           |
+| ----------------------- | ------------------------------------------------------------------- |
+| `NUXT_ADMIN_USERNAME`   | The login name for the single owner account (e.g. your name).       |
+| `NUXT_ADMIN_PASSWORD`   | A password you choose. This is your login; don't leave `change-me`. |
+| `NUXT_SESSION_PASSWORD` | A random string, **32+ characters**. It seals your session cookie.  |
 
 Generate a strong session secret with:
 

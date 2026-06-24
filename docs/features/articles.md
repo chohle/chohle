@@ -62,7 +62,7 @@ quote editor (`app/pages/quotes/[id].vue`) fetch **both** lists and
 merge them:
 
 ```ts
-const { data: globalArticles }   = useFetch('/api/articles')
+const { data: globalArticles } = useFetch('/api/articles')
 const { data: customerArticles } = useFetch(`/api/customers/${customerId}/articles`)
 const articles = computed(() => [...globalArticles.value, ...customerArticles.value])
 ```

@@ -16,12 +16,12 @@ the right.
 
 A row in the `signatures` table is just three things plus bookkeeping:
 
-| Column         | Meaning                                                       |
-| -------------- | ------------------------------------------------------------ |
-| `name`         | Label shown in the picker (required, trimmed).               |
-| `content_html` | The rich HTML body of the sign-off.                          |
-| `is_default`   | `1` for the one preselected when composing (at most one).    |
-| `created_at`   | Set on insert.                                               |
+| Column         | Meaning                                                   |
+| -------------- | --------------------------------------------------------- |
+| `name`         | Label shown in the picker (required, trimmed).            |
+| `content_html` | The rich HTML body of the sign-off.                       |
+| `is_default`   | `1` for the one preselected when composing (at most one). |
+| `created_at`   | Set on insert.                                            |
 
 There is no per-user scoping in the schema: the table is app-wide. The
 "at most one default" rule is enforced in the API, not the schema:

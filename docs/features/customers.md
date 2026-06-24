@@ -25,21 +25,21 @@ Parsed and validated server-side by `parseCustomer` in
 `server/utils/customer.ts`; only `name` is strictly required (400
 otherwise). The columns map 1:1 to the `customers` table:
 
-| Field                            | Column             | Notes                                                  |
-| -------------------------------- | ------------------ | ------------------------------------------------------ |
-| type                             | `type`             | `person` or `company`, defaults to `company`           |
-| name                             | `name`             | required                                               |
-| contact person                   | `contact_person`   |                                                        |
-| email / phone                    | `email` / `phone`  | email locks the quote/invoice send flow when missing   |
-| street / zip / city              | `street` ...       | printed as the document billing address                |
-| country                          | `country`          | defaults to `CH`                                       |
-| language                         | `language`         | `de` / `fr` / `it` / `en`, defaults to `de` (below)    |
-| customer number                  | `customer_number`  | free text, shown in the list and PDFs                  |
-| price category                   | `price_category`   | free-text label                                        |
-| discount %                       | `discount_percent` | defaults to 0                                          |
-| payment term days                | `payment_term_days`| defaults to 30, drives invoice due dates (below)       |
-| website / social                 | `website` / `social`|                                                       |
-| UID / MWST / HR number / founded | `uid` / `mwst` ... | company-only business identifiers                      |
+| Field                            | Column               | Notes                                                |
+| -------------------------------- | -------------------- | ---------------------------------------------------- |
+| type                             | `type`               | `person` or `company`, defaults to `company`         |
+| name                             | `name`               | required                                             |
+| contact person                   | `contact_person`     |                                                      |
+| email / phone                    | `email` / `phone`    | email locks the quote/invoice send flow when missing |
+| street / zip / city              | `street` ...         | printed as the document billing address              |
+| country                          | `country`            | defaults to `CH`                                     |
+| language                         | `language`           | `de` / `fr` / `it` / `en`, defaults to `de` (below)  |
+| customer number                  | `customer_number`    | free text, shown in the list and PDFs                |
+| price category                   | `price_category`     | free-text label                                      |
+| discount %                       | `discount_percent`   | defaults to 0                                        |
+| payment term days                | `payment_term_days`  | defaults to 30, drives invoice due dates (below)     |
+| website / social                 | `website` / `social` |                                                      |
+| UID / MWST / HR number / founded | `uid` / `mwst` ...   | company-only business identifiers                    |
 
 A logo can be uploaded per customer (`/api/customers/[id]/logo`,
 stored in `logo_path`) and shows as the avatar on the detail page.

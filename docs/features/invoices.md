@@ -82,6 +82,7 @@ divided by 100 for display (`de-CH` formatting).
   It is applied to **each per-rate MWST amount** and to the final
   `totalRappen`. Line nets (`lineNetRappen`) are plain
   `Math.round`ed to the Rappen. Only VAT and the grand total snap to 5.
+
 - **Per-VAT-rate breakdown**: `computeInvoiceTotals` groups line nets
   by `mwstPercent` into a `mwstByRate[]` (sorted ascending), each with
   its own rounded `mwstRappen`; `totalMwstRappen` is the sum of those.
@@ -160,5 +161,5 @@ eligibility can be derived (`GET .../reminders`). See
 - Related: [Quotes](quotes.md), [Customers](customers.md),
   [Articles](articles.md), [Reminders](reminders.md),
   [Tax export](tax-export.md), [Bank reconciliation](bank-reconciliation.md).
-</content>
-</invoke>
+  </content>
+  </invoke>

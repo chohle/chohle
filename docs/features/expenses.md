@@ -30,16 +30,16 @@ report reclaim the input VAT (Vorsteuer) hidden in each gross amount.
 
 ## Fields
 
-| Field      | Stored as                | Notes                                                                |
-| ---------- | ------------------------ | -------------------------------------------------------------------- |
-| Title      | `title`                  | required, trimmed                                                    |
-| Amount     | `amount_rappen` (INTEGER)| required, > 0; entered in CHF, stored as Rappen (`amount × 100`)      |
-| Currency   | `currency`               | defaults to `CHF`                                                    |
-| Date       | `date`                   | required, `YYYY-MM-DD`                                               |
-| Category   | `category_id`            | optional; expense-type [categories](../) only, `SET NULL` on delete  |
-| Vendor     | `vendor`                 | optional                                                            |
-| Notes      | `notes`                  | optional                                                            |
-| VAT rate   | `vat_rate` (REAL)        | optional %, `0`-`100`, default `0`; see below                        |
+| Field    | Stored as                 | Notes                                                               |
+| -------- | ------------------------- | ------------------------------------------------------------------- |
+| Title    | `title`                   | required, trimmed                                                   |
+| Amount   | `amount_rappen` (INTEGER) | required, > 0; entered in CHF, stored as Rappen (`amount × 100`)    |
+| Currency | `currency`                | defaults to `CHF`                                                   |
+| Date     | `date`                    | required, `YYYY-MM-DD`                                              |
+| Category | `category_id`             | optional; expense-type [categories](../) only, `SET NULL` on delete |
+| Vendor   | `vendor`                  | optional                                                            |
+| Notes    | `notes`                   | optional                                                            |
+| VAT rate | `vat_rate` (REAL)         | optional %, `0`-`100`, default `0`; see below                       |
 
 `parseExpense` validates server-side (bad input → 400 `Invalid expense`),
 so the same rules apply to the API and the in-app form. The form also
@@ -94,15 +94,15 @@ is intentionally excluded (it can carry inline script).
 
 ## Endpoints
 
-| Method & path                          | Purpose                                  |
-| -------------------------------------- | ---------------------------------------- |
-| `GET /api/expenses?month=YYYY-MM`      | list a month (or all if month omitted)   |
-| `POST /api/expenses`                   | create → `{ id }`                         |
-| `PUT /api/expenses/:id`                | update (404 if missing)                  |
-| `DELETE /api/expenses/:id`             | delete expense + its receipt files       |
-| `POST /api/expenses/:id/attachments`   | multipart upload, one or more `files`    |
-| `GET /api/attachments/:id`             | stream a receipt inline                  |
-| `DELETE /api/attachments/:id`          | delete a receipt                         |
+| Method & path                        | Purpose                                |
+| ------------------------------------ | -------------------------------------- |
+| `GET /api/expenses?month=YYYY-MM`    | list a month (or all if month omitted) |
+| `POST /api/expenses`                 | create → `{ id }`                      |
+| `PUT /api/expenses/:id`              | update (404 if missing)                |
+| `DELETE /api/expenses/:id`           | delete expense + its receipt files     |
+| `POST /api/expenses/:id/attachments` | multipart upload, one or more `files`  |
+| `GET /api/attachments/:id`           | stream a receipt inline                |
+| `DELETE /api/attachments/:id`        | delete a receipt                       |
 
 All require an authenticated session (`requireUserSession`).
 

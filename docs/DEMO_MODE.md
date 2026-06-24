@@ -25,12 +25,12 @@ code runs.
 
 ## Configuration
 
-| Variable              | Default         | Purpose                                                                                                                            |
-| --------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `CHOHLE_DEMO`         | _(off)_         | `true` enables demo mode                                                                                                           |
+| Variable              | Default         | Purpose                                                                                                                           |
+| --------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `CHOHLE_DEMO`         | _(off)_         | `true` enables demo mode                                                                                                          |
 | `DEMO_DATA_PATH`      | `data/demo`     | where templates + sandboxes live. Use a fast local disk / Docker named volume, **not** a macOS bind mount (SQLite corrupts there) |
-| `DEMO_SESSION_TTL_MS` | `7200000` (2 h) | idle time before a sandbox is evicted                                                                                              |
-| `DEMO_MAX_SESSIONS`   | `500`           | cap; the oldest sandbox is evicted past this                                                                                       |
+| `DEMO_SESSION_TTL_MS` | `7200000` (2 h) | idle time before a sandbox is evicted                                                                                             |
+| `DEMO_MAX_SESSIONS`   | `500`           | cap; the oldest sandbox is evicted past this                                                                                      |
 
 To run a demo publicly, follow [Hosting](HOSTING.md) and set
 `CHOHLE_DEMO=true` (the production compose already points `DEMO_DATA_PATH` at the

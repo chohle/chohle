@@ -70,17 +70,17 @@ topics, see the [development guide](docs/DEVELOPMENT.md).
 
 ## Documentation
 
-| Doc                                            | What's inside                                                 |
-| ---------------------------------------------- | ------------------------------------------------------------- |
-| [Features](docs/features/)                     | One page per feature: invoices, quotes, reminders, tax, etc.  |
-| [Quick start](docs/QUICK_START.md)             | Step-by-step: run chohle locally from scratch                 |
-| [Tech stack](docs/TECH_STACK.md)               | What chohle is built from, and why                            |
-| [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure         |
-| [Mail sync](docs/MAIL_SYNC.md)                 | Connecting an inbox (IMAP / Gmail / Outlook)                  |
-| [Sending email](docs/SENDING_EMAIL.md)         | SMTP setup for outbound (invoices, quotes, replies)           |
-| [Hosting](docs/HOSTING.md)                     | _Optional_: putting it online (VPS + Docker + Caddy)          |
-| [Demo mode](docs/DEMO_MODE.md)                 | _Optional_: public per-visitor sandbox (`CHOHLE_DEMO`)        |
-| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                         |
+| Doc                                            | What's inside                                                |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| [Features](docs/features/)                     | One page per feature: invoices, quotes, reminders, tax, etc. |
+| [Quick start](docs/QUICK_START.md)             | Step-by-step: run chohle locally from scratch                |
+| [Tech stack](docs/TECH_STACK.md)               | What chohle is built from, and why                           |
+| [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure        |
+| [Mail sync](docs/MAIL_SYNC.md)                 | Connecting an inbox (IMAP / Gmail / Outlook)                 |
+| [Sending email](docs/SENDING_EMAIL.md)         | SMTP setup for outbound (invoices, quotes, replies)          |
+| [Hosting](docs/HOSTING.md)                     | _Optional_: putting it online (VPS + Docker + Caddy)         |
+| [Demo mode](docs/DEMO_MODE.md)                 | _Optional_: public per-visitor sandbox (`CHOHLE_DEMO`)       |
+| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                        |
 
 ## Contributing
 

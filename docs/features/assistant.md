@@ -114,15 +114,15 @@ delete one.
 
 ## How it works (internals)
 
-| File                                  | Role                                                                |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `server/utils/assistant/llm.ts`       | OpenAI-compatible client + system prompt.                           |
-| `server/utils/assistant/tools.ts`     | Tool registry: read tools + propose-only write tools.               |
+| File                                  | Role                                                               |
+| ------------------------------------- | ------------------------------------------------------------------ |
+| `server/utils/assistant/llm.ts`       | OpenAI-compatible client + system prompt.                          |
+| `server/utils/assistant/tools.ts`     | Tool registry: read tools + propose-only write tools.              |
 | `server/utils/assistant/commit.ts`    | `commitActions(db, actions)`: the atomic, re-validated write path. |
-| `server/api/assistant/chat.post.ts`   | Runs the tool-calling loop; returns proposals.                      |
-| `server/api/assistant/commit.post.ts` | Executes approved actions; writes the audit row.                    |
-| `server/api/assistant/status.get.ts`  | Whether the assistant is enabled.                                   |
-| `app/pages/assistant.vue`             | The chat page with approval cards.                                  |
+| `server/api/assistant/chat.post.ts`   | Runs the tool-calling loop; returns proposals.                     |
+| `server/api/assistant/commit.post.ts` | Executes approved actions; writes the audit row.                   |
+| `server/api/assistant/status.get.ts`  | Whether the assistant is enabled.                                  |
+| `app/pages/assistant.vue`             | The chat page with approval cards.                                 |
 
 Reuses the same `parseCustomer` / `computeInvoiceTotals` logic as the normal
 endpoints, so assistant-created records are identical to hand-entered ones.
