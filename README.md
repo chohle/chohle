@@ -53,21 +53,9 @@ why it's here.
 
 ## Quick start
 
-chohle runs in Docker; no Node or Yarn needed on your host.
-
-```bash
-git clone https://github.com/chohle/chohle.git
-cd chohle
-cp .env.example .env   # then set the admin + session secrets
-docker compose up
-```
-
-- App: http://localhost:3000 (log in with the credentials from your `.env`)
-- Mailpit (dev email): http://localhost:8125
-
-New here? The [quick start guide](docs/QUICK_START.md) walks through every step: what to
-set in `.env`, how to generate the session secret, and first login. For the deeper dev
-topics, see the [development guide](docs/DEVELOPMENT.md).
+chohle runs in Docker, so you don't need Node or Yarn on your host. The
+[quick start guide](docs/QUICK_START.md) walks through every step: prerequisites, the
+`.env` secrets, generating the session key, first launch, and login.
 
 ## Documentation
 

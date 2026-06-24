@@ -73,11 +73,16 @@ docker compose up
 ```
 
 The first run builds the app image and installs dependencies, so it takes a few minutes.
-You'll know it's ready when the logs show Nuxt listening on port 3000. On startup chohle
-also applies its database migrations and seeds your owner account automatically. There
-is no separate setup step.
+Those dependencies (including Nuxt) live inside the container, not on your host, so you
+do not need Node or Yarn locally. You'll know it's ready when the logs show Nuxt
+listening on port 3000. On startup chohle also applies its database migrations and seeds
+your owner account automatically. There is no separate setup step.
 
 To run it in the background instead, add `-d` (`docker compose up -d`).
+
+> If a previous, interrupted run left an empty dependency volume and the app exits with
+> `command not found: nuxt`, reset it with `docker compose down -v` then
+> `docker compose up --build`. See [Troubleshooting](#troubleshooting) below.
 
 ## 5. Open the app and log in
 
