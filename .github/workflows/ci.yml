@@ -10,6 +10,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least-privilege token: this workflow only reads the repo.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Lint, test & build
