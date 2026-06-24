@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { CalendarDate, parseDate } from '@internationalized/date'
+import { CalendarDate, parseDate, type DateValue } from '@internationalized/date'
+import type { DateRange } from 'reka-ui'
 
 defineProps<{ disabled?: boolean }>()
 
@@ -17,8 +18,11 @@ const calendarValue = computed<CalendarDate | null>(() => {
 })
 
 const open = ref(false)
-function onCalendar(v: CalendarDate | null) {
-  modelValue.value = v ? v.toString() : ''
+function onCalendar(v: DateValue | DateRange | DateValue[] | null | undefined) {
+  // UCalendar runs in single-date mode here, so only a DateValue (or null)
+  // arrives at runtime; narrow defensively to satisfy the broad emit type.
+  const single = Array.isArray(v) ? v[0] : v instanceof CalendarDate ? v : null
+  modelValue.value = single ? single.toString() : ''
   open.value = false
 }
 </script>

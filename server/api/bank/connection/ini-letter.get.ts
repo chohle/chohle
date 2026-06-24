@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
   const conn = getConnection(useDb())
-  if (!conn || conn.provider !== 'ebics') {
+  if (!conn || conn.provider !== 'ebics' || !conn.config) {
     throw createError({ statusCode: 404, statusMessage: 'No EBICS connection' })
   }
 

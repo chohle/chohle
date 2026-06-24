@@ -138,6 +138,8 @@ async function fetchInboxSince(token: string, sinceIso: string): Promise<GraphMe
 
   const out: GraphMessage[] = []
   while (url && out.length < 200) {
+    // @ts-ignore Nuxt's generated route types recurse too deeply for $fetch on a dynamic
+    // external URL (TS2321 excessive stack depth); this is a plain external Graph request.
     const res: GraphListResponse = await $fetch(url, {
       headers: { Authorization: `Bearer ${token}`, Prefer: 'outlook.body-content-type="html"' }
     })

@@ -74,9 +74,9 @@ function loadImage(src: unknown): Buffer | null {
   if (typeof src !== 'string') return null
   try {
     const data = src.match(/^data:image\/[a-z+]+;base64,(.+)$/i)
-    if (data) return Buffer.from(data[1], 'base64')
+    if (data?.[1]) return Buffer.from(data[1], 'base64')
     const m = src.match(/\/api\/email-asset\/([^/?#]+)/)
-    if (m) return readFileSync(join(emailAssetsDir(), basename(decodeURIComponent(m[1]))))
+    if (m?.[1]) return readFileSync(join(emailAssetsDir(), basename(decodeURIComponent(m[1]))))
   } catch {
     /* unreadable → skip the image rather than fail the PDF */
   }
@@ -238,7 +238,7 @@ export function renderDocumentPdf(opts: {
   let drewLogo = false
   if (sender.logo) {
     try {
-      pdf.image(sender.logo, PAGE.margin, 50, { fit: [170, 40], valign: 'top' })
+      pdf.image(sender.logo, PAGE.margin, 50, { fit: [170, 40] })
       drewLogo = true
     } catch {
       /* fall back to text */
