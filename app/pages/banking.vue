@@ -160,7 +160,7 @@ function setChosen(txId: number, value: unknown) {
 }
 
 // The matcher doesn't persist *why* it suggested, so derive a label from the
-// data the same way it decided (see docs/BANK_RECONCILIATION.md).
+// data the same way it decided (see docs/features/bank-reconciliation.md).
 function reasonFor(tx: Tx): string | null {
   if (tx.status !== 'suggested') return null
   if (!tx.reference) return t('banking.reasonFuzzy')

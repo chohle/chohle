@@ -2,7 +2,7 @@
 // key generation and the initialization letter. The live handshake
 // (INI/HIA/HPB key exchange) and the signed/encrypted statement download need a
 // real EBICS contract to test against and land once one is available; see
-// server/utils/bankSync.ts (ebicsProvider) and docs/BANK_RECONCILIATION.md.
+// server/utils/bankSync.ts (ebicsProvider) and docs/features/bank-reconciliation.md.
 //
 // What this does today:
 //   1. generateEbicsKeys() — the three RSA-2048 key pairs EBICS requires:

@@ -31,7 +31,7 @@ The MWST summary appears only when you're **VAT-registered** (Settings →
 
 - **Output VAT (Umsatzsteuer)** is recomputed from each paid invoice's line items.
 - **Input VAT (Vorsteuer)** comes from the optional **VAT %** you set per expense
-  (Expenses form). Expenses left at 0 % contribute no input VAT — but their
+  (Expenses form). Expenses left at 0 % contribute no input VAT, but their
   receipts are still in the bundle, so the Treuhänder can reconcile Vorsteuer from
   them.
 
@@ -44,13 +44,13 @@ business records and receipts for **10 years**.
 
 ## Internals
 
-| File                                   | Role                                                  |
-| -------------------------------------- | ----------------------------------------------------- |
-| `server/utils/taxReport.ts`            | `buildTaxReport(db, year)` — gathers the year's data. |
-| `server/utils/taxReportPdf.ts`         | Renders the Erfolgsrechnung PDF (pdfkit).             |
-| `server/utils/taxExportZip.ts`         | Bundles PDF + CSV + receipts (fflate).                |
-| `server/api/tax-export/summary.get.ts` | JSON preview for the page.                            |
-| `server/api/tax-export/[year].get.ts`  | Streams the ZIP.                                      |
-| `app/pages/tax-export.vue`             | The page.                                             |
+| File                                   | Role                                                 |
+| -------------------------------------- | ---------------------------------------------------- |
+| `server/utils/taxReport.ts`            | `buildTaxReport(db, year)`: gathers the year's data. |
+| `server/utils/taxReportPdf.ts`         | Renders the Erfolgsrechnung PDF (pdfkit).            |
+| `server/utils/taxExportZip.ts`         | Bundles PDF + CSV + receipts (fflate).               |
+| `server/api/tax-export/summary.get.ts` | JSON preview for the page.                           |
+| `server/api/tax-export/[year].get.ts`  | Streams the ZIP.                                     |
+| `app/pages/tax-export.vue`             | The page.                                            |
 
 Migration `0048` adds the optional `expenses.vat_rate` column.
