@@ -9,6 +9,7 @@ customers, and bill them with proper Swiss invoices and a QR-Rechnung. Your data
 server, no subscription.
 
 [![CI](https://github.com/chohle/chohle/actions/workflows/ci.yml/badge.svg)](https://github.com/chohle/chohle/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/chohle/chohle?sort=semver)](https://github.com/chohle/chohle/releases)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Nuxt](https://img.shields.io/badge/Nuxt-4-00DC82?logo=nuxt&logoColor=white)
 ![Made for Switzerland](https://img.shields.io/badge/made%20for-Switzerland%20%F0%9F%87%A8%F0%9F%87%AD-red)

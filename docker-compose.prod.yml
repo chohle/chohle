@@ -4,15 +4,18 @@
 #   1. Point a DNS A record for your domain at this host's IP.
 #   2. cp .env.example .env  &&  edit it (DOMAIN, CHOHLE_SECRET,
 #      NUXT_SESSION_PASSWORD, admin creds, CHOHLE_DEMO).
-#   3. docker compose -f docker-compose.prod.yml up -d --build
+#   3. docker compose -f docker-compose.prod.yml up -d
 #
-# Caddy fetches a Let's Encrypt certificate for $DOMAIN on first boot, so the
-# domain must already resolve here and ports 80/443 must be open.
+# This pulls the published image; update later with `pull` + `up -d` (see
+# docs/HOSTING.md). Caddy fetches a Let's Encrypt certificate for $DOMAIN on
+# first boot, so the domain must already resolve here and ports 80/443 open.
 services:
   app:
-    build:
-      context: .
-      target: prod
+    # Published multi-arch image. Pin a version for reproducible deploys, e.g.
+    # `ghcr.io/chohle/chohle:0.0.1` (see the Releases page / CHANGELOG.md). To
+    # build from source instead, replace this line with:
+    #   build: { context: ., target: prod }
+    image: ghcr.io/chohle/chohle:latest
     restart: unless-stopped
     environment:
       - NUXT_HOST=0.0.0.0

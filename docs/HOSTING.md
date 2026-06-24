@@ -58,25 +58,32 @@ Set, at minimum:
 ## 5. Launch
 
 ```sh
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d
 ```
 
-First boot builds the image (native `better-sqlite3` compiles), Caddy fetches a
-Let's Encrypt cert, and the app comes up at `https://<DOMAIN>`.
+First boot pulls the published image (`ghcr.io/chohle/chohle:latest`), Caddy
+fetches a Let's Encrypt cert, and the app comes up at `https://<DOMAIN>`.
 
 ```sh
 docker compose -f docker-compose.prod.yml logs -f          # follow logs
 docker compose -f docker-compose.prod.yml ps               # container status
 ```
 
+> Want a specific version instead of `latest`? Pin it in `docker-compose.prod.yml`
+> (e.g. `image: ghcr.io/chohle/chohle:0.0.1`). Releases and the changelog are on the
+> [Releases page](https://github.com/chohle/chohle/releases). To build from source
+> instead of pulling, swap the `image:` line for `build: { context: ., target: prod }`.
+
 ## 6. Updating
 
 ```sh
-git pull
-docker compose -f docker-compose.prod.yml up -d --build     # rebuild, not just restart
+docker compose -f docker-compose.prod.yml pull             # fetch the new image
+docker compose -f docker-compose.prod.yml up -d            # recreate the app
 ```
 
-A plain restart reuses the old image. Code changes need `--build`.
+Your data is untouched (it lives on the `appdata` volume). Pinning a version? Bump the
+tag in `docker-compose.prod.yml` first, then run the two commands above. Database
+migrations apply automatically on startup.
 
 ## Notes
 
