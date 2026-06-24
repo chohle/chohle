@@ -106,7 +106,7 @@ docker compose down -v        # -v drops the stale node_modules volume
 docker compose up --build     # rebuilds the image and reseeds the volume
 ```
 
-The `-v` is the important part — without it the empty volume survives and the error
+The `-v` is the important part: without it the empty volume survives and the error
 persists.
 
 ## Production build

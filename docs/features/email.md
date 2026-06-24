@@ -9,18 +9,18 @@ app; account connection and SMTP setup live in their own guides
 ## Where to find it
 
 - **Sidebar -> Workspace -> Conversations** (route `/conversations`,
-  mail icon `i-lucide-mail`) — a two pane view: a list of projects
+  mail icon `i-lucide-mail`): a two pane view: a list of projects
   that have at least one email on the left, the selected project's
   thread on the right.
 - **Sidebar -> Workspace -> Triage** (route `/triage`, inbox icon
-  `i-lucide-inbox`, with a **pending-count badge**) — inbound mail
+  `i-lucide-inbox`, with a **pending-count badge**): inbound mail
   that didn't thread to any project, waiting for a human to file or
   drop it. The badge shows the number of `pending` rows and stays in
   lockstep with the page via `useTriageCount()`.
 
 ## How inbound mail threads to a project
 
-Threading is header based and deliberately conservative — nothing
+Threading is header based and deliberately conservative, nothing
 attaches to a project automatically except a real reply to mail we
 sent.
 
@@ -61,17 +61,17 @@ suggestion:
 Each card on `/triage` shows the sender, subject, a 180-char snippet,
 and the suggestion chip. Three actions:
 
-- **Assign to suggested** (`POST /api/triage/{id}/assign`) — files the
+- **Assign to suggested** (`POST /api/triage/{id}/assign`): files the
   message into `project_emails`. It also sweeps in the rest of that
   back-and-forth: other `pending` rows with the same sender and same
   normalized subject move together. The moved triage rows are
   tombstoned `status = 'assigned'`; their Message-IDs then act as
   thread anchors so future replies match automatically.
-- **Choose project…** — lazy-loads the suggested customer's projects
+- **Choose project…**: lazy-loads the suggested customer's projects
   and hands off to the shared `ProjectPicker` (which can also create a
   new project), then assigns to the chosen one. Shown only when a
   customer was matched.
-- **Dismiss** (`POST /api/triage/{id}/dismiss`) — marks the row
+- **Dismiss** (`POST /api/triage/{id}/dismiss`): marks the row
   `status = 'dismissed'`. The tombstone is kept so the next sync
   doesn't re-triage the same Message-ID.
 
@@ -82,13 +82,13 @@ Both actions refresh the list and the sidebar badge.
 The conversation pane doesn't host a composer of its own. The Reply
 button on an inbound message jumps to the project detail
 (`/<sales|procurement>/<id>?reply=<id>`), whose composer opens
-pre-filled for that message — keeping one send path.
+pre-filled for that message, keeping one send path.
 
 Sending (`POST /api/projects/{id}/emails`) wraps the body in the
 shared branded shell (`buildBrandedEmail`, optional signature slot),
 sends via the configured SMTP transport (`getMailer()`), and logs the
 raw body back onto `project_emails` as an `outbound` row with its own
-Message-ID — which becomes the anchor that threads the customer's
+Message-ID, which becomes the anchor that threads the customer's
 reply. The recipient defaults to the linked customer's email; the
 sender comes from the Billing sender record. There's also a
 `log.post.ts` endpoint to record a reply sent outside chohle (no
@@ -116,7 +116,7 @@ background tick (`server/plugins/03.mail-sync.ts`); the same code path
 is exposed as a manual **Sync now** (`POST /api/mailboxes/{id}/sync`),
 which surfaces sync errors as a 502 with the driver's message.
 
-Connection and per-provider setup are out of scope here — see:
+Connection and per-provider setup are out of scope here. See:
 
 - [Mail sync overview](../MAIL_SYNC.md)
 - [Gmail](../GMAIL_SYNC.md) · [Outlook](../OUTLOOK_SYNC.md) ·

@@ -23,7 +23,7 @@ A row in the `signatures` table is just three things plus bookkeeping:
 | `is_default`   | `1` for the one preselected when composing (at most one).    |
 | `created_at`   | Set on insert.                                               |
 
-There is no per-user scoping in the schema — the table is app-wide. The
+There is no per-user scoping in the schema: the table is app-wide. The
 "at most one default" rule is enforced in the API, not the schema:
 creating or updating a signature with `is_default` clears the flag on all
 others in the same transaction (`index.post.ts`, `[id].put.ts`). The
@@ -41,7 +41,7 @@ image-upload node (`EditorImageUploadNode.vue`) POSTs the file to
 `/api/uploads/email-image`, which:
 
 1. validates type and size (`saveEmailImage` in `server/utils/uploads.ts`
-   — allowed image types only, max 5 MB, PNG magic-byte check),
+   (allowed image types only, max 5 MB, PNG magic-byte check),
 2. writes it under the public **email-asset** store with a `uuid.ext`
    name, and
 3. returns an absolute URL (`siteUrl` + `/api/email-asset/<name>`).
@@ -58,14 +58,14 @@ email-asset subdirectory, and responses are sent with
 Compose surfaces share `useSignatures()`
 (`app/composables/useSignatures.ts`), which exposes the rows,
 `defaultSignatureId` (to preselect), and `signatureItems` for a
-`USelect` — including a "None" option (`value: null`). The invoice send
+`USelect`, including a "None" option (`value: null`). The invoice send
 panel (`app/pages/invoices/[id]/index.vue`), the quote editor
 (`app/pages/quotes/[id].vue`) and the project composer
 (`ProjectDetailView.vue`) all render this dropdown and seed it with the
 default.
 
 On send, the client passes `signature_id`. The server resolves it to
-HTML at send time — it does **not** store a copy on the message — by
+HTML at send time (it does **not** store a copy on the message) by
 looking up `content_html` for that id and handing it to
 `buildBrandedEmail(..., { signatureHtml })`. See
 `server/api/invoices/[id]/send.post.ts` and

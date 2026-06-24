@@ -18,17 +18,17 @@ a slideover form.
 
 Each row in the `categories` table carries:
 
-- **id** — autoincrement primary key.
-- **name** — free text, required (trimmed; empty is rejected).
-- **type** — `'expense'` or `'income'`, enforced by a CHECK constraint
+- **id**: autoincrement primary key.
+- **name**: free text, required (trimmed; empty is rejected).
+- **type**: `'expense'` or `'income'`, enforced by a CHECK constraint
   and by `parseCategory`. The two types are just two lists; expenses
   only ever reference expense-type categories in the editor.
-- **color** — a stored `TEXT NOT NULL`, but no longer user-editable.
+- **color**: a stored `TEXT NOT NULL`, but no longer user-editable.
   The page writes a constant ink value (`#0A0A0A`) so existing rows
   stay valid; the column survives for back-compat.
-- **icon** — a Lucide icon name picked from a fixed grid of ~18 options
+- **icon**: a Lucide icon name picked from a fixed grid of ~18 options
   (`i-lucide-shopping-cart`, `i-lucide-car`, `i-lucide-home`, ...).
-- **created_at** — `datetime('now')` default.
+- **created_at**: `datetime('now')` default.
 
 ## How categories are used
 
@@ -49,12 +49,12 @@ key **`Uncategorized`**. This array is surfaced by
 
 ## Create / edit / delete
 
-- **Create** — `POST /api/categories` runs `parseCategory`, which
+- **Create**: `POST /api/categories` runs `parseCategory`, which
   requires a non-empty name, a valid `type`, plus color and icon, then
   inserts and returns the new id.
-- **Edit** — `PUT /api/categories/:id` re-validates and updates
+- **Edit**: `PUT /api/categories/:id` re-validates and updates
   name/type/color/icon; a missing id returns 404.
-- **Delete** — `DELETE /api/categories/:id` removes the row. It does
+- **Delete**: `DELETE /api/categories/:id` removes the row. It does
   **not** delete the expenses pointing at it: the `expenses.category_id`
   foreign key is declared `ON DELETE SET NULL`, so affected expenses
   simply become uncategorised (and then group under `Uncategorized` in

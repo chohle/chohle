@@ -1,7 +1,7 @@
 # Sending email
 
-chohle sends outbound mail — invoices, quotes, payment reminders, and
-project replies — through a single SMTP transport. This page covers how to
+chohle sends outbound mail (invoices, quotes, payment reminders, and
+project replies) through a single SMTP transport. This page covers how to
 configure it.
 
 > This is the **send** side. For pulling replies back into a project thread
@@ -18,16 +18,16 @@ There is exactly one thing to decide: **is `NUXT_SMTP_USER` set or not?**
 | **unset / blank** | Mailpit / dev | No auth, no TLS, no From check. All mail lands in the Mailpit UI.  |
 | **set**           | Real provider | Authenticates, derives TLS from the port, enforces the From guard. |
 
-That's the whole model. You don't need a separate "use Mailpit yes/no" flag —
-the presence of a username _is_ the flag.
+That's the whole model. You don't need a separate "use Mailpit yes/no" flag.
+The presence of a username _is_ the flag.
 
-### Mailpit (the default — nothing to configure)
+### Mailpit (the default: nothing to configure)
 
 Out of the box every send is captured by the Mailpit catch-all that ships in
 `docker-compose.yml`; nothing leaves your machine and you read it at
 **http://localhost:8125**. This is all most contributors ever need.
 
-In **Docker** (the default), leave the SMTP host/port **unset** in `.env` —
+In **Docker** (the default), leave the SMTP host/port **unset** in `.env`:
 compose points the container at the Mailpit sidecar automatically:
 
 ```yaml
@@ -35,7 +35,7 @@ compose points the container at the Mailpit sidecar automatically:
 - NUXT_SMTP_PORT=${NUXT_SMTP_PORT:-1025}
 ```
 
-> Don't set `NUXT_SMTP_HOST=localhost` for Docker — inside the container
+> Don't set `NUXT_SMTP_HOST=localhost` for Docker: inside the container
 > `localhost` is the container itself, not the host, so the send fails. Those
 > `localhost:1125` values are only for running **host `yarn dev`** (no Docker),
 > where they reach Mailpit's published port:
@@ -50,7 +50,7 @@ NUXT_SMTP_PORT=1125
 ### A real provider (when you actually want mail to go out)
 
 Fill in all four auth values. Use the provider's **submission** host and
-port — **not** the IMAP port `993`.
+port, **not** the IMAP port `993`.
 
 ```env
 NUXT_SMTP_HOST=asmtp.mail.example.ch   # provider's SMTP submission host
@@ -67,11 +67,11 @@ NUXT_SMTP_PASS=••••••••                  # that mailbox's passwo
   derived from the port (`465` → implicit TLS, anything else → STARTTLS). Only
   set `NUXT_SMTP_SECURE=true`/`false` if a host needs something non-standard.
 
-## The From address comes from Billing — and must match
+## The From address comes from Billing, and must match
 
 The visible **From** is _not_ an env var. It's the **sender email** set in
-**Billing / Abrechnung** (`hello@chohle.ch` in the example). Every send —
-invoice, quote, reminder, reply — uses it.
+**Billing / Abrechnung** (`hello@chohle.ch` in the example). Every send
+(invoice, quote, reminder, reply) uses it.
 
 Because of that, there is one rule that matters for deliverability:
 
@@ -80,7 +80,7 @@ Because of that, there is one rule that matters for deliverability:
 If you authenticate as `hello@chohle.ch` you can only send _as_ a `@chohle.ch`
 address. A provider will reject or rewrite a From it doesn't own, and the
 recipient's SPF/DKIM checks will fail. chohle enforces this with a **From-domain
-guard**: in real-provider mode, any send whose From domain differs from the
+guard**. In real-provider mode, any send whose From domain differs from the
 `NUXT_SMTP_USER` domain is refused before it reaches the provider. The guard is
 off in Mailpit mode.
 
@@ -135,7 +135,7 @@ The endpoint is gated to dev (`import.meta.dev`) and 404s in production.
 
 - **`Refusing to send: From domain "@x" does not match the SMTP account "@y"`**
   The From-domain guard fired. Your Billing sender email and `NUXT_SMTP_USER`
-  are on different domains. Align them — set the Billing sender to an address on
+  are on different domains. Align them: set the Billing sender to an address on
   the `NUXT_SMTP_USER` domain, or point `NUXT_SMTP_USER` at the mailbox that
   owns the Billing address.
 - **`500 Server Error` when sending an invoice, but the smoke test works**
@@ -143,14 +143,14 @@ The endpoint is gated to dev (`import.meta.dev`) and 404s in production.
   the invoice sends as the Billing sender (may not). Check the two domains
   match.
 - **Connection timeout / TLS error**
-  Wrong host or port — you're probably pointing at the IMAP endpoint (`:993`).
+  Wrong host or port: you're probably pointing at the IMAP endpoint (`:993`).
   Use the provider's SMTP submission host; try `587` if `465` fails.
 - **`535` authentication failed**
   Wrong `NUXT_SMTP_USER` / `NUXT_SMTP_PASS`, or the provider requires an app
   password.
 - **Mail "sends" but never arrives**
   You're still in Mailpit mode (`NUXT_SMTP_USER` blank, or Docker is using the
-  Mailpit default). Check http://localhost:8125 — if it's there, the app is
+  Mailpit default). Check http://localhost:8125: if it's there, the app is
   talking to Mailpit, not your provider.
 - **Sends suppressed with `[demo] outbound email suppressed`**
   The instance is running in demo mode (`CHOHLE_DEMO=true`); all outbound is

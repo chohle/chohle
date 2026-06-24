@@ -32,7 +32,7 @@ Each source is a row in `income_sources` with:
 There is no separate "salary vs client income" type. Any source is
 just a recurring monthly amount; the form defaults to payout day `25`,
 canton `LU`, and rule `earlier`. The overview endpoint lists every
-source and computes its pay date for the selected month — it does not
+source and computes its pay date for the selected month. It does not
 distinguish salary from a client retainer.
 
 ## Swiss pay-date calculation
@@ -61,7 +61,7 @@ nominal date and resolves it:
 4. **Result**: `{ date, reason }`. `reason` is the original conflict
    name (`'Weekend'` / the holiday) when a shift happened, else `null`.
    With rule `none` the date is returned untouched and `reason` is
-   always `null` — even when it lands on a weekend.
+   always `null`, even when it lands on a weekend.
 
 The card shows the computed `pay_date`; if `reason` is set it renders a
 "moved · {reason}" pill, otherwise "on schedule".
@@ -84,7 +84,7 @@ holidays from the [OpenHolidays API](https://openholidaysapi.org)
 (`CH-<canton>`, German names) and caches them in the `holidays` table
 (keyed by `canton, year, date`), so it works **offline** afterwards. If
 the API is unreachable and nothing is cached, it degrades to an empty
-map — weekend shifting still works, holiday shifting is skipped.
+map. Weekend shifting still works, holiday shifting is skipped.
 `overview.get.ts` memoises the map per canton so each canton is fetched
 at most once per request.
 
@@ -103,9 +103,9 @@ drive the received / pending chips and the KPI totals. See the
 - Migrations `0005_holidays` (cached cantonal holidays),
   `0006_income_sources` (sources + the `payout_rule` CHECK constraint),
   and `0007_income_payments` (per-month received snapshots).
-- `server/utils/payout.ts` — `computePayout()` and the `conflict()`
+- `server/utils/payout.ts`: `computePayout()` and the `conflict()`
   weekend/holiday detector; the `earlier` / `later` / `none` rules.
-- `server/utils/holidays.ts` — `getHolidays()`, OpenHolidays fetch +
+- `server/utils/holidays.ts`: `getHolidays()`, OpenHolidays fetch +
   DB cache + offline fallback.
 - Endpoints under `server/api/income/`: `overview.get.ts`,
   `sources/index.{get,post}.ts`, `sources/[id].{put,delete}.ts`, and

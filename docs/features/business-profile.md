@@ -13,7 +13,7 @@ workspace.
   person/company toggle, name + address, contact, IBAN, VAT
   registration, company numbers, and the logo. Despite the prompt's
   framing, `/profile` (`app/pages/profile.vue`) only changes your
-  username/password — the sender identity lives under Billing.
+  username/password. The sender identity lives under Billing.
 - **User avatar menu -> Settings** (route `/settings`,
   `app/pages/settings.vue`) holds the rest: UI language (General tab),
   the invoice email template (Email tab), and the three reminder
@@ -24,18 +24,18 @@ workspace.
 Edited on `/billing`, saved by `PUT /api/sender`
 (`server/api/sender.put.ts`):
 
-- `type` — `person` or `company`. Switching to `company` reveals the
+- `type`: `person` or `company`. Switching to `company` reveals the
   UID / MWST-number / HR-number / founding-year fields and flips
   `vat_registered` on by default.
 - `name`, `street`, `zip`, `city`, `country` (defaults `CH`).
 - `email`, `phone`, `website`.
-- `vat_registered` — whether you charge MWST. Off (e.g. a private
+- `vat_registered`: whether you charge MWST. Off (e.g. a private
   person under the CHF 100k threshold) means invoices carry no VAT.
 
 Client-side validation requires `name`, a well-formed `email`, and
 `iban`; the server is the source of truth and trims every field.
 
-## Banking — IBAN / QR-IBAN
+## Banking: IBAN / QR-IBAN
 
 There is one `iban` column, not separate IBAN and QR-IBAN fields. The
 QR-bill code inspects it at PDF time: `buildReference()` in
@@ -71,17 +71,17 @@ The same image prints on the [Invoices](invoices.md) and
 
 ## Default document & email templates
 
-- **Invoice cover email** — `sender.email_template` (migration
+- **Invoice cover email**: `sender.email_template` (migration
   `0018_sender_email_template`), edited on Settings -> Email and saved
   by `PUT /api/email-template` (`server/api/email-template.put.ts`).
   A single HTML body with placeholders `{customer}` `{number}` `{due}`
   `{sender}` filled per send; the branded shell/footer are added on
   send. Default copy is German.
-- **Reminder templates** — three Mahnung levels, each with
+- **Reminder templates**: three Mahnung levels, each with
   `reminderN_subject`, `reminderN_body`, and `reminderN_wait_days`
   (migration `0033_invoice_reminders`), edited on Settings ->
   Reminders and saved together by `PUT /api/reminder-templates`
-  (`server/api/reminder-templates.put.ts`, clamps wait days 0–365).
+  (`server/api/reminder-templates.put.ts`, clamps wait days 0-365).
   Placeholders add `{amount}` `{issued}` `{days_overdue}`. See
   [Reminders](reminders.md).
 - **Quote subject/message** are **not** stored on `sender`. They come

@@ -15,7 +15,7 @@ It is **off by default**. Turn it on only if you want it.
   signatures, expenses, income sources.
 - **Edit, with your approval**: customers, invoices, quotes, articles,
   signatures. An edit shows a **before → after** card so you can double check,
-  and it can only change fields — never remove a record.
+  and it can only change fields, never remove a record.
 - **It can never delete anything, and never send email.** There is no delete tool
   and no send tool in the registry, so those are impossible by construction.
   Every write is shown as an **Approve / Cancel** card; nothing happens until you
@@ -87,11 +87,11 @@ needed.
 The model must support **tool/function calling**, or it can chat but won't create
 records reliably. Known-good local models:
 
-- **qwen2.5:7b** (default) — good tool calling, ~8 GB RAM.
-- **llama3.1:8b** / **llama3.2** — also solid.
-- **mistral** — works.
-- Small box (≤ 4 GB RAM): try a **3B** model (e.g. `qwen2.5:3b`) — faster but
-  flakier at multi-step requests — or point at an external endpoint instead.
+- **qwen2.5:7b** (default), good tool calling, ~8 GB RAM.
+- **llama3.1:8b** / **llama3.2**, also solid.
+- **mistral**, works.
+- Small box (≤ 4 GB RAM): try a **3B** model (e.g. `qwen2.5:3b`), faster but
+  flakier at multi-step requests, or point at an external endpoint instead.
 
 **Hardware note:** an 8B model needs roughly 8 GB of free RAM and is CPU-bound
 (seconds to tens of seconds per reply) without a GPU. The public demo box is too
@@ -118,7 +118,7 @@ delete one.
 | ------------------------------------- | ------------------------------------------------------------------- |
 | `server/utils/assistant/llm.ts`       | OpenAI-compatible client + system prompt.                           |
 | `server/utils/assistant/tools.ts`     | Tool registry: read tools + propose-only write tools.               |
-| `server/utils/assistant/commit.ts`    | `commitActions(db, actions)` — the atomic, re-validated write path. |
+| `server/utils/assistant/commit.ts`    | `commitActions(db, actions)`: the atomic, re-validated write path. |
 | `server/api/assistant/chat.post.ts`   | Runs the tool-calling loop; returns proposals.                      |
 | `server/api/assistant/commit.post.ts` | Executes approved actions; writes the audit row.                    |
 | `server/api/assistant/status.get.ts`  | Whether the assistant is enabled.                                   |

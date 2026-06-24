@@ -1,6 +1,6 @@
 # Expenses (Ausgaben / Dépenses / Spese)
 
-chohle expenses are the business costs you record against a month — a
+chohle expenses are the business costs you record against a month: a
 title, an amount in CHF, an optional vendor and category, and any number
 of receipts (Belege) you scan or photograph. They feed the
 [tax export](tax-export.md): an optional per-expense VAT rate lets the
@@ -20,7 +20,7 @@ report reclaim the input VAT (Vorsteuer) hidden in each gross amount.
 ## The list page
 
 - **KPIs**: total this month, number of entries, distinct categories,
-  and average per entry — all in CHF, rendered with `de-CH` formatting
+  and average per entry, all in CHF, rendered with `de-CH` formatting
   and no decimals.
 - **By category**: a donut + legend summing every expense in the month
   that has a category. Uncategorised expenses are left out of it.
@@ -39,11 +39,11 @@ report reclaim the input VAT (Vorsteuer) hidden in each gross amount.
 | Category   | `category_id`            | optional; expense-type [categories](../) only, `SET NULL` on delete  |
 | Vendor     | `vendor`                 | optional                                                            |
 | Notes      | `notes`                  | optional                                                            |
-| VAT rate   | `vat_rate` (REAL)        | optional %, `0`–`100`, default `0`; see below                        |
+| VAT rate   | `vat_rate` (REAL)        | optional %, `0`-`100`, default `0`; see below                        |
 
 `parseExpense` validates server-side (bad input → 400 `Invalid expense`),
 so the same rules apply to the API and the in-app form. The form also
-validates: title and amount required, amount positive, VAT rate 0–100.
+validates: title and amount required, amount positive, VAT rate 0-100.
 
 ## Per-expense VAT rate (Vorsteuer)
 
@@ -51,8 +51,8 @@ The VAT field only appears when the sender is **VAT-registered**
 (`/api/sender` → `vat_registered`); for everyone else it stays hidden and
 `vat_rate` stays `0`. When set, the [tax export](tax-export.md) computes
 the input VAT contained in the gross amount as
-`round5(gross × rate / (100 + rate))` — i.e. the Vorsteuer you can
-reclaim — rounded to 5 Rappen like the rest of the CHF math.
+`round5(gross × rate / (100 + rate))` (i.e. the Vorsteuer you can
+reclaim), rounded to 5 Rappen like the rest of the CHF math.
 
 ## Receipts (attachments)
 
@@ -64,7 +64,7 @@ display and download.
 
 - **In the form**: when creating, picked files sit in a pending list and
   upload only after the expense itself saves (so a Beleg can be attached
-  on create). A receipt-upload failure is non-fatal — the expense is kept
+  on create). A receipt-upload failure is non-fatal: the expense is kept
   and the slide-over still closes.
 - **In the row**: the `ExpenseReceipts` chip lets you upload more or
   delete existing receipts inline.
@@ -110,11 +110,11 @@ All require an authenticated session (`requireUserSession`).
 
 - Migration `0003_expenses` creates `expenses`; `0004_attachments`
   creates `attachments`; `0048_expense_vat_rate` adds the
-  `vat_rate REAL NOT NULL DEFAULT 0 CHECK (0–100)` column.
-- `server/utils/expense.ts` — `parseExpense` (shared validation, CHF →
+  `vat_rate REAL NOT NULL DEFAULT 0 CHECK (0-100)` column.
+- `server/utils/expense.ts`: `parseExpense` (shared validation, CHF →
   Rappen, VAT clamping).
-- `server/utils/uploads.ts` — `uploadsDir`, `MAX_RECEIPT_BYTES`,
+- `server/utils/uploads.ts`: `uploadsDir`, `MAX_RECEIPT_BYTES`,
   `detectReceiptType`, `sanitizeFilename`.
-- `server/utils/taxReport.ts` — `inputVat` consumes `vat_rate` for the
+- `server/utils/taxReport.ts`: `inputVat` consumes `vat_rate` for the
   Vorsteuer figure in the tax export.
 - Endpoints under `server/api/expenses/` and `server/api/attachments/`.

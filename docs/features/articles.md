@@ -38,11 +38,11 @@ sender isn't VAT-registered new articles default to `0`.
 
 `customer_id` decides the scope:
 
-- **Global** (`customer_id IS NULL`) — the shared library shown on
+- **Global** (`customer_id IS NULL`): the shared library shown on
   `/articles`. Served and created by
   `GET`/`POST /api/articles/index.{get,post}.ts`, which filter on
   `customer_id IS NULL` and insert with no `customer_id`.
-- **Per-customer** (`customer_id` set) — articles that only make
+- **Per-customer** (`customer_id` set): articles that only make
   sense for one customer (a negotiated rate, a bespoke service).
   Served and created by
   `server/api/customers/[id]/articles.{get,post}.ts`, which 404 if

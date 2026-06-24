@@ -1,4 +1,4 @@
-# Quick start — run chohle locally
+# Quick start: run chohle locally
 
 This walks through every step to get chohle running on your own machine, from nothing to
 a logged-in app. It should take about five minutes. Everything runs in Docker, so you do
@@ -11,10 +11,10 @@ along.
 
 You need two things:
 
-- **[Docker](https://docs.docker.com/get-docker/)** and **Docker Compose** — Docker
+- **[Docker](https://docs.docker.com/get-docker/)** and **Docker Compose**. Docker
   Desktop (macOS / Windows) includes Compose. On Linux, install Docker Engine plus the
   Compose plugin.
-- **[git](https://git-scm.com/downloads)** — to clone the repository.
+- **[git](https://git-scm.com/downloads)**, to clone the repository.
 
 Check they are ready:
 
@@ -24,7 +24,7 @@ docker compose version
 git --version
 ```
 
-If `docker compose version` errors, your Docker is too old — update Docker Desktop or
+If `docker compose version` errors, your Docker is too old. Update Docker Desktop or
 install the Compose plugin.
 
 ## 2. Get the code
@@ -50,7 +50,7 @@ Now open `.env` in an editor and set three values before first launch:
 | Variable                | Set it to                                                              |
 | ----------------------- | --------------------------------------------------------------------- |
 | `NUXT_ADMIN_USERNAME`   | The login name for the single owner account (e.g. your name).         |
-| `NUXT_ADMIN_PASSWORD`   | A password you choose. This is your login — don't leave `change-me`.  |
+| `NUXT_ADMIN_PASSWORD`   | A password you choose. This is your login; don't leave `change-me`.   |
 | `NUXT_SESSION_PASSWORD` | A random string, **32+ characters**. It seals your session cookie.    |
 
 Generate a strong session secret with:
@@ -59,7 +59,7 @@ Generate a strong session secret with:
 openssl rand -base64 32
 ```
 
-Paste the output as `NUXT_SESSION_PASSWORD`. Leave the SMTP lines commented out — in
+Paste the output as `NUXT_SESSION_PASSWORD`. Leave the SMTP lines commented out: in
 Docker, email is automatically routed to the bundled Mailpit catcher, so you don't need a
 real mail server to start.
 
@@ -74,23 +74,23 @@ docker compose up
 
 The first run builds the app image and installs dependencies, so it takes a few minutes.
 You'll know it's ready when the logs show Nuxt listening on port 3000. On startup chohle
-also applies its database migrations and seeds your owner account automatically — there
+also applies its database migrations and seeds your owner account automatically. There
 is no separate setup step.
 
 To run it in the background instead, add `-d` (`docker compose up -d`).
 
 ## 5. Open the app and log in
 
-- **App:** [http://localhost:3000](http://localhost:3000) — log in with the
+- **App:** [http://localhost:3000](http://localhost:3000), log in with the
   `NUXT_ADMIN_USERNAME` and `NUXT_ADMIN_PASSWORD` you set in step 3.
-- **Mailpit (dev email):** [http://localhost:8125](http://localhost:8125) — every email
+- **Mailpit (dev email):** [http://localhost:8125](http://localhost:8125). Every email
   chohle "sends" in development lands here instead of a real inbox, so you can preview
   invoices, quotes, and reminders.
 
 ## 6. (Optional) Load demo data
 
-To explore with realistic content — categories, six months of expenses, income,
-customers, articles, and invoices — seed the database once the app is running:
+To explore with realistic content (categories, six months of expenses, income,
+customers, articles, and invoices), seed the database once the app is running:
 
 ```bash
 docker compose exec app yarn seed
@@ -102,7 +102,7 @@ empty.
 ## 7. Stopping and restarting
 
 - **Stop:** press `Ctrl+C` in the terminal running it (or `docker compose down` if you
-  used `-d`). Your data is safe — it lives in a Docker volume and the `data/` folder.
+  used `-d`). Your data is safe: it lives in a Docker volume and the `data/` folder.
 - **Start again:** `docker compose up`. Subsequent starts are fast; the image is already
   built.
 

@@ -41,7 +41,7 @@ need -> requested -> received -> accepted
 Sales has two extra lifecycle stages, **`active`** and
 **`completed`**, that the server accepts (e.g. a project keeps
 running after a deal is won, or it's done) but the kanban GET filters
-out — they aren't kanban columns. Migration `0029` also auto-creates
+out. They aren't kanban columns. Migration `0029` also auto-creates
 placeholder projects in stage `completed` for legacy invoices.
 
 New cards default to `lead` (sales) or `need` (procurement). A card
@@ -69,16 +69,16 @@ Either action can be skipped; the card just stays in the column.
 A project is the hub that ties a customer's deal to its paperwork and
 correspondence:
 
-- **Invoices** — `invoices.project_id` (migration `0027`) and made
+- **Invoices**: `invoices.project_id` (migration `0027`) and made
   **NOT NULL** by `0029`: every invoice belongs to a project. The
   detail view lists a project's invoices with computed totals
   (`GET /api/projects/[id]/invoices`) so you can see budget burn vs
   the project budget. A project with invoices can't be deleted
   (`ON DELETE RESTRICT` -> 409). See [Invoices](invoices.md).
-- **Quotes** — `POST /api/projects/[id]/quotes` spins up a draft
+- **Quotes**: `POST /api/projects/[id]/quotes` spins up a draft
   quote (customer + title prefilled, valid 30 days) linked back via
   `quotes.project_id`. See [Quotes](quotes.md).
-- **Email** — each project has its own conversation thread in
+- **Email**: each project has its own conversation thread in
   `project_emails`. `POST /api/projects/[id]/emails` sends a branded
   email through SMTP (outbound) and `.../emails/log` records a reply
   the user pasted in by hand (inbound). `GET .../emails` returns the
@@ -92,17 +92,17 @@ customer record exists.
 ## Backed by
 
 - **Migrations** (`server/utils/migrate.ts`):
-  - `0022_deals` — original sales kanban (`deals`, stages
+  - `0022_deals`: original sales kanban (`deals`, stages
     lead/contacted/proposal/won).
-  - `0023_deals_direction` — adds the `direction` column and the
+  - `0023_deals_direction`: adds the `direction` column and the
     procurement stages (need/requested/received/accepted).
-  - `0024_deal_emails` — per-deal email thread.
-  - `0025_deals_contact` — inline `email` / `phone` on a card.
-  - `0026_rename_deals_to_projects` — renames `deals` -> `projects`,
+  - `0024_deal_emails`: per-deal email thread.
+  - `0025_deals_contact`: inline `email` / `phone` on a card.
+  - `0026_rename_deals_to_projects`: renames `deals` -> `projects`,
     `value_rappen` -> `budget_rappen`, adds `budget_type`.
-  - `0027_invoices_project_id` / `0029_invoices_require_project` —
+  - `0027_invoices_project_id` / `0029_invoices_require_project`:
     link invoices to projects, then make it mandatory.
-  - `0028_projects_active_completed_stages` — drops the stage CHECK
+  - `0028_projects_active_completed_stages`: drops the stage CHECK
     and adds the `active` / `completed` sales lifecycle stages
     (validated in the API instead).
 - **Endpoints** (`server/api/projects/`):

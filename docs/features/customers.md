@@ -51,12 +51,12 @@ rejects anything outside that set and falls back to `de` (the table
 default in migration `0009_customers`). It drives the language of
 generated documents, not the app UI:
 
-- **Invoice PDF** — `server/utils/invoicePdf.ts` picks the label
+- **Invoice PDF**: `server/utils/invoicePdf.ts` picks the label
   catalog by `customer.language`, including the Swiss QR-bill language
   (DE/FR/IT/EN). The QR-bill is the payment slip Swiss banks scan.
-- **Quote PDF** — `server/utils/quotePdf.ts` localises the header to
+- **Quote PDF**: `server/utils/quotePdf.ts` localises the header to
   "Rechnung/Offerte" wording the same way.
-- **Email send** — the subject and body templates are prefilled in the
+- **Email send**: the subject and body templates are prefilled in the
   customer's language, so a Geneva customer with `language: 'fr'`
   receives "Devis ..." / "Facture ..." even when your own UI is in
   German. This is the Swiss reality: French- and Italian-speaking
@@ -73,15 +73,15 @@ article_id, price_rappen)` table; migration `0015_drop_customer_rates`
 removed it. Instead, `0014_articles_customer_id` added a nullable
 `customer_id` to `articles`:
 
-- `customer_id IS NULL` — a global article in the shared library.
-- `customer_id = <id>` — an article that belongs only to that customer,
+- `customer_id IS NULL`: a global article in the shared library.
+- `customer_id = <id>`: an article that belongs only to that customer,
   with its own name, unit, price, and MWST.
 
 The **Articles** tab on the detail page manages these via:
 
-- `GET  /api/customers/[id]/articles` — lists that customer's articles
+- `GET  /api/customers/[id]/articles`: lists that customer's articles
   (`server/api/customers/[id]/articles.get.ts`).
-- `POST /api/customers/[id]/articles` — creates one with
+- `POST /api/customers/[id]/articles`: creates one with
   `customer_id` set (`...articles.post.ts`).
 
 Both 404 if the customer doesn't exist. See [Articles](articles.md)
@@ -105,7 +105,7 @@ the customer changes the due date of every invoice created afterward
 - Migrations `0011_customer_rates` -> `0014_articles_customer_id` ->
   `0015_drop_customer_rates`: the per-customer-rates table was replaced
   by per-customer articles (a nullable `customer_id` on `articles`).
-- `server/utils/customer.ts` — `parseCustomer`, the validated
+- `server/utils/customer.ts`: `parseCustomer`, the validated
   `CustomerInput`, and the shared `CUSTOMER_COLUMNS` / `customerValues`
   used by both INSERT and UPDATE.
 - Endpoints: `server/api/customers/index.get.ts` (list),
