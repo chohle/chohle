@@ -44,7 +44,7 @@ interface IncomeSource {
 
 const { t, locale } = useI18n()
 const month = ref(new Date().toISOString().slice(0, 7))
-const { data, refresh } = await useFetch<{ month: string; sources: IncomeSource[] }>(
+const { data, error, refresh } = await useFetch<{ month: string; sources: IncomeSource[] }>(
   '/api/income/overview',
   { query: { month }, default: () => ({ month: '', sources: [] }) }
 )
@@ -176,8 +176,9 @@ const totalPending = computed(() => totalMonth.value - totalPaid.value)
     <UiSectionLabel>{{ $t('income.recurringSources') }}</UiSectionLabel>
 
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!data.sources.length"
+        v-else-if="!data.sources.length"
         :bordered="false"
         icon="i-lucide-briefcase"
         :title="$t('income.emptyTitle')"

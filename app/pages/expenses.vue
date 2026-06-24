@@ -27,7 +27,11 @@ const { t } = useI18n()
 const toast = useToast()
 const month = ref(new Date().toISOString().slice(0, 7))
 
-const { data: expenses, refresh } = await useFetch<Expense[]>('/api/expenses', {
+const {
+  data: expenses,
+  error,
+  refresh
+} = await useFetch<Expense[]>('/api/expenses', {
   query: { month },
   default: () => []
 })
@@ -300,8 +304,9 @@ function chf(rappen: number) {
     <UiSectionLabel>{{ $t('expenses.recent') }}</UiSectionLabel>
 
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!filtered.length"
+        v-else-if="!filtered.length"
         :bordered="false"
         icon="i-lucide-receipt"
         :title="$t('expenses.emptyTitle')"

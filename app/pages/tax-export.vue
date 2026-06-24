@@ -92,11 +92,7 @@ async function onReceipt(e: Event) {
       </template>
     </UiPageHead>
 
-    <div v-if="error" class="tax-error">
-      <UIcon name="i-lucide-triangle-alert" class="tax-warn size-4" />
-      <span class="tax-warn">{{ $t('taxExport.loadError') }}</span>
-      <button class="ed-btn" type="button" @click="refresh()">{{ $t('common.retry') }}</button>
-    </div>
+    <FetchError v-if="error" @retry="refresh()" />
 
     <div v-else-if="!data || !data.years.length" class="tax-empty note">
       {{ $t('taxExport.noData') }}

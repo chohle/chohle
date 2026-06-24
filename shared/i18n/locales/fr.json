@@ -789,7 +789,9 @@
     "password": "Mot de passe",
     "delete": "Supprimer",
     "optional": "Facultatif",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "loadErrorTitle": "Échec du chargement",
+    "loadErrorText": "Une erreur s'est produite lors du chargement. Réessaie."
   },
   "triage": {
     "title": "Triage",
@@ -966,7 +968,6 @@
     "addReceipt": "Justificatif",
     "receiptsSection": "Justificatifs",
     "uploadFailed": "Impossible de téléverser le justificatif",
-    "loadError": "Impossible de charger le récapitulatif fiscal",
     "yearLabel": "Année fiscale"
   }
 }

@@ -9,7 +9,11 @@ interface Category {
 
 const { t } = useI18n()
 const formRef = ref()
-const { data: categories, refresh } = await useFetch<Category[]>('/api/categories', {
+const {
+  data: categories,
+  refresh,
+  error
+} = await useFetch<Category[]>('/api/categories', {
   default: () => []
 })
 
@@ -101,8 +105,9 @@ const income = computed(() => categories.value.filter((c) => c.type === 'income'
     </UiPageHead>
 
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!expense.length && !income.length"
+        v-else-if="!expense.length && !income.length"
         :bordered="false"
         icon="i-lucide-tags"
         :title="$t('categories.emptyTitle')"

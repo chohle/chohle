@@ -28,7 +28,11 @@ interface ReminderRow {
 const { t } = useI18n()
 const toast = useToast()
 
-const { data: rows, refresh } = await useFetch<ReminderRow[]>('/api/reminders', {
+const {
+  data: rows,
+  error,
+  refresh
+} = await useFetch<ReminderRow[]>('/api/reminders', {
   default: () => []
 })
 
@@ -143,8 +147,9 @@ function levelLabel(level: 1 | 2 | 3 | null) {
 
     <UiSectionLabel>{{ $t('reminders.readyHeader') }}</UiSectionLabel>
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!eligible.length"
+        v-else-if="!eligible.length"
         :bordered="false"
         icon="i-lucide-bell-off"
         :title="$t('reminders.emptyReadyTitle')"
@@ -191,8 +196,9 @@ function levelLabel(level: 1 | 2 | 3 | null) {
 
     <UiSectionLabel>{{ $t('reminders.waitingHeader') }}</UiSectionLabel>
     <UiCard>
+      <FetchError v-if="error" :bordered="false" @retry="refresh()" />
       <EmptyState
-        v-if="!waiting.length"
+        v-else-if="!waiting.length"
         :bordered="false"
         icon="i-lucide-check"
         :title="$t('reminders.emptyWaitingTitle')"

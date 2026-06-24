@@ -63,10 +63,14 @@ const filterOptions = computed(() => [
 const messagesUrl = computed<string | null>(() =>
   selectedId.value ? `/api/projects/${selectedId.value}/emails` : null
 )
-const { data: thread, refresh: refreshThread } = await useFetch<{ rows: ProjectEmail[] }>(
-  messagesUrl as Ref<string>,
-  { default: () => ({ rows: [] }), watch: [messagesUrl] }
-)
+const {
+  data: thread,
+  error: threadError,
+  refresh: refreshThread
+} = await useFetch<{ rows: ProjectEmail[] }>(messagesUrl as Ref<string>, {
+  default: () => ({ rows: [] }),
+  watch: [messagesUrl]
+})
 
 const filteredRows = computed<ProjectEmail[]>(() => {
   const rows = thread.value?.rows ?? []
@@ -196,7 +200,9 @@ watch(selectedId, async () => {
           </div>
         </header>
 
-        <div v-if="filteredRows.length" class="email-groups">
+        <FetchError v-if="threadError" :bordered="false" @retry="refreshThread()" />
+
+        <div v-else-if="filteredRows.length" class="email-groups">
           <section v-for="g in emailGroups" :key="g.key" class="email-group">
             <header class="email-group__head">
               <h4 class="email-group__subject">{{ g.subject || $t('conversations.noSubject') }}</h4>
