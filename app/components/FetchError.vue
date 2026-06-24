@@ -7,7 +7,10 @@ defineEmits<{ retry: [] }>()
 </script>
 
 <template>
+  <!-- role="alert" (implies aria-live="assertive") so screen readers announce the
+       failure and retry action; it falls through to EmptyState's single root element. -->
   <EmptyState
+    role="alert"
     icon="i-lucide-triangle-alert"
     :title="$t('common.loadErrorTitle')"
     :description="$t('common.loadErrorText')"
