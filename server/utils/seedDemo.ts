@@ -945,7 +945,14 @@ export function seedDemo(db: Database, requested: string): SeedResult {
     }
   ]
   const customerIds = customers.map((c) => insertCustomer.run(c).lastInsertRowid)
-  const [muellerId, cafeId, annaId, studioId, techhubId, marinaId] = customerIds
+  const [muellerId, cafeId, annaId, studioId, techhubId, marinaId] = customerIds as [
+    number | bigint,
+    number | bigint,
+    number | bigint,
+    number | bigint,
+    number | bigint,
+    number | bigint
+  ]
 
   // --- Articles ---------------------------------------------------------
   const insertArticle = db.prepare(
@@ -1188,7 +1195,8 @@ export function seedDemo(db: Database, requested: string): SeedResult {
     updated_at: d.updated_at
   })
   const projectIds = projectDefs.map((d) => insertProject.run(toProjectRow(d)).lastInsertRowid)
-  const projectIdByKey = (key: string) => projectIds[projectDefs.findIndex((d) => d.key === key)]
+  const projectIdByKey = (key: string): number | bigint =>
+    projectIds[projectDefs.findIndex((d) => d.key === key)]!
 
   // Pick a few project ids out by stable key for the email thread + invoice linking.
   const proposalProjectId = projectIdByKey('marketing')

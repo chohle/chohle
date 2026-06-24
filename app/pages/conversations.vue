@@ -55,18 +55,23 @@ const filterOptions = computed(() => [
   { value: 'outbound', label: t('conversations.filterSent') }
 ])
 
-const messagesUrl = computed(() =>
+// `messagesUrl` is `null` when no project is selected. Nuxt's `useFetch` request
+// type only models string URLs, so the nullable computed is cast to the request
+// shape Nuxt expects. The runtime value (including `null`) is passed through
+// unchanged; the cast is purely to satisfy the overload and keep the explicit
+// `{ rows: ProjectEmail[] }` response generic.
+const messagesUrl = computed<string | null>(() =>
   selectedId.value ? `/api/projects/${selectedId.value}/emails` : null
 )
 const { data: thread, refresh: refreshThread } = await useFetch<{ rows: ProjectEmail[] }>(
-  messagesUrl,
+  messagesUrl as Ref<string>,
   { default: () => ({ rows: [] }), watch: [messagesUrl] }
 )
 
-const filteredRows = computed(() => {
+const filteredRows = computed<ProjectEmail[]>(() => {
   const rows = thread.value?.rows ?? []
   if (filter.value === 'all') return rows
-  return rows.filter((r) => r.direction === filter.value)
+  return rows.filter((r: ProjectEmail) => r.direction === filter.value)
 })
 
 // Group the (filtered) thread into per-subject conversations so a reply sits

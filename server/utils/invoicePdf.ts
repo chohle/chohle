@@ -134,7 +134,7 @@ export async function generateInvoicePdf(id: number): Promise<Buffer> {
   let logoDrawn = false
   if (logo) {
     try {
-      pdf.image(logo, 50, 50, { fit: [170, 40], valign: 'top' })
+      pdf.image(logo, 50, 50, { fit: [170, 40] })
       logoDrawn = true
     } catch {
       // ignore — fall back to the text name below

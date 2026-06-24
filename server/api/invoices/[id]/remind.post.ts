@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
   }
 
-  const body = (await readBody<Body>(event).catch(() => ({}))) ?? {}
+  const body: Body = (await readBody<Body>(event).catch(() => ({}) as Body)) ?? {}
   const previewOnly = body.previewOnly === true
 
   const db = useDb()

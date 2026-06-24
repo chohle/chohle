@@ -60,7 +60,7 @@ export function renderTaxReportPdf(report: TaxReport, logo: Buffer | null): Prom
   let logoDrawn = false
   if (logo) {
     try {
-      pdf.image(logo, PAGE.margin, 50, { fit: [170, 40], valign: 'top' })
+      pdf.image(logo, PAGE.margin, 50, { fit: [170, 40] })
       logoDrawn = true
     } catch {
       /* fall back to the name */

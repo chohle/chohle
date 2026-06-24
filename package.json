@@ -10,6 +10,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "vitest run",
+    "typecheck": "nuxt typecheck",
     "seed": "node scripts/seed-dev.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -45,6 +46,7 @@
     "prettier-plugin-tailwindcss": "^0.8.0",
     "sass-embedded": "^1.100.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.7",
+    "vue-tsc": "^3.3.5"
   }
 }
