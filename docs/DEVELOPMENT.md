@@ -120,4 +120,4 @@ The production image runs the self-contained Nitro server with
 
 ## Commit messages
 
-This project follows Conventional Commits. See [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md).
+This project follows Conventional Commits. See [the commit convention](COMMIT_CONVENTION.md).

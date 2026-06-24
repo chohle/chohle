@@ -32,7 +32,7 @@ code runs.
 | `DEMO_SESSION_TTL_MS` | `7200000` (2 h) | idle time before a sandbox is evicted                                                                                              |
 | `DEMO_MAX_SESSIONS`   | `500`           | cap; the oldest sandbox is evicted past this                                                                                       |
 
-To run a demo publicly, follow [HOSTING.md](HOSTING.md) and set
+To run a demo publicly, follow [Hosting](HOSTING.md) and set
 `CHOHLE_DEMO=true` (the production compose already points `DEMO_DATA_PATH` at the
 safe named volume).
 

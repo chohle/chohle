@@ -5,7 +5,7 @@ chohle is **local-first** — the normal way to use it is on your own machine
 host it anywhere to use it.
 
 This guide is only for when you want chohle reachable over the internet — for
-example to run the **public demo** (see [DEMO_MODE.md](DEMO_MODE.md)) or to reach
+example to run the **public demo** (see [Demo mode](DEMO_MODE.md)) or to reach
 your own instance remotely. It uses one small Linux VPS with Docker + Caddy
 (automatic HTTPS).
 
@@ -53,7 +53,7 @@ Set, at minimum:
 | `CHOHLE_SECRET`                               | random 32+ chars (at-rest encryption key) — `openssl rand -hex 32`      |
 | `NUXT_SESSION_PASSWORD`                       | random 32+ chars (seals the session cookie)                             |
 | `NUXT_ADMIN_USERNAME` / `NUXT_ADMIN_PASSWORD` | owner login                                                             |
-| `CHOHLE_DEMO`                                 | `true` only if this is a public demo (see [DEMO_MODE.md](DEMO_MODE.md)) |
+| `CHOHLE_DEMO`                                 | `true` only if this is a public demo (see [Demo mode](DEMO_MODE.md)) |
 
 ## 5. Launch
 

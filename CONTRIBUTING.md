@@ -25,11 +25,11 @@ understanding of the project are unlikely to be accepted.
 
 ## Development setup
 
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for local setup, environment variables,
+See [development guide](docs/DEVELOPMENT.md) for local setup, environment variables,
 the database, and project structure.
 
 ## Commit messages
 
 This project follows Conventional Commits. See
-[docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md) for the format, the allowed
+[commit convention](docs/COMMIT_CONVENTION.md) for the format, the allowed
 types, and examples.

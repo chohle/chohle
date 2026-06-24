@@ -35,8 +35,9 @@ QR-bill), quotes, customers, a sales/procurement pipeline, per-project email, ba
 reconciliation, year-end tax export, and an optional AI assistant — all single-user and
 self-hosted.
 
-**See the full list — one page per feature — in [docs/features/](docs/features/)** or,
-nicely rendered, at [chohle.ch/features](https://chohle.ch/features/).
+**See the full list — one page per feature — in the
+[features documentation](docs/features/)** or, nicely rendered, at
+[chohle.ch/features](https://chohle.ch/features/).
 
 > Want to put it online or run a public playground? See
 > [Hosting](docs/HOSTING.md) and [Demo mode](docs/DEMO_MODE.md). Both are
@@ -44,33 +45,36 @@ nicely rendered, at [chohle.ch/features](https://chohle.ch/features/).
 
 ## Tech stack
 
-- [Nuxt 4](https://nuxt.com) (Vue 3, Nitro server)
-- [Nuxt UI](https://ui.nuxt.com) on Tailwind CSS v4
-- SQLite via better-sqlite3
-- Sealed-cookie auth with nuxt-auth-utils
-- Docker and Docker Compose, with Mailpit for email in development
+[Nuxt 4](https://nuxt.com) (Vue 3 + Nitro) with [Nuxt UI](https://ui.nuxt.com) on
+Tailwind CSS v4, SQLite via better-sqlite3, sealed-cookie auth, and Docker for
+development. The [tech stack page](docs/TECH_STACK.md) explains what each piece does and
+why it's here.
 
 ## Quick start
 
-chohle runs in Docker.
+chohle runs in Docker — no Node or Yarn needed on your host.
 
 ```bash
 git clone https://github.com/chohle/chohle.git
 cd chohle
-cp .env.example .env   # then edit the secrets
+cp .env.example .env   # then set the admin + session secrets
 docker compose up
 ```
 
 - App: http://localhost:3000 (log in with the credentials from your `.env`)
 - Mailpit (dev email): http://localhost:8125
 
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
+New here? The [quick start guide](docs/QUICK_START.md) walks through every step — what to
+set in `.env`, how to generate the session secret, and first login. For the deeper dev
+topics, see the [development guide](docs/DEVELOPMENT.md).
 
 ## Documentation
 
 | Doc                                            | What's inside                                                 |
 | ---------------------------------------------- | ------------------------------------------------------------- |
 | [Features](docs/features/)                     | One page per feature — invoices, quotes, reminders, tax, etc. |
+| [Quick start](docs/QUICK_START.md)             | Step-by-step: run chohle locally from scratch                 |
+| [Tech stack](docs/TECH_STACK.md)               | What chohle is built from, and why                            |
 | [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure         |
 | [Mail sync](docs/MAIL_SYNC.md)                 | Connecting an inbox (IMAP / Gmail / Outlook)                  |
 | [Sending email](docs/SENDING_EMAIL.md)         | SMTP setup for outbound (invoices, quotes, replies)           |
@@ -80,8 +84,8 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and open an
-issue to discuss your idea before sending a pull request.
+Contributions are welcome. Please read the [contributing guide](CONTRIBUTING.md) and open
+an issue to discuss your idea before sending a pull request.
 
 ## License
 
