@@ -46,10 +46,8 @@ single-user and self-hosted.
 
 ## Tech stack
 
-[Nuxt 4](https://nuxt.com) (Vue 3 + Nitro) with [Nuxt UI](https://ui.nuxt.com) on
-Tailwind CSS v4, SQLite via better-sqlite3, sealed-cookie auth, and Docker for
-development. The [tech stack page](docs/TECH_STACK.md) explains what each piece does and
-why it's here.
+A Nuxt 4 (Vue 3) app backed by a single SQLite file, self-hosted with Docker. The
+[tech stack page](docs/TECH_STACK.md) explains every piece and why it's there.
 
 ## Quick start
 
