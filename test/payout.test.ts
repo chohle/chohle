@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { computePayout } from '../server/utils/payout'
 
-// Luzern, paid on the 25th, from the FEATURES.md verification table.
+// Luzern, paid on the 25th (see docs/features/income.md for the worked example).
 const luzern2026 = new Map([
   ['2026-05-25', 'Pfingstmontag'],
   ['2026-12-25', 'Weihnachten']

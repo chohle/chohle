@@ -3,7 +3,7 @@
 // endpoint so the matching rules are unit-testable against an in-memory db,
 // the same way quotes.ts is — see test/reconcile.test.ts.
 //
-// Matching order per credit (mirrors docs/BANK_RECONCILIATION.md):
+// Matching order per credit (mirrors docs/features/bank-reconciliation.md):
 //   1. deterministic reference -> invoice; amount == live total -> auto-pay
 //   2. deterministic reference, amount differs -> suggest (amount mismatch)
 //   3. no/garbled reference -> fuzzy by amount (+ debtor name) -> suggest

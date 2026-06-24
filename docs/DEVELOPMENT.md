@@ -93,6 +93,22 @@ docker compose restart app
 
 This only affects dev. The production build is a clean `yarn build`, not HMR.
 
+### `command not found: nuxt` (app exits with code 127)
+
+`node_modules` lives on a container-owned named volume (`chohle_node_modules`), and
+Docker only seeds that volume from the image the **first time** the volume is created.
+If the volume was created empty before deps finished installing, it stays empty and
+`yarn dev` can't find the `nuxt` binary. A plain `docker compose up` reuses the empty
+volume and keeps failing. Remove the volume and rebuild:
+
+```bash
+docker compose down -v        # -v drops the stale node_modules volume
+docker compose up --build     # rebuilds the image and reseeds the volume
+```
+
+The `-v` is the important part — without it the empty volume survives and the error
+persists.
+
 ## Production build
 
 ```bash

@@ -30,19 +30,13 @@ cantonal public holidays, and the QR-bill are first-class, not afterthoughts.
 
 ## Features
 
-- **Expenses** with receipt uploads (PDF or image), categories, and filters
-- **Income** for salary and clients, with automatic Swiss pay-date calculation that
-  shifts around weekends and cantonal holidays
-- **Customers** with per-customer rates and document language
-- **Articles**: reusable invoice line items
-- **Quotes** (Offerten) you can convert to an invoice in one click
-- **Invoices** with correct MWST, 5-Rappen rounding, a print-ready PDF, and the Swiss
-  QR-bill
-- **Projects & pipeline**: track sales and procurement deals across stages
-- **Reminders**: staged overdue-payment reminders (1st, 2nd, final notice)
-- **Email**: per-project conversations, with IMAP / Gmail / Outlook inbox sync
-- **Dashboard**: income vs expenses, net, a 6-month trend, and what is still outstanding
-- **Single owner** login; everything private and stored locally under `data/`
+Expenses with receipts, Swiss-correct income and invoicing (MWST, 5-Rappen rounding,
+QR-bill), quotes, customers, a sales/procurement pipeline, per-project email, bank
+reconciliation, year-end tax export, and an optional AI assistant — all single-user and
+self-hosted.
+
+**See the full list — one page per feature — in [docs/features/](docs/features/)** or,
+nicely rendered, at [chohle.ch/features](https://chohle.ch/features/).
 
 > Want to put it online or run a public playground? See
 > [Hosting](docs/HOSTING.md) and [Demo mode](docs/DEMO_MODE.md). Both are
@@ -74,19 +68,15 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full development guide.
 
 ## Documentation
 
-| Doc                                                | What's inside                                             |
-| -------------------------------------------------- | --------------------------------------------------------- |
-| [Development](docs/DEVELOPMENT.md)                 | Local setup, environment, database, project structure     |
-| [Reminders](docs/REMINDERS.md)                     | Staged overdue-payment reminders                          |
-| [Quotes](docs/QUOTES.md)                           | Offers and convert-to-invoice                             |
-| [Mail sync](docs/MAIL_SYNC.md)                     | Connecting an inbox (IMAP / Gmail / Outlook)              |
-| [Sending email](docs/SENDING_EMAIL.md)             | SMTP setup for outbound (invoices, quotes, replies)       |
-| [Bank reconciliation](docs/BANK_RECONCILIATION.md) | camt.053 import + auto-match payments (folder / EBICS)    |
-| [Tax export](docs/TAX_EXPORT.md)                   | Year-end ZIP: Erfolgsrechnung + receipts + Treuhänder CSV |
-| [Hosting](docs/HOSTING.md)                         | _Optional_ — putting it online (VPS + Docker + Caddy)     |
-| [Demo mode](docs/DEMO_MODE.md)                     | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`)   |
-| [AI assistant](docs/ASSISTANT.md)                  | _Optional_ — local LLM that drafts customers/invoices     |
-| [Commit convention](docs/COMMIT_CONVENTION.md)     | Commit message format                                     |
+| Doc                                            | What's inside                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------- |
+| [Features](docs/features/)                     | One page per feature — invoices, quotes, reminders, tax, etc. |
+| [Development](docs/DEVELOPMENT.md)             | Local setup, environment, database, project structure         |
+| [Mail sync](docs/MAIL_SYNC.md)                 | Connecting an inbox (IMAP / Gmail / Outlook)                  |
+| [Sending email](docs/SENDING_EMAIL.md)         | SMTP setup for outbound (invoices, quotes, replies)           |
+| [Hosting](docs/HOSTING.md)                     | _Optional_ — putting it online (VPS + Docker + Caddy)         |
+| [Demo mode](docs/DEMO_MODE.md)                 | _Optional_ — public per-visitor sandbox (`CHOHLE_DEMO`)       |
+| [Commit convention](docs/COMMIT_CONVENTION.md) | Commit message format                                         |
 
 ## Contributing
 
