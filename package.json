@@ -35,6 +35,9 @@
     "vue-router": "^5.0.7"
   },
   "packageManager": "yarn@4.11.0",
+  "resolutions": {
+    "esbuild@^0.27.0": "^0.28.1"
+  },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.109",
     "@types/better-sqlite3": "^7.6.13",
