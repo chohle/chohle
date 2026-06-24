@@ -6,6 +6,7 @@
       "package-name": "chohle",
       "include-component-in-tag": false,
       "release-as": "0.0.1",
+      "bootstrap-sha": "cb0f302a5bb237fabd009831b622d4fbc09fe88b",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "changelog-sections": [
