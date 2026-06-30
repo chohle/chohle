@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Base image: Node 22 LTS with Corepack-managed Yarn 4.
-FROM node:24.16.0-bookworm-slim AS base
+FROM node:24.18.0-bookworm-slim AS base
 ENV YARN_ENABLE_GLOBAL_CACHE=false
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 WORKDIR /app
