@@ -19,38 +19,38 @@
   "dependencies": {
     "@nuxt/ui": "^4.8.2",
     "@nuxtjs/i18n": "^10.4.0",
-    "@tiptap/extension-text-align": "^3.23.6",
-    "better-sqlite3": "^12.10.0",
-    "fast-xml-parser": "^5.8.0",
+    "@tiptap/extension-text-align": "^3.27.1",
+    "better-sqlite3": "^12.11.1",
+    "fast-xml-parser": "^5.9.3",
     "fflate": "^0.8.3",
-    "imapflow": "^1.3.4",
-    "isomorphic-dompurify": "^3.15.0",
-    "mailparser": "^3.9.9",
-    "nodemailer": "^9.0.0",
+    "imapflow": "^1.4.3",
+    "isomorphic-dompurify": "^3.18.0",
+    "mailparser": "^3.9.12",
+    "nodemailer": "^9.0.3",
     "nuxt": "^4.4.8",
     "nuxt-auth-utils": "^0.5.29",
-    "pdfkit": "^0.18.0",
+    "pdfkit": "^0.19.1",
     "swissqrbill": "^4.3.0",
-    "vue": "^3.5.34",
+    "vue": "^3.5.39",
     "vue-draggable-plus": "^0.6.1",
-    "vue-router": "^5.0.7"
+    "vue-router": "^5.1.0"
   },
-  "packageManager": "yarn@4.11.0",
+  "packageManager": "yarn@4.17.0",
   "resolutions": {
     "esbuild@^0.27.0": "^0.28.1"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.109",
+    "@iconify-json/lucide": "^1.2.115",
     "@types/better-sqlite3": "^7.6.13",
     "@types/mailparser": "^3.4.6",
-    "@types/nodemailer": "^8.0.0",
+    "@types/nodemailer": "^8.0.1",
     "@types/pdfkit": "^0.17.6",
-    "playwright": "^1.60.0",
-    "prettier": "^3.8.3",
+    "playwright": "^1.61.1",
+    "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "sass-embedded": "^1.100.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.7",
-    "vue-tsc": "^3.3.5"
+    "vitest": "^4.1.9",
+    "vue-tsc": "^3.3.6"
   }
 }
