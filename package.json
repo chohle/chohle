@@ -39,6 +39,11 @@
     "vue-router": "^5.1.0"
   },
   "packageManager": "yarn@4.17.0",
+  "dependenciesMeta": {
+    "better-sqlite3": {
+      "built": true
+    }
+  },
   "resolutions": {
     "esbuild@^0.25.4": "^0.28.1",
     "esbuild@^0.27.0": "^0.28.1"

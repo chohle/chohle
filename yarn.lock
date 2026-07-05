@@ -5355,6 +5355,9 @@ __metadata:
     vue-draggable-plus: "npm:^0.6.1"
     vue-router: "npm:^5.1.0"
     vue-tsc: "npm:^3.3.6"
+  dependenciesMeta:
+    better-sqlite3:
+      built: true
   languageName: unknown
   linkType: soft
 
