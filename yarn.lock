@@ -1595,7 +1595,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxt/ui@npm:^4.8.2":
+"@nuxt/ui@npm:^4.9.0":
   version: 4.9.0
   resolution: "@nuxt/ui@npm:4.9.0"
   dependencies:
@@ -5225,7 +5225,7 @@ __metadata:
   resolution: "chohle@workspace:."
   dependencies:
     "@iconify-json/lucide": "npm:^1.2.109"
-    "@nuxt/ui": "npm:^4.8.2"
+    "@nuxt/ui": "npm:^4.9.0"
     "@nuxtjs/i18n": "npm:^10.4.0"
     "@tiptap/core": "npm:^3.27.1"
     "@tiptap/extension-list": "npm:^3.27.1"
