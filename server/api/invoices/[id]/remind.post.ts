@@ -39,10 +39,7 @@ interface Body {
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const body: Body = (await readBody<Body>(event).catch(() => ({}) as Body)) ?? {}
   const previewOnly = body.previewOnly === true
@@ -216,9 +213,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const pdf = await generateInvoicePdf(id)
-  const from = sender.email
-    ? `${sender.name} <${sender.email}>`
-    : `${sender.name} <no-reply@chohle.local>`
+  const from = senderFromAddress(sender)
   const { html, text } = await buildBrandedEmail(sender, renderedBody)
   await getMailer().sendMail({
     from,

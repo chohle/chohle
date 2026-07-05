@@ -189,7 +189,7 @@ async function save() {
       return
     }
     // 2) Upload receipts. The expense is already saved, so a failure here is a
-    // distinct (non-fatal) error — we still close and refresh.
+    // distinct (non-fatal) error, we still close and refresh.
     if (form.id && pendingFiles.value.length) {
       try {
         const fd = new FormData()
@@ -211,13 +211,6 @@ async function removeExpense(id: number) {
   if (!(await confirm())) return
   await $fetch(`/api/expenses/${id}`, { method: 'DELETE' })
   await refresh()
-}
-
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
 }
 </script>
 

@@ -122,13 +122,6 @@ async function onProjectResolved(projectId: number) {
   }
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
-
 const details = computed(() => {
   const c = customer.value
   if (!c) return []

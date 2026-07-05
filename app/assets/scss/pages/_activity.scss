@@ -33,7 +33,7 @@
     padding: 8px 0 10px;
   }
 
-  // Activity row — circle icon · markdown body · mono timestamp.
+  // Activity row - circle icon · markdown body · mono timestamp.
   .activity-row {
     width: 100%;
     display: grid;
@@ -269,7 +269,7 @@
     letter-spacing: 0;
   }
 
-  // Popover for the mobile filter dropdown — same editorial chrome as
+  // Popover for the mobile filter dropdown, same editorial chrome as
   // the date picker popover, with overrides for Nuxt UI tokens at scope.
   &__pop {
     --ui-bg: var(--surface);
@@ -311,7 +311,7 @@
       grid-template-columns: 1fr;
     }
 
-    // Drop the right-hand aside on mobile — its content moves into the
+    // Drop the right-hand aside on mobile, its content moves into the
     // top toolbar (dropdown) so the feed is the only thing below the head.
     &__side {
       display: none;

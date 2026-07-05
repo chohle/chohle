@@ -56,7 +56,7 @@ export function htmlToText(html: string): string {
 }
 
 // Absolute URL of the sender logo, or null when no base URL / no logo is set.
-export function logoUrlFor(logoPath: string | null | undefined): string | null {
+function logoUrlFor(logoPath: string | null | undefined): string | null {
   const base = (useRuntimeConfig().siteUrl as string) || ''
   if (!base || !logoPath) return null
   return `${base.replace(/\/+$/, '')}/api/sender/logo?v=${encodeURIComponent(logoPath)}`

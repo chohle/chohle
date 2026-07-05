@@ -46,13 +46,6 @@ function reloadAll() {
   refreshYear()
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
-
 const prevMonth = computed(() => {
   const t = data.value?.trend ?? []
   return t[t.length - 2]

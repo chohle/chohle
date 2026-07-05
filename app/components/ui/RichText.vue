@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Minimal inline-emphasis renderer used by the activity feed. Supports
-// **bold** and *italic* only — anything else passes through as plain
+// **bold** and *italic* only, anything else passes through as plain
 // text. Inputs come from server responses, but the API escapes any raw
 // * / _ in user-controlled strings before composing the message so we
 // only see emphasis we put there ourselves.

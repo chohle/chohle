@@ -159,7 +159,7 @@
     color: var(--ink-3);
   }
 
-  // Parent group (collapsible) — same chrome as nav-item, plus a chevron.
+  // Parent group (collapsible) - same chrome as nav-item, plus a chevron.
   // Buttons ship with appearance + content-box height that make them
   // visibly taller than the sibling NuxtLink rows. Reset both so the
   // group trigger matches the other items pixel-for-pixel.
@@ -172,7 +172,7 @@
     margin: 0;
     text-align: left;
     cursor: pointer;
-    // Don't use the `font` shorthand — it expands to font-size:<inherited>
+    // Don't use the `font` shorthand, it expands to font-size:<inherited>
     // and overrides the 13px from .nav-item (same specificity, declared later).
     font-family: inherit;
     font-weight: inherit;
@@ -192,7 +192,7 @@
     }
   }
 
-  // Child list under an expanded group — kept visually quieter than peers.
+  // Child list under an expanded group, kept visually quieter than peers.
   .nav-children {
     list-style: none;
     padding: 0;
@@ -259,7 +259,7 @@
     color: var(--ink-3);
   }
 
-  // Collapsed (desktop icon-only) — width comes from --sidebar-w (64px),
+  // Collapsed (desktop icon-only) - width comes from --sidebar-w (64px),
   // labels hide, content centers in the narrow column.
   &.is-collapsed {
     padding: 22px 8px 14px;

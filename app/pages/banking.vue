@@ -100,7 +100,7 @@ const tabOptions = computed(() => [
 const openInvoices = computed(() => invoices.value.filter((i) => i.status === 'sent'))
 const invoiceItems = computed(() =>
   openInvoices.value.map((i) => ({
-    label: `${i.number || '—'} · ${i.customer_name} · CHF ${chf(i.total_rappen)}`,
+    label: `${i.number || '—'} · ${i.customer_name} · CHF ${chf(i.total_rappen, 2)}`,
     value: i.id
   }))
 )
@@ -302,12 +302,6 @@ async function disconnect() {
   }
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
 function errMessage(err: unknown): string {
   return (
     (err as { data?: { statusMessage?: string }; statusMessage?: string })?.data?.statusMessage ??
@@ -450,7 +444,7 @@ function errMessage(err: unknown): string {
         />
         <ul v-else class="tx-list">
           <li v-for="tx in queue" :key="tx.id" class="tx" :class="tx.status">
-            <div class="tx__amount mono">CHF {{ chf(tx.amount_rappen) }}</div>
+            <div class="tx__amount mono">CHF {{ chf(tx.amount_rappen, 2) }}</div>
             <div class="tx__info">
               <div class="tx__line">
                 <span class="tx__debtor">{{ tx.debtor_name || $t('banking.unknownDebtor') }}</span>
@@ -526,7 +520,7 @@ function errMessage(err: unknown): string {
                   </NuxtLink>
                   <span v-else class="muted">—</span>
                 </td>
-                <td class="right mono">CHF {{ chf(tx.amount_rappen) }}</td>
+                <td class="right mono">CHF {{ chf(tx.amount_rappen, 2) }}</td>
               </tr>
             </tbody>
           </table>
@@ -553,7 +547,7 @@ function errMessage(err: unknown): string {
               <tr v-for="tx in ignored" :key="tx.id">
                 <td class="mono">{{ dateCh(tx.booking_date) }}</td>
                 <td>{{ tx.debtor_name || '—' }}</td>
-                <td class="right mono">CHF {{ chf(tx.amount_rappen) }}</td>
+                <td class="right mono">CHF {{ chf(tx.amount_rappen, 2) }}</td>
               </tr>
             </tbody>
           </table>

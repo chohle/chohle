@@ -1,4 +1,4 @@
-// chohle editorial mono — main entry.
+// chohle editorial mono - main entry.
 // Loaded as a second CSS entry alongside main.css, so Tailwind v4 keeps
 // its CSS pipeline and SCSS handles tokens + component/page styles.
 
@@ -23,7 +23,6 @@
 @use "components/donut";
 @use "components/bar-chart";
 @use "components/card";
-@use "components/field";
 @use "components/page-head";
 @use "components/section-label";
 @use "components/date-picker";

@@ -82,7 +82,7 @@ function liveTotalRappen(db: Database, invoiceId: number, vat: boolean): number 
 }
 
 /** A statement transaction is the same payment if these four agree. */
-export function dedupeHash(credit: ParsedCredit): string {
+function dedupeHash(credit: ParsedCredit): string {
   return createHash('sha256')
     .update(
       [
@@ -163,7 +163,7 @@ function fuzzyMatch(db: Database, credit: ParsedCredit, vat: boolean): MatchOutc
 }
 
 /** Flip an invoice to paid, freezing the total and stamping the booking date. */
-export function markInvoicePaid(
+function markInvoicePaid(
   db: Database,
   invoiceId: number,
   paidAt: string,

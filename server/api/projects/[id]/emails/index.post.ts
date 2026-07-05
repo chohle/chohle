@@ -29,10 +29,7 @@ interface CustomerRow {
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isFinite(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const body = await readBody<Body>(event)
   const subject = (body.subject ?? '').trim()
@@ -77,13 +74,7 @@ export default defineEventHandler(async (event) => {
   // store on the conversation row (the thread UI shouldn't show email chrome).
   // Render the chosen signature into the template's signature slot (kept out of
   // the stored body so the conversation thread shows just the message).
-  let signatureHtml: string | undefined
-  if (Number.isInteger(Number(body.signature_id))) {
-    const sig = db
-      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
-      .get(Number(body.signature_id)) as { content_html: string } | undefined
-    signatureHtml = sig?.content_html || undefined
-  }
+  const signatureHtml = resolveSignatureHtml(db, body.signature_id)
   const { html: brandedHtml, text } = await buildBrandedEmail(sender, html, { signatureHtml })
 
   // Generate our own RFC 5322 Message-ID and hand it to nodemailer rather than

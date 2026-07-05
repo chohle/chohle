@@ -7,10 +7,7 @@ import { ReconcileError, deleteImport } from '~~/server/utils/reconcile'
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   try {
     deleteImport(useDb(), id)

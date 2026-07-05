@@ -22,7 +22,7 @@ function apply(t: Tweaks) {
   // Nuxt UI components read the `.dark` class (driven by @nuxtjs/color-mode,
   // which keeps its OWN persisted preference under `nuxt-color-mode`). That
   // separate store can go stale and leave `.dark` on while our editorial theme
-  // is light — the exact `class="dark" data-theme="light"` mismatch. Own the
+  // is light, the exact `class="dark" data-theme="light"` mismatch. Own the
   // class here so `data-theme` is the single source of truth: the two can't
   // diverge regardless of what color-mode restored on first paint.
   const isDark = t.theme === 'dark'
@@ -50,7 +50,7 @@ export function useTweaks() {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Tweaks>
-        // Older clients persisted a `radius` field — ignore it silently
+        // Older clients persisted a `radius` field, ignore it silently
         // so removing the setting doesn't blow up on existing installs.
         // The removed `warm` theme (and any junk) falls back to light.
         if (isTheme(parsed.theme)) state.value.theme = parsed.theme

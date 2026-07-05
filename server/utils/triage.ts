@@ -23,7 +23,7 @@ export interface TriageInput {
 
 // Pull the bare address out of a "Display Name <a@b.com>" (or already-bare)
 // From header, validating it looks like an email.
-export function extractEmail(addr: string | null): string | null {
+function extractEmail(addr: string | null): string | null {
   if (!addr) return null
   const angled = addr.match(/<([^>]+)>/)
   const raw = (angled?.[1] ?? addr).trim()
@@ -49,7 +49,7 @@ export function loadHandledInboundIds(db: Database): Set<string> {
 // (case-insensitive) email match against customers only — never fuzzy, never
 // auto-applied. Prefers a single non-completed project, else the most recently
 // touched one. Returns nulls when the sender is unknown or has no projects.
-export function suggestProject(
+function suggestProject(
   db: Database,
   fromAddress: string | null
 ): { customerId: number | null; projectId: number | null } {

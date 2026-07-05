@@ -14,7 +14,7 @@ const props = withDefaults(
 )
 
 const height = props.height
-// Length to render against — the shortest series so missing buckets at
+// Length to render against - the shortest series so missing buckets at
 // the tail of any series can't produce undefined arithmetic / NaN bars.
 const n = computed(() => {
   if (!props.series.length) return 0

@@ -8,23 +8,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const sender = (db
-    .prepare('SELECT name, email, phone, website, mwst, logo_path FROM sender WHERE id = 1')
-    .get() as {
-    name: string
-    email: string | null
-    phone: string | null
-    website: string | null
-    mwst: string | null
-    logo_path: string | null
-  } | null) ?? {
-    name: 'chohle',
-    email: null,
-    phone: null,
-    website: null,
-    mwst: null,
-    logo_path: null
-  }
+  const sender = senderRowOrDefault(db)
 
   const body =
     `<p>Guten Tag Emanuell Ademi</p>` +

@@ -107,7 +107,6 @@
     "deleteConfirmTitle": "Delete this quote?",
     "deleteConfirmText": "This deletes the quote and all its line items. Cannot be undone.",
     "deletedToast": "Quote deleted",
-    "noProjectForConvert": "Link the quote to a project before converting; invoices require a project.",
     "untitledQuote": "Untitled quote",
     "noProject": "No project link",
     "openInvoice": "Open invoice",
@@ -134,10 +133,7 @@
     "docUpload": "Upload file",
     "docUploadFailed": "Upload failed",
     "saveFailed": "Could not save the quote",
-    "docActionFailed": "Could not update the document",
-    "tabDetails": "Quote",
-    "tabReferences": "References",
-    "tabDocuments": "Documents"
+    "docActionFailed": "Could not update the document"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -316,8 +312,7 @@
     "logout": "Log out"
   },
   "topbar": {
-    "newInvoice": "New invoice",
-    "menu": "Open menu"
+    "newInvoice": "New invoice"
   },
   "sidebar": {
     "collapse": "Collapse",
@@ -325,7 +320,6 @@
   },
   "search": {
     "placeholder": "Search ...",
-    "hint": "Type to search invoices, customers, articles, expenses, and projects.",
     "empty": "No matches.",
     "scopeLabel": "Search scope",
     "scope": {
@@ -344,11 +338,6 @@
   "settings": {
     "subtitle": "App preferences.",
     "tabGeneral": "General",
-    "appearance": "Appearance",
-    "appearanceHelp": "Choose the colour theme.",
-    "themeSystem": "System",
-    "themeLight": "Light",
-    "themeDark": "Dark",
     "yourData": "Your data",
     "yourDataText": "Everything lives in the {folder} folder: the SQLite database and your uploaded files. Back up that folder and you have backed up everything.",
     "emailTemplate": "Email template",
@@ -386,7 +375,6 @@
       "waitDaysHelpAfterPrevious": "Days to wait after the previous reminder before this one becomes eligible.",
       "subject": "Subject",
       "body": "Body",
-      "bodyHelp": "Header and footer are added automatically when sent.",
       "placeholders": "Placeholders",
       "phAmount": "Invoice amount (CHF)",
       "phIssued": "Invoice issue date",
@@ -406,7 +394,6 @@
       "emptyText": "Pick a provider below to connect your first mailbox.",
       "lastSync": "Last sync",
       "neverSynced": "Never synced",
-      "comingSoon": "Coming soon",
       "outlookDesc": "Microsoft 365 or personal Outlook account",
       "outlookConnectTitle": "Connect Outlook",
       "outlookConnectHint": "Paste your Azure app's Client ID and Tenant ID, then sign in with Microsoft to authorise chohle. See docs/OUTLOOK_SYNC.md for the one time Azure app setup.",
@@ -449,10 +436,6 @@
     "expected": "Expected",
     "outstanding": "CHF {amount} outstanding",
     "fromInvoices": "incl. CHF {amount} from invoices",
-    "vsLastMonth": "vs. last month",
-    "expensesByCategory": "Expenses by category",
-    "noExpensesTitle": "No expenses this month",
-    "noExpensesText": "Expenses you add will break down here by category.",
     "trend": "6-month trend",
     "cashflow": "Cashflow {year}",
     "recurring": "Recurring income this month",
@@ -684,7 +667,6 @@
     "toastSaved": "Invoice saved",
     "send": "Send",
     "continue": "Continue",
-    "markSent": "Mark as sent",
     "markPaid": "Mark as paid",
     "markUnpaid": "Mark as unpaid",
     "recipient": "Recipient",
@@ -768,8 +750,6 @@
     "back": "Back",
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
-    "prevYear": "Previous year",
-    "nextYear": "Next year",
     "save": "Save",
     "edit": "Edit",
     "date": "Date",
@@ -818,7 +798,6 @@
     "importError": "Import failed",
     "summary": "{total} transactions · {auto} auto-matched · {suggested} suggestions · {unmatched} unmatched",
     "summaryDuplicates": "{n} already imported",
-    "queueTitle": "To review",
     "queueEmptyTitle": "Nothing to review",
     "queueEmptyText": "Every incoming payment is matched.",
     "unknownDebtor": "Unknown sender",
@@ -847,12 +826,10 @@
     "connManage": "Manage",
     "connSyncNow": "Sync now",
     "connDisconnect": "Disconnect",
-    "connProvider": "Provider",
     "connProvider_folder": "Folder (camt.053 files)",
     "connProvider_ebics": "EBICS (bank protocol)",
     "connFolderDir": "Folder path",
     "connFolderHint": "Path where your bank drops camt.053 files (e.g. an SFTP mount).",
-    "connEbicsNote": "Configure your EBICS access. Your keys are generated when you save.",
     "connEbicsHostUrl": "EBICS host URL",
     "connEbicsHostId": "Host ID",
     "connEbicsPartnerId": "Partner ID",

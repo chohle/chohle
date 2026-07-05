@@ -107,7 +107,6 @@
     "deleteConfirmTitle": "Diese Offerte löschen?",
     "deleteConfirmText": "Löscht die Offerte und alle Positionen. Kann nicht rückgängig gemacht werden.",
     "deletedToast": "Offerte gelöscht",
-    "noProjectForConvert": "Verknüpfe die Offerte mit einem Projekt, bevor du sie umwandelst; Rechnungen benötigen ein Projekt.",
     "untitledQuote": "Offerte ohne Titel",
     "noProject": "Kein Projekt verknüpft",
     "openInvoice": "Rechnung öffnen",
@@ -134,10 +133,7 @@
     "docUpload": "Datei hochladen",
     "docUploadFailed": "Upload fehlgeschlagen",
     "saveFailed": "Die Offerte konnte nicht gespeichert werden",
-    "docActionFailed": "Das Dokument konnte nicht aktualisiert werden",
-    "tabDetails": "Offerte",
-    "tabReferences": "Referenzen",
-    "tabDocuments": "Dokumente"
+    "docActionFailed": "Das Dokument konnte nicht aktualisiert werden"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -316,8 +312,7 @@
     "logout": "Abmelden"
   },
   "topbar": {
-    "newInvoice": "Neue Rechnung",
-    "menu": "Menü öffnen"
+    "newInvoice": "Neue Rechnung"
   },
   "sidebar": {
     "collapse": "Einklappen",
@@ -325,7 +320,6 @@
   },
   "search": {
     "placeholder": "Suchen ...",
-    "hint": "Tippe, um Rechnungen, Kunden, Artikel, Ausgaben und Projekte zu durchsuchen.",
     "empty": "Keine Treffer.",
     "scopeLabel": "Suchbereich",
     "scope": {
@@ -344,11 +338,6 @@
   "settings": {
     "subtitle": "App-Einstellungen.",
     "tabGeneral": "Allgemein",
-    "appearance": "Erscheinungsbild",
-    "appearanceHelp": "Wähle das Farbschema.",
-    "themeSystem": "System",
-    "themeLight": "Hell",
-    "themeDark": "Dunkel",
     "yourData": "Deine Daten",
     "yourDataText": "Alles liegt im Ordner {folder}: die SQLite-Datenbank und deine hochgeladenen Dateien. Sichere diesen Ordner und du hast alles gesichert.",
     "emailTemplate": "E-Mail-Vorlage",
@@ -386,7 +375,6 @@
       "waitDaysHelpAfterPrevious": "Tage nach der vorherigen Mahnung, bevor diese bereit ist.",
       "subject": "Betreff",
       "body": "Text",
-      "bodyHelp": "Kopf- und Fusszeile werden beim Versand automatisch ergänzt.",
       "placeholders": "Platzhalter",
       "phAmount": "Rechnungsbetrag (CHF)",
       "phIssued": "Rechnungsdatum",
@@ -406,7 +394,6 @@
       "emptyText": "Wähle unten einen Anbieter, um deine erste Mailbox zu verbinden.",
       "lastSync": "Letzte Synchronisation",
       "neverSynced": "Noch nie synchronisiert",
-      "comingSoon": "Bald verfügbar",
       "outlookDesc": "Microsoft 365 oder persönliches Outlook Konto",
       "outlookConnectTitle": "Outlook verbinden",
       "outlookConnectHint": "Trage die Client ID und Tenant ID deiner Azure App ein und melde dich mit Microsoft an, um chohle freizugeben. Die einmalige Azure App Einrichtung ist in docs/OUTLOOK_SYNC.md beschrieben.",
@@ -449,10 +436,6 @@
     "expected": "Erwartet",
     "outstanding": "CHF {amount} ausstehend",
     "fromInvoices": "davon CHF {amount} aus Rechnungen",
-    "vsLastMonth": "ggü. Vormonat",
-    "expensesByCategory": "Ausgaben nach Kategorie",
-    "noExpensesTitle": "Keine Ausgaben diesen Monat",
-    "noExpensesText": "Hinzugefügte Ausgaben werden hier nach Kategorie aufgeschlüsselt.",
     "trend": "6-Monats-Trend",
     "cashflow": "Cashflow {year}",
     "recurring": "Wiederkehrende Einnahmen diesen Monat",
@@ -684,7 +667,6 @@
     "toastSaved": "Rechnung gespeichert",
     "send": "Senden",
     "continue": "Weiter",
-    "markSent": "Als gesendet markieren",
     "markPaid": "Als bezahlt markieren",
     "markUnpaid": "Als unbezahlt markieren",
     "recipient": "Empfänger",
@@ -768,8 +750,6 @@
     "back": "Zurück",
     "prevMonth": "Vorheriger Monat",
     "nextMonth": "Nächster Monat",
-    "prevYear": "Vorheriges Jahr",
-    "nextYear": "Nächstes Jahr",
     "save": "Speichern",
     "edit": "Bearbeiten",
     "date": "Datum",
@@ -818,7 +798,6 @@
     "importError": "Import fehlgeschlagen",
     "summary": "{total} Transaktionen · {auto} automatisch abgeglichen · {suggested} Vorschläge · {unmatched} offen",
     "summaryDuplicates": "{n} bereits importiert",
-    "queueTitle": "Zu prüfen",
     "queueEmptyTitle": "Nichts zu prüfen",
     "queueEmptyText": "Alle eingehenden Zahlungen sind zugeordnet.",
     "unknownDebtor": "Unbekannter Absender",
@@ -847,12 +826,10 @@
     "connManage": "Verwalten",
     "connSyncNow": "Jetzt synchronisieren",
     "connDisconnect": "Trennen",
-    "connProvider": "Anbieter",
     "connProvider_folder": "Ordner (camt.053-Dateien)",
     "connProvider_ebics": "EBICS (Bankprotokoll)",
     "connFolderDir": "Ordnerpfad",
     "connFolderHint": "Pfad, in den Ihre Bank camt.053-Dateien ablegt (z. B. ein SFTP-Mount).",
-    "connEbicsNote": "EBICS-Zugang konfigurieren. Beim Speichern werden Ihre Schlüssel erzeugt.",
     "connEbicsHostUrl": "EBICS-Host-URL",
     "connEbicsHostId": "Host-ID",
     "connEbicsPartnerId": "Partner-ID",

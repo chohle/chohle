@@ -124,10 +124,6 @@ async function openEdit(id: number) {
 }
 
 const formRef = ref()
-// Basic RFC-ish check — good enough to catch typos like "aadsf" without
-// rejecting valid edge cases. Server is the source of truth.
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 function validate(state: typeof form) {
   const errors: { name: string; message: string }[] = []
   const req = (key: keyof typeof state, fieldName: string) => {
@@ -137,7 +133,7 @@ function validate(state: typeof form) {
   }
   req('name', 'name')
   req('email', 'email')
-  if (state.email?.trim() && !EMAIL_RE.test(state.email.trim())) {
+  if (state.email?.trim() && !isValidEmail(state.email.trim())) {
     errors.push({ name: 'email', message: t('validation.email') })
   }
   req('phone', 'phone')

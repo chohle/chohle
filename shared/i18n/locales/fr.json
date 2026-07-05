@@ -157,7 +157,6 @@
     "deleteConfirmTitle": "Supprimer ce devis ?",
     "deleteConfirmText": "Supprime le devis et toutes ses lignes. Action irréversible.",
     "deletedToast": "Devis supprimé",
-    "noProjectForConvert": "Liez le devis à un projet avant de le convertir ; les factures requièrent un projet.",
     "untitledQuote": "Devis sans titre",
     "noProject": "Aucun projet lié",
     "openInvoice": "Ouvrir la facture",
@@ -184,10 +183,7 @@
     "docUpload": "Téléverser un fichier",
     "docUploadFailed": "Échec du téléversement",
     "saveFailed": "Le devis n'a pas pu être enregistré",
-    "docActionFailed": "Le document n'a pas pu être mis à jour",
-    "tabDetails": "Offre",
-    "tabReferences": "Références",
-    "tabDocuments": "Documents"
+    "docActionFailed": "Le document n'a pas pu être mis à jour"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -316,8 +312,7 @@
     "logout": "Déconnexion"
   },
   "topbar": {
-    "newInvoice": "Nouvelle facture",
-    "menu": "Ouvrir le menu"
+    "newInvoice": "Nouvelle facture"
   },
   "sidebar": {
     "collapse": "Réduire",
@@ -325,7 +320,6 @@
   },
   "search": {
     "placeholder": "Rechercher ...",
-    "hint": "Tapez pour rechercher factures, clients, articles, dépenses et projets.",
     "empty": "Aucun résultat.",
     "scopeLabel": "Portée de recherche",
     "scope": {
@@ -344,11 +338,6 @@
   "settings": {
     "subtitle": "Préférences de l'application.",
     "tabGeneral": "Général",
-    "appearance": "Apparence",
-    "appearanceHelp": "Choisissez le thème de couleur.",
-    "themeSystem": "Système",
-    "themeLight": "Clair",
-    "themeDark": "Sombre",
     "yourData": "Vos données",
     "yourDataText": "Tout se trouve dans le dossier {folder} : la base de données SQLite et vos fichiers téléversés. Sauvegardez ce dossier et vous avez tout sauvegardé.",
     "emailTemplate": "Modèle d'e-mail",
@@ -386,7 +375,6 @@
       "waitDaysHelpAfterPrevious": "Jours à attendre après la relance précédente avant que celle ci ne soit prête.",
       "subject": "Objet",
       "body": "Corps",
-      "bodyHelp": "L'en tête et le pied de page sont ajoutés automatiquement à l'envoi.",
       "placeholders": "Espaces réservés",
       "phAmount": "Montant de la facture (CHF)",
       "phIssued": "Date de la facture",
@@ -406,7 +394,6 @@
       "emptyText": "Choisissez un fournisseur ci dessous pour connecter votre première boîte mail.",
       "lastSync": "Dernière synchro",
       "neverSynced": "Jamais synchronisée",
-      "comingSoon": "Bientôt disponible",
       "outlookDesc": "Microsoft 365 ou compte Outlook personnel",
       "outlookConnectTitle": "Connecter Outlook",
       "outlookConnectHint": "Collez le Client ID et le Tenant ID de votre app Azure puis connectez vous avec Microsoft pour autoriser chohle. La configuration unique de l'app Azure est documentée dans docs/OUTLOOK_SYNC.md.",
@@ -449,10 +436,6 @@
     "expected": "Attendu",
     "outstanding": "CHF {amount} en attente",
     "fromInvoices": "dont CHF {amount} de factures",
-    "vsLastMonth": "vs mois dernier",
-    "expensesByCategory": "Dépenses par catégorie",
-    "noExpensesTitle": "Aucune dépense ce mois-ci",
-    "noExpensesText": "Les dépenses que vous ajoutez seront ventilées ici par catégorie.",
     "trend": "Tendance sur 6 mois",
     "cashflow": "Trésorerie {year}",
     "recurring": "Revenus récurrents ce mois-ci",
@@ -684,7 +667,6 @@
     "toastSaved": "Facture enregistrée",
     "send": "Envoyer",
     "continue": "Continuer",
-    "markSent": "Marquer comme envoyée",
     "markPaid": "Marquer comme payée",
     "markUnpaid": "Marquer comme impayée",
     "recipient": "Destinataire",
@@ -768,8 +750,6 @@
     "back": "Retour",
     "prevMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
-    "prevYear": "Année précédente",
-    "nextYear": "Année suivante",
     "save": "Enregistrer",
     "edit": "Modifier",
     "date": "Date",
@@ -818,7 +798,6 @@
     "importError": "Échec de l'importation",
     "summary": "{total} transactions · {auto} rapprochées automatiquement · {suggested} suggestions · {unmatched} non rapprochées",
     "summaryDuplicates": "{n} déjà importées",
-    "queueTitle": "À vérifier",
     "queueEmptyTitle": "Rien à vérifier",
     "queueEmptyText": "Tous les paiements entrants sont rapprochés.",
     "unknownDebtor": "Expéditeur inconnu",
@@ -847,12 +826,10 @@
     "connManage": "Gérer",
     "connSyncNow": "Synchroniser maintenant",
     "connDisconnect": "Déconnecter",
-    "connProvider": "Fournisseur",
     "connProvider_folder": "Dossier (fichiers camt.053)",
     "connProvider_ebics": "EBICS (protocole bancaire)",
     "connFolderDir": "Chemin du dossier",
     "connFolderHint": "Chemin où votre banque dépose les fichiers camt.053 (p. ex. un montage SFTP).",
-    "connEbicsNote": "Configurez votre accès EBICS. Vos clés sont générées à l’enregistrement.",
     "connEbicsHostUrl": "URL de l'hôte EBICS",
     "connEbicsHostId": "ID de l'hôte",
     "connEbicsPartnerId": "ID partenaire",

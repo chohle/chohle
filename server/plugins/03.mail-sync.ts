@@ -6,7 +6,9 @@
 // so the app finishes hydrating before we start hammering external
 // APIs.
 
+import type { Database } from 'better-sqlite3'
 import { secretIsAvailable } from '~~/server/utils/secrets'
+import type { SyncResult } from '~~/server/utils/mailbox'
 import {
   listOutlookMailboxes,
   recordSyncError,
@@ -17,6 +19,39 @@ import { listImapMailboxes, syncImapMailbox } from '~~/server/utils/imapSync'
 
 const DEFAULT_INTERVAL_MS = 5 * 60 * 1000
 const FIRST_RUN_DELAY_MS = 30 * 1000
+
+// One sync pass over every mailbox of a single provider, with the shared
+// per-mailbox error handling: a failing mailbox is recorded + logged and the
+// rest keep syncing. The generic keeps each driver's concrete mailbox row
+// type internal so DRIVERS can stay a plain array.
+function driver<M extends { id: number }>(
+  name: string,
+  list: (db: Database) => M[],
+  sync: (db: Database, mailbox: M) => Promise<SyncResult>
+): (db: Database) => Promise<void> {
+  return async (db) => {
+    for (const mailbox of list(db)) {
+      try {
+        const r = await sync(db, mailbox)
+        if (r.inserted > 0) {
+          console.log(
+            `[mail-sync] ${name} ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`
+          )
+        }
+      } catch (err) {
+        const msg = (err as { message?: string }).message ?? String(err)
+        recordSyncError(db, mailbox.id, msg)
+        console.warn(`[mail-sync] ${name} ${mailbox.id} failed:`, msg)
+      }
+    }
+  }
+}
+
+const DRIVERS = [
+  driver('outlook', listOutlookMailboxes, syncOutlookMailbox),
+  driver('gmail', listGmailMailboxes, syncGmailMailbox),
+  driver('imap', listImapMailboxes, syncImapMailbox)
+]
 
 // One run at a time. If a previous tick is still going (slow API,
 // pagination, many mailboxes) the next interval just skips. Prevents
@@ -33,45 +68,8 @@ async function runOnce(): Promise<void> {
   runningPromise = (async () => {
     try {
       const db = useDb()
-      for (const mailbox of listOutlookMailboxes(db)) {
-        try {
-          const r = await syncOutlookMailbox(db, mailbox)
-          if (r.inserted > 0) {
-            console.log(
-              `[mail-sync] outlook ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`
-            )
-          }
-        } catch (err) {
-          const msg = (err as { message?: string }).message ?? String(err)
-          recordSyncError(db, mailbox.id, msg)
-          console.warn(`[mail-sync] outlook ${mailbox.id} failed:`, msg)
-        }
-      }
-      for (const mailbox of listGmailMailboxes(db)) {
-        try {
-          const r = await syncGmailMailbox(db, mailbox)
-          if (r.inserted > 0) {
-            console.log(
-              `[mail-sync] gmail ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`
-            )
-          }
-        } catch (err) {
-          const msg = (err as { message?: string }).message ?? String(err)
-          recordSyncError(db, mailbox.id, msg)
-          console.warn(`[mail-sync] gmail ${mailbox.id} failed:`, msg)
-        }
-      }
-      for (const mailbox of listImapMailboxes(db)) {
-        try {
-          const r = await syncImapMailbox(db, mailbox)
-          if (r.inserted > 0) {
-            console.log(`[mail-sync] imap ${mailbox.id}: +${r.inserted} new (scanned ${r.scanned})`)
-          }
-        } catch (err) {
-          const msg = (err as { message?: string }).message ?? String(err)
-          recordSyncError(db, mailbox.id, msg)
-          console.warn(`[mail-sync] imap ${mailbox.id} failed:`, msg)
-        }
+      for (const run of DRIVERS) {
+        await run(db)
       }
     } catch (err) {
       // Surface infra failures (DB unavailable, list query throws, ...)

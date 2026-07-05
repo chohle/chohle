@@ -68,13 +68,6 @@ function pickExisting(p: ProjectLite) {
   emit('resolved', p.id)
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
-
 async function submitCreate() {
   if (!newProject.name.trim()) return
   submitting.value = true

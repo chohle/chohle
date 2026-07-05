@@ -4,10 +4,7 @@ import { join } from 'node:path'
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const row = useDb()
     .prepare('SELECT filename, stored_name, mime_type FROM attachments WHERE id = ?')

@@ -19,7 +19,7 @@ useHead({ title: () => props.docTitle ?? props.title })
         <slot name="title">{{ title }}</slot>
       </h1>
       <!-- A div, not a p: subtitle slots can contain block content (chips,
-           links, flex rows). A <div> inside a <p> is invalid HTML — the browser
+           links, flex rows). A <div> inside a <p> is invalid HTML, the browser
            hoists it out, which breaks SSR hydration. -->
       <div v-if="subtitle || $slots.subtitle" class="page-head__sub">
         <slot name="subtitle">{{ subtitle }}</slot>
