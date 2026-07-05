@@ -22,7 +22,6 @@ export default defineEventHandler(async (event) => {
   // Read back so an idempotent re-accept returns the row's actual date
   // (COALESCE keeps the original; we'd otherwise lie about the new one).
   const row = db.prepare('SELECT accepted_at FROM quotes WHERE id = ?').get(id) as
-    | { accepted_at: string | null }
-    | undefined
+    { accepted_at: string | null } | undefined
   return { ok: true, accepted_at: row?.accepted_at ?? today }
 })

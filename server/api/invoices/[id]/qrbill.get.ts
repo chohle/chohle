@@ -24,8 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const invoice = db.prepare('SELECT id, customer_id FROM invoices WHERE id = ?').get(id) as
-    | { customer_id: number }
-    | undefined
+    { customer_id: number } | undefined
   if (!invoice) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
@@ -46,8 +45,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const customer = db.prepare('SELECT * FROM customers WHERE id = ?').get(invoice.customer_id) as
-    | Party
-    | undefined
+    Party | undefined
 
   const items = db
     .prepare(

@@ -12,8 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as
-    | { project_id: number | null }
-    | undefined
+    { project_id: number | null } | undefined
   if (!invoice) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
@@ -25,8 +24,7 @@ export default defineEventHandler(async (event) => {
     ? ((db
         .prepare(`SELECT id, name, direction FROM projects WHERE id = ?`)
         .get(invoice.project_id) as
-        | { id: number; name: string; direction: 'sales' | 'procurement' }
-        | undefined) ?? null)
+        { id: number; name: string; direction: 'sales' | 'procurement' } | undefined) ?? null)
     : null
 
   const items = db
@@ -35,8 +33,7 @@ export default defineEventHandler(async (event) => {
 
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
 
   const totals = computeInvoiceTotals(

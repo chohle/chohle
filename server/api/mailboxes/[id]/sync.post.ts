@@ -17,8 +17,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
   const provider = (
     db.prepare('SELECT provider FROM mailboxes WHERE id = ?').get(id) as
-      | { provider?: string }
-      | undefined
+      { provider?: string } | undefined
   )?.provider
   if (!provider) {
     throw createError({ statusCode: 404, statusMessage: 'mailbox not found' })

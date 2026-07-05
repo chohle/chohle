@@ -1,14 +1,7 @@
 type Direction = 'sales' | 'procurement'
 // Only kanban stages can be reordered (active/completed are not kanban columns).
 type Stage =
-  | 'lead'
-  | 'contacted'
-  | 'proposal'
-  | 'won'
-  | 'need'
-  | 'requested'
-  | 'received'
-  | 'accepted'
+  'lead' | 'contacted' | 'proposal' | 'won' | 'need' | 'requested' | 'received' | 'accepted'
 
 interface Body {
   direction: Direction

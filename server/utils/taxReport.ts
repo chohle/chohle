@@ -79,8 +79,7 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
   const y = String(year)
 
   const s = db.prepare('SELECT * FROM sender WHERE id = 1').get() as
-    | Record<string, unknown>
-    | undefined
+    Record<string, unknown> | undefined
   const sender = {
     name: String(s?.name ?? ''),
     street: String(s?.street ?? ''),

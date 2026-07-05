@@ -58,8 +58,7 @@ interface ItemRow {
 
 function senderVat(db: Database): boolean {
   const s = db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-    | { vat_registered: number }
-    | undefined
+    { vat_registered: number } | undefined
   return !!s?.vat_registered
 }
 
@@ -115,8 +114,7 @@ export function decideMatch(db: Database, credit: ParsedCredit, vat: boolean): M
 
   if (invoiceId !== null) {
     const inv = db.prepare('SELECT id, status FROM invoices WHERE id = ?').get(invoiceId) as
-      | { id: number; status: string }
-      | undefined
+      { id: number; status: string } | undefined
     if (inv) {
       // A reference resolving to an already-paid invoice is almost always a
       // re-seen payment the dedupe missed (different bank ref). Leave it for a
@@ -187,8 +185,7 @@ export function reconcileStatement(
   filename: string
 ): ImportSummary {
   const sender = db.prepare('SELECT iban, vat_registered FROM sender WHERE id = 1').get() as
-    | { iban: string; vat_registered: number }
-    | undefined
+    { iban: string; vat_registered: number } | undefined
   if (!sender) throw new ReconcileError(400, 'Sender is not configured')
 
   const norm = (iban: string) => iban.replace(/\s/g, '').toUpperCase()
@@ -295,8 +292,7 @@ export function confirmTransaction(
   if (tx.status === 'ignored') throw new ReconcileError(409, 'Transaction is ignored')
 
   const inv = db.prepare('SELECT id, status FROM invoices WHERE id = ?').get(invoiceId) as
-    | { id: number; status: string }
-    | undefined
+    { id: number; status: string } | undefined
   if (!inv) throw new ReconcileError(404, 'Invoice not found')
   if (inv.status === 'paid') throw new ReconcileError(409, 'Invoice is already paid')
 
@@ -314,8 +310,7 @@ export function confirmTransaction(
 /** Mark a transaction ignored (bank fee, non-invoice income, etc.). */
 export function ignoreTransaction(db: Database, txId: number): void {
   const tx = db.prepare('SELECT id, status FROM bank_transactions WHERE id = ?').get(txId) as
-    | { id: number; status: string }
-    | undefined
+    { id: number; status: string } | undefined
   if (!tx) throw new ReconcileError(404, 'Transaction not found')
   // A matched transaction has already flipped an invoice to paid; ignoring it
   // would leave that invoice paid with no backing transaction. Out of scope

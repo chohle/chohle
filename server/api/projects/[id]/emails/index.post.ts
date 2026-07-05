@@ -40,8 +40,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const project = db.prepare(`SELECT id, customer_id FROM projects WHERE id = ?`).get(id) as
-    | ProjectRow
-    | undefined
+    ProjectRow | undefined
   if (!project) throw createError({ statusCode: 404, statusMessage: 'project not found' })
 
   // Resolve the recipient: explicit body.to wins, otherwise pull from the
@@ -49,8 +48,7 @@ export default defineEventHandler(async (event) => {
   let to = (body.to ?? '').trim()
   if (!to && project.customer_id) {
     const c = db.prepare(`SELECT email FROM customers WHERE id = ?`).get(project.customer_id) as
-      | CustomerRow
-      | undefined
+      CustomerRow | undefined
     if (c?.email) to = c.email
   }
   if (!to) {

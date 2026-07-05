@@ -5,8 +5,7 @@ export default defineEventHandler(async (event) => {
   const id = requireIdParam(event)
   const db = useDb()
   const row = db.prepare(`SELECT is_default FROM signatures WHERE id = ?`).get(id) as
-    | { is_default: number }
-    | undefined
+    { is_default: number } | undefined
   if (!row) {
     throw createError({ statusCode: 404, statusMessage: 'signature not found' })
   }

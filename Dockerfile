@@ -2,7 +2,7 @@
 
 # Base image: Node 24 with Corepack-managed Yarn 4. Keep the version in
 # sync with .github/workflows/ci.yml so the shipped image matches CI.
-FROM node:24.17.0-bookworm-slim AS base
+FROM node:24.18.0-bookworm-slim AS base
 ENV YARN_ENABLE_GLOBAL_CACHE=false
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 WORKDIR /app

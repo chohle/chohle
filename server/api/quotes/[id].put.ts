@@ -13,8 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const current = db.prepare('SELECT project_id, customer_id FROM quotes WHERE id = ?').get(id) as
-    | { project_id: number | null; customer_id: number }
-    | undefined
+    { project_id: number | null; customer_id: number } | undefined
   if (!current) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
@@ -47,8 +46,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Invalid projectId' })
     }
     const project = db.prepare('SELECT customer_id FROM projects WHERE id = ?').get(next) as
-      | { customer_id: number | null }
-      | undefined
+      { customer_id: number | null } | undefined
     if (!project) {
       throw createError({ statusCode: 404, statusMessage: 'Project not found' })
     }
@@ -77,8 +75,7 @@ export default defineEventHandler(async (event) => {
 
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
   const { totalRappen } = computeInvoiceTotals(
     items.map((it: Record<string, unknown>) => ({

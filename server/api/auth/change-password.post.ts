@@ -11,8 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const owner = db.prepare('SELECT password_hash FROM owner WHERE id = 1').get() as
-    | { password_hash: string }
-    | undefined
+    { password_hash: string } | undefined
   if (!owner || !(await verifyPassword(owner.password_hash, currentPassword))) {
     throw createError({ statusCode: 401, statusMessage: 'Current password is incorrect' })
   }

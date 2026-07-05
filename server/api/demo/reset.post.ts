@@ -16,8 +16,7 @@ export default defineEventHandler(async (event) => {
   const locale =
     (
       useDb().prepare('SELECT locale FROM owner WHERE id = 1').get() as
-        | { locale: string }
-        | undefined
+        { locale: string } | undefined
     )?.locale ?? 'en'
 
   resetSessionDb(sid, locale)
