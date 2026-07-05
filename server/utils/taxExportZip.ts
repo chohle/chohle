@@ -38,8 +38,7 @@ export async function buildTaxExportZip(db: Database, year: number): Promise<Tax
   // --- report PDF ---
   const logoPath = (
     db.prepare('SELECT logo_path FROM sender WHERE id = 1').get() as
-      | { logo_path: string | null }
-      | undefined
+      { logo_path: string | null } | undefined
   )?.logo_path
   files[`Steuerexport-${year}.pdf`] = await renderTaxReportPdf(report, await readUpload(logoPath))
 

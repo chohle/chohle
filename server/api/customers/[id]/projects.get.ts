@@ -52,8 +52,7 @@ export default defineEventHandler(async (event) => {
   // Avoids N invoice queries when the customer has many projects.
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
 
   const ids = projects.map((p) => p.id)

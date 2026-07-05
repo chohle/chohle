@@ -52,8 +52,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
 
   const existing = db.prepare(`SELECT id, direction, stage FROM projects WHERE id = ?`).get(id) as
-    | { id: number; direction: 'sales' | 'procurement'; stage: Stage }
-    | undefined
+    { id: number; direction: 'sales' | 'procurement'; stage: Stage } | undefined
   if (!existing) {
     throw createError({ statusCode: 404, statusMessage: 'not found' })
   }

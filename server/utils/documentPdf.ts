@@ -296,8 +296,7 @@ export async function quoteDocumentAttachment(
     'SELECT title, content, kind, file_name, file_path, mime FROM quote_documents WHERE id = ?' +
     (scoped ? ' AND quote_id = ?' : '')
   const row = (scoped ? db.prepare(sql).get(docId, quoteId) : db.prepare(sql).get(docId)) as
-    | DocRow
-    | undefined
+    DocRow | undefined
   if (!row) return null
 
   if (row.kind === 'file') {
@@ -311,8 +310,7 @@ export async function quoteDocumentAttachment(
   }
 
   const sender = db.prepare('SELECT name, logo_path FROM sender WHERE id = 1').get() as
-    | { name: string; logo_path: string | null }
-    | undefined
+    { name: string; logo_path: string | null } | undefined
   const logo = sender?.logo_path ? await readUpload(sender.logo_path) : null
 
   let content: TipTapNode

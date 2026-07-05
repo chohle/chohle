@@ -12,8 +12,7 @@ export default defineEventHandler(async (event) => {
   const project = db
     .prepare('SELECT id, customer_id, name, label FROM projects WHERE id = ?')
     .get(projectId) as
-    | { id: number; customer_id: number | null; name: string; label: string }
-    | undefined
+    { id: number; customer_id: number | null; name: string; label: string } | undefined
   if (!project) {
     throw createError({ statusCode: 404, statusMessage: 'Project not found' })
   }

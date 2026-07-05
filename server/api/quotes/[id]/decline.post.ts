@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
   // Read back so an idempotent re-decline returns the row's actual date
   // (COALESCE keeps the original; we'd otherwise lie about the new one).
   const row = db.prepare('SELECT declined_at FROM quotes WHERE id = ?').get(id) as
-    | { declined_at: string | null }
-    | undefined
+    { declined_at: string | null } | undefined
   return { ok: true, declined_at: row?.declined_at ?? today }
 })

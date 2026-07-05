@@ -15,15 +15,13 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const customer = db.prepare('SELECT id, name FROM customers WHERE id = ?').get(customerId) as
-    | { id: number; name: string }
-    | undefined
+    { id: number; name: string } | undefined
   if (!customer) {
     throw createError({ statusCode: 404, statusMessage: 'Customer not found' })
   }
   if (projectId != null) {
     const project = db.prepare('SELECT customer_id FROM projects WHERE id = ?').get(projectId) as
-      | { customer_id: number | null }
-      | undefined
+      { customer_id: number | null } | undefined
     if (!project) {
       throw createError({ statusCode: 404, statusMessage: 'Project not found' })
     }

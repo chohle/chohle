@@ -58,8 +58,7 @@ function dateFmt(iso: string) {
 export async function generateInvoicePdf(id: number): Promise<Buffer> {
   const db = useDb()
   const invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as
-    | InvoiceRow
-    | undefined
+    InvoiceRow | undefined
   if (!invoice) throw createError({ statusCode: 404, statusMessage: 'Invoice not found' })
 
   const sender = db.prepare('SELECT * FROM sender WHERE id = 1').get() as Party & {

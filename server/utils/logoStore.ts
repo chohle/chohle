@@ -9,8 +9,7 @@ type LogoTable = 'sender' | 'customers'
 
 function logoRow(db: Database, table: LogoTable, id: number) {
   return db.prepare(`SELECT logo_path FROM ${table} WHERE id = ?`).get(id) as
-    | { logo_path: string | null }
-    | undefined
+    { logo_path: string | null } | undefined
 }
 
 // GET: stream the stored logo. Auth and caching stay in the route handlers

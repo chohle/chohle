@@ -4,13 +4,7 @@ interface ProposedAction {
   [k: string]: unknown
 }
 type ProposalKind =
-  | 'customer'
-  | 'invoice'
-  | 'quote'
-  | 'article'
-  | 'signature'
-  | 'expense'
-  | 'income'
+  'customer' | 'invoice' | 'quote' | 'article' | 'signature' | 'expense' | 'income'
 interface Proposal {
   kind: ProposalKind
   mode: 'create' | 'edit'

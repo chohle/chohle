@@ -21,8 +21,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const sender = db.prepare(`SELECT email, name FROM sender WHERE id = 1`).get() as
-    | SenderRow
-    | undefined
+    SenderRow | undefined
 
   const { smtp } = useRuntimeConfig()
   // Send AS the authenticated SMTP account so this smoke test exercises the

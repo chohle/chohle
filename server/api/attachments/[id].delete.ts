@@ -8,8 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const row = db.prepare('SELECT stored_name FROM attachments WHERE id = ?').get(id) as
-    | { stored_name: string }
-    | undefined
+    { stored_name: string } | undefined
   if (row) {
     await rm(join(uploadsDir(), row.stored_name), { force: true })
     db.prepare('DELETE FROM attachments WHERE id = ?').run(id)

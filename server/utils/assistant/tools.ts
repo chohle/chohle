@@ -32,8 +32,7 @@ function chf(rappen: number): string {
 function senderVat(): boolean {
   return !!(
     useDb().prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
 }
 /** A VAT rate as a sane percentage (0-100); falls back to 8.1 when out of range. */
@@ -553,8 +552,7 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
       } else if (Number.isInteger(Number(args.customerId))) {
         customerId = Number(args.customerId)
         const row = db.prepare('SELECT name FROM customers WHERE id = ?').get(customerId) as
-          | { name: string }
-          | undefined
+          { name: string } | undefined
         if (!row) throw createError({ statusCode: 400, statusMessage: 'Unknown customer' })
         customerLabel = row.name
       } else {
@@ -750,8 +748,7 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
       const itemsTable = isQuote ? 'quote_items' : 'invoice_items'
       const fk = isQuote ? 'quote_id' : 'invoice_id'
       const cur = db.prepare(`SELECT number, title FROM ${table} WHERE id = ?`).get(id) as
-        | { number: string; title: string }
-        | undefined
+        { number: string; title: string } | undefined
       if (!cur)
         throw createError({
           statusCode: 400,
@@ -836,8 +833,7 @@ export function buildProposal(name: string, args: Record<string, unknown>): Prop
     case 'propose_edit_signature': {
       const id = Number(args.id)
       const cur = db.prepare('SELECT name FROM signatures WHERE id = ?').get(id) as
-        | { name: string }
-        | undefined
+        { name: string } | undefined
       if (!cur) throw createError({ statusCode: 400, statusMessage: 'Unknown signature' })
       const summary: string[] = []
       if (args.name !== undefined) summary.push(`name: ${String(args.name)}`)

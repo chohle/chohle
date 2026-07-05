@@ -98,14 +98,7 @@ export type ProposedAction =
   | { type: 'edit_signature'; id: number; name?: string; contentHtml?: string; isDefault?: boolean }
 
 export type ProposalKind =
-  | 'customer'
-  | 'invoice'
-  | 'quote'
-  | 'article'
-  | 'signature'
-  | 'expense'
-  | 'income'
-  | 'project'
+  'customer' | 'invoice' | 'quote' | 'article' | 'signature' | 'expense' | 'income' | 'project'
 
 export interface CommitRef {
   kind: ProposalKind
@@ -144,8 +137,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
   }
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
 
   const run = db.transaction((): CommitResult => {
@@ -175,8 +167,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
         const nm = String((a.newCustomer as Raw).name ?? '').trim()
         const existing = nm
           ? (db.prepare('SELECT id FROM customers WHERE name = ? COLLATE NOCASE').get(nm) as
-              | { id: number }
-              | undefined)
+              { id: number } | undefined)
           : undefined
         return existing ? existing.id : insertCustomer(a.newCustomer).id
       }
@@ -475,8 +466,7 @@ export function commitActions(db: Database, actions: ProposedAction[]): CommitRe
         case 'edit_customer': {
           const id = Number(action.id)
           const current = db.prepare('SELECT * FROM customers WHERE id = ?').get(id) as
-            | Record<string, unknown>
-            | undefined
+            Record<string, unknown> | undefined
           if (!current) throw createError({ statusCode: 400, statusMessage: 'Unknown customer' })
           // Merge changes onto the current row (camelCase keys expected), then
           // re-validate through parseCustomer so the result is always valid.

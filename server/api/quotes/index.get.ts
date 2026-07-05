@@ -42,8 +42,7 @@ export default defineEventHandler(async (event) => {
   }
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
 
   return quotes.map((q) => {

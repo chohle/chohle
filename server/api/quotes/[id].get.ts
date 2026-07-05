@@ -25,8 +25,7 @@ export default defineEventHandler(async (event) => {
     ? ((db
         .prepare(`SELECT id, name, direction FROM projects WHERE id = ?`)
         .get(quote.project_id) as
-        | { id: number; name: string; direction: 'sales' | 'procurement' }
-        | undefined) ?? null)
+        { id: number; name: string; direction: 'sales' | 'procurement' } | undefined) ?? null)
     : null
 
   const convertedInvoice = quote.converted_invoice_id
@@ -47,8 +46,7 @@ export default defineEventHandler(async (event) => {
 
   const vat = !!(
     db.prepare('SELECT vat_registered FROM sender WHERE id = 1').get() as
-      | { vat_registered: number }
-      | undefined
+      { vat_registered: number } | undefined
   )?.vat_registered
 
   const totals = computeInvoiceTotals(

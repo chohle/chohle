@@ -23,8 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const sender = db.prepare('SELECT iban FROM sender WHERE id = 1').get() as
-    | { iban: string }
-    | undefined
+    { iban: string } | undefined
   const iban = (sender?.iban ?? '').replace(/\s/g, '')
   if (!iban) {
     throw createError({
@@ -69,8 +68,7 @@ export default defineEventHandler(async (event) => {
     // activation (the user may already have sent the bank a letter for them);
     // generate fresh otherwise. The whole config is encrypted at rest.
     const existing = db.prepare('SELECT config FROM bank_connections LIMIT 1').get() as
-      | { config: string | null }
-      | undefined
+      { config: string | null } | undefined
     let keys = generateEbicsKeys()
     try {
       const prev = existing?.config ? JSON.parse(decryptSecret(existing.config)) : null
