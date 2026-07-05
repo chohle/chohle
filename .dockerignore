@@ -4,7 +4,13 @@ node_modules
 .nitro
 .cache
 .git
+.github
+.idea
 data
+dbdata
+docs
+test
+ai-images
 *.log
 .DS_Store
 .yarn/cache
