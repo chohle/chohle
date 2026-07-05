@@ -172,6 +172,7 @@
     margin: 0;
     text-align: left;
     cursor: pointer;
+
     // Don't use the `font` shorthand, it expands to font-size:<inherited>
     // and overrides the 13px from .nav-item (same specificity, declared later).
     font-family: inherit;

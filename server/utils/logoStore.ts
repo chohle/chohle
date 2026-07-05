@@ -37,8 +37,14 @@ export async function replaceLogo(
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
   const storedName = await saveImageUpload(event, opts.allowedTypes)
-  await deleteUpload(current.logo_path)
   db.prepare(`UPDATE ${table} SET logo_path = ? WHERE id = ?`).run(storedName, id)
+  // Best-effort cleanup after the DB points at the new file: a filesystem
+  // hiccup here must not fail the request or orphan the fresh upload.
+  try {
+    await deleteUpload(current.logo_path)
+  } catch {
+    // Old file stays behind on disk; harmless and retried on the next replace.
+  }
   return { ok: true }
 }
 
