@@ -19,7 +19,10 @@
   "dependencies": {
     "@nuxt/ui": "^4.8.2",
     "@nuxtjs/i18n": "^10.4.0",
+    "@tiptap/core": "^3.27.1",
+    "@tiptap/extension-list": "^3.27.1",
     "@tiptap/extension-text-align": "^3.23.6",
+    "@tiptap/vue-3": "^3.27.1",
     "better-sqlite3": "^12.10.0",
     "fast-xml-parser": "^5.8.0",
     "fflate": "^0.8.3",
@@ -37,6 +40,7 @@
   },
   "packageManager": "yarn@4.11.0",
   "resolutions": {
+    "esbuild@^0.25.4": "^0.28.1",
     "esbuild@^0.27.0": "^0.28.1"
   },
   "devDependencies": {
@@ -45,7 +49,6 @@
     "@types/mailparser": "^3.4.6",
     "@types/nodemailer": "^8.0.0",
     "@types/pdfkit": "^0.17.6",
-    "playwright": "^1.60.0",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "sass-embedded": "^1.100.0",
