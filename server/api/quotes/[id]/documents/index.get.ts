@@ -2,10 +2,7 @@
 // JSON object so the editor can load it directly.
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const quoteId = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(quoteId)) {
-    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
-  }
+  const quoteId = requireIdParam(event)
   const rows = useDb()
     .prepare(
       `SELECT id, title, content, kind, file_name, mime, attach, sort_order, updated_at

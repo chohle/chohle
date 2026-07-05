@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import DOMPurify from 'isomorphic-dompurify'
-
 // The preview body is owner-authored template HTML with customer fields
 // substituted in; sanitize before binding via v-html, same as the inbound
 // email renderers in conversations.vue / ProjectDetailView.vue.
-function sanitizeHtml(html: string) {
-  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
-}
 
 interface ReminderRow {
   invoice_id: number
@@ -38,13 +33,6 @@ const {
 
 const eligible = computed(() => (rows.value ?? []).filter((r) => r.eligible))
 const waiting = computed(() => (rows.value ?? []).filter((r) => !r.eligible))
-
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
 
 const eligibleTotal = computed(() => eligible.value.reduce((s, r) => s + r.total_rappen, 0))
 const waitingTotal = computed(() => waiting.value.reduce((s, r) => s + r.total_rappen, 0))

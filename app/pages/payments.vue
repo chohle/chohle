@@ -18,12 +18,6 @@ const { locale } = useI18n()
 const year = ref(new Date().getFullYear())
 const { data, error, refresh } = await useFetch<Payload>('/api/payments', { query: { year } })
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
 function monthLabel(ym: string) {
   return new Date(`${ym}-01`).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
 }

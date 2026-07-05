@@ -83,13 +83,6 @@ async function remove(id: number) {
   await $fetch(`/api/articles/${id}`, { method: 'DELETE' })
   await refresh()
 }
-
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
 </script>
 
 <template>

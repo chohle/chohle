@@ -8,7 +8,7 @@ const toast = useToast()
 const file = ref<File | null>(null)
 const loading = ref(false)
 
-// Upload the picked image to the server and insert it by hosted URL — never as
+// Upload the picked image to the server and insert it by hosted URL, never as
 // a base64 data URI, which several email clients (Gmail) refuse to display.
 watch(file, async (newFile) => {
   if (!newFile) return

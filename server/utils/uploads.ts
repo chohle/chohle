@@ -19,14 +19,6 @@ export function emailAssetsDir(): string {
   return dir
 }
 
-export const ALLOWED_RECEIPT_TYPES = [
-  'application/pdf',
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/gif'
-]
-
 // SVG is intentionally excluded: it can carry inline <script>/onload that
 // executes when the file is opened directly, and these uploads are served
 // from the app's own origin. Raster formats cover the logo use case.

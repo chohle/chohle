@@ -2,10 +2,7 @@
 // (status='dismissed') so the next sync doesn't re-triage the same message.
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isFinite(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const db = useDb()
   const info = db

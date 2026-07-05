@@ -2,10 +2,7 @@
 // promoted so there's still a default to preselect when composing.
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
-  }
+  const id = requireIdParam(event)
   const db = useDb()
   const row = db.prepare(`SELECT is_default FROM signatures WHERE id = ?`).get(id) as
     | { is_default: number }

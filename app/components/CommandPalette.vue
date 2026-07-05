@@ -96,7 +96,7 @@ function fetchNow() {
       if (id === requestId) result.value = r
     } catch (err) {
       // Swallow so the rejection doesn't bubble as unhandled. Clear results
-      // on the live request only — a stale rejection mustn't wipe newer data.
+      // on the live request only, a stale rejection mustn't wipe newer data.
       if (id === requestId) result.value = { ...empty }
       console.error('[search] fetch failed', err)
     } finally {

@@ -11,11 +11,11 @@
 # first boot, so the domain must already resolve here and ports 80/443 open.
 services:
   app:
-    # Published multi-arch image. Pin a version for reproducible deploys, e.g.
-    # `ghcr.io/chohle/chohle:0.0.1` (see the Releases page / CHANGELOG.md). To
-    # build from source instead, replace this line with:
+    # Published multi-arch image. Set CHOHLE_TAG in .env to pin a version for
+    # reproducible deploys, e.g. CHOHLE_TAG=0.0.1 (see the Releases page /
+    # CHANGELOG.md). To build from source instead, replace this line with:
     #   build: { context: ., target: prod }
-    image: ghcr.io/chohle/chohle:latest
+    image: ghcr.io/chohle/chohle:${CHOHLE_TAG:-latest}
     restart: unless-stopped
     environment:
       - NUXT_HOST=0.0.0.0

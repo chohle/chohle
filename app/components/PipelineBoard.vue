@@ -70,13 +70,6 @@ const stageMeta: Record<Stage, { title: string; dot: string }> = {
   accepted: { title: t('pipeline.stage.accepted'), dot: 'var(--ink)' }
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
-
 const totals = computed<Record<Stage, number>>(() => {
   const r = {} as Record<Stage, number>
   for (const s of STAGES) r[s] = board[s].reduce((sum, p) => sum + p.budget_rappen, 0)
@@ -184,15 +177,11 @@ function openEdit(p: Project) {
 }
 
 const formRef = ref()
-// Basic RFC-ish check, good enough to catch typos like "aadsf" without
-// rejecting valid edge cases. Server is the source of truth.
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 function validate(state: FormState) {
   const errors: { name: string; message: string }[] = []
   if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
   if (!state.email.trim()) errors.push({ name: 'email', message: t('validation.required') })
-  else if (!EMAIL_RE.test(state.email.trim()))
+  else if (!isValidEmail(state.email.trim()))
     errors.push({ name: 'email', message: t('validation.email') })
   if (!state.phone.trim()) errors.push({ name: 'phone', message: t('validation.required') })
   return errors

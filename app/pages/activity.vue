@@ -63,7 +63,7 @@ function isoFromYMD(y: number, m: number, d: number) {
   return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 }
 
-// Window per period — half-open [start, end).
+// Window per period, half-open [start, end).
 const window_ = computed<{ start: string; end: string | null }>(() => {
   if (period.value === 'week') return { start: sevenDaysAgoIso, end: null }
   if (period.value === 'month') {
@@ -77,7 +77,7 @@ const window_ = computed<{ start: string; end: string | null }>(() => {
       end: isoFromYMD(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 1)
     }
   }
-  // custom — exact month chosen via MonthSelect (YYYY-MM).
+  // custom - exact month chosen via MonthSelect (YYYY-MM).
   const [y, m] = customMonth.value.split('-').map(Number) as [number, number]
   const next = new Date(y, m, 1)
   return {
@@ -114,13 +114,6 @@ const groups = computed(() => {
     { label: t('activity.earlier'), items: earlier }
   ].filter((g) => g.items.length)
 })
-
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
 
 function relTime(iso: string): string {
   const days = Math.floor((Date.parse(todayIso) - Date.parse(iso)) / 86_400_000)

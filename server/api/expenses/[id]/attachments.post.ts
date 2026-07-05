@@ -5,10 +5,7 @@ import { join } from 'node:path'
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const expenseId = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(expenseId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const expenseId = requireIdParam(event)
 
   const db = useDb()
   if (!db.prepare('SELECT id FROM expenses WHERE id = ?').get(expenseId)) {

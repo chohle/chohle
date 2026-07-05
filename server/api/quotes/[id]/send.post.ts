@@ -9,10 +9,7 @@
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const { subject, message, signature_id } = await readBody(event)
   if (!subject?.trim() || !message?.trim()) {
@@ -73,16 +70,8 @@ export default defineEventHandler(async (event) => {
 
   const pdf = await generateQuotePdf(id)
 
-  const from = sender.email
-    ? `${sender.name} <${sender.email}>`
-    : `${sender.name} <no-reply@chohle.local>`
-  let signatureHtml: string | undefined
-  if (Number.isInteger(Number(signature_id))) {
-    const sig = db
-      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
-      .get(Number(signature_id)) as { content_html: string } | undefined
-    signatureHtml = sig?.content_html || undefined
-  }
+  const from = senderFromAddress(sender)
+  const signatureHtml = resolveSignatureHtml(db, signature_id)
   const { html, text } = await buildBrandedEmail(sender, message, { signatureHtml })
 
   // Attach the quote PDF plus every document flagged attach=1, rendered to PDF.

@@ -35,13 +35,6 @@ watchEffect(() => {
   if (years.length && !years.includes(year.value)) year.value = years[0]!
 })
 
-/** Format Rappen as a Swiss-formatted CHF amount. */
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
 /** Format an ISO date as Swiss dd.mm.yyyy. */
 function fmtDate(iso: string) {
   const [y, m, d] = (iso || '').split('-')
@@ -117,20 +110,20 @@ async function onReceipt(e: Event) {
         <UiKpiCell
           :label="$t('taxExport.income')"
           currency="CHF"
-          :value="chf(data.income.totalRappen)"
-          :delta="`${$t('taxExport.invoices')} ${chf(data.income.invoiceRappen)}  ·  ${$t('taxExport.salary')} ${chf(data.income.salaryRappen)}`"
+          :value="chf(data.income.totalRappen, 2)"
+          :delta="`${$t('taxExport.invoices')} ${chf(data.income.invoiceRappen, 2)}  ·  ${$t('taxExport.salary')} ${chf(data.income.salaryRappen, 2)}`"
         />
         <UiKpiCell
           :label="$t('taxExport.expenses')"
           currency="CHF"
-          :value="chf(data.expenseRappen)"
+          :value="chf(data.expenseRappen, 2)"
           inverted
           :delta="`${data.expenseCount} ${$t('taxExport.bookings')}`"
         />
         <UiKpiCell
           :label="$t('taxExport.net')"
           currency="CHF"
-          :value="chf(data.netRappen)"
+          :value="chf(data.netRappen, 2)"
           :delta="$t('taxExport.netHint')"
         />
       </UiKpiRow>
@@ -140,15 +133,15 @@ async function onReceipt(e: Event) {
         <div class="tax-vat__items">
           <span
             ><span class="note">{{ $t('taxExport.vatOutput') }}</span> CHF
-            {{ chf(data.vat.outputRappen) }}</span
+            {{ chf(data.vat.outputRappen, 2) }}</span
           >
           <span
             ><span class="note">{{ $t('taxExport.vatInput') }}</span> CHF
-            {{ chf(data.vat.inputRappen) }}</span
+            {{ chf(data.vat.inputRappen, 2) }}</span
           >
           <span class="tax-vat__net"
             ><span class="note">{{ $t('taxExport.vatNet') }}</span> CHF
-            {{ chf(data.vat.netVatRappen) }}</span
+            {{ chf(data.vat.netVatRappen, 2) }}</span
           >
         </div>
       </div>
@@ -171,7 +164,7 @@ async function onReceipt(e: Event) {
             <li v-for="m in data.missing" :key="m.id">
               <span class="mono note">{{ fmtDate(m.date) }}</span>
               <span class="tax-missing__name">{{ m.vendor || m.title }}</span>
-              <span class="mono">CHF {{ chf(m.grossRappen) }}</span>
+              <span class="mono">CHF {{ chf(m.grossRappen, 2) }}</span>
               <button
                 type="button"
                 class="tax-missing__add"

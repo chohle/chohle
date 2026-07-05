@@ -57,15 +57,11 @@ const typeItems = computed(() => [
   { label: t('customers.typeCompany'), value: 'company' }
 ])
 
-// Basic RFC-ish check — good enough to catch typos like "aadsf" without
-// rejecting valid edge cases. Server is the source of truth.
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 function validate(state: typeof form) {
   const errors: { name: string; message: string }[] = []
   if (!state.name.trim()) errors.push({ name: 'name', message: t('validation.required') })
   if (!state.email.trim()) errors.push({ name: 'email', message: t('validation.required') })
-  else if (!EMAIL_RE.test(state.email.trim()))
+  else if (!isValidEmail(state.email.trim()))
     errors.push({ name: 'email', message: t('validation.email') })
   if (!state.iban.trim()) errors.push({ name: 'iban', message: t('validation.required') })
   return errors

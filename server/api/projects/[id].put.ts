@@ -46,10 +46,7 @@ function stagesFor(direction: 'sales' | 'procurement') {
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isFinite(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const body = await readBody<Body>(event)
   const db = useDb()

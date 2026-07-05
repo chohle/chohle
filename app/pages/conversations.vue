@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import DOMPurify from 'isomorphic-dompurify'
-
 interface ThreadRow {
   project_id: number
   project_name: string
@@ -110,10 +108,6 @@ function fmtTimestamp(s: string) {
   const ymd = s.slice(0, 10)
   const hm = s.slice(11, 16)
   return hm ? `${dateCh(ymd)} · ${hm}` : dateCh(ymd)
-}
-
-function sanitizeHtml(html: string) {
-  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
 }
 
 // `tabindex="0"` rows are keyboard navigable. Scroll the selected thread row

@@ -80,12 +80,6 @@ const footerLine = computed(() => {
   return [s.phone, s.email, s.website, s.mwst].filter(Boolean).join(' · ')
 })
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
 function lineAmount(i: Item) {
   return lineNetRappen({
     quantity: i.quantity,
@@ -185,8 +179,8 @@ function printPage() {
               <td class="py-2 pr-3">{{ i.description }}</td>
               <td class="px-3 py-2 text-right tabular-nums">{{ i.quantity }}</td>
               <td class="px-3 py-2">{{ i.unit }}</td>
-              <td class="px-3 py-2 text-right tabular-nums">{{ chf(i.unit_price_rappen) }}</td>
-              <td class="py-2 pl-3 text-right tabular-nums">{{ chf(lineAmount(i)) }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ chf(i.unit_price_rappen, 2) }}</td>
+              <td class="py-2 pl-3 text-right tabular-nums">{{ chf(lineAmount(i), 2) }}</td>
             </tr>
           </tbody>
         </table>
@@ -197,17 +191,17 @@ function printPage() {
             <tbody>
               <tr>
                 <td class="py-0.5 pr-12 text-gray-600">{{ td('invoiceDoc.sumInChf') }}</td>
-                <td class="py-0.5 text-right tabular-nums">{{ chf(totals.nettoRappen) }}</td>
+                <td class="py-0.5 text-right tabular-nums">{{ chf(totals.nettoRappen, 2) }}</td>
               </tr>
               <tr v-for="r in totals.mwstByRate" :key="r.rate">
                 <td class="py-0.5 pr-12 text-gray-600">
                   {{ td('invoiceDoc.vatLine', { rate: r.rate }) }}
                 </td>
-                <td class="py-0.5 text-right tabular-nums">{{ chf(r.mwstRappen) }}</td>
+                <td class="py-0.5 text-right tabular-nums">{{ chf(r.mwstRappen, 2) }}</td>
               </tr>
               <tr class="border-t border-black font-bold">
                 <td class="py-1.5 pr-12">{{ td('invoiceDoc.invoiceAmountChf') }}</td>
-                <td class="py-1.5 text-right tabular-nums">{{ chf(totals.totalRappen) }}</td>
+                <td class="py-1.5 text-right tabular-nums">{{ chf(totals.totalRappen, 2) }}</td>
               </tr>
             </tbody>
           </table>

@@ -7,10 +7,7 @@ import { isIBANValid } from 'swissqrbill/utils'
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const { subject, message, signature_id } = await readBody(event)
   if (!subject?.trim() || !message?.trim()) {
@@ -19,9 +16,16 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
   const invoice = db
-    .prepare('SELECT id, customer_id, number FROM invoices WHERE id = ?')
-    .get(id) as { customer_id: number; number: string } | undefined
+    .prepare('SELECT id, customer_id, number, status FROM invoices WHERE id = ?')
+    .get(id) as { customer_id: number; number: string; status: string } | undefined
   if (!invoice) throw createError({ statusCode: 404, statusMessage: 'Invoice not found' })
+
+  // Refuse to send a paid invoice: the status reset below would silently wipe
+  // paid_at and the frozen total_rappen snapshot. Unmark it as paid first
+  // (edit the invoice) if a re-send is really intended.
+  if (invoice.status === 'paid') {
+    throw createError({ statusCode: 409, statusMessage: 'Invoice is already paid' })
+  }
 
   const customer = db
     .prepare('SELECT name, email FROM customers WHERE id = ?')
@@ -61,16 +65,8 @@ export default defineEventHandler(async (event) => {
 
   const pdf = await generateInvoicePdf(id)
 
-  const from = sender.email
-    ? `${sender.name} <${sender.email}>`
-    : `${sender.name} <no-reply@chohle.local>`
-  let signatureHtml: string | undefined
-  if (Number.isInteger(Number(signature_id))) {
-    const sig = db
-      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
-      .get(Number(signature_id)) as { content_html: string } | undefined
-    signatureHtml = sig?.content_html || undefined
-  }
+  const from = senderFromAddress(sender)
+  const signatureHtml = resolveSignatureHtml(db, signature_id)
   const { html, text } = await buildBrandedEmail(sender, message, { signatureHtml })
   await getMailer().sendMail({
     from,

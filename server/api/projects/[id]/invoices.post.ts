@@ -5,10 +5,7 @@
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const projectId = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(projectId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const projectId = requireIdParam(event)
 
   const db = useDb()
   const project = db

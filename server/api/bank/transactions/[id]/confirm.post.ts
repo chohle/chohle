@@ -7,10 +7,7 @@ import { ReconcileError, confirmTransaction } from '~~/server/utils/reconcile'
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const body = await readBody(event)
   const invoiceId = Number(body?.invoice_id ?? body?.invoiceId)

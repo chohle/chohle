@@ -133,7 +133,7 @@ const items = ref<EditRow[]>(
 const articleNames = computed(() => articles.value.map((a) => a.name))
 
 // When the typed article name exactly matches a saved article, remember the id
-// and autofill unit/price/VAT — but only the fields the user hasn't filled, so
+// and autofill unit/price/VAT, but only the fields the user hasn't filled, so
 // a free-typed line is never clobbered.
 function onArticleName(row: EditRow) {
   const name = row.articleName.trim()
@@ -205,13 +205,6 @@ function answerLeave(v: boolean) {
   resolveLeave = null
 }
 useDirtyGuard(() => dirty.value, confirmLeave)
-
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
 
 async function save() {
   saving.value = true
@@ -409,7 +402,7 @@ async function onDocFile(e: Event) {
   }
 }
 
-// Open/closed state for the optional sections — a plain ref the user controls
+// Open/closed state for the optional sections, a plain ref the user controls
 // (NOT bound to content length, which would fight a manual collapse). Start
 // open when there's already something in the section.
 const refsOpen = ref(references.value.length > 0)
@@ -638,7 +631,7 @@ const isExpired = computed(
             class="w-full"
           />
           <div class="amt mono">
-            <span>CHF {{ chf(lineAmount(row)) }}</span>
+            <span>CHF {{ chf(lineAmount(row), 2) }}</span>
             <button type="button" class="icon-btn" @click="removeRow(i)">
               <UIcon name="i-lucide-x" />
             </button>
@@ -660,15 +653,15 @@ const isExpired = computed(
       <dl class="totals">
         <div v-if="vat" class="t-row">
           <dt class="eyebrow">{{ $t('invoices.netto') }}</dt>
-          <dd class="mono">CHF {{ chf(totals.nettoRappen) }}</dd>
+          <dd class="mono">CHF {{ chf(totals.nettoRappen, 2) }}</dd>
         </div>
         <div v-for="r in totals.mwstByRate" :key="r.rate" class="t-row">
           <dt class="eyebrow">{{ $t('common.vat') }} {{ r.rate }}%</dt>
-          <dd class="mono">CHF {{ chf(r.mwstRappen) }}</dd>
+          <dd class="mono">CHF {{ chf(r.mwstRappen, 2) }}</dd>
         </div>
         <div class="t-row total">
           <dt class="eyebrow">{{ $t('common.total') }}</dt>
-          <dd class="mono">CHF {{ chf(totals.totalRappen) }}</dd>
+          <dd class="mono">CHF {{ chf(totals.totalRappen, 2) }}</dd>
         </div>
       </dl>
     </UiCard>

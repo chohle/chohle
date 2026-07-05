@@ -132,13 +132,6 @@ async function togglePaid(id: number) {
   await refresh()
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
-
 const totalMonth = computed(() => data.value.sources.reduce((s, x) => s + x.salary_rappen, 0))
 const totalPaid = computed(() =>
   data.value.sources.filter((s) => s.paid).reduce((s, x) => s + x.salary_rappen, 0)

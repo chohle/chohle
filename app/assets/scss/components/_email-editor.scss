@@ -14,7 +14,7 @@
     resize: vertical;
 
     // Make the editable surface fill the whole box below the toolbar, so a
-    // click anywhere lands the cursor — not only on the first line of text.
+    // click anywhere lands the cursor, not only on the first line of text.
     // UEditor nests the .ProseMirror inside an [data-slot="content"] wrapper;
     // both need to stretch and pass the height down.
     [data-slot="content"] {
@@ -42,7 +42,7 @@
   }
 
   // Tiptap's editable element ships with horizontal padding via the
-  // Nuxt UI theme but no vertical padding — paragraphs glue to the
+  // Nuxt UI theme but no vertical padding. Paragraphs glue to the
   // toolbar/footer otherwise. Give the editable surface breathing room.
   [contenteditable="true"] {
     padding-top: 16px;

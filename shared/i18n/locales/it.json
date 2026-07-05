@@ -157,7 +157,6 @@
     "deleteConfirmTitle": "Eliminare questa offerta?",
     "deleteConfirmText": "Elimina l'offerta e tutte le sue righe. Non si può annullare.",
     "deletedToast": "Offerta eliminata",
-    "noProjectForConvert": "Collega l'offerta a un progetto prima di convertirla; le fatture richiedono un progetto.",
     "untitledQuote": "Offerta senza titolo",
     "noProject": "Nessun progetto collegato",
     "openInvoice": "Apri fattura",
@@ -184,10 +183,7 @@
     "docUpload": "Carica file",
     "docUploadFailed": "Caricamento non riuscito",
     "saveFailed": "Impossibile salvare l'offerta",
-    "docActionFailed": "Impossibile aggiornare il documento",
-    "tabDetails": "Offerta",
-    "tabReferences": "Riferimenti",
-    "tabDocuments": "Documenti"
+    "docActionFailed": "Impossibile aggiornare il documento"
   },
   "pipeline": {
     "title": "Pipeline",
@@ -316,8 +312,7 @@
     "logout": "Esci"
   },
   "topbar": {
-    "newInvoice": "Nuova fattura",
-    "menu": "Apri il menu"
+    "newInvoice": "Nuova fattura"
   },
   "sidebar": {
     "collapse": "Riduci",
@@ -325,7 +320,6 @@
   },
   "search": {
     "placeholder": "Cerca ...",
-    "hint": "Digita per cercare fatture, clienti, articoli, spese e progetti.",
     "empty": "Nessun risultato.",
     "scopeLabel": "Ambito di ricerca",
     "scope": {
@@ -344,11 +338,6 @@
   "settings": {
     "subtitle": "Preferenze dell'app.",
     "tabGeneral": "Generale",
-    "appearance": "Aspetto",
-    "appearanceHelp": "Scegli il tema dei colori.",
-    "themeSystem": "Sistema",
-    "themeLight": "Chiaro",
-    "themeDark": "Scuro",
     "yourData": "I tuoi dati",
     "yourDataText": "Tutto si trova nella cartella {folder}: il database SQLite e i tuoi file caricati. Esegui il backup di questa cartella e avrai eseguito il backup di tutto.",
     "emailTemplate": "Modello e-mail",
@@ -386,7 +375,6 @@
       "waitDaysHelpAfterPrevious": "Giorni da attendere dopo il sollecito precedente prima che questo sia pronto.",
       "subject": "Oggetto",
       "body": "Corpo",
-      "bodyHelp": "Intestazione e piè di pagina vengono aggiunti automaticamente all'invio.",
       "placeholders": "Segnaposto",
       "phAmount": "Importo fattura (CHF)",
       "phIssued": "Data fattura",
@@ -406,7 +394,6 @@
       "emptyText": "Scegli un provider qui sotto per collegare la prima mailbox.",
       "lastSync": "Ultima sincronizzazione",
       "neverSynced": "Mai sincronizzata",
-      "comingSoon": "In arrivo",
       "outlookDesc": "Microsoft 365 o account Outlook personale",
       "outlookConnectTitle": "Collega Outlook",
       "outlookConnectHint": "Incolla il Client ID e il Tenant ID della tua app Azure, poi accedi con Microsoft per autorizzare chohle. La configurazione una tantum dell'app Azure è descritta in docs/OUTLOOK_SYNC.md.",
@@ -449,10 +436,6 @@
     "expected": "Previsto",
     "outstanding": "CHF {amount} in sospeso",
     "fromInvoices": "di cui CHF {amount} da fatture",
-    "vsLastMonth": "vs mese scorso",
-    "expensesByCategory": "Spese per categoria",
-    "noExpensesTitle": "Nessuna spesa questo mese",
-    "noExpensesText": "Le spese che aggiungi verranno suddivise qui per categoria.",
     "trend": "Andamento a 6 mesi",
     "cashflow": "Cashflow {year}",
     "recurring": "Entrate ricorrenti questo mese",
@@ -684,7 +667,6 @@
     "toastSaved": "Fattura salvata",
     "send": "Invia",
     "continue": "Continua",
-    "markSent": "Segna come inviata",
     "markPaid": "Segna come pagata",
     "markUnpaid": "Segna come non pagata",
     "recipient": "Destinatario",
@@ -768,8 +750,6 @@
     "back": "Indietro",
     "prevMonth": "Mese precedente",
     "nextMonth": "Mese successivo",
-    "prevYear": "Anno precedente",
-    "nextYear": "Anno successivo",
     "save": "Salva",
     "edit": "Modifica",
     "date": "Data",
@@ -818,7 +798,6 @@
     "importError": "Importazione non riuscita",
     "summary": "{total} transazioni · {auto} abbinate automaticamente · {suggested} suggerimenti · {unmatched} non abbinate",
     "summaryDuplicates": "{n} già importate",
-    "queueTitle": "Da verificare",
     "queueEmptyTitle": "Niente da verificare",
     "queueEmptyText": "Ogni pagamento in entrata è abbinato.",
     "unknownDebtor": "Mittente sconosciuto",
@@ -847,12 +826,10 @@
     "connManage": "Gestisci",
     "connSyncNow": "Sincronizza ora",
     "connDisconnect": "Scollega",
-    "connProvider": "Fornitore",
     "connProvider_folder": "Cartella (file camt.053)",
     "connProvider_ebics": "EBICS (protocollo bancario)",
     "connFolderDir": "Percorso cartella",
     "connFolderHint": "Percorso in cui la tua banca deposita i file camt.053 (es. un mount SFTP).",
-    "connEbicsNote": "Configura il tuo accesso EBICS. Le chiavi vengono generate al salvataggio.",
     "connEbicsHostUrl": "URL host EBICS",
     "connEbicsHostId": "ID host",
     "connEbicsPartnerId": "ID partner",

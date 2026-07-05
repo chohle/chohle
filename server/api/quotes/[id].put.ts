@@ -9,10 +9,7 @@
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
 
-  const id = Number(getRouterParam(event, 'id'))
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid id' })
-  }
+  const id = requireIdParam(event)
 
   const db = useDb()
   const current = db.prepare('SELECT project_id, customer_id FROM quotes WHERE id = ?').get(id) as

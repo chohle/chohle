@@ -10,6 +10,7 @@
 
 import type { Database } from 'better-sqlite3'
 import { decryptSecret, encryptSecret } from './secrets'
+import { externalFetch } from './externalFetch'
 import type { SyncResult } from './mailbox'
 import { loadHandledInboundIds, triageInbound } from './triage'
 
@@ -144,7 +145,8 @@ async function listInboxIdsSince(token: string, sinceUnix: number): Promise<stri
     `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${q}&maxResults=50`
   const ids: string[] = []
   while (url && ids.length < 200) {
-    const res: GmailListResponse = await $fetch(url, {
+    // externalFetch: $fetch on this dynamic URL trips TS2321 (see externalFetch.ts).
+    const res: GmailListResponse = await externalFetch<GmailListResponse>(url, {
       headers: { Authorization: `Bearer ${token}` }
     })
     for (const m of res.messages ?? []) ids.push(m.id)

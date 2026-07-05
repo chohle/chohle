@@ -40,12 +40,6 @@ const draftTotal = computed(() => sumBy('draft'))
 const sentTotal = computed(() => sumBy('sent'))
 const acceptedTotal = computed(() => sumBy('accepted'))
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
 function open(id: number) {
   navigateTo(`/quotes/${id}`)
 }

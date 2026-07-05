@@ -33,12 +33,6 @@ const paidTotal = computed(() => sumBy('paid'))
 const sentTotal = computed(() => sumBy('sent'))
 const draftTotal = computed(() => sumBy('draft'))
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
-}
 function open(id: number) {
   navigateTo(`/invoices/${id}`)
 }

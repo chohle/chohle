@@ -15,32 +15,10 @@ export default defineEventHandler(async (event) => {
   const { body_html, signature_id, signature_html } = await readBody<Body>(event)
 
   const db = useDb()
-  const sender = (db
-    .prepare('SELECT name, email, phone, website, mwst, logo_path FROM sender WHERE id = 1')
-    .get() as {
-    name: string
-    email: string | null
-    phone: string | null
-    website: string | null
-    mwst: string | null
-    logo_path: string | null
-  } | null) ?? {
-    name: 'chohle',
-    email: null,
-    phone: null,
-    website: null,
-    mwst: null,
-    logo_path: null
-  }
+  const sender = senderRowOrDefault(db)
 
   // Resolve the signature: explicit html (live editing) wins, else by id.
-  let signatureHtml = signature_html?.trim() || undefined
-  if (!signatureHtml && Number.isInteger(Number(signature_id))) {
-    const sig = db
-      .prepare(`SELECT content_html FROM signatures WHERE id = ?`)
-      .get(Number(signature_id)) as { content_html: string } | undefined
-    signatureHtml = sig?.content_html || undefined
-  }
+  const signatureHtml = signature_html?.trim() || resolveSignatureHtml(db, signature_id)
 
   // Real message when given; otherwise a neutral, language-agnostic placeholder
   // (faint bars) so a signature can be previewed without inventing prose.

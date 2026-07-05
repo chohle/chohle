@@ -244,13 +244,6 @@ async function setStatus(status: InvoiceRow['status']) {
   await save()
 }
 
-function chf(rappen: number) {
-  return (rappen / 100).toLocaleString('de-CH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
-
 const custLocale = (customer.value?.language ?? 'en') as Parameters<typeof loadLocaleMessages>[0]
 await loadLocaleMessages(custLocale)
 const td = (key: string, named?: Record<string, unknown>) =>
@@ -430,7 +423,7 @@ const sendPreview = ref(false)
                 <UInput v-model.number="row.mwstPercent" type="number" step="0.1" class="w-full" />
               </UFormField>
               <div class="amt mono">
-                <span>CHF {{ chf(lineAmount(row)) }}</span>
+                <span>CHF {{ chf(lineAmount(row), 2) }}</span>
                 <button type="button" class="icon-btn" @click="removeRow(i)">
                   <UIcon name="i-lucide-x" />
                 </button>
@@ -448,15 +441,15 @@ const sendPreview = ref(false)
           <dl class="totals">
             <div v-if="vat" class="t-row">
               <dt class="eyebrow">{{ $t('invoices.netto') }}</dt>
-              <dd class="mono">CHF {{ chf(totals.nettoRappen) }}</dd>
+              <dd class="mono">CHF {{ chf(totals.nettoRappen, 2) }}</dd>
             </div>
             <div v-for="r in totals.mwstByRate" :key="r.rate" class="t-row">
               <dt class="eyebrow">{{ $t('common.vat') }} {{ r.rate }}%</dt>
-              <dd class="mono">CHF {{ chf(r.mwstRappen) }}</dd>
+              <dd class="mono">CHF {{ chf(r.mwstRappen, 2) }}</dd>
             </div>
             <div class="t-row total">
               <dt class="eyebrow">{{ $t('common.total') }}</dt>
-              <dd class="mono">CHF {{ chf(totals.totalRappen) }}</dd>
+              <dd class="mono">CHF {{ chf(totals.totalRappen, 2) }}</dd>
             </div>
           </dl>
         </UiCard>
@@ -484,7 +477,7 @@ const sendPreview = ref(false)
             <div class="preview-row">
               <div>
                 <div class="eyebrow">{{ $t('common.total') }}</div>
-                <div class="preview-amt mono">CHF {{ chf(totals.totalRappen) }}</div>
+                <div class="preview-amt mono">CHF {{ chf(totals.totalRappen, 2) }}</div>
               </div>
               <button class="ed-btn" @click="previewPdf">
                 <UIcon name="i-lucide-file-text" class="size-3.5" /> {{ $t('invoices.pdfPreview') }}
@@ -571,7 +564,7 @@ const sendPreview = ref(false)
               header.status === 'paid' ? $t('invoices.paidDone') : $t('invoices.awaitingPayment')
             }}
           </div>
-          <div class="paid-amt tabular">CHF {{ chf(totals.totalRappen) }}</div>
+          <div class="paid-amt tabular">CHF {{ chf(totals.totalRappen, 2) }}</div>
           <div class="paid-actions">
             <button class="ed-btn-ghost" @click="step = 1">
               <UIcon name="i-lucide-arrow-left" class="size-3.5" /> {{ $t('common.back') }}
