@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/chohle/chohle/compare/v0.0.1...v0.0.2) (2026-07-26)
+
+
+### Refactoring
+
+* audit cleanup, dead code removal, and config fixes ([#50](https://github.com/chohle/chohle/issues/50)) ([a091cdb](https://github.com/chohle/chohle/commit/a091cdb5ca144ae540154a6e5f91efc5a82e7338))
+
 ## 0.0.1 (2026-06-25)
 
 
