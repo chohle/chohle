@@ -3219,11 +3219,11 @@ __metadata:
   linkType: hard
 
 "@tiptap/core@npm:^3.27.1, @tiptap/core@npm:^3.27.3, @tiptap/core@npm:^3.28.0":
-  version: 3.28.0
-  resolution: "@tiptap/core@npm:3.28.0"
+  version: 3.31.0
+  resolution: "@tiptap/core@npm:3.31.0"
   peerDependencies:
-    "@tiptap/pm": 3.28.0
-  checksum: 10c0/a7a6f09ad01491bab03d442fb10b6b30a04eaa42be3bad5a1d12d2b2d2bfefe4dba172b9b62324eb102dd50d997ee0d104e563eb4a7c6b4753b95bf70ffc6b68
+    "@tiptap/pm": 3.31.0
+  checksum: 10c0/b0682197944088fe9f745867cb889502a4364d1177c218ed22dc47a6f902288f46d7de7f43b24bdb4bb9aa51a0ace4f02e37850f7bb281db90ccd5c41d73f97f
   languageName: node
   linkType: hard
 
@@ -8664,13 +8664,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-expression-matcher@npm:^1.6.2":
-  version: 1.6.2
-  resolution: "path-expression-matcher@npm:1.6.2"
-  checksum: 10c0/8241302f563de367a81acacd417055a22dd3792a84700569dc2a7888da31aa18eb01131c55f05200c92790b6c45b01fee1984b02540cc5f15726ba1b73a8a075
-  languageName: node
-  linkType: hard
-
 "path-key@npm:^3.1.0":
   version: 3.1.1
   resolution: "path-key@npm:3.1.1"
@@ -12224,13 +12217,6 @@ __metadata:
   version: 5.0.0
   resolution: "xml-name-validator@npm:5.0.0"
   checksum: 10c0/3fcf44e7b73fb18be917fdd4ccffff3639373c7cb83f8fc35df6001fecba7942f1dbead29d91ebb8315e2f2ff786b508f0c9dc0215b6353f9983c6b7d62cb1f5
-  languageName: node
-  linkType: hard
-
-"xml-naming@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "xml-naming@npm:0.3.0"
-  checksum: 10c0/48bfc4fe888cdf1c3eceb7853632ebce59e4aa71f0ae33c3f9ce1fbd3213caad293457de0a311114491f0d4efcfba70977dcba3a4f66dfed8c92edbb938056bf
   languageName: node
   linkType: hard
 
