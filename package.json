@@ -27,7 +27,7 @@
     "fast-xml-parser": "^5.9.3",
     "fflate": "^0.8.3",
     "imapflow": "^1.4.6",
-    "isomorphic-dompurify": "^3.18.0",
+    "isomorphic-dompurify": "^4.2.0",
     "mailparser": "^3.9.14",
     "nodemailer": "^9.0.3",
     "nuxt": "^4.4.8",
