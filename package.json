@@ -28,7 +28,7 @@
     "fflate": "^0.8.3",
     "imapflow": "^1.7.8",
     "isomorphic-dompurify": "^3.19.0",
-    "mailparser": "^3.9.24",
+    "mailparser": "^3.9.23",
     "nodemailer": "^9.0.3",
     "nuxt": "^4.4.8",
     "nuxt-auth-utils": "^0.5.30",
@@ -49,7 +49,7 @@
     "esbuild@^0.27.0": "^0.28.2"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.131",
+    "@iconify-json/lucide": "^1.2.130",
     "@types/better-sqlite3": "^7.6.13",
     "@types/mailparser": "^3.4.6",
     "@types/nodemailer": "^8.0.1",
