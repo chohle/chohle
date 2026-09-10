@@ -27,6 +27,12 @@
       "description": "Group all GitHub Actions updates together",
       "matchManagers": ["github-actions"],
       "groupName": "github-actions"
+    },
+    {
+      "description": "TypeScript 7 (native) is not yet supported by vue-tsc and @vue/compiler-sfc, skip majors for now",
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ],
   "vulnerabilityAlerts": {
