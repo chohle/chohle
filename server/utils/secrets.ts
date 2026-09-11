@@ -21,6 +21,7 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:
 
 const ALGO = 'aes-256-gcm'
 const IV_BYTES = 12
+const TAG_BYTES = 16
 const FORMAT_VERSION = 'v1'
 const MIN_SECRET_LENGTH = 16
 
@@ -91,15 +92,22 @@ function parseStored(stored: string): Parsed {
     throw new Error('encrypted secret is malformed')
   }
   const [ivHex, tagHex, dataHex] = segments
-  if (!ivHex || !tagHex || !dataHex) {
+  const iv = hexToBuffer(ivHex)
+  const tag = hexToBuffer(tagHex)
+  const data = hexToBuffer(dataHex)
+  if (iv.length !== IV_BYTES || tag.length !== TAG_BYTES || data.length === 0) {
     throw new Error('encrypted secret is malformed')
   }
-  return {
-    iv: Buffer.from(ivHex, 'hex'),
-    tag: Buffer.from(tagHex, 'hex'),
-    data: Buffer.from(dataHex, 'hex'),
-    legacy
+  return { iv, tag, data, legacy }
+}
+
+// Buffer.from(x, 'hex') silently stops at the first non-hex character and
+// returns an empty buffer for garbage, so validate the text first.
+function hexToBuffer(hex: string | undefined): Buffer {
+  if (!hex || hex.length % 2 !== 0 || !/^[0-9a-f]+$/i.test(hex)) {
+    throw new Error('encrypted secret is malformed')
   }
+  return Buffer.from(hex, 'hex')
 }
 
 function decryptWith(key: Buffer, parsed: Parsed): string {
@@ -147,15 +155,21 @@ export function decryptSecret(stored: string): string {
   return decryptSecretDetailed(stored).plain
 }
 
+// Why the key configuration is unusable (CHOHLE_SECRET missing or too short,
+// a too short CHOHLE_SECRET_PREVIOUS entry), or null when it is fine.
+export function secretConfigError(): string | null {
+  try {
+    getKeys()
+    return null
+  } catch (err) {
+    return err instanceof Error ? err.message : String(err)
+  }
+}
+
 // `secretIsAvailable` lets the UI surface a helpful "set CHOHLE_SECRET" hint
 // instead of failing the first encrypt() call deep in an OAuth callback.
 export function secretIsAvailable(): boolean {
-  try {
-    getKeys()
-    return true
-  } catch {
-    return false
-  }
+  return secretConfigError() === null
 }
 
 // True when the operator is mid rotation (CHOHLE_SECRET_PREVIOUS is set).

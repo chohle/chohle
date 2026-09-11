@@ -4,6 +4,7 @@ import {
   decryptSecretDetailed,
   encryptSecret,
   hasPreviousSecret,
+  secretConfigError,
   secretIsAvailable
 } from '../server/utils/secrets'
 
@@ -72,6 +73,13 @@ describe('secrets', () => {
     expect(() => decryptSecret('v1:::')).toThrow(/malformed/)
     expect(() => decryptSecret('a:b:c:d:e')).toThrow(/malformed/)
     expect(() => decryptSecret('v2:aa:bb:cc')).toThrow(/unsupported version/)
+    // Non-hex text would decode to an empty buffer, so it is rejected up front.
+    const [v, iv, tag] = encryptSecret('x').split(':')
+    expect(() => decryptSecret(`${v}:${iv}:${tag}:zz`)).toThrow(/malformed/)
+    expect(() => decryptSecret(`${v}:${iv}:${tag}:abc`)).toThrow(/malformed/)
+    // Wrong IV or auth tag length.
+    expect(() => decryptSecret(`${v}:${iv!.slice(2)}:${tag}:abcd`)).toThrow(/malformed/)
+    expect(() => decryptSecret(`${v}:${iv}:${tag!.slice(2)}:abcd`)).toThrow(/malformed/)
   })
 
   it('refuses to encrypt without CHOHLE_SECRET (or too short)', async () => {
@@ -79,6 +87,7 @@ describe('secrets', () => {
     vi.resetModules()
     const mod = await import('../server/utils/secrets')
     expect(mod.secretIsAvailable()).toBe(false)
+    expect(mod.secretConfigError()).toMatch(/CHOHLE_SECRET is required/)
     expect(() => mod.encryptSecret('x')).toThrow(/CHOHLE_SECRET/)
     process.env.CHOHLE_SECRET = 'short'
     expect(mod.secretIsAvailable()).toBe(false)
@@ -86,6 +95,7 @@ describe('secrets', () => {
 
   it('secretIsAvailable returns true when key is set', () => {
     expect(secretIsAvailable()).toBe(true)
+    expect(secretConfigError()).toBeNull()
     expect(hasPreviousSecret()).toBe(false)
   })
 
@@ -133,6 +143,7 @@ describe('secrets', () => {
       process.env.CHOHLE_SECRET_PREVIOUS = 'short'
       expect(() => encryptSecret('x')).toThrow(/CHOHLE_SECRET_PREVIOUS/)
       expect(secretIsAvailable()).toBe(false)
+      expect(secretConfigError()).toMatch(/CHOHLE_SECRET_PREVIOUS entry must be 16\+ chars/)
     })
   })
 })

@@ -3,16 +3,15 @@
 // unversioned format) is rewritten with the current CHOHLE_SECRET. Normal
 // boots without a previous key never touch the secrets. Runs after the
 // migrations (00) and before the mail (03) and bank (04) sync workers.
-import { hasPreviousSecret, secretIsAvailable } from '~~/server/utils/secrets'
+import { hasPreviousSecret, secretConfigError } from '~~/server/utils/secrets'
 import { rotateStoredSecrets } from '~~/server/utils/secretRotation'
 
 export default defineNitroPlugin(() => {
   if (isDemo()) return
   if (!hasPreviousSecret()) return
-  if (!secretIsAvailable()) {
-    console.error(
-      '[secrets] CHOHLE_SECRET_PREVIOUS is set but CHOHLE_SECRET is missing or too short'
-    )
+  const problem = secretConfigError()
+  if (problem) {
+    console.error(`[secrets] CHOHLE_SECRET_PREVIOUS is set but key rotation cannot run: ${problem}`)
     return
   }
 
