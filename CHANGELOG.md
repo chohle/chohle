@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.0.2](https://github.com/chohle/chohle/compare/v0.0.1...v0.0.2) (2026-09-11)
+
+
+### Features
+
+* **security:** rotate CHOHLE_SECRET with CHOHLE_SECRET_PREVIOUS, existing mailboxes and bank connections keep working (see docs/MAIL_SYNC.md) ([#72](https://github.com/chohle/chohle/issues/72)) ([08db0d4](https://github.com/chohle/chohle/commit/08db0d4c7289f977ac292c586c3d096fc7e4db32))
+
+
+### Bug Fixes
+
+* **deps:** update nodemailer, nuxt, @tiptap/core and vitest to releases with security fixes ([#71](https://github.com/chohle/chohle/issues/71)) ([e5c5fee](https://github.com/chohle/chohle/commit/e5c5feed2f69b45a6909abcb77d7751596123865))
+
+
+### Refactoring
+
+* audit cleanup, dead code removal, and config fixes ([#50](https://github.com/chohle/chohle/issues/50)) ([a091cdb](https://github.com/chohle/chohle/commit/a091cdb5ca144ae540154a6e5f91efc5a82e7338))
+
+
+### Build
+
+* **deps:** update better-sqlite3 to v13 and isomorphic-dompurify to v4, Node.js 22.22+ or 24.15+ is now required outside Docker ([#71](https://github.com/chohle/chohle/issues/71)) ([e5c5fee](https://github.com/chohle/chohle/commit/e5c5feed2f69b45a6909abcb77d7751596123865))
+
 ## 0.0.1 (2026-06-25)
 
 
