@@ -47,13 +47,14 @@ cp .env.example .env
 
 Set, at minimum:
 
-| Variable                                      | Notes                                                                |
-| --------------------------------------------- | -------------------------------------------------------------------- |
-| `DOMAIN`                                      | e.g. `app.example.com`: Caddy gets the cert for this                 |
-| `CHOHLE_SECRET`                               | random 32+ chars (at-rest encryption key): `openssl rand -hex 32`    |
-| `NUXT_SESSION_PASSWORD`                       | random 32+ chars (seals the session cookie)                          |
-| `NUXT_ADMIN_USERNAME` / `NUXT_ADMIN_PASSWORD` | owner login                                                          |
-| `CHOHLE_DEMO`                                 | `true` only if this is a public demo (see [Demo mode](DEMO_MODE.md)) |
+| Variable                                      | Notes                                                                                     |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `DOMAIN`                                      | e.g. `app.example.com`: Caddy gets the cert for this                                      |
+| `CHOHLE_SECRET`                               | random 32+ chars (at-rest encryption key): `openssl rand -hex 32`                         |
+| `CHOHLE_SECRET_PREVIOUS`                      | only while rotating `CHOHLE_SECRET`, see [Mail sync](MAIL_SYNC.md#rotating-chohle_secret) |
+| `NUXT_SESSION_PASSWORD`                       | random 32+ chars (seals the session cookie)                                               |
+| `NUXT_ADMIN_USERNAME` / `NUXT_ADMIN_PASSWORD` | owner login                                                                               |
+| `CHOHLE_DEMO`                                 | `true` only if this is a public demo (see [Demo mode](DEMO_MODE.md))                      |
 
 ## 5. Launch
 

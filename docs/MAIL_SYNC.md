@@ -23,8 +23,8 @@ setup** (Azure app, Google Cloud project, IMAP credentials, etc.) see:
   ```
 
   OAuth tokens and IMAP passwords are encrypted at rest (AES-256-GCM)
-  with a key derived from this secret. Rotating it invalidates every
-  stored mailbox connection; you'll have to reconnect.
+  with a key derived from this secret. It can be rotated without
+  reconnecting anything, see [Rotating CHOHLE_SECRET](#rotating-chohle_secret).
 
 - For OAuth providers (Outlook, Gmail), chohle runs the PKCE flow.
   Outlook works secret free; Google's Web OAuth client also requires
@@ -77,6 +77,25 @@ on the running instance. The first run fires roughly thirty seconds
 after boot so the rest of the app has time to come up.
 
 You can always force a sync from the Settings list with **Sync now**.
+
+## Rotating CHOHLE_SECRET
+
+Stored secrets carry a `v1:` format prefix and chohle can read rows
+encrypted with a previous key while you switch over:
+
+1. Generate a new value (`openssl rand -hex 32`).
+2. Set `CHOHLE_SECRET` to the new value and `CHOHLE_SECRET_PREVIOUS` to
+   the old one (comma separate several old keys if you skipped a step).
+3. Restart chohle. On boot it re-encrypts every mailbox token, IMAP
+   password and bank connection config with the new key and logs
+   `[secrets] key rotation: re-encrypted N of N stored secret(s)`.
+4. Once the log says every stored secret uses the current key, remove
+   `CHOHLE_SECRET_PREVIOUS` and restart again.
+
+A row that matches neither key is left untouched and listed in the log;
+reconnect that mailbox or bank connection. Without
+`CHOHLE_SECRET_PREVIOUS`, changing `CHOHLE_SECRET` still invalidates
+every stored secret, exactly as before.
 
 ## Troubleshooting
 
