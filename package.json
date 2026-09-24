@@ -29,7 +29,7 @@
     "imapflow": "^1.7.8",
     "isomorphic-dompurify": "^4.2.0",
     "mailparser": "^3.9.23",
-    "nodemailer": "^9.0.3",
+    "nodemailer": "^10.0.10",
     "nuxt": "^4.4.8",
     "nuxt-auth-utils": "^0.5.30",
     "pdfkit": "^0.20.2",
