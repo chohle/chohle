@@ -17,7 +17,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@nuxt/ui": "^4.11.1",
+    "@nuxt/ui": "^4.11.3",
     "@nuxtjs/i18n": "^10.6.0",
     "@tiptap/core": "^3.27.1",
     "@tiptap/extension-list": "^3.31.3",
@@ -30,7 +30,7 @@
     "isomorphic-dompurify": "^4.2.0",
     "mailparser": "^3.9.23",
     "nodemailer": "^9.0.3",
-    "nuxt": "^4.4.8",
+    "nuxt": "^4.5.2",
     "nuxt-auth-utils": "^0.5.30",
     "pdfkit": "^0.20.2",
     "swissqrbill": "^4.4.1",
