@@ -4747,7 +4747,7 @@ __metadata:
     imapflow: "npm:^1.7.8"
     isomorphic-dompurify: "npm:^4.2.0"
     mailparser: "npm:^3.9.23"
-    nodemailer: "npm:^9.0.3"
+    nodemailer: "npm:^10.0.0"
     nuxt: "npm:^4.4.8"
     nuxt-auth-utils: "npm:^0.5.30"
     pdfkit: "npm:^0.20.2"
@@ -7712,10 +7712,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^9.0.3":
-  version: 9.1.1
-  resolution: "nodemailer@npm:9.1.1"
-  checksum: 10c0/b213a2a906697a735f6eb21103629b7a77aeac297b6d843efd4588157999bf6d19381853ac1224e472f5a34aec2e2412444151a2c6ec6e8c52150afa3055039c
+"nodemailer@npm:^10.0.0":
+  version: 10.0.14
+  resolution: "nodemailer@npm:10.0.14"
+  checksum: 10c0/8965d6ccd0a69f5b439d2bf5efc67cc4bac34f4893749c7b6b6290d5541beaf03174a169546739f370e989fd0f050221eec25aa6b017544d5b16fc23be374937
   languageName: node
   linkType: hard
 
