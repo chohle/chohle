@@ -52,7 +52,6 @@
     "@iconify-json/lucide": "^1.2.145",
     "@types/better-sqlite3": "^9.6.0",
     "@types/mailparser": "^3.9.0",
-    "@types/nodemailer": "^8.0.2",
     "@types/pdfkit": "^0.17.6",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
