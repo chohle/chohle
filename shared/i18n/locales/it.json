@@ -37,7 +37,7 @@
       "week": "Questa settimana",
       "month": "Questo mese",
       "lastMonth": "Mese scorso",
-      "custom": "Altro mese"
+      "custom": "Personalizzato"
     },
     "loadMore": "Carica altri {n}",
     "showing": "{shown} su {total}",
@@ -47,7 +47,11 @@
       "overdue": "Scadute",
       "expense": "Spese",
       "salary": "Stipendio"
-    }
+    },
+    "quickRanges": "Scorciatoie",
+    "lastDays": "Ultimi {n} giorni",
+    "pickRange": "Oppure scegli un periodo",
+    "customRange": "Periodo personalizzato"
   },
   "nav": {
     "dashboard": "Dashboard",

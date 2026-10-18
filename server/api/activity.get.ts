@@ -160,17 +160,15 @@ export default defineEventHandler(async (event) => {
   events.sort((a, b) => b.at.localeCompare(a.at))
   const limited = events.slice(0, MAX_EVENTS)
 
-  // Convenience aggregates for the "This week" stat + per-kind counts.
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-  const sevenIso = sevenDaysAgo.toISOString().slice(0, 10)
-
-  let weekIn = 0
-  let weekOut = 0
+  // Money in/out per day over the full window, so the client can total any
+  // period (presets or a custom range) without a refetch. Built from the
+  // untruncated list, like `counts`, so the numbers stay exact past MAX_EVENTS.
+  const daily: Record<string, { in_rappen: number; out_rappen: number }> = {}
   for (const e of events) {
-    if (e.at < sevenIso) continue
-    if (e.kind === 'paid' || e.kind === 'salary') weekIn += e.amount_rappen
-    else if (e.kind === 'expense') weekOut += e.amount_rappen
+    if (e.kind !== 'paid' && e.kind !== 'salary' && e.kind !== 'expense') continue
+    const day = (daily[e.at] ??= { in_rappen: 0, out_rappen: 0 })
+    if (e.kind === 'expense') day.out_rappen += e.amount_rappen
+    else day.in_rappen += e.amount_rappen
   }
 
   // Counts reflect the full window so the filter sidebar stays accurate
@@ -178,9 +176,5 @@ export default defineEventHandler(async (event) => {
   const counts: Record<Kind, number> = { paid: 0, sent: 0, overdue: 0, expense: 0, salary: 0 }
   for (const e of events) counts[e.kind]++
 
-  return {
-    events: limited,
-    counts,
-    week: { net_rappen: weekIn - weekOut, in_rappen: weekIn, out_rappen: weekOut }
-  }
+  return { events: limited, counts, daily }
 })

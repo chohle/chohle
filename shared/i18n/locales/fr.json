@@ -37,7 +37,7 @@
       "week": "Cette semaine",
       "month": "Ce mois-ci",
       "lastMonth": "Mois dernier",
-      "custom": "Autre mois"
+      "custom": "Personnalisé"
     },
     "loadMore": "Charger {n} de plus",
     "showing": "{shown} sur {total}",
@@ -47,7 +47,11 @@
       "overdue": "En retard",
       "expense": "Dépenses",
       "salary": "Salaire"
-    }
+    },
+    "quickRanges": "Raccourcis",
+    "lastDays": "{n} derniers jours",
+    "pickRange": "Ou choisir une période",
+    "customRange": "Période personnalisée"
   },
   "nav": {
     "dashboard": "Tableau de bord",
