@@ -279,7 +279,7 @@
       "week": "Diese Woche",
       "month": "Dieser Monat",
       "lastMonth": "Letzter Monat",
-      "custom": "Anderer Monat"
+      "custom": "Individuell"
     },
     "loadMore": "{n} weitere laden",
     "showing": "{shown} von {total}",
@@ -289,7 +289,11 @@
       "overdue": "Überfällig",
       "expense": "Ausgaben",
       "salary": "Lohn"
-    }
+    },
+    "quickRanges": "Schnellauswahl",
+    "lastDays": "Letzte {n} Tage",
+    "pickRange": "Oder Zeitraum wählen",
+    "customRange": "Eigener Zeitraum"
   },
   "payments": {
     "title": "Zahlungen",

@@ -43,5 +43,8 @@ function onKey(e: KeyboardEvent, index: number) {
     >
       {{ o.label }}
     </button>
+    <!-- Trailing slot for a tab the parent manages itself (e.g. a popover
+         trigger). It shares the pill chrome but not the roving tabindex. -->
+    <slot name="after" />
   </div>
 </template>

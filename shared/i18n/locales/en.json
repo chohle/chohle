@@ -289,7 +289,11 @@
       "overdue": "Overdue",
       "expense": "Expenses",
       "salary": "Salary"
-    }
+    },
+    "quickRanges": "Quick ranges",
+    "lastDays": "Last {n} days",
+    "pickRange": "Or pick a range",
+    "customRange": "Custom date range"
   },
   "payments": {
     "title": "Payments",

@@ -333,3 +333,61 @@
     }
   }
 }
+
+// Custom-range tab inside the period control, and its popover. The popover
+// content is portaled to body (calendar tokens come from .date-picker__pop),
+// so these rules live outside .page-activity.
+.activity-range {
+  width: 296px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px;
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__icon {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 auto;
+  }
+
+  &__title {
+    color: var(--ink-3);
+  }
+
+  &__spans {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__span {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    padding: 4px 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-2);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--ink);
+    }
+    &.is-active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--accent-ink);
+    }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ink);
+    }
+  }
+}
