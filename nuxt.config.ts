@@ -97,6 +97,9 @@ export default defineNuxtConfig({
         '@tiptap/extension-text-align',
         '@tiptap/core',
         '@tiptap/vue-3',
+        // Discovered at runtime by Vite otherwise, which forces a dev reload.
+        'isomorphic-dompurify',
+        'vue-draggable-plus',
         // Dedupe ProseMirror so direct tiptap imports share Nuxt UI's instance.
         '@nuxt/ui > prosemirror-state',
         '@nuxt/ui > prosemirror-transform',

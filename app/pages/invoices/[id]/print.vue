@@ -50,11 +50,17 @@ const totals = data.value!.totals
 
 const { data: customer } = await useFetch<Party>(`/api/customers/${invoice.customer_id}`)
 const { data: sender } = await useFetch<Party>('/api/sender')
-const { data: qrbill } = await useFetch<string>(`/api/invoices/${id}/qrbill`, {
-  // Read as text (it's SVG markup we inline); 422 (e.g. no IBAN) just shows a hint.
-  responseType: 'text',
-  ignoreResponseError: true
-})
+const { data: qrbill, status: qrbillStatus } = await useFetch<string>(
+  `/api/invoices/${id}/qrbill`,
+  {
+    // Read as text (it's SVG markup we inline); 422 (e.g. no IBAN) just shows a hint.
+    responseType: 'text',
+    ignoreResponseError: true,
+    // Client-only: the SVG is ~230 kB and would otherwise be serialised into the
+    // SSR payload on top of the rendered markup (Nuxt warns, NUXT_E8006).
+    server: false
+  }
+)
 
 // The printed invoice is a document for the customer, so render it in their
 // language regardless of the owner's UI locale. Page controls stay on $t.
@@ -66,6 +72,10 @@ function td(key: string, named?: Record<string, unknown>) {
   return t(key, named ?? {}, { locale: docLocale })
 }
 const hasQrbill = computed(() => typeof qrbill.value === 'string' && qrbill.value.includes('<svg'))
+// Don't flash the "set an IBAN" hint while the client-side fetch is still running.
+const qrbillSettled = computed(
+  () => qrbillStatus.value === 'success' || qrbillStatus.value === 'error'
+)
 const senderLogo = computed(() =>
   sender.value?.logo_path ? `/api/sender/logo?v=${sender.value.logo_path}` : null
 )
@@ -215,7 +225,7 @@ function printPage() {
 
       <!-- Swiss QR-bill (bottom 105mm) -->
       <div v-if="hasQrbill" class="w-full" v-html="qrbill" />
-      <p v-else class="px-[20mm] pb-8 text-[10px] text-gray-500">
+      <p v-else-if="qrbillSettled" class="px-[20mm] pb-8 text-[10px] text-gray-500">
         {{ $t('invoices.qrHint') }}
       </p>
     </div>
