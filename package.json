@@ -17,28 +17,28 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@nuxt/ui": "^4.11.1",
+    "@nuxt/ui": "^4.12.0",
     "@nuxtjs/i18n": "^10.6.0",
-    "@tiptap/core": "^3.27.1",
-    "@tiptap/extension-list": "^3.31.3",
-    "@tiptap/extension-text-align": "^3.31.3",
-    "@tiptap/vue-3": "^3.31.3",
+    "@tiptap/core": "^3.32.0",
+    "@tiptap/extension-list": "^3.32.0",
+    "@tiptap/extension-text-align": "^3.32.0",
+    "@tiptap/vue-3": "^3.32.0",
     "better-sqlite3": "^13.0.3",
-    "fast-xml-parser": "^5.11.1",
+    "fast-xml-parser": "^5.11.2",
     "fflate": "^0.8.3",
-    "imapflow": "^1.7.8",
-    "isomorphic-dompurify": "^4.2.0",
-    "mailparser": "^3.9.23",
-    "nodemailer": "^9.0.3",
-    "nuxt": "^4.4.8",
-    "nuxt-auth-utils": "^0.5.30",
+    "imapflow": "^2.5.2",
+    "isomorphic-dompurify": "^4.6.0",
+    "mailparser": "^3.9.40",
+    "nodemailer": "^10.1.2",
+    "nuxt": "^4.6.2",
+    "nuxt-auth-utils": "^0.5.32",
     "pdfkit": "^0.20.2",
-    "swissqrbill": "^4.4.1",
-    "vue": "^3.5.42",
+    "swissqrbill": "^4.4.2",
+    "vue": "^3.5.44",
     "vue-draggable-plus": "^0.6.1",
-    "vue-router": "^5.3.1"
+    "vue-router": "^5.4.0"
   },
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "dependenciesMeta": {
     "better-sqlite3": {
       "built": true
@@ -49,16 +49,15 @@
     "esbuild@^0.27.0": "^0.28.2"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.130",
+    "@iconify-json/lucide": "^1.2.145",
     "@types/better-sqlite3": "^9.6.0",
-    "@types/mailparser": "^3.4.6",
-    "@types/nodemailer": "^8.0.1",
+    "@types/mailparser": "^3.9.0",
     "@types/pdfkit": "^0.17.6",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "sass-embedded": "^1.104.0",
+    "sass-embedded": "^1.105.2",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9",
-    "vue-tsc": "^3.3.11"
+    "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13"
   }
 }
