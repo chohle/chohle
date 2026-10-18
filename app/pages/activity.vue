@@ -197,6 +197,13 @@ const rangeLabel = computed(() => {
 const customTabLabel = computed(() =>
   period.value === 'custom' ? rangeLabel.value : t('activity.period.custom')
 )
+// Accessible name announces the selection too, since the aria-label would
+// otherwise replace the visible date text for screen readers.
+const customTabAria = computed(() =>
+  period.value === 'custom'
+    ? `${t('activity.customRange')}: ${rangeLabel.value}`
+    : t('activity.customRange')
+)
 // Title of the stat card: follows the active period instead of a fixed week.
 const periodTitle = computed(() =>
   period.value === 'custom' ? rangeLabel.value : t(`activity.period.${period.value}`)
@@ -219,6 +226,9 @@ const activeSpan = computed(() => {
 })
 
 const calendarLocale = computed(() => `${locale.value}-CH`)
+// /api/activity only returns the last year (see server/api/activity.get.ts),
+// so don't let the calendar select days whose totals we could not compute.
+const calendarMin = parseDate(todayIso).subtract({ years: 1 })
 const calendarRange = computed<DateRange>(() => ({
   start: parseDate(customRange.value.from),
   end: parseDate(customRange.value.to)
@@ -276,7 +286,7 @@ function go(link: string | undefined) {
                 :class="{ 'is-active': period === 'custom' }"
                 role="radio"
                 :aria-checked="period === 'custom'"
-                :aria-label="$t('activity.customRange')"
+                :aria-label="customTabAria"
                 @click="selectCustom"
               >
                 <UIcon name="i-lucide-calendar-range" class="activity-range__icon" />
@@ -303,6 +313,7 @@ function go(link: string | undefined) {
                     :model-value="calendarRange"
                     :first-day-of-week="1"
                     :locale="calendarLocale"
+                    :min-value="calendarMin"
                     @update:model-value="onCalendar"
                   />
                 </div>
