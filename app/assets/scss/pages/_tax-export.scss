@@ -150,7 +150,8 @@
 
       li {
         display: grid;
-        grid-template-columns: 88px minmax(0, 1fr) auto auto auto;
+        grid-template-columns: 88px minmax(0, 1fr) auto auto;
+        grid-template-areas: "date name amount actions";
         gap: 10px;
         align-items: center;
         padding: 7px 10px;
@@ -163,11 +164,25 @@
         color: var(--ink-3);
       }
     }
+    &__date {
+      grid-area: date;
+    }
     &__name {
+      grid-area: name;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    &__amount {
+      grid-area: amount;
+      white-space: nowrap;
+    }
+    &__actions {
+      grid-area: actions;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     &__btn {
       display: inline-flex;
@@ -364,12 +379,17 @@
         border-top: 1px solid var(--rule);
       }
     }
+    // Phone: date and amount on one line, vendor below, actions in a row.
     .tax-receipts__list li {
-      grid-template-columns: 88px minmax(0, 1fr);
-
-      > :nth-child(n + 3) {
-        grid-column: 2;
-      }
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "date amount"
+        "name name"
+        "actions actions";
+      row-gap: 4px;
+    }
+    .tax-receipts__name {
+      white-space: normal;
     }
   }
 

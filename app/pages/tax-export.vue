@@ -270,43 +270,47 @@ function download() {
 
           <ul v-if="data.missingReceipts" class="tax-receipts__list">
             <li v-for="m in visibleMissing" :key="m.id">
-              <span class="mono note">{{ fmtDate(m.date) }}</span>
+              <span class="tax-receipts__date mono note">{{ fmtDate(m.date) }}</span>
               <span class="tax-receipts__name">{{ m.vendor || m.title }}</span>
-              <span class="mono tabular">CHF {{ chf(m.grossRappen, 2) }}</span>
-              <button
-                type="button"
-                class="tax-receipts__btn"
-                :disabled="busy"
-                @click="addReceipt(m.id)"
-              >
-                <UIcon name="i-lucide-upload" class="size-3" /> {{ $t('taxExport.addReceipt') }}
-              </button>
-              <button
-                type="button"
-                class="tax-receipts__btn"
-                :disabled="busy"
-                :title="$t('taxExport.noReceiptHint')"
-                @click="setWaived(m.id, true)"
-              >
-                <UIcon name="i-lucide-file-x" class="size-3" /> {{ $t('taxExport.noReceipt') }}
-              </button>
+              <span class="tax-receipts__amount mono tabular">CHF {{ chf(m.grossRappen, 2) }}</span>
+              <span class="tax-receipts__actions">
+                <button
+                  type="button"
+                  class="tax-receipts__btn"
+                  :disabled="busy"
+                  @click="addReceipt(m.id)"
+                >
+                  <UIcon name="i-lucide-upload" class="size-3" /> {{ $t('taxExport.addReceipt') }}
+                </button>
+                <button
+                  type="button"
+                  class="tax-receipts__btn"
+                  :disabled="busy"
+                  :title="$t('taxExport.noReceiptHint')"
+                  @click="setWaived(m.id, true)"
+                >
+                  <UIcon name="i-lucide-file-x" class="size-3" /> {{ $t('taxExport.noReceipt') }}
+                </button>
+              </span>
             </li>
           </ul>
 
           <ul v-if="showWaived && data.waived.length" class="tax-receipts__list">
             <li v-for="w in data.waived" :key="w.id" class="is-waived">
-              <span class="mono">{{ fmtDate(w.date) }}</span>
+              <span class="tax-receipts__date mono">{{ fmtDate(w.date) }}</span>
               <span class="tax-receipts__name">{{ w.vendor || w.title }}</span>
-              <span class="mono tabular">CHF {{ chf(w.grossRappen, 2) }}</span>
-              <span class="note">{{ $t('taxExport.noReceipt') }}</span>
-              <button
-                type="button"
-                class="tax-receipts__btn"
-                :disabled="busy"
-                @click="setWaived(w.id, false)"
-              >
-                <UIcon name="i-lucide-undo-2" class="size-3" /> {{ $t('taxExport.undoWaiver') }}
-              </button>
+              <span class="tax-receipts__amount mono tabular">CHF {{ chf(w.grossRappen, 2) }}</span>
+              <span class="tax-receipts__actions">
+                <span class="note">{{ $t('taxExport.noReceipt') }}</span>
+                <button
+                  type="button"
+                  class="tax-receipts__btn"
+                  :disabled="busy"
+                  @click="setWaived(w.id, false)"
+                >
+                  <UIcon name="i-lucide-undo-2" class="size-3" /> {{ $t('taxExport.undoWaiver') }}
+                </button>
+              </span>
             </li>
           </ul>
 
