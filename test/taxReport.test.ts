@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { unzipSync } from 'fflate'
 import { runMigrations } from '../server/utils/migrate'
 import { buildTaxReport } from '../server/utils/taxReport'
-import { buildTaxExportZip } from '../server/utils/taxExportZip'
+import { buildJournalCsv, buildTaxExportZip, CSV_HEADER } from '../server/utils/taxExportZip'
 
 function makeDb() {
   const db = new Database(':memory:')
@@ -135,6 +135,58 @@ describe('buildTaxExportZip', () => {
     const entries = Object.keys(unzipSync(new Uint8Array(buffer)))
     expect(entries).toContain('Steuerexport-2024.pdf')
     expect(entries).toContain('buchungen-2024.csv')
+    expect(entries).toContain('README.txt')
     expect(entries.some((e) => e.startsWith('belege/0001_'))).toBe(true)
+  })
+})
+
+describe('buildJournalCsv', () => {
+  const parse = (csv: string) =>
+    csv
+      .replace(/^\uFEFF/, '')
+      .trimEnd()
+      .split('\r\n')
+      .map((l) => l.split(';'))
+
+  it('lists expenses and income chronologically with receipt file and status', () => {
+    const rows = parse(buildJournalCsv(buildTaxReport(db, 2024)))
+    expect(rows[0]).toEqual(CSV_HEADER)
+    const body = rows.slice(1)
+    expect(body.map((r) => r[1])).toEqual(['2024-02-15', '2024-03-25', '2024-04-10', '2024-05-02'])
+    expect(body.map((r) => r[2])).toEqual(['Ertrag', 'Ertrag', 'Aufwand', 'Aufwand'])
+    // Salary row carries its payout date and a readable title.
+    expect(body[1]!.slice(0, 7)).toEqual([
+      '',
+      '2024-03-25',
+      'Ertrag',
+      'Job AG',
+      'Lohn März 2024',
+      'Lohn',
+      '5000.00'
+    ])
+    // Toner: receipt attached, VAT split, file name points into belege/.
+    const toner = body[2]!
+    expect(toner.slice(0, 10)).toEqual([
+      '0001',
+      '2024-04-10',
+      'Aufwand',
+      'Migros',
+      'Toner',
+      'Büro',
+      '108.10',
+      '8.1',
+      '8.10',
+      '100.00'
+    ])
+    expect(toner[10]).toBe('0001_Migros_2024-04-10.jpg')
+    expect(toner[11]).toBe('ja')
+    // Kaffee: no receipt.
+    expect(body[3]!.slice(10)).toEqual(['', 'fehlt'])
+  })
+
+  it('marks a waived expense as "nicht nötig" instead of "fehlt"', () => {
+    db.prepare("UPDATE expenses SET receipt_waived = 1 WHERE title = 'Kaffee'").run()
+    const rows = parse(buildJournalCsv(buildTaxReport(db, 2024)))
+    expect(rows.at(-1)!.at(-1)).toBe('nicht nötig')
   })
 })
