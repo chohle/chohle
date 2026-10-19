@@ -110,6 +110,16 @@ describe('buildTaxReport', () => {
     expect(buildTaxReport(db, 2023).expenses.totalRappen).toBe(0)
   })
 
+  it('does not report a waived receipt as missing, but lists it separately', () => {
+    db.prepare("UPDATE expenses SET receipt_waived = 1 WHERE title = 'Kaffee'").run()
+    const r = buildTaxReport(db, 2024)
+    expect(r.missingReceipts).toHaveLength(0)
+    expect(r.waivedReceipts.map((w) => w.title)).toEqual(['Kaffee'])
+    // Still part of the journal and the totals.
+    expect(r.expenses.journal.find((j) => j.title === 'Kaffee')?.receiptWaived).toBe(true)
+    expect(r.expenses.totalRappen).toBe(15810)
+  })
+
   it('treats an expense whose receipt file is gone as missing', () => {
     // The attachment row exists but its file vanished from disk.
     rmSync(join(process.env.UPLOADS_PATH!, 'receipt1.jpg'))

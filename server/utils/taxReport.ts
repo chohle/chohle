@@ -26,6 +26,8 @@ export interface TaxJournalRow {
   vatRate: number
   inputVatRappen: number
   attachments: TaxReportAttachment[]
+  // Owner marked this booking as "no receipt needed" (see migration 0049).
+  receiptWaived: boolean
 }
 export interface TaxReport {
   year: number
@@ -59,13 +61,18 @@ export interface TaxReport {
     inputRappen: number
     netVatRappen: number
   }
-  missingReceipts: {
-    id: number
-    date: string
-    vendor: string
-    title: string
-    grossRappen: number
-  }[]
+  missingReceipts: TaxReceiptRef[]
+  // Bookings without a receipt that the owner explicitly waived. Not missing,
+  // but listed so the UI can show (and undo) the decision.
+  waivedReceipts: TaxReceiptRef[]
+}
+
+export interface TaxReceiptRef {
+  id: number
+  date: string
+  vendor: string
+  title: string
+  grossRappen: number
 }
 
 /** Input VAT (Vorsteuer) contained in a gross amount at the given rate.
@@ -116,7 +123,8 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
   const expenseRows = db
     .prepare(
       `SELECT e.id AS id, e.date AS date, e.vendor AS vendor, e.title AS title,
-              e.amount_rappen AS grossRappen, e.vat_rate AS vatRate, c.name AS category
+              e.amount_rappen AS grossRappen, e.vat_rate AS vatRate, c.name AS category,
+              e.receipt_waived AS receiptWaived
        FROM expenses e LEFT JOIN categories c ON c.id = e.category_id
        WHERE substr(e.date, 1, 4) = ?
        ORDER BY e.date, e.id`
@@ -129,6 +137,7 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
     grossRappen: number
     vatRate: number
     category: string | null
+    receiptWaived: number
   }[]
 
   const attRows = db
@@ -159,7 +168,8 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
     grossRappen: e.grossRappen,
     vatRate: e.vatRate ?? 0,
     inputVatRappen: inputVat(e.grossRappen, e.vatRate ?? 0),
-    attachments: attByExpense.get(e.id) ?? []
+    attachments: attByExpense.get(e.id) ?? [],
+    receiptWaived: e.receiptWaived === 1
   }))
   const expenseTotal = journal.reduce((n, r) => n + r.grossRappen, 0)
 
@@ -208,15 +218,16 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
   const outputRappen = outputByRate.reduce((n, r) => n + r.vatRappen, 0)
   const inputRappen = journal.reduce((n, r) => n + r.inputVatRappen, 0)
 
-  const missingReceipts = journal
-    .filter((r) => r.attachments.length === 0)
-    .map((r) => ({
-      id: r.id,
-      date: r.date,
-      vendor: r.vendor,
-      title: r.title,
-      grossRappen: r.grossRappen
-    }))
+  const receiptRef = (r: TaxJournalRow): TaxReceiptRef => ({
+    id: r.id,
+    date: r.date,
+    vendor: r.vendor,
+    title: r.title,
+    grossRappen: r.grossRappen
+  })
+  const withoutReceipt = journal.filter((r) => r.attachments.length === 0)
+  const missingReceipts = withoutReceipt.filter((r) => !r.receiptWaived).map(receiptRef)
+  const waivedReceipts = withoutReceipt.filter((r) => r.receiptWaived).map(receiptRef)
 
   return {
     year,
@@ -237,7 +248,8 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
       inputRappen,
       netVatRappen: outputRappen - inputRappen
     },
-    missingReceipts
+    missingReceipts,
+    waivedReceipts
   }
 }
 
