@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.0.2](https://github.com/chohle/chohle/compare/v0.0.1...v0.0.2) (2026-10-19)
+
+
+### Features
+
+* **activity:** real custom date range and a stat card that follows the period ([#83](https://github.com/chohle/chohle/issues/83)) ([246b2df](https://github.com/chohle/chohle/commit/246b2dfba375e508e94c1dd1dd01f78872d766fb))
+* **security:** rotate CHOHLE_SECRET with CHOHLE_SECRET_PREVIOUS, existing mailboxes and bank connections keep working (see docs/MAIL_SYNC.md) ([#72](https://github.com/chohle/chohle/issues/72)) ([08db0d4](https://github.com/chohle/chohle/commit/08db0d4c7289f977ac292c586c3d096fc7e4db32))
+* **tax-export:** cleaner PDF report, chronological CSV journal, receipts per vendor ([#85](https://github.com/chohle/chohle/issues/85)) ([e401ffd](https://github.com/chohle/chohle/commit/e401ffd740c58ec692769662caa6b1f0c4697e7f))
+* **tax-export:** package card, receipt progress with waivers, category breakdown ([#84](https://github.com/chohle/chohle/issues/84)) ([ec381a2](https://github.com/chohle/chohle/commit/ec381a2385afcf1a35ca30aa5a32dbec542052bc))
+
+
+### Bug Fixes
+
+* **deps:** update nodemailer, nuxt, @tiptap/core and vitest to releases with security fixes ([#71](https://github.com/chohle/chohle/issues/71)) ([e5c5fee](https://github.com/chohle/chohle/commit/e5c5feed2f69b45a6909abcb77d7751596123865))
+* **invoices:** keep the QR-bill SVG out of the print page's SSR payload ([#82](https://github.com/chohle/chohle/issues/82)) ([23422b6](https://github.com/chohle/chohle/commit/23422b60791787f5f98c60717ab62070ae58e319))
+
+
+### Refactoring
+
+* audit cleanup, dead code removal, and config fixes ([#50](https://github.com/chohle/chohle/issues/50)) ([a091cdb](https://github.com/chohle/chohle/commit/a091cdb5ca144ae540154a6e5f91efc5a82e7338))
+
+
+### Build
+
+* **deps:** update better-sqlite3 to v13 and isomorphic-dompurify to v4, Node.js 22.22+ or 24.15+ is now required outside Docker ([#71](https://github.com/chohle/chohle/issues/71)) ([e5c5fee](https://github.com/chohle/chohle/commit/e5c5feed2f69b45a6909abcb77d7751596123865))
+
 ## 0.0.1 (2026-06-25)
 
 
