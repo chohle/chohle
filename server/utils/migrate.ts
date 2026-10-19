@@ -898,6 +898,13 @@ const migrations: Migration[] = [
     // (Vorsteuer). 0 = not specified -> contributes no input VAT. Constrained to
     // a valid percentage at the DB level.
     up: 'ALTER TABLE expenses ADD COLUMN vat_rate REAL NOT NULL DEFAULT 0 CHECK (vat_rate >= 0 AND vat_rate <= 100)'
+  },
+  {
+    name: '0049_expense_receipt_waived',
+    // "No receipt needed" flag. Rent with a contract, bank fees and the like
+    // never come with a Beleg; without this they would block the tax export
+    // forever. Waived expenses stay in the journal but are not listed as missing.
+    up: 'ALTER TABLE expenses ADD COLUMN receipt_waived INTEGER NOT NULL DEFAULT 0 CHECK (receipt_waived IN (0, 1))'
   }
 ]
 

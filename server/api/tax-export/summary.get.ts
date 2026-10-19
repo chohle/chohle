@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
     missingReceipts: r.missingReceipts.length,
     // The actual expenses lacking a receipt, so the page can list them. Capped.
     missing: r.missingReceipts.slice(0, 1000),
+    waived: r.waivedReceipts.slice(0, 1000),
     byCategory: r.expenses.byCategory,
     vat: r.vat
   }
