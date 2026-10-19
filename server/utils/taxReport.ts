@@ -46,7 +46,7 @@ export interface TaxReport {
     salaryRappen: number
     totalRappen: number
     invoices: { number: string; paidAt: string; customer: string; totalRappen: number }[]
-    salary: { month: string; company: string; amountRappen: number }[]
+    salary: { month: string; date: string; company: string; amountRappen: number }[]
   }
   expenses: {
     totalRappen: number
@@ -111,12 +111,12 @@ export function buildTaxReport(db: Database, year: number): TaxReport {
 
   const salary = db
     .prepare(
-      `SELECT ip.month AS month, ip.amount_rappen AS amountRappen, src.company AS company
+      `SELECT ip.month AS month, ip.date AS date, ip.amount_rappen AS amountRappen, src.company AS company
        FROM income_payments ip JOIN income_sources src ON src.id = ip.source_id
        WHERE substr(ip.month, 1, 4) = ?
        ORDER BY ip.month`
     )
-    .all(y) as { month: string; amountRappen: number; company: string }[]
+    .all(y) as { month: string; date: string; amountRappen: number; company: string }[]
   const salaryRappen = salary.reduce((n, r) => n + (r.amountRappen || 0), 0)
 
   // --- expenses + receipts ---
