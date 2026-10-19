@@ -151,7 +151,9 @@ async function setWaived(id: number, waived: boolean) {
 
 // --- Export ------------------------------------------------------------------
 
-const canDownload = computed(() => !!data.value && data.value.missingReceipts === 0)
+// Also blocked while an upload / waiver round-trip is in flight, so a click
+// right after "Undo" can't grab a ZIP built from the stale summary.
+const canDownload = computed(() => !!data.value && data.value.missingReceipts === 0 && !busy.value)
 
 /** Trigger the ZIP download for the selected year. */
 function download() {
@@ -253,6 +255,9 @@ function download() {
           <div
             class="tax-receipts__bar"
             role="progressbar"
+            :aria-label="$t('taxExport.receiptsSection')"
+            aria-valuemin="0"
+            aria-valuemax="100"
             :aria-valuenow="Math.round(coverage * 100)"
           >
             <span :style="{ width: `${coverage * 100}%` }" />
@@ -260,7 +265,7 @@ function download() {
 
           <div v-if="!data.missingReceipts" class="tax-receipts__done">
             <UIcon name="i-lucide-circle-check-big" class="tax-ok size-5" />
-            <span>{{ $t('taxExport.allReceipts', { n: data.receiptCount }) }}</span>
+            <span>{{ $t('taxExport.allReceipts') }}</span>
           </div>
 
           <ul v-if="data.missingReceipts" class="tax-receipts__list">

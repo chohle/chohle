@@ -28,7 +28,9 @@ export default defineEventHandler(async (event) => {
     missingReceipts: r.missingReceipts.length,
     // The actual expenses lacking a receipt, so the page can list them. Capped.
     missing: r.missingReceipts.slice(0, 1000),
-    waived: r.waivedReceipts.slice(0, 1000),
+    // Waivers are returned in full: the page derives its coverage count from
+    // this list, so a cap would misreport some waived rows as receipted.
+    waived: r.waivedReceipts,
     byCategory: r.expenses.byCategory,
     vat: r.vat
   }

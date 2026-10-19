@@ -64,6 +64,7 @@
     }
     &__amount {
       text-align: right;
+      white-space: nowrap;
     }
     &__share {
       text-align: right;
@@ -319,21 +320,48 @@
     font-size: 12px;
   }
 
-  @media (max-width: 900px) {
+  // Below ~1200px the main column would drop under 560px (three KPI cells
+  // plus the 320px package card no longer fit), so stack: package card first,
+  // laid out as two columns (files | checklist) while there is room for it.
+  @media (max-width: 1200px) {
     .tax-grid {
       grid-template-columns: 1fr;
     }
-    // The package card is the point of the page, so it comes first on mobile.
     .tax-side {
       position: static;
       order: -1;
     }
-    .tax-cats li {
-      grid-template-columns: minmax(0, 1fr) auto;
+    .tax-package {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 24px;
 
-      .tax-cats__bar,
-      .tax-cats__share {
-        display: none;
+      &__title,
+      &__action {
+        grid-column: 1 / -1;
+      }
+      &__checks {
+        padding-top: 0;
+        border-top: 0;
+      }
+    }
+  }
+
+  // The shared KPI row falls back to two columns on tablet; with three cells
+  // that leaves an orphan slot, so let the last (net result) cell span the row.
+  @media (max-width: 800px) and (min-width: 481px) {
+    .tax-main .kpi-cell:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .tax-package {
+      display: flex;
+
+      &__checks {
+        padding-top: 12px;
+        border-top: 1px solid var(--rule);
       }
     }
     .tax-receipts__list li {
@@ -341,6 +369,17 @@
 
       > :nth-child(n + 3) {
         grid-column: 2;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    .tax-cats li {
+      grid-template-columns: minmax(0, 1fr) auto;
+
+      .tax-cats__bar,
+      .tax-cats__share {
+        display: none;
       }
     }
   }
