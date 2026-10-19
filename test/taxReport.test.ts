@@ -135,8 +135,9 @@ describe('buildTaxExportZip', () => {
     const entries = Object.keys(unzipSync(new Uint8Array(buffer)))
     expect(entries).toContain('Steuerexport-2024.pdf')
     expect(entries).toContain('buchungen-2024.csv')
-    expect(entries).toContain('README.txt')
-    expect(entries.some((e) => e.startsWith('belege/0001_'))).toBe(true)
+    expect(entries).not.toContain('README.txt')
+    // One folder per vendor; the journal number leads the file name.
+    expect(entries).toContain('belege/Migros/0001_2024-04-10.jpg')
   })
 })
 
@@ -178,7 +179,7 @@ describe('buildJournalCsv', () => {
       '8.10',
       '100.00'
     ])
-    expect(toner[10]).toBe('0001_Migros_2024-04-10.jpg')
+    expect(toner[10]).toBe('belege/Migros/0001_2024-04-10.jpg')
     expect(toner[11]).toBe('ja')
     // Kaffee: no receipt.
     expect(body[3]!.slice(10)).toEqual(['', 'fehlt'])

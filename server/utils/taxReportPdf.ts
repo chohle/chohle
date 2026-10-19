@@ -3,8 +3,8 @@
 // style as the invoice PDF. Rendered in German — the language of Swiss tax
 // filings and the Treuhänder handoff. Every page carries a running header
 // (from page 2) and a footer with the generation date and "Seite n / N".
-import { extname } from 'node:path'
 import PDFDocument from 'pdfkit'
+import { journalNr, receiptFileName } from './taxReceiptFiles'
 import type { TaxJournalRow, TaxReport } from './taxReport'
 
 const PAGE = { width: 595.28, height: 841.89, left: 50, right: 50, top: 72, bottom: 64 }
@@ -17,6 +17,7 @@ const INK = '#111'
 const MUTED = '#555'
 const FAINT = '#999'
 const RULE = '#ddd'
+const RULE_FAINT = '#eee'
 const RED = '#c0392b'
 
 const MONTHS = [
@@ -54,15 +55,15 @@ function monthLabel(iso: string): string {
   return `${MONTHS[Number(m) - 1] ?? m} ${y}`
 }
 
-/** What the "Beleg" column says for a journal row. */
-function receiptLabel(row: TaxJournalRow): { text: string; color: string } {
+/** What the "Beleg" column says for a journal row: the file name in its vendor folder. */
+function receiptLabel(row: TaxJournalRow, nr: string): { text: string; color: string } {
   if (row.attachments.length === 0) {
     return row.receiptWaived ? { text: 'kein Beleg', color: FAINT } : { text: 'fehlt', color: RED }
   }
-  if (row.attachments.length > 1) return { text: `${row.attachments.length} Dateien`, color: INK }
-  const a = row.attachments[0]!
-  const ext = (extname(a.storedName) || extname(a.filename)).replace('.', '').toUpperCase()
-  return { text: ext || 'Datei', color: INK }
+  if (row.attachments.length > 1) {
+    return { text: `${receiptFileName(nr, row, 0)} (+${row.attachments.length - 1})`, color: INK }
+  }
+  return { text: receiptFileName(nr, row, 0), color: INK }
 }
 
 /** Render the tax report to a PDF buffer. `logo` is the sender logo, if any. */
@@ -89,8 +90,8 @@ export function renderTaxReportPdf(
   const ensure = (h: number) => {
     if (pdf.y + h > BOTTOM) pdf.addPage()
   }
-  const rule = (color = RULE) => {
-    pdf.moveTo(LEFT, pdf.y).lineTo(RIGHT, pdf.y).lineWidth(0.5).strokeColor(color).stroke()
+  const rule = (color = RULE, width = 0.5) => {
+    pdf.moveTo(LEFT, pdf.y).lineTo(RIGHT, pdf.y).lineWidth(width).strokeColor(color).stroke()
     pdf.y += 4
   }
   const heading = (text: string) => {
@@ -259,13 +260,15 @@ export function renderTaxReportPdf(
   // --- Expense journal, grouped by month ---------------------------------------------
   heading('Aufwandjournal')
   const withVat = report.vat.registered
-  // Column x positions; money columns are given by their right edge.
+  // Column layout (x = left edge; money columns are right-aligned within their width).
+  // The Beleg column is wide enough for "0012_2026-09-18.pdf" at 8pt.
   const col = withVat
-    ? { nr: LEFT, date: 78, vendor: 124, cat: 272, gross: 418, rate: 452, vst: 500, beleg: 508 }
-    : { nr: LEFT, date: 78, vendor: 124, cat: 290, gross: 440, rate: 478, vst: 0, beleg: 488 }
-  const vendorW = col.cat - col.vendor - 8
-  const catW = (withVat ? col.gross - 62 : col.gross - 62) - col.cat - 6
-  const ROW = 12
+    ? { nr: LEFT, date: 76, vendor: 122, cat: 240, gross: 318, rate: 374, vst: 406, beleg: 458 }
+    : { nr: LEFT, date: 76, vendor: 122, cat: 262, gross: 352, rate: 408, vst: 0, beleg: 458 }
+  const w = withVat
+    ? { vendor: 112, cat: 72, gross: 50, rate: 28, vst: 46, beleg: RIGHT - 458 }
+    : { vendor: 134, cat: 84, gross: 50, rate: 28, vst: 0, beleg: RIGHT - 458 }
+  const ROW = 13
 
   const headerRow = () => {
     const y = pdf.y
@@ -274,63 +277,82 @@ export function renderTaxReportPdf(
     pdf.text('Datum', col.date, y, { lineBreak: false })
     pdf.text('Lieferant', col.vendor, y, { lineBreak: false })
     pdf.text('Kategorie', col.cat, y, { lineBreak: false })
-    pdf.text('Brutto', col.gross - 60, y, { width: 60, align: 'right', lineBreak: false })
-    pdf.text('MWST', col.rate - 32, y, { width: 32, align: 'right', lineBreak: false })
+    pdf.text('Brutto', col.gross, y, { width: w.gross, align: 'right', lineBreak: false })
+    pdf.text('MWST', col.rate, y, { width: w.rate, align: 'right', lineBreak: false })
     if (withVat)
-      pdf.text('Vorsteuer', col.vst - 46, y, { width: 46, align: 'right', lineBreak: false })
+      pdf.text('Vorsteuer', col.vst, y, { width: w.vst, align: 'right', lineBreak: false })
     pdf.text('Beleg', col.beleg, y, { lineBreak: false })
     pdf.y = y + ROW
     rule()
   }
-  const journalRow = (row: TaxJournalRow, nr: string) => {
-    if (pdf.y + ROW > BOTTOM) {
+  const newPageIfNeeded = (h: number) => {
+    if (pdf.y + h > BOTTOM) {
       pdf.addPage()
       headerRow()
     }
+  }
+  const journalRow = (row: TaxJournalRow, nr: string) => {
+    newPageIfNeeded(ROW)
     const y = pdf.y
     pdf.font('Helvetica').fontSize(8).fillColor(INK)
     pdf.text(nr, col.nr, y, { lineBreak: false })
     pdf.text(dateFmt(row.date), col.date, y, { lineBreak: false })
     pdf.text(row.vendor || row.title, col.vendor, y, {
-      width: vendorW,
+      width: w.vendor,
       lineBreak: false,
       ellipsis: true
     })
-    pdf.text(row.category, col.cat, y, { width: catW, lineBreak: false, ellipsis: true })
-    pdf.text(chf(row.grossRappen), col.gross - 60, y, {
-      width: 60,
+    pdf
+      .fillColor(MUTED)
+      .text(row.category, col.cat, y, { width: w.cat, lineBreak: false, ellipsis: true })
+      .fillColor(INK)
+    pdf.text(chf(row.grossRappen), col.gross, y, {
+      width: w.gross,
       align: 'right',
       lineBreak: false
     })
-    pdf.text(row.vatRate ? `${row.vatRate}%` : '', col.rate - 32, y, {
-      width: 32,
-      align: 'right',
-      lineBreak: false
-    })
+    pdf
+      .fillColor(MUTED)
+      .text(row.vatRate ? `${row.vatRate}%` : '', col.rate, y, {
+        width: w.rate,
+        align: 'right',
+        lineBreak: false
+      })
+      .fillColor(INK)
     if (withVat) {
-      pdf.text(row.inputVatRappen ? chf(row.inputVatRappen) : '', col.vst - 46, y, {
-        width: 46,
+      pdf.text(row.inputVatRappen ? chf(row.inputVatRappen) : '', col.vst, y, {
+        width: w.vst,
         align: 'right',
         lineBreak: false
       })
     }
-    const b = receiptLabel(row)
-    pdf.fillColor(b.color).text(b.text, col.beleg, y, { lineBreak: false }).fillColor(INK)
+    const b = receiptLabel(row, nr)
+    pdf
+      .fillColor(b.color)
+      .text(b.text, col.beleg, y, { width: w.beleg, lineBreak: false, ellipsis: true })
+      .fillColor(INK)
+    // Faint separator under each row keeps long tables scannable.
+    pdf
+      .moveTo(LEFT, y + ROW - 2)
+      .lineTo(RIGHT, y + ROW - 2)
+      .lineWidth(0.25)
+      .strokeColor(RULE_FAINT)
+      .stroke()
     pdf.y = y + ROW
   }
   const monthRow = (label: string, count: number, gross: number) => {
-    if (pdf.y + ROW * 3 > BOTTOM) {
-      pdf.addPage()
-      headerRow()
-    }
-    const y = pdf.y + 3
-    pdf.font('Helvetica-Bold').fontSize(8).fillColor(MUTED)
-    pdf.text(`${label}  ·  ${count} ${count === 1 ? 'Buchung' : 'Buchungen'}`, col.nr, y, {
-      lineBreak: false
-    })
+    newPageIfNeeded(ROW * 3)
+    const y = pdf.y + 5
+    pdf.font('Helvetica-Bold').fontSize(8).fillColor(INK)
+    pdf.text(label, col.nr, y, { lineBreak: false })
     pdf
       .font('Helvetica')
-      .text(chf(gross), col.gross - 60, y, { width: 60, align: 'right', lineBreak: false })
+      .fillColor(FAINT)
+      .text(`${count} ${count === 1 ? 'Buchung' : 'Buchungen'}`, col.vendor, y, {
+        lineBreak: false
+      })
+      .fillColor(MUTED)
+      .text(chf(gross), col.gross, y, { width: w.gross, align: 'right', lineBreak: false })
     pdf.y = y + ROW
   }
 
@@ -344,7 +366,7 @@ export function renderTaxReportPdf(
     journal.forEach((row, i) => {
       const key = row.date.slice(0, 7)
       const g = groups.get(key) ?? { rows: [], gross: 0 }
-      g.rows.push({ row, nr: String(i + 1).padStart(4, '0') })
+      g.rows.push({ row, nr: journalNr(i) })
       g.gross += row.grossRappen
       groups.set(key, g)
     })
@@ -354,24 +376,25 @@ export function renderTaxReportPdf(
     }
     // Total row.
     ensure(ROW * 2)
-    pdf.y += 2
-    rule()
+    pdf.y += 3
+    rule(INK, 0.8)
     const y = pdf.y
     pdf.font('Helvetica-Bold').fontSize(8).fillColor(INK)
     pdf.text(`Total Aufwand ${report.year}`, col.nr, y, { lineBreak: false })
-    pdf.text(chf(report.expenses.totalRappen), col.gross - 60, y, {
-      width: 60,
+    pdf.text(chf(report.expenses.totalRappen), col.gross, y, {
+      width: w.gross,
       align: 'right',
       lineBreak: false
     })
     if (withVat) {
-      pdf.text(chf(report.vat.inputRappen), col.vst - 46, y, {
-        width: 46,
+      pdf.text(chf(report.vat.inputRappen), col.vst, y, {
+        width: w.vst,
         align: 'right',
         lineBreak: false
       })
     }
     pdf.y = y + ROW
+    note('Belege liegen unter belege/<Lieferant>/ und tragen die Journalnummer im Dateinamen.')
   }
 
   // --- Waived receipts: deliberate, not forgotten ------------------------------------------
@@ -380,20 +403,35 @@ export function renderTaxReportPdf(
     note(
       'Vom Inhaber als «kein Beleg nötig» markiert, z. B. Miete mit Mietvertrag oder Bankspesen.'
     )
-    pdf.font('Helvetica').fontSize(9).fillColor(MUTED)
+    // One line per vendor: the journal already marks each row, so a full
+    // repeat would only add pages. Count and total are what the reader needs.
+    const byVendor = new Map<string, { count: number; gross: number }>()
     for (const w of report.waivedReceipts) {
+      const key = w.vendor || w.title
+      const g = byVendor.get(key) ?? { count: 0, gross: 0 }
+      g.count += 1
+      g.gross += w.grossRappen
+      byVendor.set(key, g)
+    }
+    pdf.font('Helvetica').fontSize(9).fillColor(MUTED)
+    for (const [vendor, g] of [...byVendor].sort((x, y) => y[1].gross - x[1].gross)) {
       ensure(14)
       const y = pdf.y
-      pdf.text(dateFmt(w.date), LEFT, y, { lineBreak: false })
-      pdf.text(w.vendor || w.title, LEFT + 70, y, { width: 300, lineBreak: false, ellipsis: true })
-      pdf.text(chf(w.grossRappen), RIGHT - 90, y, { width: 90, align: 'right', lineBreak: false })
+      pdf.text(vendor, LEFT, y, { width: 280, lineBreak: false, ellipsis: true })
+      pdf
+        .fillColor(FAINT)
+        .text(`${g.count} ${g.count === 1 ? 'Buchung' : 'Buchungen'}`, LEFT + 290, y, {
+          lineBreak: false
+        })
+        .fillColor(MUTED)
+      pdf.text(chf(g.gross), RIGHT - 90, y, { width: 90, align: 'right', lineBreak: false })
       pdf.y = y + 13
     }
   }
 
   // --- Closing note --------------------------------------------------------------------------
   pdf.y += 6
-  note('Alle Beträge in CHF, brutto inkl. MWST. Belege siehe Ordner «belege» in diesem Export.')
+  note('Alle Beträge in CHF, brutto inkl. MWST.')
 
   // --- Running header + footer on every page ---------------------------------------------------
   const range = pdf.bufferedPageRange()
