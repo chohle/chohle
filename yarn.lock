@@ -8091,10 +8091,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:10.1.2, nodemailer@npm:^10.1.2":
+"nodemailer@npm:10.1.2":
   version: 10.1.2
   resolution: "nodemailer@npm:10.1.2"
   checksum: 10c0/dde04b480febfa96f03ddcf67c8fb40495c0ad55040c627aae0df831429093f17e7ef6c2c8056190b3fda587eeb6e79dea15c704a90a852c39c25c13ba5acee5
+  languageName: node
+  linkType: hard
+
+"nodemailer@npm:^10.1.2":
+  version: 10.3.1
+  resolution: "nodemailer@npm:10.3.1"
+  checksum: 10c0/a960ba9e7cb8f7135b828fb72bcdfd061bb914c6357578ed6613dd5303e8461710a1151210e95a92542461128e900038dd0794fc27bd74b297bd822013cfe8e8
   languageName: node
   linkType: hard
 
