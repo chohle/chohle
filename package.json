@@ -17,8 +17,8 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@nuxt/ui": "^4.12.0",
-    "@nuxtjs/i18n": "^10.6.0",
+    "@nuxt/ui": "^4.13.1",
+    "@nuxtjs/i18n": "^10.7.0",
     "@tiptap/core": "^3.32.0",
     "@tiptap/extension-list": "^3.32.0",
     "@tiptap/extension-text-align": "^3.32.0",
